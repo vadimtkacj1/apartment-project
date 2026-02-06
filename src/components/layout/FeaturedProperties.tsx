@@ -52,7 +52,7 @@ const FeaturedProperties: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-gradient-to-b from-slate-50 to-white overflow-hidden"
+      className="relative w-full py-24 md:py-32 bg-white overflow-hidden"
     >
       {/* Decorative background */}
       <div className="absolute inset-0 opacity-5">
@@ -113,7 +113,7 @@ const FeaturedProperties: React.FC = () => {
         >
           <Link
             href="/apartments"
-            className="inline-flex items-center gap-3 px-12 py-5 bg-gray-900 text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-xl hover:bg-[#C19A6B] transition-all duration-300 hover:scale-105 active:scale-95 group"
+            className="inline-flex items-center gap-3 px-12 py-5 bg-[#C19A6B] text-white font-black text-xl uppercase tracking-tight rounded-2xl shadow-2xl hover:bg-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
           >
             <span>כל הנכסים</span>
             <ArrowLeft

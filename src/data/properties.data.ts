@@ -8,12 +8,12 @@ export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'area-asc' | 'a
 /** * Configuration for the category navigation bar 
  */
 export const CATEGORIES = [
-  { id: 'all', label: 'All', value: 'all' },
-  { id: 'sales', label: 'Sales', value: 'sales' },
-  { id: 'rentals', label: 'Rentals', value: 'rentals' },
-  { id: 'management', label: 'Property Management', value: 'management' },
-  { id: 'land', label: 'Land', value: 'land' },
-  { id: 'commercial', label: 'Commercial', value: 'commercial' }
+  { id: 'all', label: 'הכל', value: 'all' },
+  { id: 'sales', label: 'מכירה', value: 'sales' },
+  { id: 'rentals', label: 'השכרה', value: 'rentals' },
+  { id: 'management', label: 'ניהול נכסים', value: 'management' },
+  { id: 'land', label: 'קרקעות', value: 'land' },
+  { id: 'commercial', label: 'מסחרי', value: 'commercial' }
 ] as const;
 
 /** * Static dataset containing all property listings 

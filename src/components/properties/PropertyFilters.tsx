@@ -417,13 +417,13 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
         <div className="flex-1 flex gap-3 justify-end">
             <button
             onClick={onReset}
-            className="px-6 py-3 bg-gray-100 text-gray-700 font-bold text-base uppercase rounded-xl hover:bg-gray-200 transition-all duration-300"
+            className="px-6 py-3 bg-gray-100 text-gray-700 font-bold text-base uppercase rounded-2xl hover:bg-gray-200 transition-all duration-300 shadow-md hover:shadow-lg"
             >
             אפס
             </button>
             <button
             onClick={onApply}
-            className="px-8 py-3 bg-[#C19A6B] text-white font-black text-base uppercase rounded-xl hover:bg-gray-900 transition-all duration-300 shadow-lg"
+            className="px-8 py-3 bg-[#C19A6B] text-white font-black text-base uppercase rounded-2xl hover:bg-gray-900 transition-all duration-300 shadow-2xl hover:scale-105 border border-white/20"
             >
             החל פילטרים
             </button>

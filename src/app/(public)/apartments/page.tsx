@@ -131,10 +131,10 @@ function ApartmentsPageContent() {
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.value as Category)}
-                className={`px-6 py-3 rounded-xl font-bold transition-all ${
+                className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300 ${
                   selectedCategory === cat.value
-                    ? 'bg-[#C19A6B] text-white shadow-lg'
-                    : 'bg-white text-gray-700 border-2 border-gray-200'
+                    ? 'bg-[#C19A6B] text-white shadow-2xl border border-white/20 scale-105'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:shadow-lg hover:scale-105'
                 }`}
               >
                 {cat.label}
@@ -145,7 +145,7 @@ function ApartmentsPageContent() {
           <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-900"
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold text-gray-900 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
               <SlidersHorizontal size={20} />
               <span>{showFilters ? 'הסתר פילטרים' : 'הצג פילטרים'}</span>
@@ -156,7 +156,7 @@ function ApartmentsPageContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold focus:border-[#C19A6B] outline-none"
+                className="px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold focus:border-[#C19A6B] outline-none shadow-md hover:shadow-lg transition-all duration-300"
               >
                 <option value="newest">החדשים ביותר</option>
                 <option value="price-asc">מחיר: נמוך לגבוה</option>
@@ -206,8 +206,10 @@ function ApartmentsPageContent() {
                 <button
                   key={page}
                   onClick={() => updatePage(page)}
-                  className={`w-12 h-12 rounded-xl font-bold transition-all ${
-                    currentPage === page ? 'bg-[#C19A6B] text-white shadow-md' : 'bg-white border-2 border-gray-200'
+                  className={`w-12 h-12 rounded-2xl font-bold transition-all duration-300 ${
+                    currentPage === page
+                      ? 'bg-[#C19A6B] text-white shadow-2xl scale-110 border border-white/20'
+                      : 'bg-white border border-gray-200 hover:shadow-lg hover:scale-105'
                   }`}
                 >
                   {page}

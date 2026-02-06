@@ -113,7 +113,7 @@ const hotApartments = [
 const ApartmentCard = ({ item }: { item: typeof hotApartments[0] }) => (
   <Link href={`/apartments/${item.id}`}>
     <div
-      className="group relative flex flex-col w-[340px] md:w-[380px] min-h-[280px] bg-white rounded-xl overflow-hidden shrink-0 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-[#C19A6B]"
+      className="group relative flex flex-col w-[340px] md:w-[380px] min-h-[280px] bg-white rounded-2xl overflow-hidden shrink-0 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[#C19A6B] hover:scale-105"
       dir="rtl"
     >
       {/* Content */}
@@ -147,7 +147,7 @@ const ApartmentCard = ({ item }: { item: typeof hotApartments[0] }) => (
 
         {/* CTA Button */}
         <div className="mt-auto">
-          <div className="w-full bg-[#1c3664] text-white py-3.5 rounded-lg font-bold text-base text-center group-hover:bg-[#C19A6B] transition-all duration-300">
+          <div className="w-full bg-[#C19A6B] text-white py-3.5 rounded-xl font-bold text-base text-center group-hover:bg-gray-900 transition-all duration-300 shadow-md">
             לפרטים נוספים ←
           </div>
         </div>
@@ -199,7 +199,7 @@ function HotPropositions() {
   const { isMobile } = usePerformanceSettings();
 
   return (
-    <section className="relative py-20 md:py-32 bg-white overflow-hidden w-full" dir="rtl">
+    <section className="relative py-20 md:py-32 bg-gray-50 overflow-hidden w-full" dir="rtl">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-72 h-72 bg-[#C19A6B]/10 rounded-full blur-3xl"></div>
@@ -240,12 +240,6 @@ function HotPropositions() {
             items={hotApartments}
             direction="left"
             duration={60}
-            isMobile={isMobile}
-          />
-          <MarqueeRow
-            items={hotApartments}
-            direction="right"
-            duration={70}
             isMobile={isMobile}
           />
         </div>

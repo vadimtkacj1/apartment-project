@@ -9,7 +9,7 @@ const ContactForm: React.FC = () => {
     <section
       id="contact"
       dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-gradient-to-b from-white via-slate-50 to-white overflow-hidden"
+      className="relative w-full py-24 md:py-32 bg-white overflow-hidden"
     >
       {/* Decorative Background */}
       <div className="absolute inset-0 opacity-5">
