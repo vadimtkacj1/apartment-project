@@ -5,9 +5,10 @@ interface HeroProps {
   img: string;
   mainText: string;
   subText: string;
+  staticTitle?: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ img, mainText, subText }) => {
+const Hero: React.FC<HeroProps> = ({ img, mainText, subText, staticTitle }) => {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -18,24 +19,27 @@ const Hero: React.FC<HeroProps> = ({ img, mainText, subText }) => {
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, x: 100, filter: 'blur(20px)' },
-    visible: { 
-      opacity: 1, 
-      x: 0, 
+    visible: {
+      opacity: 1,
+      x: 0,
       filter: 'blur(0px)',
       transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
     },
   };
 
+  // Если есть staticTitle, текст не анимируется
+  const shouldAnimateText = !staticTitle;
+
   return (
-    <section 
+    <section
       dir="rtl"
       className="relative h-screen w-full flex items-center justify-start overflow-hidden bg-black"
     >
       {/* Background */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={img} 
-          alt="Real Estate background" 
+        <img
+          src={img}
+          alt="Real Estate background"
           className="w-full h-full object-cover object-center"
         />
         {/* Затемнение для читаемости */}
@@ -44,41 +48,76 @@ const Hero: React.FC<HeroProps> = ({ img, mainText, subText }) => {
 
       {/* Content Container */}
       <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        variants={shouldAnimateText ? containerVariants : undefined}
+        initial={shouldAnimateText ? "hidden" : undefined}
+        animate={shouldAnimateText ? "visible" : undefined}
         className="relative z-10 w-full px-10 md:px-24 lg:px-40 flex flex-col items-start text-right pt-32 md:pt-40"
       >
-        <motion.h1
-          variants={itemVariants}
-          className="font-black text-white leading-[0.8] mb-8 uppercase"
-          style={{
-            fontSize: 'clamp(3rem, 12vw, 10rem)',
-            letterSpacing: '-0.04em'
-          }}
-        >
-          {mainText}
-        </motion.h1>
-
-        <motion.p
-          variants={itemVariants}
-          className="text-white font-extrabold leading-tight mb-14"
-          style={{
-            fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
-            letterSpacing: '-0.01em',
-            textShadow: '0 4px 20px rgba(0,0,0,0.6)'
-          }}
-        >
-          {subText}
-        </motion.p>
-
-        <motion.div variants={itemVariants}>
-          <button 
-            className="bg-[#C19A6B] text-white px-20 py-8 rounded-sm font-black text-3xl uppercase tracking-tighter shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:bg-white hover:text-black transition-all duration-300 active:scale-95"
+        {shouldAnimateText ? (
+          <motion.h1
+            variants={itemVariants}
+            className="font-black text-white leading-[0.8] mb-8 uppercase"
+            style={{
+              fontSize: 'clamp(3rem, 12vw, 10rem)',
+              letterSpacing: '-0.04em'
+            }}
           >
-            לפרטים נוספים
-          </button>
-        </motion.div>
+            {mainText}
+          </motion.h1>
+        ) : (
+          <h1
+            className="font-black text-white leading-[0.8] mb-8 uppercase"
+            style={{
+              fontSize: 'clamp(3rem, 12vw, 10rem)',
+              letterSpacing: '-0.04em'
+            }}
+          >
+            {staticTitle}
+          </h1>
+        )}
+
+        {shouldAnimateText ? (
+          <motion.p
+            variants={itemVariants}
+            className="text-white font-extrabold leading-tight mb-14"
+            style={{
+              fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+              letterSpacing: '-0.01em',
+              textShadow: '0 4px 20px rgba(0,0,0,0.6)'
+            }}
+          >
+            {subText}
+          </motion.p>
+        ) : (
+          <p
+            className="text-white font-extrabold leading-tight mb-14"
+            style={{
+              fontSize: 'clamp(1.2rem, 3vw, 2.2rem)',
+              letterSpacing: '-0.01em',
+              textShadow: '0 4px 20px rgba(0,0,0,0.6)'
+            }}
+          >
+            {subText}
+          </p>
+        )}
+
+        {shouldAnimateText ? (
+          <motion.div variants={itemVariants}>
+            <button
+              className="bg-[#C19A6B] text-white px-20 py-8 rounded-2xl font-black text-3xl uppercase tracking-tighter shadow-2xl hover:bg-gray-900 hover:scale-105 transition-all duration-300 active:scale-95 border border-white/20"
+            >
+              לפרטים נוספים
+            </button>
+          </motion.div>
+        ) : (
+          <div>
+            <button
+              className="bg-[#C19A6B] text-white px-20 py-8 rounded-2xl font-black text-3xl uppercase tracking-tighter shadow-2xl hover:bg-gray-900 hover:scale-105 transition-all duration-300 active:scale-95 border border-white/20"
+            >
+              לפרטים נוספים
+            </button>
+          </div>
+        )}
       </motion.div>
     </section>
   );

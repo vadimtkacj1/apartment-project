@@ -12,11 +12,14 @@
   }
 }
 
-html,
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background: var(--background);
   font-family: var(--font-heebo), Arial, Helvetica, sans-serif;
 }
 

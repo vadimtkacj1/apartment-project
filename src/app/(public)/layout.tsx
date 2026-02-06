@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import WhatsAppButton from "@/components/ui/WhatsAppButton";
 
 export default function PublicLayout({
   children,
@@ -10,7 +11,8 @@ export default function PublicLayout({
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow">{children}</main>
-      {/* <Footer /> */}
+      <Footer />
+      <WhatsAppButton />
     </div>
   );
 }

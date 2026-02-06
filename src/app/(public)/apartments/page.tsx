@@ -1,370 +1,232 @@
 "use client";
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { SlidersHorizontal, Search, Mail } from 'lucide-react';
+
+// Component Imports
 import PropertyCard from '@/components/properties/PropertyCard';
-import { SlidersHorizontal, Search } from 'lucide-react';
+import PropertyFilters from '@/components/properties/PropertyFilters';
+import ContactFormPopup from '@/components/layout/ContactFormPopup';
 
-type Category = 'all' | 'sales' | 'rentals' | 'management' | 'land' | 'commercial';
-type City = 'all' | 'holon' | 'batyam' | 'rishon';
-type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'area-asc' | 'area-desc';
+// Logic & Data Imports
+import { FilterState } from '@/types/property.types';
 
-export default function ApartmentsPage() {
+import { 
+  PROPERTIES, 
+  CATEGORIES, 
+  Category, 
+  SortOption, 
+  filterProperties 
+} from '@/data/properties.data';
+
+/**
+ * Interface to resolve Error 7006 (Implicit any)
+ */
+interface Property {
+  id: number;
+  image: string;
+  title: string;
+  location: string;
+  price: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  status?: string;
+  category: string;
+}
+
+interface CategoryItem {
+  id: string;
+  label: string;
+  value: string;
+}
+
+const ITEMS_PER_PAGE = 12;
+
+function ApartmentsPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // --- UI State ---
   const [selectedCategory, setSelectedCategory] = useState<Category>('all');
-  const [selectedCity, setSelectedCity] = useState<City>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const propertiesPerPage = 9;
+  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({ dealType: 'all', city: 'all' });
 
-  const categories = [
-    { id: 'all', label: 'הכל', value: 'all' },
-    { id: 'sales', label: 'מכירות', value: 'sales' },
-    { id: 'rentals', label: 'השכרות', value: 'rentals' },
-    { id: 'management', label: 'ניהול נכסים', value: 'management' },
-    { id: 'land', label: 'קרקעות ומגרשים', value: 'land' },
-    { id: 'commercial', label: 'נדל״ן מסחרי', value: 'commercial' }
-  ];
+  // --- Sync Pagination with URL ---
+  useEffect(() => {
+    const pageFromUrl = searchParams.get('page');
+    if (pageFromUrl) setCurrentPage(parseInt(pageFromUrl, 10));
+  }, [searchParams]);
 
-  const cities = [
-    { id: 'all', label: 'כל הערים', value: 'all' },
-    { id: 'holon', label: 'חולון', value: 'holon' },
-    { id: 'batyam', label: 'בת ים', value: 'batyam' },
-    { id: 'rishon', label: 'ראשון לציון', value: 'rishon' }
-  ];
+  // --- Memoized Filtering Logic ---
+  const filteredProperties = useMemo(() => 
+    filterProperties(PROPERTIES, selectedCategory, filters), 
+  [selectedCategory, filters]);
 
-  // Sample properties data
-  const properties = [
-    {
-      id: 1,
-      image: "/images/hero/sales.jpg",
-      title: "דירת 4 חדרים מרווחת במרכז חולון",
-      location: "חולון",
-      price: "1,950,000",
-      bedrooms: 4,
-      bathrooms: 2,
-      area: 110,
-      status: "בלעדיות",
-      category: "sales"
-    },
-    {
-      id: 2,
-      image: "/images/hero/rentals.webp",
-      title: "דירת 3 חדרים משופצת - להשכרה",
-      location: "בת ים",
-      price: "5,500",
-      bedrooms: 3,
-      bathrooms: 1.5,
-      area: 85,
-      status: "חדש",
-      category: "rentals"
-    },
-    {
-      id: 3,
-      image: "/images/hero/rent.png",
-      title: "פנטהאוז יוקרתי עם גג",
-      location: "ראשון לציון",
-      price: "3,200,000",
-      bedrooms: 5,
-      bathrooms: 3,
-      area: 160,
-      status: "בלעדיות",
-      category: "sales"
-    },
-    {
-      id: 4,
-      image: "/images/hero/sales.jpg",
-      title: "דירת 2 חדרים קומה גבוהה",
-      location: "חולון",
-      price: "4,200",
-      bedrooms: 2,
-      bathrooms: 1,
-      area: 65,
-      category: "rentals"
-    },
-    {
-      id: 5,
-      image: "/images/hero/rentals.webp",
-      title: "מגרש לבנייה במיקום מרכזי",
-      location: "ראשון לציון",
-      price: "2,800,000",
-      bedrooms: 0,
-      bathrooms: 0,
-      area: 500,
-      status: "הזדמנות",
-      category: "land"
-    },
-    {
-      id: 6,
-      image: "/images/hero/rent.png",
-      title: "מחסן מסחרי + משרדים",
-      location: "בת ים",
-      price: "15,000",
-      bedrooms: 0,
-      bathrooms: 2,
-      area: 250,
-      category: "commercial"
-    }
-  ];
+  // --- Pagination Logic ---
+  const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE);
+  const currentProperties = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProperties.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProperties, currentPage]);
 
-  // Filter properties
-  const filteredProperties = properties.filter(property => {
-    if (selectedCategory !== 'all' && property.category !== selectedCategory) return false;
-    if (selectedCity !== 'all' && property.location !== cities.find(c => c.value === selectedCity)?.label) return false;
-    return true;
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredProperties.length / propertiesPerPage);
-  const startIndex = (currentPage - 1) * propertiesPerPage;
-  const endIndex = startIndex + propertiesPerPage;
-  const currentProperties = filteredProperties.slice(startIndex, endIndex);
-
-  // Reset to page 1 when filters change
-  const handleCategoryChange = (category: Category) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
+  // --- Navigation Handlers ---
+  const updatePage = (page: number) => {
+    setCurrentPage(page);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    router.push(`?${params.toString()}`, { scroll: false });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCityChange = (city: City) => {
-    setSelectedCity(city);
-    setCurrentPage(1);
+  const handleCategoryChange = (category: Category) => {
+    setSelectedCategory(category);
+    updatePage(1);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-32 pb-16" dir="rtl">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+    <>
+      <ContactFormPopup isOpen={isContactPopupOpen} onClose={() => setIsContactPopupOpen(false)} />
 
-        {/* Page Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12"
+      {/* FIXED CONTACT BUTTON (MATCHING PHOTO) */}
+      <motion.button
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        whileHover={{ scale: 1.05 }}
+        onClick={() => setIsContactPopupOpen(true)}
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-40 bg-[#C19A6B] text-white py-6 px-3 rounded-r-2xl shadow-2xl hover:bg-gray-900 transition-all flex flex-col items-center gap-4 group border-y border-r border-white/20"
+      >
+        <Mail size={24} className="mb-1" />
+        <span 
+          className="font-bold tracking-widest uppercase"
+          style={{ 
+            writingMode: 'vertical-rl', 
+            textOrientation: 'mixed',
+            letterSpacing: '0.1em'
+          }}
         >
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-4 uppercase tracking-tight">
-            נכסים למכירה והשכרה
-          </h1>
-          <p className="text-xl text-gray-600 font-semibold">
-            נמצאו {filteredProperties.length} נכסים
-          </p>
-        </motion.div>
+          צור קשר
+        </span>
+      </motion.button>
 
-        {/* Categories */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="flex flex-wrap gap-3 justify-center">
-            {categories.map((category) => (
+      {/* Main Content */}
+      <div className="min-h-screen bg-linear-to-b from-slate-50 to-white pt-32 pb-16" dir="rtl">
+        <div className="w-full mx-auto px-6 lg:px-12">
+          
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+            <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-4 uppercase tracking-tight">
+              נכסים למכירה והשכרה
+            </h1>
+            <p className="text-xl text-gray-600 font-semibold">
+              נמצאו {filteredProperties.length} תוצאות
+            </p>
+          </motion.div>
+
+          <div className="flex flex-wrap gap-3 justify-center mb-8">
+            {CATEGORIES.map((cat: CategoryItem) => (
               <button
-                key={category.id}
-                onClick={() => handleCategoryChange(category.value as Category)}
-                className={`px-6 py-3 rounded-xl font-bold text-base uppercase tracking-tight transition-all duration-300 ${
-                  selectedCategory === category.value
-                    ? 'bg-[#C19A6B] text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                key={cat.id}
+                onClick={() => handleCategoryChange(cat.value as Category)}
+                className={`px-6 py-3 rounded-2xl font-bold transition-all duration-300 ${
+                  selectedCategory === cat.value
+                    ? 'bg-[#C19A6B] text-white shadow-2xl border border-white/20 scale-105'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:shadow-lg hover:scale-105'
                 }`}
               >
-                {category.label}
+                {cat.label}
               </button>
             ))}
           </div>
-        </motion.div>
 
-        {/* Filters Toggle & Sort */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center"
-        >
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-900 hover:border-[#C19A6B] transition-all duration-300"
-          >
-            <SlidersHorizontal size={20} />
-            <span>{showFilters ? 'הסתר פילטרים' : 'הצג פילטרים'}</span>
-          </button>
-
-          <div className="flex items-center gap-3">
-            <span className="text-gray-700 font-semibold">מיון:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-bold text-gray-900 focus:border-[#C19A6B] focus:outline-none transition-all duration-300"
-            >
-              <option value="newest">חדש ביותר</option>
-              <option value="price-asc">מחיר: נמוך לגבוה</option>
-              <option value="price-desc">מחיר: גבוה לנמוך</option>
-              <option value="area-asc">שטח: קטן לגדול</option>
-              <option value="area-desc">שטח: גדול לקטן</option>
-            </select>
-          </div>
-        </motion.div>
-
-        {/* Filters Panel */}
-        {showFilters && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mb-8 bg-white rounded-2xl p-6 border-2 border-gray-200 shadow-lg"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
-              {/* City Filter */}
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                  עיר
-                </label>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => handleCityChange(e.target.value as City)}
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all duration-300"
-                >
-                  {cities.map((city) => (
-                    <option key={city.id} value={city.value}>
-                      {city.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price Range */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                  טווח מחירים
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="מ-"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all duration-300"
-                  />
-                  <input
-                    type="number"
-                    placeholder="עד-"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all duration-300"
-                  />
-                </div>
-              </div>
-
-              {/* Rooms */}
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                  חדרים
-                </label>
-                <select className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all duration-300">
-                  <option value="">כל הכמויות</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4+</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Apply Filters Button */}
-            <div className="mt-6 flex gap-3">
-              <button className="flex-1 px-6 py-3 bg-[#C19A6B] text-white font-black text-base uppercase rounded-xl hover:bg-gray-900 transition-all duration-300 shadow-lg">
-                החל פילטרים
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCity('all');
-                  setCurrentPage(1);
-                }}
-                className="px-6 py-3 bg-gray-100 text-gray-700 font-bold text-base uppercase rounded-xl hover:bg-gray-200 transition-all duration-300"
-              >
-                אפס
-              </button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Properties Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
-        >
-          {currentProperties.map((property, index) => (
-            <PropertyCard
-              key={property.id}
-              {...property}
-              index={index}
-            />
-          ))}
-        </motion.div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex justify-center items-center gap-2 mt-12"
-          >
+          <div className="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${
-                currentPage === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-900 border-2 border-gray-200 hover:border-[#C19A6B]'
-              }`}
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold text-gray-900 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
-              הקודם
+              <SlidersHorizontal size={20} />
+              <span>{showFilters ? 'הסתר פילטרים' : 'הצג פילטרים'}</span>
             </button>
 
-            <div className="flex gap-2">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-700 font-semibold">מיון:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold focus:border-[#C19A6B] outline-none shadow-md hover:shadow-lg transition-all duration-300"
+              >
+                <option value="newest">החדשים ביותר</option>
+                <option value="price-asc">מחיר: נמוך לגבוה</option>
+                <option value="price-desc">מחיר: גבוה לנמוך</option>
+              </select>
+            </div>
+          </div>
+
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-8 overflow-hidden"
+              >
+                <PropertyFilters
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  onApply={() => updatePage(1)}
+                  onReset={() => {
+                    setFilters({ dealType: 'all', city: 'all' });
+                    setSelectedCategory('all');
+                    updatePage(1);
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {currentProperties.map((property: Property, index: number) => (
+              <PropertyCard key={property.id} {...property} index={index} />
+            ))}
+          </div>
+
+          {filteredProperties.length === 0 && (
+            <div className="text-center py-20">
+              <Search size={40} className="mx-auto mb-6 text-gray-400" />
+              <h3 className="text-2xl font-black text-gray-900">לא נמצאו תוצאות</h3>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2 mt-12">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-12 h-12 rounded-xl font-bold transition-all duration-300 ${
+                  onClick={() => updatePage(page)}
+                  className={`w-12 h-12 rounded-2xl font-bold transition-all duration-300 ${
                     currentPage === page
-                      ? 'bg-[#C19A6B] text-white shadow-lg scale-110'
-                      : 'bg-white text-gray-900 border-2 border-gray-200 hover:border-[#C19A6B]'
+                      ? 'bg-[#C19A6B] text-white shadow-2xl scale-110 border border-white/20'
+                      : 'bg-white border border-gray-200 hover:shadow-lg hover:scale-105'
                   }`}
                 >
                   {page}
                 </button>
               ))}
             </div>
-
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${
-                currentPage === totalPages
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-white text-gray-900 border-2 border-gray-200 hover:border-[#C19A6B]'
-              }`}
-            >
-              הבא
-            </button>
-          </motion.div>
-        )}
-
-        {/* No Results */}
-        {filteredProperties.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search size={40} className="text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-black text-gray-900 mb-2">לא נמצאו תוצאות</h3>
-            <p className="text-gray-600 font-semibold">נסה לשנות את הפילטרים או את הקטגוריה</p>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
+  );
+}
+
+export default function ApartmentsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ApartmentsPageContent />
+    </Suspense>
   );
 }
