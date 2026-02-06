@@ -80,12 +80,12 @@ const Stats: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-gradient-to-b from-slate-50 via-white to-slate-100 overflow-hidden"
+      className="relative w-full py-24 md:py-32 bg-white overflow-hidden"
     >
       {/* Decorative background elements */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-1/4 right-10 w-72 h-72 bg-[#C19A6B] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-[#C19A6B] rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-1/4 right-10 w-72 h-72 bg-[#1c3664] rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-[#1c3664] rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">

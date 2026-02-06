@@ -5,9 +5,10 @@ interface HeroProps {
   img: string;
   mainText: string;
   subText: string;
+  staticTitle?: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ img, mainText, subText }) => {
+const Hero: React.FC<HeroProps> = ({ img, mainText, subText, staticTitle }) => {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -57,7 +58,7 @@ const Hero: React.FC<HeroProps> = ({ img, mainText, subText }) => {
             letterSpacing: '-0.04em'
           }}
         >
-          {mainText}
+          {staticTitle || mainText}
         </motion.h1>
 
         <motion.p

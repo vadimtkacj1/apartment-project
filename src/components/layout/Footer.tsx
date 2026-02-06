@@ -71,7 +71,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/contact"
+                  href="/#contact"
                   className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
                 >
                   <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
@@ -152,7 +152,7 @@ export default function Footer() {
         <div className="border-t border-white/10 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-sm text-center md:text-right">
-              © {new Date().getFullYear()} זמיר נדל״ן. כל הזכויות שמורות.
+              © {new Date().getFullYear()} כל הזכויות שמורות.
             </p>
             <div className="flex gap-6 text-sm">
               <Link href="#" className="text-gray-400 hover:text-[#C19A6B] transition-colors">

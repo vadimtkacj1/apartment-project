@@ -18,7 +18,8 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 3.5,
       bathrooms: 2,
       area: 85,
-      status: "משגע לפגוס"
+      status: "משגע לפגוס",
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13540.5!2d34.7818!3d32.0113!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b8c3c4e707b%3A0x3cf89d1e0c97e244!2sHolon%2C%20Israel!5e0!3m2!1sen!2s!4v1234567890123"
     },
     {
       id: 2,
@@ -30,7 +31,8 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 4.5,
       bathrooms: 2,
       area: 120,
-      status: "גגם חדש"
+      status: "גגם חדש",
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13540.2!2d34.7925!3d32.0679!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4ca6193b7c1f%3A0x98a9f4fd8b9c4b0d!2sRamat%20Gan%2C%20Israel!5e0!3m2!1sen!2s!4v1234567891123"
     },
     {
       id: 3,
@@ -42,7 +44,8 @@ const FeaturedProperties: React.FC = () => {
       bedrooms: 5,
       bathrooms: 3,
       area: 140,
-      status: "משגע לפגוס"
+      status: "משגע לפגוס",
+      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13524.8!2d34.7818!3d32.0853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b7d84f7cc8b%3A0xd3e6d52d7a4ac1a0!2sTel%20Aviv-Yafo%2C%20Israel!5e0!3m2!1sen!2s!4v1234567892123"
     }
   ];
 
