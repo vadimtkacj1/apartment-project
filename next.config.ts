@@ -5,6 +5,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Enable standalone output for production deployment
+  output: 'standalone',
+  // Optimize images
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

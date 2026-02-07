@@ -1,0 +1,69 @@
+name: CI - Build & Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - dev
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Check standalone output
+        run: |
+          if [ -d ".next/standalone" ]; then
+            echo "✅ Standalone build created successfully"
+            ls -lah .next/standalone/
+          else
+            echo "❌ Error: Standalone build not found"
+            echo "Please ensure next.config.ts has 'output: standalone'"
+            exit 1
+          fi
+
+      - name: Check server.js
+        run: |
+          if [ -f ".next/standalone/server.js" ]; then
+            echo "✅ server.js exists"
+          else
+            echo "❌ Error: server.js not found"
+            exit 1
+          fi
+
+      - name: Build summary
+        run: |
+          echo "📊 Build Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Node version: $(node --version)"
+          echo "npm version: $(npm --version)"
+          echo "Build output size:"
+          du -sh .next 2>/dev/null || echo "N/A"
+          echo "Standalone size:"
+          du -sh .next/standalone 2>/dev/null || echo "N/A"

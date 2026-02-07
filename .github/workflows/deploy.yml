@@ -1,0 +1,154 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          # Verify standalone build exists
+          if [ ! -d ".next/standalone" ]; then
+            echo "❌ Error: .next/standalone not found"
+            exit 1
+          fi
+
+          # Copy standalone server
+          echo "📦 Copying standalone build..."
+          cp -r .next/standalone/* deploy/
+
+          # Copy static files
+          echo "📦 Copying static assets..."
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+
+          # Create package.json for production
+          cat > deploy/package.json << EOF
+          {
+            "name": "apartment-project-production",
+            "version": "1.0.0",
+            "scripts": {
+              "start": "node server.js"
+            }
+          }
+          EOF
+
+          # Verify server.js exists
+          if [ ! -f "deploy/server.js" ]; then
+            echo "❌ Error: server.js not found"
+            exit 1
+          fi
+
+          echo "✅ Deployment package created"
+          tar -czf deploy.tar.gz deploy/
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 120s
+          source: "deploy.tar.gz"
+          target: "/tmp"
+
+      - name: Execute deployment on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 120s
+          script: |
+            set -e
+
+            # Configuration
+            APP_DIR="/opt/apartment-project"
+            APP_NAME="apartment-project"
+            PORT=3000
+
+            echo "🚀 Starting deployment..."
+
+            # Create app directory
+            sudo mkdir -p $APP_DIR
+            sudo chown $USER:$USER $APP_DIR
+
+            # Extract deployment
+            cd $APP_DIR
+            tar -xzf /tmp/deploy.tar.gz
+            cp -r deploy/* .
+            rm -rf deploy
+
+            # Create environment file
+            cat > .env << EOF
+            NODE_ENV=production
+            PORT=$PORT
+            HOSTNAME=0.0.0.0
+            EOF
+
+            # Install PM2 if not present
+            if ! command -v pm2 &> /dev/null; then
+              echo "📦 Installing PM2..."
+              npm install -g pm2
+            fi
+
+            # Stop existing process
+            pm2 stop $APP_NAME || true
+            pm2 delete $APP_NAME || true
+
+            # Start application
+            echo "▶️ Starting application..."
+            pm2 start server.js --name $APP_NAME --update-env
+            pm2 save
+
+            # Wait for startup
+            sleep 5
+
+            # Health check
+            if curl -f http://localhost:$PORT > /dev/null 2>&1; then
+              echo "✅ Deployment successful!"
+              pm2 status
+            else
+              echo "⚠️ Warning: Health check failed"
+              pm2 logs $APP_NAME --lines 30
+              exit 1
+            fi
+
+            # Cleanup
+            rm -f /tmp/deploy.tar.gz
+
+      - name: Health check
+        run: |
+          if [ -n "${{ secrets.DEPLOYMENT_URL }}" ]; then
+            sleep 10
+            curl -f "${{ secrets.DEPLOYMENT_URL }}" || echo "⚠️ Health check failed"
+          fi
