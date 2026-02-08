@@ -42,31 +42,36 @@ jobs:
 
           # Copy standalone server
           echo "📦 Copying standalone build..."
-          cp -r .next/standalone/* deploy/
+          cp -r .next/standalone/. deploy/
 
-          # Copy static files
+          # Copy static files (CRITICAL: Next.js needs these)
           echo "📦 Copying static assets..."
-          mkdir -p deploy/.next
-          cp -r .next/static deploy/.next/static
-          mkdir -p deploy/public
-          cp -r public/* deploy/public/ 2>/dev/null || echo "No public files"
+          mkdir -p deploy/.next/static
+          cp -r .next/static/. deploy/.next/static/
 
-          # Create package.json for production
-          cat > deploy/package.json << EOF
-          {
-            "name": "apartment-project-production",
-            "version": "1.0.0",
-            "scripts": {
-              "start": "node server.js"
-            }
-          }
-          EOF
+          # Copy public files
+          echo "📦 Copying public files..."
+          if [ -d "public" ]; then
+            mkdir -p deploy/public
+            cp -r public/. deploy/public/
+          fi
 
-          # Verify server.js exists
+          # Verify critical files
+          echo "🔍 Verifying deployment package..."
           if [ ! -f "deploy/server.js" ]; then
             echo "❌ Error: server.js not found"
             exit 1
           fi
+
+          if [ ! -d "deploy/.next/static" ]; then
+            echo "❌ Error: .next/static not found"
+            exit 1
+          fi
+
+          echo "📋 Deployment structure:"
+          ls -la deploy/
+          ls -la deploy/.next/
+          ls -la deploy/.next/static/ | head -5
 
           echo "✅ Deployment package created"
           tar -czf deploy.tar.gz deploy/
