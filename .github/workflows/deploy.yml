@@ -46,8 +46,10 @@ jobs:
 
           # Copy static files
           echo "📦 Copying static assets..."
+          mkdir -p deploy/.next
           cp -r .next/static deploy/.next/static
-          cp -r public deploy/public
+          mkdir -p deploy/public
+          cp -r public/* deploy/public/ 2>/dev/null || echo "No public files"
 
           # Create package.json for production
           cat > deploy/package.json << EOF
