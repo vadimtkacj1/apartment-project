@@ -53,17 +53,26 @@ const AboutSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-5xl md:text-6xl font-black text-gray-900 mb-8 uppercase tracking-tight"
+              className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight"
             >
               אודות
             </motion.h2>
+
+            {/* Decorative Line */}
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              whileInView={{ opacity: 1, scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="w-24 h-1 bg-gradient-to-r from-[#C19A6B] to-transparent mb-8"
+            ></motion.div>
 
             {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.25 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="text-xl md:text-2xl font-bold text-gray-900 mb-6"
             >
               שיווק נכסים - משרד תיווך ושיווק נכסים שקיים יותר מ24 שנה

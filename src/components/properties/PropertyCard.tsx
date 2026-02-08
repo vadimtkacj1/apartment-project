@@ -132,7 +132,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   return (
     <motion.div
       whileHover={{ y: -5 }}
-      className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+      className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
+      style={{
+        boxShadow: '0 4px 20px rgba(193, 154, 107, 0.15), 0 0 40px rgba(193, 154, 107, 0.08)'
+      }}
       dir="rtl"
     >
       {/* Property Image */}
