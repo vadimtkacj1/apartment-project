@@ -112,7 +112,7 @@ jobs:
             # Extract deployment
             cd $APP_DIR
             tar -xzf /tmp/deploy.tar.gz
-            cp -r deploy/* .
+            cp -r deploy/. .
             rm -rf deploy
 
             # Create environment file
