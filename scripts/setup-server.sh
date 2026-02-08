@@ -11,11 +11,22 @@ echo "📦 Updating system packages..."
 sudo apt-get update
 sudo apt-get upgrade -y
 
-# Install Node.js 18 (LTS)
-echo "📦 Installing Node.js..."
+# Install Node.js 20 (LTS)
+echo "📦 Installing Node.js 20..."
 if ! command -v node &> /dev/null; then
-    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+    curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt-get install -y nodejs
+else
+    # Check version and update if needed
+    CURRENT_VERSION=$(node --version)
+    if [[ ! "$CURRENT_VERSION" == v20* ]]; then
+        echo "⚠️  Node.js $CURRENT_VERSION detected, updating to v20..."
+        sudo rm -f /etc/apt/sources.list.d/nodesource.list
+        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    else
+        echo "✅ Node.js 20 already installed"
+    fi
 fi
 
 # Install build tools
