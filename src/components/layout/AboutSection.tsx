@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 
 const AboutSection: React.FC = () => {
   return (
@@ -23,7 +24,7 @@ const AboutSection: React.FC = () => {
           >
             <div className="relative w-full h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/hero/sales.jpg"
+                src="/images/car.jpeg"
                 alt="logo"
                 fill
                 className="object-cover"
@@ -57,6 +58,17 @@ const AboutSection: React.FC = () => {
               אודות
             </motion.h2>
 
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.25 }}
+              className="text-xl md:text-2xl font-bold text-gray-900 mb-6"
+            >
+              שיווק נכסים - משרד תיווך ושיווק נכסים שקיים יותר מ24 שנה
+            </motion.p>
+
             {/* Description */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -65,24 +77,12 @@ const AboutSection: React.FC = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="space-y-6 text-gray-700 leading-relaxed"
             >
-              <p className="text-xl md:text-2xl font-bold text-gray-900">
-                זמיר נדל״ן – משרד תיווך ושיווק נכסים ופרויקטים של לדל״י
+              <p className="text-lg md:text-xl">
+                רם וחיים שיווק נכסים הוא משרד תיווך מקומי המתמחה במכירה, השכרה ושיווק נכסים באזור חולון, בת-ים וכל אזור המרכז. המשרד פועל בגישה אישית ומקצועית, עם היכרות עמוקה של השוק המקומי, קהל הקונים והדינמיקה בכל שכונה.
               </p>
 
               <p className="text-lg md:text-xl">
-                ג׳ זיווג למכירה והשכרה, בחולון, בת-ים, יפו ודרום תל אביב.
-              </p>
-
-              <p className="text-lg md:text-xl">
-                במשרדינו עובדים סוכנים מקצועיים בעלי רישיון תיווך ונסק של מיניינום שנתיים.
-              </p>
-
-              <p className="text-lg md:text-xl">
-                משרדינו נבחר לאחת מ10 המשרדים הטובים ביותר בחולון- בת ים ע״י אתר מדל״ן.
-              </p>
-
-              <p className="text-lg md:text-xl">
-                תשרדינו עובד בצורה הדיגיטאלית המתקדמת ביותר בתחום, עם תוכנת ניהול לקוחות ויצירת קמפיינים לנכסים.
+                אנחנו מלווים בעלי נכסים ורוכשים משלב האפיון הראשוני, דרך תמחור נכון, צילום ושיווק ממוקד, ניהול משא ומתן ועד לסגירת העסקה. הדגש שלנו הוא על שקיפות, זמינות ושירות מדויק שמוביל לתוצאות. בין אם מדובר בדירת מגורים, נכס להשקעה או השכרה – אנחנו כאן כדי להוביל אתכם לעסקה נכונה ובטוחה.
               </p>
             </motion.div>
 
@@ -96,9 +96,10 @@ const AboutSection: React.FC = () => {
             >
               <Link
                 href="/about"
-                className="inline-block px-12 py-5 bg-[#C19A6B] text-white font-black text-xl uppercase tracking-tight rounded-sm shadow-xl hover:bg-gray-900 hover:scale-105 transition-all duration-300 active:scale-95"
+                className="inline-flex items-center gap-3 px-12 py-5 bg-[#C19A6B] text-white font-black text-xl uppercase tracking-tight rounded-sm shadow-xl hover:bg-gray-900 hover:scale-105 transition-all duration-300 active:scale-95"
               >
-                להמשך קריאה
+                לפרטים נוספים
+                <ArrowLeft className="w-6 h-6" />
               </Link>
             </motion.div>
           </motion.div>

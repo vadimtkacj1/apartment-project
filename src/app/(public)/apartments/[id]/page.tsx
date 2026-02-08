@@ -21,6 +21,7 @@ import {
   Wind 
 } from 'lucide-react';
 import Link from 'next/link';
+import SimilarProperties from '@/components/properties/SimilarProperties';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -370,6 +371,9 @@ export default function ApartmentDetailPage() {
           </div>
 
         </div>
+
+        {/* Similar Properties Section */}
+        <SimilarProperties currentPropertyId={SAMPLE_PROPERTY.id} limit={3} />
       </div>
     </div>
   );

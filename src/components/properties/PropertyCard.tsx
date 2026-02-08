@@ -3,10 +3,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Bed, Maximize, MapPin, Car, Home, Compass, 
+import {
+  Bed, Maximize, MapPin, Car, Home, Compass,
   Wind, Warehouse, Sun, Droplet, Shield, ArrowUpDown,
-  Building, Calendar
+  Building, Calendar, ArrowLeft
 } from 'lucide-react';
 import { Property } from '@/types/property.types';
 
@@ -291,9 +291,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           
           <Link
             href={`/apartments/${id}`}
-            className="px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-[#C19A6B] transition-colors shadow-lg hover:shadow-xl"
+            className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-[#C19A6B] transition-colors shadow-lg hover:shadow-xl"
           >
-            {dealTypeLabel}
+            לפרטים נוספים
+            <ArrowLeft size={18} />
           </Link>
         </div>
       </div>
