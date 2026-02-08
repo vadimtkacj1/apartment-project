@@ -17,6 +17,7 @@ import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import MarketingMessage from '@/components/layout/MarketingMessage';
 
 export default function Home() {
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function Home() {
       <div className="relative z-10 bg-white">
         <HotPropositions />
         <Stats />
+       < MarketingMessage/>
         <AboutSection />
         <Testimonials />
         <FeaturedProperties />

@@ -10,8 +10,7 @@ import {
   Building2,
   Star,
   Phone,
-  Mail,
-  CheckCircle2
+  Mail
 } from 'lucide-react';
 import './about.css';
 import SkewedSlider from '@/components/layout/SkewedSlider';
@@ -50,38 +49,58 @@ const owners = [
 const team = [
   {
     id: 1,
-    name: 'מיכאל אברהם',
-    role: 'סוכן נדל"ן בכיר',
+    name: 'מורן נדלן',
+    role: 'מנכ"ל ומייסד',
     image: '/images/agent1.jpg',
-    specialty: 'דירות יוקרה'
+    phone: '09-7407500',
+    mobile: '052-3385053',
+    fax: '09-7407600',
+    email: 'moran@topnadlan.co.il',
+    description: 'בעל ניסיון עשיר ורצוף בריכוז הנרכשים וההרכשונות במהלך השנים. ביצענו מאות עסקאות והצלחנו לזהות את הנכס הנכון והרכישה והלקרכא בכל הרירכבים כגר- גלילים, מעכבישים, עפקים ונדללים חון עידה לעיפים הנרכז.'
   },
   {
     id: 2,
-    name: 'רחל ברק',
-    role: 'סוכנת נדל"ן',
+    name: 'חיים וסר',
+    role: 'סוכן נדל"ן בכיר',
     image: '/images/agent2.jpg',
-    specialty: 'דירות משפחתיות'
+    phone: '09-7407500',
+    mobile: '052-7808233',
+    fax: '09-7407600',
+    email: 'haim@topnadlan.co.il',
+    description: 'בעל ניסיון של למעלה מ-5 שנים הידד בן בהונות, אינתי-הדין, מדכל ובעל אינשי חומים טובים. בעל קשרים עמוקים עם בנקים להשבתמאות ושירד שמתמחמים בנדלן (בוועדת כספודת המוכסת בנדלן), מספה סיטענה למודעה 24 שעות, עובד בתישוק עם משרד התיווך באזור.'
   },
   {
     id: 3,
     name: 'יוסי דהן',
-    role: 'סוכן נדל"ן',
+    role: 'סוכן נדל"ן מומחה',
     image: '/images/agent3.jpg',
-    specialty: 'השקעות נדל"ן'
+    phone: '09-7407500',
+    mobile: '053-3254789',
+    fax: '09-7407600',
+    email: 'yossi@topnadlan.co.il',
+    description: 'מומחה בתחום ההשקעות נדל"ן עם ניסיון של מעל 15 שנה. מתמחה בזיהוי הזדמנויות השקעה ייחודיות ומלווה משקיעים בתהליך מקצועי ואישי. מכיר לעומק את שוק הנדל"ן באזור ומספק ייעוץ מקצועי ברמה הגבוהה ביותר.'
   },
   {
     id: 4,
     name: 'תמר גולן',
     role: 'סוכנת נדל"ן',
     image: '/images/agent4.jpg',
-    specialty: 'דירות סטודיו'
+    phone: '09-7407500',
+    mobile: '054-8765432',
+    fax: '09-7407600',
+    email: 'tamar@topnadlan.co.il',
+    description: 'מתמחה בדירות סטודיו ונכסים קטנים למשקיעים. עם ניסיון רב בליווי קונים צעירים ומשקיעים חכמים למציאת הנכס המושלם. מספקת שירות אישי ומקצועי ומלווה את הלקוחות בכל שלב עד להשלמת העסקה בהצלחה.'
   },
   {
     id: 5,
     name: 'אורי הרץ',
-    role: 'סוכן נדל"ן',
+    role: 'סוכן נדל"ן יוקרה',
     image: '/images/agent5.jpg',
-    specialty: 'פנטהאוזים'
+    phone: '09-7407500',
+    mobile: '052-9876543',
+    fax: '09-7407600',
+    email: 'uri@topnadlan.co.il',
+    description: 'מומחה לנכסי יוקרה ופנטהאוזים עם ניסיון של מעל 12 שנה. מתמחה במציאת נכסים ייחודיים ויוקרתיים ללקוחות VIP. מספק שירות דיסקרטי ומקצועי ומלווה את הלקוחות למציאת הנכס המושלם שמתאים לסטנדרטים הגבוהים ביותר.'
   }
 ];
 
@@ -244,38 +263,44 @@ export default function AboutPage() {
             סוכני הנדל"ן המומחים שלנו כאן כדי לעזור לכם בכל שלב
           </p>
 
-          <div className="team-grid">
+          <div className="agents-list">
             {team.map((member, index) => (
               <motion.div
                 key={member.id}
-                className="team-card"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={teamInView ? { scale: 1, opacity: 1 } : {}}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
+                className="agent-card-horizontal"
+                initial={{ x: 50, opacity: 0 }}
+                animate={teamInView ? { x: 0, opacity: 1 } : {}}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
               >
-                <div className="team-image-wrapper">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    width={300}
-                    height={300}
-                    className="team-image"
-                  />
-                  <div className="team-overlay">
-                    <button className="team-contact-btn">
-                      <Phone size={18} />
-                      צור קשר
-                    </button>
+                <div className="agent-content">
+                  <div className="agent-text">
+                    <h3 className="agent-name">{member.name}</h3>
+                    <p className="agent-role">{member.role}</p>
+                    <p className="agent-description">{member.description}</p>
+                    <div className="agent-contact-info">
+                      <a href={`tel:${member.phone}`} className="contact-link">
+                        <Phone size={18} />
+                        <span>{member.phone}</span>
+                      </a>
+                      <a href={`tel:${member.mobile}`} className="contact-link">
+                        <Phone size={18} />
+                        <span>{member.mobile}</span>
+                      </a>
+                      <a href={`mailto:${member.email}`} className="contact-link">
+                        <Mail size={18} />
+                        <span>{member.email}</span>
+                      </a>
+                    </div>
                   </div>
-                </div>
-                <div className="team-info">
-                  <h3 className="team-name">{member.name}</h3>
-                  <p className="team-role">{member.role}</p>
-                  <span className="team-specialty">
-                    <CheckCircle2 size={16} />
-                    {member.specialty}
-                  </span>
+                  <div className="agent-image-container">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      width={300}
+                      height={350}
+                      className="agent-photo"
+                    />
+                  </div>
                 </div>
               </motion.div>
             ))}

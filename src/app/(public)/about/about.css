@@ -315,13 +315,14 @@
   margin: 0 0 4rem 0;
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+/* Horizontal Agent Card Layout */
+.agents-list {
+  display: flex;
+  flex-direction: column;
   gap: 3rem;
 }
 
-.team-card {
+.agent-card-horizontal {
   background: #ffffff;
   border-radius: 20px;
   overflow: hidden;
@@ -330,96 +331,102 @@
   transition: all 0.3s ease;
 }
 
-.team-card:hover {
+.agent-card-horizontal:hover {
   box-shadow: 0 20px 60px rgba(193, 154, 107, 0.2);
   border-color: #C19A6B;
+  transform: translateY(-5px);
 }
 
-.team-image-wrapper {
+.agent-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 3rem;
+  padding: 3rem;
+  align-items: center;
+}
+
+.agent-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  text-align: right;
+}
+
+.agent-name {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #1a1a1a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.agent-role {
+  font-size: 1.2rem;
+  color: #C19A6B;
+  font-weight: 700;
+  margin: 0;
+}
+
+.agent-description {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #555;
+  margin: 0;
+}
+
+.agent-contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  background: #f8f9fa;
+  color: #333;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(193, 154, 107, 0.2);
+}
+
+.contact-link:hover {
+  background: #C19A6B;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(193, 154, 107, 0.3);
+}
+
+.contact-link svg {
+  flex-shrink: 0;
+}
+
+.agent-image-container {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 350px;
+  border-radius: 15px;
   overflow: hidden;
   background: #f5f5f5;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-.team-image {
+.agent-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.4s ease;
 }
 
-.team-card:hover .team-image {
-  transform: scale(1.1);
-}
-
-.team-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 60%);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 2rem;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.team-card:hover .team-overlay {
-  opacity: 1;
-}
-
-.team-contact-btn {
-  background: #C19A6B;
-  color: white;
-  border: none;
-  padding: 0.9rem 1.5rem;
-  border-radius: 25px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.team-contact-btn:hover {
-  background: #8B6F47;
-  transform: translateY(-2px);
-}
-
-.team-info {
-  padding: 2rem;
-  text-align: center;
-}
-
-.team-name {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #1a1a1a;
-  margin: 0 0 0.5rem 0;
-}
-
-.team-role {
-  font-size: 1.1rem;
-  color: #666;
-  margin: 0 0 1rem 0;
-  font-weight: 600;
-}
-
-.team-specialty {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, #C19A6B 0%, #8B6F47 100%);
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
+.agent-card-horizontal:hover .agent-photo {
+  transform: scale(1.08);
 }
 
 /* ===== CTA Section ===== */
@@ -580,6 +587,20 @@
     gap: 2rem;
   }
 
+  .agent-content {
+    grid-template-columns: 1fr 280px;
+    gap: 2rem;
+    padding: 2.5rem;
+  }
+
+  .agent-name {
+    font-size: 1.9rem;
+  }
+
+  .agent-image-container {
+    height: 320px;
+  }
+
   .cta-section {
     padding: 6rem 2rem;
   }
@@ -630,6 +651,33 @@
 
   .team-grid {
     grid-template-columns: 1fr;
+  }
+
+  .agent-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .agent-image-container {
+    height: 400px;
+    order: -1;
+  }
+
+  .agent-text {
+    text-align: center;
+  }
+
+  .agent-contact-info {
+    justify-content: center;
+  }
+
+  .agent-name {
+    font-size: 1.8rem;
+  }
+
+  .agent-description {
+    font-size: 1rem;
   }
 
   .section-title {

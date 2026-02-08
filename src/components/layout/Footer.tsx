@@ -71,6 +71,15 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/faq"
+                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
+                >
+                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  שאלות ותשובות
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/#contact"
                   className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
                 >

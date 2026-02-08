@@ -21,8 +21,6 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
         delay: index * 0.1,
         ease: "easeOut"
       }}
-      // УБРАЛ: bg-white, shadow-lg, border, rounded-2xl
-      // ОСТАВИЛ: позиционирование и отступы
       className="flex flex-col items-center justify-center p-4 group transition-all duration-300"
     >
       <motion.div
@@ -82,11 +80,11 @@ const Stats: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-16 bg-white overflow-hidden"
+      className="relative w-full pt-24 md:pt-32 pb-12 bg-white overflow-hidden"
     >
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-8">
           {stats.map((stat, index) => (
             <StatItem
               key={index}
@@ -97,21 +95,6 @@ const Stats: React.FC = () => {
             />
           ))}
         </div>
-
-        {/* Bottom CTA Text */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center mt-16 max-w-4xl mx-auto"
-        >
-          <p className="text-lg md:text-xl font-medium text-gray-600 leading-relaxed">
-            שיווק נכסים ברמה אחרת בחולון ובת־ים.
-            <br className="hidden md:block" />
-            <span className="font-bold text-gray-800">ליווי אישי, תמחור מדויק ושיווק ממוקד</span> שמביא את הנכס שלכם לקונים הנכונים ומוביל לעסקה בתנאים הטובים ביותר.
-          </p>
-        </motion.div>
       </div>
     </section>
   );

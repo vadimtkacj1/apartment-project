@@ -218,7 +218,7 @@ function HotPropositions() {
   const { isMobile } = usePerformanceSettings();
 
   return (
-    <section className="relative py-20 md:py-32 bg-gray-50 overflow-hidden w-full" dir="rtl">
+    <section className="relative pt-24 md:pt-32 pb-12 overflow-hidden w-full" dir="rtl">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-72 h-72 bg-[#C19A6B]/10 rounded-full blur-3xl"></div>
