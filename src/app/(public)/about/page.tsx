@@ -14,6 +14,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import './about.css';
+import SkewedSlider from '@/components/layout/SkewedSlider';
 
 // Stats for the company
 const stats = [
@@ -97,6 +98,11 @@ export default function AboutPage() {
 
   return (
     <div className="about-page" dir="rtl">
+      {/* Skewed Slider Section - First */}
+      <section className="slider-section">
+        <SkewedSlider />
+      </section>
+
       {/* Hero Section */}
       <motion.section
         ref={heroRef}

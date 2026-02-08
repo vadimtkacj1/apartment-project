@@ -8,12 +8,15 @@ import Header from '@/components/layout/Header';
 import Stats from '@/components/layout/Stats';
 import HotPropositions from '@/components/layout/HotPropositions';
 import AboutSection from '@/components/layout/AboutSection';
+import Testimonials from '@/components/layout/Testimonials';
 import FeaturedProperties from '@/components/layout/FeaturedProperties';
 import ContactForm from '@/components/layout/ContactForm';
 
 // Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export default function Home() {
   useEffect(() => {
@@ -59,6 +62,7 @@ export default function Home() {
         <HotPropositions />
         <Stats />
         <AboutSection />
+        <Testimonials />
         <FeaturedProperties />
         <ContactForm />
       </div>
