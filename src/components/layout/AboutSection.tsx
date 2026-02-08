@@ -9,7 +9,7 @@ const AboutSection: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-white overflow-hidden"
+      className="relative w-full pt-24 md:pt-32 pb-0 bg-white overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">

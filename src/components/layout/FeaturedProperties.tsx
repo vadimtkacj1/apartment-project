@@ -50,10 +50,10 @@ const FeaturedProperties: React.FC = () => {
   ];
 
   return (
-    <section
-      dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-white overflow-hidden"
-    >
+<section
+  dir="rtl"
+  className="relative w-full pt-24 md:pt-32 pb-0 bg-white overflow-hidden"
+>
       {/* Decorative background */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 right-20 w-96 h-96 bg-[#C19A6B] rounded-full blur-3xl"></div>

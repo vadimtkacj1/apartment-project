@@ -75,6 +75,7 @@ export default function Header() {
                 { label: "דף הבית", href: "/" },
                 { label: "נכסים", href: "/apartments" },
                 { label: "אודות", href: "/about" },
+                { label: "שאלות ותשובות", href: "/faq" },
                 { label: "צור קשר", href: "/#contact", onClick: handleContactClick },
               ].map((link) => (
                 <Link
