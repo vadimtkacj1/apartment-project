@@ -14,7 +14,9 @@
       "Bash(test:*)",
       "Bash(chmod:*)",
       "Bash(npm run build:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(scripts/diagnose-server.sh:*)",
+      "Bash(scripts/fix-ip-access.sh:*)"
     ]
   }
 }

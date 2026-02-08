@@ -113,7 +113,7 @@ const hotApartments = [
 const ApartmentCard = ({ item }: { item: typeof hotApartments[0] }) => (
   <Link href={`/apartments/${item.id}`}>
     <div
-      className="group relative flex flex-col w-[340px] md:w-[380px] min-h-[280px] bg-white rounded-2xl overflow-hidden shrink-0 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-[#C19A6B] hover:scale-105"
+      className="group relative flex flex-col w-[340px] md:w-[380px] min-h-[280px] bg-white rounded-2xl overflow-hidden shrink-0 shadow-lg md:hover:shadow-2xl transition-shadow duration-300 cursor-pointer border border-gray-100 md:hover:border-[#C19A6B]"
       dir="rtl"
     >
       {/* Content */}
@@ -147,8 +147,11 @@ const ApartmentCard = ({ item }: { item: typeof hotApartments[0] }) => (
 
         {/* CTA Button */}
         <div className="mt-auto">
-          <div className="w-full bg-[#C19A6B] text-white py-3.5 rounded-xl font-bold text-base text-center group-hover:bg-gray-900 transition-all duration-300 shadow-md">
-            לפרטים נוספים ←
+          <div className="w-full bg-[#C19A6B] text-white py-3.5 rounded-xl font-bold text-base text-center group-hover:bg-gray-900 transition-all duration-300 shadow-md flex items-center justify-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            לפרטים נוספים
           </div>
         </div>
       </div>
@@ -170,8 +173,24 @@ const MarqueeRow = ({
   duration?: number,
   isMobile?: boolean
 }) => {
-  // Use a 3x duplication strategy to ensure the line is always filled during infinite transit.
-  const tripleItems = useMemo(() => [...items, ...items, ...items], [items]);
+  // Use 2x duplication on mobile for better performance, 3x on desktop
+  const duplicatedItems = useMemo(
+    () => isMobile ? [...items, ...items] : [...items, ...items, ...items],
+    [items, isMobile]
+  );
+
+  // On mobile, use simpler animation or disable it
+  if (isMobile) {
+    return (
+      <div className="flex w-full overflow-x-auto scrollbar-hide" style={{ direction: 'ltr' }}>
+        <div className="flex gap-6 py-4">
+          {items.map((item, i) => (
+            <ApartmentCard key={`apartment-card-mobile-${i}`} item={item} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
@@ -181,13 +200,13 @@ const MarqueeRow = ({
         initial={{ x: direction === "left" ? "0%" : "-33.33%" }}
         animate={{ x: direction === "left" ? "-33.33%" : "0%" }}
         transition={{
-          duration: isMobile ? duration * 1.5 : duration,
+          duration: duration,
           ease: "linear",
           repeat: Infinity,
         }}
-        whileHover={!isMobile ? { animationPlayState: "paused" } : {}}
+        whileHover={{ animationPlayState: "paused" }}
       >
-        {tripleItems.map((item, i) => (
+        {duplicatedItems.map((item, i) => (
           <ApartmentCard key={`apartment-card-${direction}-${i}`} item={item} />
         ))}
       </motion.div>

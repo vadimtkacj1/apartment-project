@@ -82,14 +82,14 @@ const FeaturedProperties: React.FC = () => {
           </motion.div>
 
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
-            נכסים למכירה
+נכסים באיזור המרכז
           </h2>
 
           <div className="w-32 h-1 bg-[#C19A6B] mx-auto mb-6"></div>
 
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
-            מבחר דירות ונכסים איכוטיים במיקומים המבוקשים ביותר
-          </p>
+מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז
+</p>
         </motion.div>
 
         {/* Properties Grid */}
@@ -118,7 +118,7 @@ const FeaturedProperties: React.FC = () => {
             <span>כל הנכסים</span>
             <ArrowLeft
               size={24}
-              className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
+              className="transition-transform duration-300 group-hover:translate-x-2"
             />
           </Link>
         </motion.div>

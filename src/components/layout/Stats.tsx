@@ -13,40 +13,42 @@ interface StatItemProps {
 const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{
-        duration: 0.6,
-        delay: index * 0.15,
-        ease: [0.16, 1, 0.3, 1]
+        duration: 0.5,
+        delay: index * 0.1,
+        ease: "easeOut"
       }}
-      className="flex flex-col items-center justify-center p-8 group bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300"
+      // УБРАЛ: bg-white, shadow-lg, border, rounded-2xl
+      // ОСТАВИЛ: позиционирование и отступы
+      className="flex flex-col items-center justify-center p-4 group transition-all duration-300"
     >
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="mb-3 text-[#C19A6B] transform transition-all duration-300"
+        className="mb-4 text-[#C19A6B]"
       >
         {icon}
       </motion.div>
 
       <motion.div
-        initial={{ scale: 0 }}
+        initial={{ scale: 0.8 }}
         whileInView={{ scale: 1 }}
         viewport={{ once: true }}
         transition={{
-          duration: 0.8,
-          delay: index * 0.15 + 0.3,
+          duration: 0.6,
+          delay: index * 0.1 + 0.2,
           type: "spring",
-          stiffness: 200
+          stiffness: 100
         }}
         className="text-4xl md:text-5xl font-black text-gray-900 mb-2 tracking-tight"
       >
         {value}
       </motion.div>
 
-      <div className="text-base md:text-lg font-bold text-gray-700 text-center uppercase tracking-wide">
+      <div className="text-base md:text-lg font-bold text-gray-600 text-center uppercase tracking-wide">
         {label}
       </div>
     </motion.div>
@@ -56,22 +58,22 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
 const Stats: React.FC = () => {
   const stats = [
     {
-      icon: <Award size={50} strokeWidth={1.5} />,
+      icon: <Award size={56} strokeWidth={1.5} />,
       value: "20",
       label: "שנות ניסיון בתחום"
     },
     {
-      icon: <ThumbsUp size={50} strokeWidth={1.5} />,
+      icon: <ThumbsUp size={56} strokeWidth={1.5} />,
       value: "+1,200",
       label: "לקוחות מרוצים"
     },
     {
-      icon: <Users size={50} strokeWidth={1.5} />,
+      icon: <Users size={56} strokeWidth={1.5} />,
       value: "8",
       label: "סוכנים מוסמכים"
     },
     {
-      icon: <Building2 size={50} strokeWidth={1.5} />,
+      icon: <Building2 size={56} strokeWidth={1.5} />,
       value: "47",
       label: "נכסים בבלעדיות"
     }
@@ -80,17 +82,11 @@ const Stats: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-12 md:py-16 bg-white overflow-hidden"
+      className="relative w-full py-16 bg-white overflow-hidden"
     >
-      {/* Decorative background elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 right-10 w-72 h-72 bg-[#1c3664] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 left-10 w-96 h-96 bg-[#1c3664] rounded-full blur-3xl"></div>
-      </div>
-
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {stats.map((stat, index) => (
             <StatItem
               key={index}
@@ -104,14 +100,16 @@ const Stats: React.FC = () => {
 
         {/* Bottom CTA Text */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-center mt-10"
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="text-center mt-16 max-w-4xl mx-auto"
         >
-          <p className="text-lg md:text-xl font-bold text-gray-600 tracking-wide">
-            לא במקרה אנחנו אחד מ-10 המשרדים הטובים בחולון בת ים
+          <p className="text-lg md:text-xl font-medium text-gray-600 leading-relaxed">
+            שיווק נכסים ברמה אחרת בחולון ובת־ים.
+            <br className="hidden md:block" />
+            <span className="font-bold text-gray-800">ליווי אישי, תמחור מדויק ושיווק ממוקד</span> שמביא את הנכס שלכם לקונים הנכונים ומוביל לעסקה בתנאים הטובים ביותר.
           </p>
         </motion.div>
       </div>

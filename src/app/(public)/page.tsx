@@ -47,7 +47,7 @@ export default function Home() {
                 img={slide.img}
                 mainText=""
                 subText="הנכס שלכם שווה יותר. אנחנו נדאג למצוא את הקונה המתאים במחיר המקסימלי."
-                staticTitle="מכירת דירות"
+                staticTitle="רם וחיים שיווק נכסים"
               />
             </SwiperSlide>
           ))}
