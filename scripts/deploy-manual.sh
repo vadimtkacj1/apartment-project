@@ -39,11 +39,17 @@ rm -rf deploy deploy.tar.gz
 mkdir -p deploy
 
 # Copy standalone build
-cp -r .next/standalone/* deploy/
+cp -r .next/standalone/. deploy/
 
-# Copy static files
-cp -r .next/static deploy/.next/static
-cp -r public deploy/public
+# Copy static files (CRITICAL for Next.js)
+mkdir -p deploy/.next/static
+cp -r .next/static/. deploy/.next/static/
+
+# Copy public files
+if [ -d "public" ]; then
+    mkdir -p deploy/public
+    cp -r public/. deploy/public/
+fi
 
 # Create production package.json
 cat > deploy/package.json << EOF
