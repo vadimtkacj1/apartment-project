@@ -12,7 +12,9 @@
       "Bash(timeout 5 tail:*)",
       "Bash(git checkout:*)",
       "Bash(test:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
