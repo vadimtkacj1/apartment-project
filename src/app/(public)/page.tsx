@@ -8,6 +8,7 @@ import Header from '@/components/layout/Header';
 import Stats from '@/components/layout/Stats';
 import HotPropositions from '@/components/layout/HotPropositions';
 import AboutSection from '@/components/layout/AboutSection';
+import ProcessSection from '@/components/layout/ProcessSection';
 import Testimonials from '@/components/layout/Testimonials';
 import FeaturedProperties from '@/components/layout/FeaturedProperties';
 import ContactForm from '@/components/layout/ContactForm';

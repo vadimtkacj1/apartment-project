@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { Heebo } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 
-const heebo = Heebo({
-  weight: ['400', '500', '600', '700', '900'],
-  subsets: ['latin', 'hebrew'],
+const openSansHebrew = localFont({
+  src: [
+    {
+      path: '../../public/fonts/OpenSansHebrew-Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/OpenSansHebrew-Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/OpenSansHebrew-BoldItalic.ttf',
+      weight: '700',
+      style: 'italic',
+    },
+  ],
   display: 'swap',
-  variable: '--font-heebo',
+  variable: '--font-opensans-hebrew',
 });
 
 export const metadata: Metadata = {
@@ -22,7 +37,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${heebo.variable} antialiased`}>
+      <body className={`${openSansHebrew.variable} antialiased`}>
         {children}
 
         {/* Sienna Accessibility Widget */}
