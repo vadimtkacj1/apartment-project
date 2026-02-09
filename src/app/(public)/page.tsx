@@ -11,6 +11,7 @@ import AboutSection from '@/components/layout/AboutSection';
 import Testimonials from '@/components/layout/Testimonials';
 import FeaturedProperties from '@/components/layout/FeaturedProperties';
 import ContactForm from '@/components/layout/ContactForm';
+import ValuesSection from '@/components/layout/ValuesSection';
 
 // Swiper styles
 import 'swiper/css';
@@ -62,7 +63,8 @@ export default function Home() {
       <div className="relative z-10 bg-white">
         <HotPropositions />
         <Stats />
-       < MarketingMessage/>
+        <MarketingMessage/>
+        <ValuesSection />
         <AboutSection />
         <Testimonials />
         <FeaturedProperties />
