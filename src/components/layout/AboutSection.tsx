@@ -24,7 +24,7 @@ const AboutSection: React.FC = () => {
           >
             <div className="relative w-full h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/images/car.jpeg"
+                src="/images/buildings.jpeg"
                 alt="logo"
                 fill
                 className="object-cover"
