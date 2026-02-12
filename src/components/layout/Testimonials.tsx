@@ -60,7 +60,7 @@ const Testimonials: React.FC = () => {
           <Star
             key={index}
             size={18}
-            className={`${index < rating ? 'fill-[#C19A6B] text-[#C19A6B]' : 'fill-gray-200 text-gray-200'}`}
+            className={`${index < rating ? 'fill-[#1c3664] text-[#1c3664]' : 'fill-gray-200 text-gray-200'}`}
           />
         ))}
       </div>
@@ -68,12 +68,11 @@ const Testimonials: React.FC = () => {
   };
 
   return (
-    <section dir="rtl" className="relative w-full pt-24 md:pt-32 pb-0 bg-white overflow-hidden">
+    <section dir="rtl" className="relative w-full pt-24 md:pt-32 pb-0 overflow-hidden bg-warm">
       <div className="relative z-10 max-w-[1400px] mx-auto px-6">
         
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">הלקוחות שלנו משתפים</h2>
-          <div className="w-20 h-1.5 bg-[#C19A6B] mx-auto rounded-full"></div>
         </div>
 
         <div className="relative">
@@ -107,14 +106,14 @@ const Testimonials: React.FC = () => {
                   <div className={`
                     relative bg-white rounded-3xl p-8 md:p-10 h-full flex flex-col border transition-all duration-500 z-10
                     ${isActive 
-                      ? 'border-[#C19A6B]/30 shadow-[0_25px_50px_-12px_rgba(193,154,107,0.2)] scale-105' 
+                      ? 'border-[#1c3664]/30 shadow-[0_25px_50px_-12px_rgba(28,54,100,0.2)] scale-105' 
                       : 'border-transparent shadow-sm scale-90 opacity-40 blur-[0.5px]'}
                   `}>
                     
                     {/* Fixed Quote Position */}
                     <div className="absolute -top-6 right-10 z-20">
                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-500 
-                        ${isActive ? 'bg-[#C19A6B]' : 'bg-gray-200'}`}>
+                        ${isActive ? 'bg-[#1c3664]' : 'bg-gray-200'}`}>
                         <Quote size={22} className="text-white fill-white" />
                       </div>
                     </div>
@@ -132,7 +131,7 @@ const Testimonials: React.FC = () => {
 
                     <div className="flex flex-col items-center pt-8 border-t border-gray-100">
                       <div className={`w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-md mb-4 transition-all
-                        ${isActive ? 'bg-gradient-to-br from-[#C19A6B] to-[#A6835B] scale-110' : 'bg-gray-200 opacity-50'}`}>
+                        ${isActive ? 'bg-gradient-to-br from-[#1c3664] to-[#152a4f] scale-110' : 'bg-gray-200 opacity-50'}`}>
                         {testimonial.name.charAt(0)}
                       </div>
                       <h4 className={`font-black text-xl transition-colors ${isActive ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -147,10 +146,10 @@ const Testimonials: React.FC = () => {
 
           <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-30 pointer-events-none px-4 hidden md:block">
             <div className="flex justify-between max-w-[1500px] mx-auto pointer-events-auto">
-              <button className="testimonial-swiper-button-prev w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C19A6B] to-[#A6835B] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
+              <button className="testimonial-swiper-button-prev w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1c3664] to-[#152a4f] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
                 <ChevronRight size={24} />
               </button>
-              <button className="testimonial-swiper-button-next w-14 h-14 rounded-2xl bg-gradient-to-br from-[#C19A6B] to-[#A6835B] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
+              <button className="testimonial-swiper-button-next w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1c3664] to-[#152a4f] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all">
                 <ChevronLeft size={24} />
               </button>
             </div>
@@ -171,7 +170,7 @@ const Testimonials: React.FC = () => {
         }
         .testimonial-bullet-active {
           width: 35px;
-          background: #C19A6B;
+          background: #1c3664;
           border-radius: 8px;
         }
       `}</style>

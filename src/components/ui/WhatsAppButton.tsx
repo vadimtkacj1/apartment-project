@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import { motion } from 'framer-motion';
+import { analytics } from '@/lib/analytics';
 
 const WhatsAppButton: React.FC = () => {
   const phoneNumber = '972501234567'; 
@@ -8,11 +9,16 @@ const WhatsAppButton: React.FC = () => {
 
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
+  const handleClick = () => {
+    analytics.trackWhatsAppClick();
+  };
+
   return (
     <motion.a
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={handleClick}
       // Improved entrance animation: slides up and fades in
       initial={{ y: 50, opacity: 0, scale: 0.5 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}

@@ -1,7 +1,7 @@
 export const heroSlides = [
   {
     id: 1,
-    colorDeep: "#C19A6B",
+    colorDeep: "#1c3664",
     mainText: "מכירת דירות", // Продажа
     subText: "הנכס שלכם שווה יותר. אנחנו נדאג למצוא את הקונה המתאים במחיר המקסימלי.",
     img: "/images/hero/sales.jpg",

@@ -1,22 +1,27 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint --turbopack)",
-      "Bash(npm init:*)",
-      "Bash(npx tailwindcss:*)",
-      "Bash(npx:*)",
-      "Bash(tree:*)",
-      "Bash(dir:*)",
+      "Bash(find:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx prisma migrate reset:*)",
+      "Bash(grep:*)",
+      "Bash(npm install:*)",
       "Bash(ls:*)",
+      "Bash(pkill:*)",
+      "Bash(killall:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npm run seed:admin:*)",
+      "Bash(curl:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(node:*)",
+      "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"да мне надо чтобы все работала и еще замени\n\nמיקום בבניין\n\nна это\n\nחזית \\\\ עורף \\\\ ח\\\\ע \\\\ צד \\\\ פינה\" npx prisma migrate reset --force)",
+      "Bash(npx prisma db seed:*)",
       "Bash(npm run dev:*)",
-      "Bash(timeout 5 tail:*)",
-      "Bash(git checkout:*)",
+      "Bash(npx tsc:*)",
+      "Bash(del:*)",
       "Bash(test:*)",
-      "Bash(chmod:*)",
-      "Bash(npm run build:*)",
-      "Bash(git commit:*)",
-      "Bash(scripts/diagnose-server.sh:*)",
-      "Bash(scripts/fix-ip-access.sh:*)"
+      "Bash(dir:*)",
+      "Bash(head:*)"
     ]
   }
 }

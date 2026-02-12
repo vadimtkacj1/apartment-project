@@ -1,176 +1,150 @@
 "use client";
-import React from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Phone, Mail, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 
+interface ContactInfo {
+  phone: string;
+  phoneLink: string;
+  email: string;
+  emailLink: string;
+  address: string;
+  city: string;
+  weekdayHours: string;
+  fridayHours: string;
+  facebook: string | null;
+  instagram: string | null;
+  linkedin: string | null;
+}
+
 export default function Footer() {
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+
+  useEffect(() => {
+    fetchContactInfo();
+  }, []);
+
+  const fetchContactInfo = async () => {
+    try {
+      const response = await fetch('/api/contact-info');
+      if (response.ok) {
+        const data = await response.json();
+        setContactInfo(data);
+      }
+    } catch (error) {
+      console.error('Error fetching contact info:', error);
+    }
+  };
+
+  // ערכי ברירת מחדל לפי התמונה שלך
+  const phone = contactInfo?.phone || '03-5551234';
+  const phoneLink = contactInfo?.phoneLink || 'tel:+97235551234';
+  const email = contactInfo?.email || 'info@apartment-realty.co.il';
+  const emailLink = contactInfo?.emailLink || 'mailto:info@apartment-realty.co.il';
+  const address = contactInfo?.address || 'רחוב סוקולוב 50';
+  const city = contactInfo?.city || 'חולון';
+  const weekdayHours = contactInfo?.weekdayHours || 'ראשון - חמישי: 9:00 - 18:00';
+  const fridayHours = contactInfo?.fridayHours || 'שישי: 9:00 - 13:00';
+  const facebook = contactInfo?.facebook || '#';
+  const instagram = contactInfo?.instagram || '#';
+  const linkedin = contactInfo?.linkedin || '#';
+
   return (
-    <footer dir="rtl" className="relative bg-gray-900 text-white overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C19A6B] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#C19A6B] rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 py-16">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-
-          {/* Company Info */}
+    <footer dir="rtl" className="bg-[#0a101f] text-white py-12 px-6 lg:px-16 border-t border-white/5">
+      <div className="max-w-7xl mx-auto">
+        {/* Grid ראשי - 4 עמודות */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 items-start">
+          
+          {/* 1. לוגו ואודות (צד ימין בתמונה) */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/10 backdrop-blur-sm rounded-full p-3">
+            <div className="flex flex-col items-start gap-4">
+              <div className="bg-white rounded-full p-2 w-20 h-20 flex items-center justify-center">
                 <Image
-                  src="/images/logo.PNG"
-                  alt="logo"
-                  width={60}
-                  height={60}
-                  className="rounded-full"
+                  src="/images/logo.png"
+                  alt="H&R Logo"
+                  width={65}
+                  height={65}
+                  className="rounded-full object-contain"
                 />
               </div>
-              <div>
-                <p className="text-sm text-gray-400">מומחים בתחום הנדל״ן</p>
-              </div>
+              <p className="text-gray-400 text-sm font-medium">מומחים בתחום הנדל"ן</p>
             </div>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-300 text-sm leading-relaxed max-w-[280px]">
               משרד תיווך ושיווק נכסים ופרויקטים של לדל״י ג׳ זיווג למכירה והשכרה, בחולון, בת-ים, יפו ודרום תל אביב.
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-xl font-black text-white mb-6 uppercase tracking-tight">קישורים מהירים</h4>
-            <ul className="space-y-3">
+          {/* 2. קישורים מהירים */}
+          <div className="lg:pr-8">
+            <h4 className="text-lg font-bold mb-6">קישורים מהירים</h4>
+            <ul className="space-y-3 text-gray-400 text-sm">
+              <li><Link href="/" className="hover:text-white transition-colors">דף הבית</Link></li>
+              <li><Link href="/apartments" className="hover:text-white transition-colors">נכסים למכירה</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">אודות</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors">שאלות ותשובות</Link></li>
+              <li><Link href="/#contact" className="hover:text-white transition-colors">צור קשר</Link></li>
+            </ul>
+          </div>
+
+          {/* 2.5. קישורים שימושיים */}
+          <div className="lg:pr-8">
+            <h4 className="text-lg font-bold mb-6">קישורים שימושיים</h4>
+            <ul className="space-y-3 text-gray-400 text-sm">
               <li>
-                <Link
-                  href="/"
-                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
-                >
-                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  דף הבית
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/apartments"
-                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
-                >
-                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  נכסים למכירה
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
-                >
-                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  אודות
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/faq"
-                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
-                >
-                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  שאלות ותשובות
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#contact"
-                  className="text-gray-300 hover:text-[#C19A6B] transition-colors duration-300 flex items-center gap-2 group"
-                >
-                  <span className="w-2 h-2 bg-[#C19A6B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  צור קשר
+                <Link href="/links" className="hover:text-white transition-colors">
+                  קישורים שימושיים
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* 3. צור קשר */}
           <div>
-            <h4 className="text-xl font-black text-white mb-6 uppercase tracking-tight">צור קשר</h4>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <Phone size={20} className="text-[#C19A6B] mt-1 flex-shrink-0" />
-                <div>
-                  <a href="tel:+972123456789" className="text-gray-300 hover:text-[#C19A6B] transition-colors">
-                    03-123-4567
-                  </a>
-                </div>
+            <h4 className="text-lg font-bold mb-6">צור קשר</h4>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-center gap-3 text-gray-300">
+                <Phone size={18} className="text-blue-500 shrink-0" />
+                <a href={phoneLink} className="hover:text-white">{phone}</a>
               </li>
-              <li className="flex items-start gap-3">
-                <Mail size={20} className="text-[#C19A6B] mt-1 flex-shrink-0" />
-                <div>
-                  <a href="mailto:info@zamir-realestate.co.il" className="text-gray-300 hover:text-[#C19A6B] transition-colors break-all">
-                    info@zamir-realestate.co.il
-                  </a>
-                </div>
+              <li className="flex items-center gap-3 text-gray-300">
+                <Mail size={18} className="text-blue-500 shrink-0" />
+                <a href={emailLink} className="hover:text-white break-all">{email}</a>
               </li>
-              <li className="flex items-start gap-3">
-                <MapPin size={20} className="text-[#C19A6B] mt-1 flex-shrink-0" />
-                <div className="text-gray-300">
-                  חולון, בת ים, ישראל
-                </div>
+              <li className="flex items-start gap-3 text-gray-300">
+                <MapPin size={18} className="text-blue-500 mt-0.5 shrink-0" />
+                <span>{address}, {city}</span>
               </li>
             </ul>
           </div>
 
-          {/* Social Media & Newsletter */}
-          <div>
-            <h4 className="text-xl font-black text-white mb-6 uppercase tracking-tight">עקבו אחרינו</h4>
-
-            {/* Social Icons */}
-            <div className="flex gap-4 mb-6">
-              <a
-                href="#"
-                className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#C19A6B] transition-all duration-300 hover:scale-110"
-                aria-label="Facebook"
-              >
-                <Facebook size={20} />
-              </a>
-              <a
-                href="#"
-                className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#C19A6B] transition-all duration-300 hover:scale-110"
-                aria-label="Instagram"
-              >
-                <Instagram size={20} />
-              </a>
-              <a
-                href="#"
-                className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#C19A6B] transition-all duration-300 hover:scale-110"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={20} />
-              </a>
+          {/* 4. עקבו אחרינו (צד שמאל בתמונה) */}
+          <div className="flex flex-col items-start lg:items-center">
+            <h4 className="text-lg font-bold mb-6 w-full lg:text-right">עקבו אחרינו</h4>
+            <div className="flex gap-3 mb-8">
+              <a href={facebook} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 transition-all border border-white/10"><Facebook size={18} /></a>
+              <a href={instagram} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-pink-600 transition-all border border-white/10"><Instagram size={18} /></a>
+              <a href={linkedin} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-700 transition-all border border-white/10"><Linkedin size={18} /></a>
             </div>
-
-            {/* Working Hours */}
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-              <h5 className="text-sm font-bold text-white mb-2">שעות פעילות</h5>
-              <p className="text-sm text-gray-400">ראשון - חמישי: 9:00 - 18:00</p>
-              <p className="text-sm text-gray-400">שישי: 9:00 - 13:00</p>
+            
+            {/* קופסת שעות פעילות */}
+            <div className="bg-[#161d2b] border border-white/5 rounded-xl p-4 w-full">
+              <h5 className="text-xs font-bold text-white mb-3 tracking-wider">שעות פעילות</h5>
+              <div className="space-y-1 text-xs text-gray-400">
+                <p>{weekdayHours}</p>
+                <p>{fridayHours}</p>
+              </div>
             </div>
           </div>
+
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/10 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-sm text-center md:text-right">
-              © {new Date().getFullYear()} כל הזכויות שמורות.
-            </p>
-            <div className="flex gap-6 text-sm">
-              <Link href="#" className="text-gray-400 hover:text-[#C19A6B] transition-colors">
-                תנאי שימוש
-              </Link>
-              <Link href="#" className="text-gray-400 hover:text-[#C19A6B] transition-colors">
-                מדיניות פרטיות
-              </Link>
-            </div>
+        {/* פס תחתון */}
+        <div className="mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+          <p>© {new Date().getFullYear()} כל הזכויות שמורות ל-H&R נדל"ן.</p>
+          <div className="flex gap-6">
+            <Link href="#" className="hover:text-gray-300">תנאי שימוש</Link>
+            <Link href="#" className="hover:text-gray-300">מדיניות פרטיות</Link>
           </div>
         </div>
       </div>

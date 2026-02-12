@@ -14,33 +14,58 @@ interface OwnerCardProps {
 export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
   return (
     <motion.div
-      className="owner-card"
+      // REMOVED: bg-white, shadow, border
+      // ONLY: layout and spacing
+      className="flex flex-col items-center text-center max-w-lg mx-auto"
+      
       initial={{ y: 50, opacity: 0 }}
       animate={inView ? { y: 0, opacity: 1 } : {}}
       transition={{ duration: 0.6, delay: index * 0.2 }}
-      whileHover={{ y: -10 }}
     >
-      <div className="owner-image-wrapper">
-        <Image
-          src={owner.image}
-          alt={owner.name}
-          width={400}
-          height={400}
-          className="owner-image"
-        />
+      
+      {/* --- Image Section --- */}
+      <div className="relative w-full max-w-[320px] aspect-[3/4] mb-8">
+        <div className="relative w-full h-full overflow-hidden rounded-[40px] shadow-2xl shadow-blue-900/10">
+          <Image
+            src={owner.image}
+            alt={owner.name}
+            fill
+            className="object-cover hover:scale-105 transition-transform duration-700"
+            sizes="(max-width: 768px) 100vw, 400px"
+          />
+        </div>
       </div>
-      <div className="owner-info">
-        <h3 className="owner-name">{owner.name}</h3>
-        <p className="owner-title">{owner.title}</p>
-        <p className="owner-description">{owner.description}</p>
-        <div className="owner-contact">
-          <a href={`tel:${owner.phone}`} className="contact-btn">
+
+      {/* --- Text Info Section --- */}
+      <div className="w-full px-4">
+        <h3 className="text-4xl font-extrabold text-[#1c3664] mb-2">
+          {owner.name}
+        </h3>
+        
+        <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
+          {owner.title}
+        </p>
+        
+        <p className="text-slate-600 text-lg leading-relaxed mb-8">
+          {owner.description}
+        </p>
+
+        {/* Contact Buttons */}
+        <div className="flex flex-wrap justify-center gap-4">
+          <a 
+            href={`tel:${owner.phone}`} 
+            className="flex items-center gap-2 px-8 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg hover:-translate-y-1"
+          >
             <Phone size={18} />
-            {owner.phone}
+            <span dir="ltr" className="font-medium">{owner.phone}</span>
           </a>
-          <a href={`mailto:${owner.email}`} className="contact-btn">
+
+          <a 
+            href={`mailto:${owner.email}`} 
+            className="flex items-center gap-2 px-8 py-3 bg-white border border-slate-300 text-slate-700 rounded-full hover:bg-slate-50 transition-all hover:border-[#1c3664]"
+          >
             <Mail size={18} />
-            צור קשר
+            <span className="font-medium">צור קשר</span>
           </a>
         </div>
       </div>

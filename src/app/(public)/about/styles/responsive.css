@@ -1,0 +1,160 @@
+/* ===== Responsive Design ===== */
+@media (max-width: 1024px) {
+  .owners-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 80vh;
+    min-height: 600px;
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 12vw, 6rem);
+    margin-bottom: 2rem;
+  }
+
+  .hero-description p {
+    font-size: clamp(1.1rem, 3vw, 1.8rem);
+  }
+
+  .hero-description p:first-child {
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 2rem 1rem;
+  }
+
+  .owners-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .owner-image-wrapper {
+    height: 350px;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .agent-content {
+    grid-template-columns: 1fr 280px;
+    gap: 2rem;
+    padding: 2.5rem;
+  }
+
+  .agent-name {
+    font-size: 1.9rem;
+  }
+
+  .agent-image-container {
+    height: 320px;
+  }
+
+  .cta-section {
+    padding: 6rem 2rem;
+  }
+
+  .cta-title {
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-subtitle {
+    margin-bottom: 3rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1.5rem 2.5rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    height: 70vh;
+    min-height: 500px;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owners-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-info {
+    padding: 2rem 1.5rem;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .agent-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .agent-image-container {
+    height: 400px;
+    order: -1;
+  }
+
+  .agent-text {
+    text-align: center;
+  }
+
+  .agent-contact-info {
+    justify-content: center;
+  }
+
+  .agent-name {
+    font-size: 1.8rem;
+  }
+
+  .agent-description {
+    font-size: 1rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .cta-section {
+    padding: 5rem 1.5rem;
+  }
+
+  .cta-title {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .cta-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    margin-bottom: 2.5rem;
+  }
+}
+

@@ -1,0 +1,387 @@
+// CoreUI Admin Panel Styles
+// Integrated from coreui-free-react-admin-template-main
+
+// Import CoreUI compiled CSS (SCSS import has dependency issues)
+// CoreUI removed - using Ant Design from Muse Dashboard
+
+// Import SimpleBar styles for custom scrollbar
+@import 'simplebar-react/dist/simplebar.min.css';
+
+// Global form font fix - must be before admin-wrapper
+input, textarea, select {
+  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+}
+
+// Wrap admin-specific styles in .admin-wrapper for isolation from Tailwind
+.admin-wrapper {
+  // Unified font family for admin panel - same as main site
+  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 15px;
+  line-height: 1.6;
+  
+  // Ensure all child elements use the same font
+  * {
+    font-family: inherit;
+  }
+
+  // Better text rendering for form elements
+  input, textarea, select, button {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  // Body background
+  background-color: var(--cui-tertiary-bg);
+  min-height: 100vh;
+
+  // Wrapper with sidebar spacing
+  .wrapper {
+    width: 100%;
+    padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
+    will-change: auto;
+    transition: padding 0.15s;
+  }
+
+  // Header and sidebar header min height
+  .header > .container-fluid,
+  .sidebar-header {
+    min-height: calc(4rem + 1px);
+  }
+
+  // Sidebar brand spacing
+  .sidebar-brand-full {
+    margin-left: 3px;
+  }
+
+  // Sidebar header navigation
+  .sidebar-header {
+    .nav-underline-border {
+      --cui-nav-underline-border-link-padding-x: 1rem;
+      --cui-nav-underline-border-gap: 0;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      min-height: calc(4rem + 1px);
+    }
+  }
+
+  // Sidebar toggler positioning
+  .sidebar-toggler {
+    margin-inline-start: auto;
+  }
+
+  .sidebar-narrow,
+  .sidebar-narrow-unfoldable:not(:hover) {
+    .sidebar-toggler {
+      margin-inline-end: auto;
+    }
+  }
+
+  // Header spacing
+  .header > .container-fluid + .container-fluid {
+    min-height: 3rem;
+  }
+
+  // Footer min height
+  .footer {
+    min-height: calc(3rem + 1px);
+  }
+
+  // SimpleBar content layout
+  .simplebar-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  // Sidebar customization
+  .sidebar {
+    background: #2c3e50;
+  }
+
+  // Header customization
+  .header {
+    background: #fff;
+    border-bottom: 1px solid #d8dbe0;
+  }
+
+  // RTL Support
+  &[dir="rtl"] {
+    .sidebar {
+      right: 0;
+      left: auto;
+    }
+
+    .sidebar-brand-full {
+      margin-right: 3px;
+      margin-left: 0;
+    }
+
+    .sidebar-toggler {
+      margin-inline-start: 0;
+      margin-inline-end: auto;
+    }
+
+    .sidebar-nav-link {
+      text-align: right;
+    }
+  }
+
+  // Dark mode support
+  &[data-coreui-theme="dark"] {
+    background-color: var(--cui-dark-bg-subtle);
+
+    .footer {
+      --cui-footer-bg: var(--cui-body-bg);
+    }
+
+    .header {
+      background: var(--cui-dark-bg-subtle);
+      border-bottom-color: var(--cui-border-color);
+    }
+  }
+
+  // Improved card styling
+  .card {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border-bottom: 2px solid #e9ecef;
+      padding: 1.25rem 1.5rem;
+      font-weight: 600;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+  }
+
+  // Improved form styling with higher specificity
+  .form-label,
+  label.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+  }
+
+  // CoreUI form components with high specificity
+  .form-control,
+  .form-select,
+  input.form-control,
+  select.form-select,
+  textarea.form-control,
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="password"],
+  textarea,
+  select {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    color: #212529 !important;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+    background-color: #fff;
+
+    &::placeholder {
+      color: #6c757d !important;
+      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-size: 14px !important;
+      opacity: 0.7;
+    }
+
+    &:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+      outline: none;
+      background-color: #fff;
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  // CoreUI specific components
+  .form-control-sm,
+  .form-select-sm {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 14px !important;
+  }
+
+  .form-control-lg,
+  .form-select-lg {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 16px !important;
+  }
+
+  // Textarea specific styling
+  textarea.form-control,
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    line-height: 1.6 !important;
+  }
+
+  // Select dropdown styling
+  select.form-select,
+  .form-select,
+  select {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+    cursor: pointer;
+    
+    option {
+      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-size: 15px !important;
+      padding: 0.5rem;
+    }
+  }
+
+  // Input group styling
+  .input-group {
+    .form-control,
+    .form-select {
+      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-size: 15px !important;
+    }
+  }
+
+  // Improved button styling
+  .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  // Improved tab styling
+  .nav-tabs {
+    border-bottom: 2px solid #e9ecef;
+
+    .nav-link {
+      border-radius: 8px 8px 0 0;
+      border: none;
+      margin-right: 0.25rem;
+      padding: 0.875rem 1.25rem;
+      color: #6c757d;
+      font-weight: 500;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+      }
+
+      &.active {
+        background-color: #fff;
+        color: #0d6efd;
+        border-bottom: 3px solid #0d6efd;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Image uploader improvements
+  .image-uploader {
+    .drop-zone {
+      transition: all 0.3s ease;
+    }
+  }
+
+  // Location picker improvements
+  .location-picker {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
+
+// Media query for system dark mode preference
+@media (prefers-color-scheme: dark) {
+  .admin-wrapper {
+    background-color: var(--cui-dark-bg-subtle);
+
+    .footer {
+      --cui-footer-bg: var(--cui-body-bg);
+    }
+
+    .header {
+      background: var(--cui-dark-bg-subtle);
+      border-bottom-color: var(--cui-border-color);
+    }
+  }
+}
+
+// Force font styles with maximum specificity - must be at the end
+.admin-wrapper {
+  // Override all form inputs with maximum specificity
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+  }
+
+  // CoreUI specific classes
+  .form-control,
+  .form-select,
+  input.form-control,
+  select.form-select,
+  textarea.form-control {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 400 !important;
+  }
+
+  // Select options
+  select option,
+  .form-select option {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 15px !important;
+  }
+
+  // Placeholders
+  input::placeholder,
+  textarea::placeholder {
+    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-size: 14px !important;
+  }
+}

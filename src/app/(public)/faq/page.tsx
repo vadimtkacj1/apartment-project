@@ -1,15 +1,24 @@
+'use client';
 import React from 'react';
+import Hero from '@/components/layout/Hero';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import FAQ from '@/components/layout/FAQ';
-
-export const metadata = {
-  title: 'שאלות ותשובות | רם וחיים שיווק נכסים',
-  description: 'שאלות נפוצות בתחום הנדל"ן - כל מה שרציתם לדעת על קניה, מכירה והשכרת דירות',
-};
 
 export default function FAQPage() {
   return (
-    <main className="min-h-screen bg-white">
-      <FAQ />
-    </main>
+    <>
+      <Hero
+        img="/images/hero/other-hero.jpeg"
+        staticTitle="שאלות ותשובות"
+        centered={true}
+      />
+
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
+
+      <main className="min-h-screen bg-white">
+        <FAQ />
+      </main>
+    </>
   );
 }

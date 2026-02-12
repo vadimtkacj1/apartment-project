@@ -42,7 +42,7 @@ export default function Breadcrumbs() {
   return (
     <>
       <nav
-        className="bg-white border-b border-gray-200 py-3 px-4 md:px-8"
+        className="bg-warm py-3 px-4 md:px-8"
         aria-label="Breadcrumb"
         dir="rtl"
         style={{ fontFamily: 'var(--font-open-sans), Arial, Helvetica, sans-serif' }}

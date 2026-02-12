@@ -1,0 +1,104 @@
+/* RTL Fixes for Admin Dashboard */
+
+/* Sidebar backdrop - hidden by default (desktop) */
+.layout-dashboard .sidebar-backdrop {
+  display: none;
+}
+
+/* Sidebar position for RTL - fixed to right */
+.layout-dashboard .ant-layout-sider.sider-primary {
+  right: 0;
+  left: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth transition when collapsed */
+.layout-dashboard .ant-layout-sider.sider-primary.ant-layout-sider-collapsed {
+  right: -250px;
+}
+
+/* Content margin for sidebar in RTL */
+.layout-dashboard .ant-layout {
+  margin-right: 250px;
+  margin-left: 0;
+  transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove margin when sidebar is collapsed */
+.layout-dashboard .ant-layout-sider.sider-primary.ant-layout-sider-collapsed ~ .ant-layout {
+  margin-right: 0;
+}
+
+/* Responsive: Mobile behavior */
+@media (max-width: 991px) {
+  .layout-dashboard .ant-layout {
+    margin-right: 0;
+  }
+
+  .layout-dashboard .ant-layout-sider.sider-primary {
+    position: fixed;
+    right: -250px;
+    z-index: 1000;
+    height: 100vh;
+  }
+
+  .layout-dashboard .ant-layout-sider.sider-primary:not(.ant-layout-sider-collapsed) {
+    right: 0;
+  }
+
+  /* Show backdrop on mobile when sidebar is open */
+  .layout-dashboard .sidebar-backdrop {
+    display: block !important;
+    animation: fadeIn 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* RTL text alignment */
+.layout-dashboard {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Fix brand spacing for RTL */
+.layout-dashboard .ant-layout-sider.sider-primary .brand span {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* Fix icon margin for RTL */
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .icon {
+  margin-left: 12px;
+  margin-right: 0;
+}
+
+/* Ensure proper RTL for Ant Design components */
+.layout-dashboard .ant-card {
+  text-align: right;
+}
+
+.layout-dashboard .ant-form-item-label {
+  text-align: right;
+}
+
+.layout-dashboard .ant-table {
+  direction: rtl;
+}
+
+/* Footer */
+.layout-dashboard .ant-layout-footer {
+  text-align: center;
+}
+
+/* Header breadcrumb */
+.layout-dashboard .ant-breadcrumb {
+  direction: rtl;
+}

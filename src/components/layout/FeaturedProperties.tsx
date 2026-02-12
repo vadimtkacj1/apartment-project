@@ -1,63 +1,100 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
+interface Property {
+  id: number;
+  title: string;
+  location: string;
+  price: string;
+  originalPrice?: string;
+  bedrooms: string;
+  bathrooms: number;
+  area: number;
+  status?: string;
+  images?: string[];
+  image?: string;
+  isSold?: boolean;
+}
+
 const FeaturedProperties: React.FC = () => {
-  // Sample properties data - replace with real data later
-  const properties = [
-    {
-      id: 1,
-      image: "/images/hero/sales.jpg",
-      title: "חופיין 58 חולון – למכירה דירת 3.5 חדרים – מחיר שיווק",
-      location: "חולון, בת ים",
-      price: "1,895,000",
-      originalPrice: undefined,
-      bedrooms: 3.5,
-      bathrooms: 2,
-      area: 85,
-      status: "משגע לפגוס",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13540.5!2d34.7818!3d32.0113!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b8c3c4e707b%3A0x3cf89d1e0c97e244!2sHolon%2C%20Israel!5e0!3m2!1sen!2s!4v1234567890123"
-    },
-    {
-      id: 2,
-      image: "/images/hero/rentals.webp",
-      title: "החשמונאים 15 חולון – למכירה דירת גג 4.5 חדרים – מחיר שיווק",
-      location: "חולון",
-      price: "2,020,000",
-      originalPrice: "2,020,000",
-      bedrooms: 4.5,
-      bathrooms: 2,
-      area: 120,
-      status: "גגם חדש",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13540.2!2d34.7925!3d32.0679!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4ca6193b7c1f%3A0x98a9f4fd8b9c4b0d!2sRamat%20Gan%2C%20Israel!5e0!3m2!1sen!2s!4v1234567891123"
-    },
-    {
-      id: 3,
-      image: "/images/hero/rent.png",
-      title: "דירת יוקרה בלב העיר – 5 חדרים עם מרפסת שמש",
-      location: "תל אביב, יפו",
-      price: "3,500,000",
-      originalPrice: undefined,
-      bedrooms: 5,
-      bathrooms: 3,
-      area: 140,
-      status: "משגע לפגוס",
-      mapUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d13524.8!2d34.7818!3d32.0853!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b7d84f7cc8b%3A0xd3e6d52d7a4ac1a0!2sTel%20Aviv-Yafo%2C%20Israel!5e0!3m2!1sen!2s!4v1234567892123"
-    }
-  ];
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch featured properties from API
+  useEffect(() => {
+    const fetchFeaturedProperties = async () => {
+      try {
+        setLoading(true);
+        // Fetch properties from center area for sale, limit to 3
+        const response = await fetch('/api/properties?region=center&dealType=sale&limit=3');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch properties');
+        }
+
+        const data = await response.json();
+
+        // Map properties to the format expected by PropertyCard
+        const mappedProperties: Property[] = data.map((prop: any) => ({
+          id: prop.id,
+          title: prop.title,
+          location: prop.location,
+          price: prop.price,
+          originalPrice: prop.originalPrice,
+          bedrooms: prop.rooms,
+          bathrooms: prop.bathrooms,
+          area: prop.area,
+          status: prop.status,
+          image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
+          isSold: prop.isSold || false,
+        }));
+
+        setProperties(mappedProperties);
+      } catch (error) {
+        console.error('Error fetching featured properties:', error);
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProperties();
+  }, []);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <section
+        dir="rtl"
+        className="relative w-full pt-24 md:pt-32 pb-0 overflow-hidden bg-warm"
+      >
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="text-center py-20">
+            <p className="text-gray-600 text-xl">טוען נכסים...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Don't show section if no properties
+  if (properties.length === 0) {
+    return null;
+  }
 
   return (
 <section
   dir="rtl"
-  className="relative w-full pt-24 md:pt-32 pb-0 bg-white overflow-hidden"
+  className="relative w-full pt-24 md:pt-32 pb-0 bg-warm overflow-hidden"
 >
       {/* Decorative background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-[#C19A6B] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#C19A6B] rounded-full blur-3xl"></div>
+        <div className="absolute top-20 right-20 w-96 h-96 bg-[#1c3664] rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
@@ -76,7 +113,7 @@ const FeaturedProperties: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#C19A6B] font-bold text-lg uppercase tracking-wider">
+            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               נכסים נבחרים
             </span>
           </motion.div>
@@ -84,8 +121,6 @@ const FeaturedProperties: React.FC = () => {
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
 נכסים באיזור המרכז
           </h2>
-
-          <div className="w-32 h-1 bg-[#C19A6B] mx-auto mb-6"></div>
 
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
 מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז
@@ -99,6 +134,7 @@ const FeaturedProperties: React.FC = () => {
               key={property.id}
               {...property}
               index={index}
+              isSold={property.isSold}
             />
           ))}
         </div>
@@ -113,7 +149,7 @@ const FeaturedProperties: React.FC = () => {
         >
           <Link
             href="/apartments"
-            className="inline-flex items-center gap-3 px-12 py-5 bg-[#C19A6B] text-white font-black text-xl uppercase tracking-tight rounded-2xl shadow-2xl hover:bg-gray-900 transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
+            className="inline-flex items-center gap-3 px-12 py-5 bg-[#1c3664] text-white font-black text-xl uppercase tracking-tight rounded-2xl shadow-2xl hover:bg-[#152a4f] transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
           >
             <span>כל הנכסים</span>
             <ArrowLeft

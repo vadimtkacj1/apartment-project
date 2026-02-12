@@ -47,3 +47,6 @@ next-env.d.ts
 deploy/
 deploy.tar.gz
 *.tar.gz
+
+/src/generated/prisma
+nul

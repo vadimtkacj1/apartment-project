@@ -6,9 +6,10 @@ import Link from 'next/link';
 import {
   Bed, Maximize, MapPin, Car, Home, Compass,
   Wind, Warehouse, Sun, Droplet, Shield, ArrowUpDown,
-  Building, Calendar, ArrowLeft
+  Building, Calendar, ArrowLeft, CheckCircle2
 } from 'lucide-react';
 import { Property } from '@/types/property.types';
+import { analytics } from '@/lib/analytics';
 
 interface PropertyCardProps extends Partial<Property> {
   id: number;
@@ -17,13 +18,14 @@ interface PropertyCardProps extends Partial<Property> {
   location: string;
   price: string;
   originalPrice?: string;
-  bedrooms?: number;
+  bedrooms?: string;
   bathrooms?: number;
   area: number;
   status?: string;
   index?: number;
   mapUrl?: string;
   images?: string[];
+  isSold?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -51,7 +53,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   directions,
   kitchen,
   vacancyDate,
-  features
+  features,
+  isSold
 }) => {
 
   // --- Helper functions for Hebrew localization ---
@@ -130,30 +133,63 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const dealTypeLabel = dealType === 'sale' ? 'למכירה' : dealType === 'rent' ? 'להשכרה' : 'למכירה';
 
   return (
-    <motion.div
-      whileHover={{ y: -5 }}
-      className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
-      style={{
-        boxShadow: '0 4px 20px rgba(193, 154, 107, 0.15), 0 0 40px rgba(193, 154, 107, 0.08)'
+    <Link
+      href={`/apartments/${id}`}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!isSold) {
+          analytics.trackPropertyClick(id, 'card');
+        }
       }}
-      dir="rtl"
+      className="block h-full"
     >
+      <motion.div
+        whileHover={isSold ? {} : { y: -5 }}
+        className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
+          isSold 
+            ? 'bg-gray-100 border-2 border-gray-300 opacity-75' 
+            : 'bg-white border border-gray-100'
+        }`}
+        style={{
+          boxShadow: isSold 
+            ? '0 2px 10px rgba(0, 0, 0, 0.1)' 
+            : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)'
+        }}
+        dir="rtl"
+      >
       {/* Property Image */}
       <div className="relative h-64 overflow-hidden bg-gray-100">
         <Image
           src={displayImage}
           alt={title}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className={`object-cover transition-transform duration-700 ${
+            isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
+          }`}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
         
         {/* Dark overlay for text contrast if needed */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60"></div>
+        <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
+          isSold ? 'opacity-40' : 'opacity-60'
+        }`}></div>
+        
+        {/* Gray overlay for sold properties */}
+        {isSold && (
+          <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
+        )}
 
-        {/* Status Badge (e.g., Sold, New) */}
-        {status && (
-          <div className="absolute top-4 right-4 bg-[#C19A6B] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+        {/* Sold Badge - Red with icon */}
+        {isSold && (
+          <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5 z-10">
+            <CheckCircle2 size={16} />
+            <span>נמכר</span>
+          </div>
+        )}
+
+        {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
+        {status && !isSold && (
+          <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
             {status}
           </div>
         )}
@@ -167,40 +203,62 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       </div>
 
       {/* Card Content */}
-      <div className="p-5 flex flex-col flex-1">
+      <div className={`p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
         
         {/* Address & Title */}
         <div className="mb-4">
-          <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium mb-2">
-            <MapPin size={16} className="text-[#C19A6B]" />
+          <div className={`flex items-center gap-1.5 text-sm font-medium mb-2 ${
+            isSold ? 'text-gray-400' : 'text-gray-500'
+          }`}>
+            <MapPin size={16} className={isSold ? 'text-gray-400' : 'text-[#1c3664]'} />
             <span className="truncate">
               {location} 
               {neighborhood && ` • ${neighborhood}`}
               {street && ` • ${street} ${streetNumber || ''}`}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 leading-snug line-clamp-2 min-h-[3.5rem]">
-            {title}
-          </h3>
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className={`text-xl font-bold leading-snug line-clamp-2 min-h-[3.5rem] flex-1 ${
+              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+            }`}>
+              {title}
+            </h3>
+            {isSold && (
+              <div className="flex items-center gap-1 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
+                <CheckCircle2 size={14} />
+                <span>נמכר</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Main Statistics Grid (Rooms, Floor, Area) */}
         <div className="grid grid-cols-3 gap-2 mb-5">
-          <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg py-2">
-            <Bed size={20} className="text-[#C19A6B] mb-1" />
-            <span className="text-sm font-bold text-gray-900">{displayRooms} חדרים</span>
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+            isSold ? 'bg-gray-200' : 'bg-gray-50'
+          }`}>
+            <Bed size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+              {displayRooms} חדרים
+            </span>
           </div>
           
-          <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg py-2">
-            <Building size={20} className="text-[#C19A6B] mb-1" />
-            <span className="text-sm font-bold text-gray-900">
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+            isSold ? 'bg-gray-200' : 'bg-gray-50'
+          }`}>
+            <Building size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
                {floor !== undefined ? `קומה ${floor}` : '-'}
             </span>
           </div>
 
-          <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg py-2">
-            <Maximize size={20} className="text-[#C19A6B] mb-1" />
-            <span className="text-sm font-bold text-gray-900">{area} מ״ר</span>
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+            isSold ? 'bg-gray-200' : 'bg-gray-50'
+          }`}>
+            <Maximize size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+              {area} מ״ר
+            </span>
           </div>
         </div>
 
@@ -280,28 +338,37 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         )}
 
         {/* Footer: Price & Action Button */}
-        <div className="mt-auto border-t border-gray-100 pt-4 flex items-center justify-between">
+        <div className={`mt-auto border-t pt-4 flex items-center justify-between ${
+          isSold ? 'border-gray-300' : 'border-gray-100'
+        }`}>
           <div>
-             {originalPrice && (
+            {originalPrice && (
               <p className="text-xs text-gray-400 line-through mb-0.5">
                 {originalPrice}
               </p>
             )}
-            <p className="text-2xl font-black text-[#C19A6B]">
-              {price} <span className="text-lg">₪</span>
+            <p className={`text-2xl font-black ${
+              isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
+            }`}>
+              {price}
             </p>
           </div>
           
-          <Link
-            href={`/apartments/${id}`}
-            className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-[#C19A6B] transition-colors shadow-lg hover:shadow-xl"
-          >
-            לפרטים נוספים
-            <ArrowLeft size={18} />
-          </Link>
+          {isSold ? (
+            <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-400 text-white font-bold rounded-xl opacity-60">
+              נמכר
+              <CheckCircle2 size={18} />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl">
+              לפרטים נוספים
+              <ArrowLeft size={18} />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
+    </Link>
   );
 };
 

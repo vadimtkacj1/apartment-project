@@ -1,0 +1,44 @@
+export interface PropertyForm {
+  dealType: string;
+  city: string;
+  neighborhood: string;
+  street: string;
+  streetNumber: string;
+  apartmentNumber: string;
+  latitude: number | null;
+  longitude: number | null;
+  propertyType: string;
+  floor: number;
+  parking: string;
+  position: string;
+  furniture: string;
+  directions: string[];
+  kitchen: string;
+  rooms: string;
+  area: number;
+  builtArea: number;
+  vacancyDate: string;
+  hasAirConditioning: boolean;
+  hasDisabledAccess: boolean;
+  hasSunBalcony: boolean;
+  hasStorage: boolean;
+  hasSunroom: boolean;
+  hasBoiler: boolean;
+  hasSafeRoom: boolean;
+  hasElevator: boolean;
+  title: string;
+  description: string;
+  price: string;
+  originalPrice: string;
+  images: string[];
+  status: string;
+  location: string;
+  bedrooms: string;
+  bathrooms: number;
+  isActive: boolean;
+}
+
+export interface PropertyFormSectionProps {
+  formData: PropertyForm;
+  handleChange: (field: keyof PropertyForm, value: any) => void;
+}

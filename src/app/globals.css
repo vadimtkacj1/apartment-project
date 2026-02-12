@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f9f6f0;
   --foreground: #171717;
+  --warm-beige: #faf7f2;
+  --warm-sand: #f9f6f0;
+  --warm-cream: #fdfbf7;
+  --warm-light: #fcf9f5;
+  --warm-lighter: #fefcfa;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +29,10 @@ body {
 }
 
 @layer utilities {
+  .bg-warm {
+    background-color: var(--warm-sand) !important;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

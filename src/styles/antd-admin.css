@@ -1,0 +1,564 @@
+/*!
+=========================================================
+* Admin Dashboard - Custom Ant Design Styles
+=========================================================
+*/
+
+/* ===== SCOPED ADMIN STYLES ===== */
+/* All admin styles are scoped to .layout-dashboard or .layout-signin */
+
+/* ===== LAYOUT ===== */
+.layout-dashboard {
+  background: var(--warm-sand);
+  text-align: right;
+  direction: rtl;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+  font-family: var(--font-opensans-hebrew), 'Open Sans Hebrew', Arial, Helvetica, sans-serif;
+  color: #141414;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.layout-dashboard * {
+  font-family: inherit;
+}
+
+@media (min-width: 992px) {
+  .layout-dashboard {
+    overflow: auto;
+  }
+}
+
+/* ===== SIDEBAR ===== */
+.layout-dashboard .ant-layout-sider.sider-primary {
+  width: 250px;
+  position: fixed;
+  right: 0;
+  left: auto;
+  z-index: 99;
+  height: 100vh;
+  overflow: auto;
+  margin: 0;
+  padding: 20px;
+  background: #fff !important;
+  border-left: 1px solid #f0f0f0;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .brand {
+  font-weight: 700;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 0;
+  color: #141414;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .brand img {
+  height: 32px;
+  width: auto;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary hr {
+  margin: 16px 0;
+  border: none;
+  height: 1px;
+  background-color: #f0f0f0;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-layout-sider-children {
+  width: auto;
+}
+
+/* ===== SIDEBAR MENU ===== */
+.layout-dashboard .ant-menu {
+  background: transparent !important;
+  border: none !important;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item {
+  padding: 0 !important;
+  height: auto;
+  line-height: normal;
+  margin: 4px 0 !important;
+  overflow: visible;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item::after {
+  display: none;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a {
+  padding: 10px 14px;
+  color: #595959;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover {
+  background-color: #f5f7fa;
+  color: #141414;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active {
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+  color: #141414;
+}
+
+/* Sidebar menu icons */
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .icon {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 12px;
+  margin-right: 0;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active .icon {
+  background-color: #1890ff;
+  box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active svg path {
+  fill: #fff;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item svg path {
+  fill: #8c8c8c;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover .icon {
+  background-color: #e6f4ff;
+}
+
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover svg path {
+  fill: #1890ff;
+}
+
+/* Sidebar label */
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .label {
+  font-weight: inherit;
+  font-size: 14px;
+  color: inherit;
+}
+
+/* Active menu selection background override */
+.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item.ant-menu-item-selected {
+  background-color: transparent !important;
+}
+
+/* ===== MAIN CONTENT LAYOUT ===== */
+.layout-dashboard .ant-layout {
+  background: transparent;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  flex-shrink: 0;
+  margin-right: 250px;
+  margin-left: 0;
+}
+
+/* ===== HEADER ===== */
+.layout-dashboard .ant-layout-header {
+  background: #fff !important;
+  height: auto;
+  padding: 0 24px;
+  margin: 12px 20px;
+  line-height: inherit;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: 0.2s;
+}
+
+.layout-dashboard .ant-breadcrumb > span .ant-breadcrumb-link a {
+  color: #8c8c8c;
+}
+
+.layout-dashboard .ant-breadcrumb > span:last-child .ant-breadcrumb-link {
+  color: #141414;
+}
+
+.layout-dashboard .ant-page-header-heading {
+  margin-top: 0;
+}
+
+.layout-dashboard .ant-page-header-heading .ant-page-header-heading-title {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  margin-top: 4px;
+  color: #141414;
+}
+
+.layout-dashboard .header-control {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  margin-top: 0;
+  gap: 8px;
+}
+
+.layout-dashboard .header-control .ant-btn-link {
+  height: auto;
+  padding: 0 7px;
+  margin: 0;
+  box-shadow: none;
+  color: #595959;
+  line-height: normal;
+}
+
+.layout-dashboard .header-control svg {
+  width: 20px;
+  height: 20px;
+}
+
+.layout-dashboard .header-control svg path {
+  fill: #595959;
+}
+
+/* ===== CONTENT AREA ===== */
+.layout-dashboard .content-ant {
+  margin: 0 20px;
+  padding: 24px;
+  min-height: calc(100vh - 140px);
+}
+
+/* ===== CARDS ===== */
+.layout-dashboard .ant-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f0f0f0;
+  color: #141414;
+}
+
+.layout-dashboard .ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+  min-height: auto;
+  padding: 16px 24px;
+}
+
+.layout-dashboard .ant-card-head-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #141414;
+  padding: 0;
+}
+
+.layout-dashboard .ant-card-body {
+  padding: 20px 24px;
+  color: #141414;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.layout-dashboard h1,
+.layout-dashboard h2,
+.layout-dashboard h3,
+.layout-dashboard h4,
+.layout-dashboard h5,
+.layout-dashboard h6 {
+  font-weight: 700;
+  color: #141414;
+}
+
+.layout-dashboard p {
+  font-size: 14px;
+  color: #595959;
+  line-height: 1.6;
+}
+
+.layout-dashboard strong {
+  color: #141414;
+}
+
+/* ===== STATISTICS ===== */
+.layout-dashboard .ant-statistic-title {
+  color: #8c8c8c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.layout-dashboard .ant-statistic-content {
+  color: #141414;
+  font-weight: 700;
+}
+
+/* ===== TABLES ===== */
+.layout-dashboard .tabled {
+  padding: 0;
+}
+
+.layout-dashboard .criclebox {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.layout-dashboard .tablespace {
+  margin-bottom: 24px;
+}
+
+.layout-dashboard .ant-border-space {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+}
+
+.layout-dashboard .ant-table-thead > tr > th {
+  color: #595959;
+  font-weight: 700;
+  background-color: #fafafa;
+  font-size: 13px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.layout-dashboard .ant-table-tbody > tr > td {
+  color: #141414;
+  font-size: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.layout-dashboard .ant-table-tbody > tr:hover > td {
+  background: #f5f7fa;
+}
+
+.layout-dashboard .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.layout-dashboard .ant-table-tbody > tr > td,
+.layout-dashboard .ant-table-thead > tr > th {
+  padding: 14px 20px;
+  white-space: nowrap;
+}
+
+/* ===== BUTTONS ===== */
+.layout-dashboard .ant-btn {
+  font-weight: 600;
+  border-radius: 8px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.layout-dashboard .ant-btn-primary {
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+/* ===== FORMS ===== */
+.layout-dashboard .ant-form-item-label > label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.layout-dashboard .ant-input,
+.layout-dashboard .ant-select-selector,
+.layout-dashboard .ant-input-number,
+.layout-dashboard .ant-picker {
+  border-radius: 8px !important;
+  font-size: 14px;
+  color: #141414;
+}
+
+.layout-dashboard .ant-input::placeholder {
+  color: #bfbfbf;
+}
+
+/* ===== BADGES ===== */
+.layout-dashboard .ant-badge-status-text {
+  color: #141414;
+  font-size: 14px;
+}
+
+/* ===== FOOTER ===== */
+.layout-dashboard .ant-layout-footer {
+  background: transparent;
+  padding: 16px 24px;
+  margin: 0 20px 16px;
+}
+
+.layout-dashboard .copyright {
+  color: #8c8c8c;
+  font-size: 13px;
+  text-align: center;
+}
+
+.layout-dashboard .footer-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.layout-dashboard .footer-menu .nav-link {
+  color: #8c8c8c;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.layout-dashboard .footer-menu .nav-link:hover {
+  color: #1890ff;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 992px) {
+  .layout-dashboard .ant-layout-sider.sider-primary {
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+  }
+
+  .layout-dashboard .ant-layout {
+    margin-right: 250px;
+    margin-left: 0;
+  }
+
+  .layout-dashboard .header-control .sidebar-toggler {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .layout-dashboard .ant-layout-header {
+    margin: 12px 20px;
+  }
+
+  .layout-dashboard .header-control {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 991px) {
+  .layout-dashboard .ant-layout-sider.sider-primary {
+    position: fixed;
+    right: -250px;
+    left: auto;
+    transition: right 0.3s;
+  }
+
+  .layout-dashboard .ant-layout {
+    margin-right: 0;
+  }
+
+  .layout-dashboard .header-control .sidebar-toggler {
+    display: block;
+  }
+}
+
+/* ===== UPLOAD AREA ===== */
+.layout-dashboard .ant-upload-drag {
+  border-radius: 12px;
+  border: 2px dashed #d9d9d9;
+  background: #fafafa;
+  transition: all 0.3s;
+}
+
+.layout-dashboard .ant-upload-drag:hover {
+  border-color: #1890ff;
+  background: #f0f7ff;
+}
+
+.layout-dashboard .ant-upload-text {
+  color: #141414 !important;
+  font-weight: 600;
+}
+
+.layout-dashboard .ant-upload-hint {
+  color: #8c8c8c !important;
+}
+
+/* ===== IMAGES ===== */
+.layout-dashboard .ant-image {
+  display: inline-block;
+}
+
+.layout-dashboard .ant-image img {
+  object-fit: cover;
+}
+
+/* ===== MISC UTILITY CLASSES ===== */
+.mb-4 {
+  margin-bottom: 24px !important;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+/* ===== DRAWER SIDEBAR ===== */
+.drawer-sidebar .ant-drawer-body {
+  padding: 0;
+}
+
+.drawer-sidebar .ant-drawer-body .ant-layout-sider.sider-primary {
+  position: relative;
+  right: 0;
+  margin: 0;
+  height: 100%;
+}
+
+/* ===== SCROLLBAR ===== */
+.layout-dashboard ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.layout-dashboard ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.layout-dashboard ::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+}
+
+.layout-dashboard ::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+/* ===== IMAGE FIX - Override Tailwind preflight ===== */
+.layout-dashboard img {
+  max-width: none;
+  height: auto;
+}
+
+.layout-dashboard .ant-image-img {
+  display: block;
+  width: auto;
+  height: auto;
+}
+
+/* ===== MODAL ===== */
+.layout-dashboard .ant-modal-header {
+  text-align: right;
+}
+
+/* ===== SELECT ===== */
+.layout-dashboard .ant-select-item-option-content {
+  color: #141414;
+}
+
+/* ===== SWITCH ===== */
+.layout-dashboard .ant-switch-inner-checked,
+.layout-dashboard .ant-switch-inner-unchecked {
+  font-size: 12px;
+}

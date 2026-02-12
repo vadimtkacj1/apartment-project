@@ -1,27 +1,30 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Autoplay } from 'swiper/modules';
-import { 
-  ArrowLeft, 
-  Send, 
-  Phone, 
-  Snowflake, 
-  Accessibility, 
-  Sun, 
-  Box, 
-  Flame, 
-  Shield, 
-  ArrowUpDown, 
+import {
+  ArrowLeft,
+  Send,
+  Phone,
+  Snowflake,
+  Accessibility,
+  Sun,
+  Box,
+  Flame,
+  Shield,
+  ArrowUpDown,
   Waves,
-  Maximize, 
-  LayoutDashboard, 
-  ArrowUpFromLine, 
-  Wind 
+  Maximize,
+  LayoutDashboard,
+  ArrowUpFromLine,
+  Wind,
+  CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
 import SimilarProperties from '@/components/properties/SimilarProperties';
+import { analytics } from '@/lib/analytics';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -41,56 +44,132 @@ const ALL_AMENITIES = [
   { key: 'elevator', label: 'מעלית', icon: ArrowUpDown }
 ];
 
-const SAMPLE_PROPERTY = {
-  id: 1,
-  title: "החשמונאים 15 חולון – למכירה דירת גג 4.5 חדרים – מחיר שיווק",
-  location: "החשמונאים 15, חולון",
-  price: "2,020,000",
-  originalPrice: "2,020,000",
-  bedrooms: 4.5,
-  bathrooms: 2,
-  area: 94,
-  floor: 4,
-  totalFloors: 4,
-  buildingType: "גמיש",
-  availableFrom: "מיידי",
-  images: [
-    "/images/hero/sales.jpg",
-    "/images/hero/rentals.webp",
-    "/images/hero/rent.png",
-    "/images/hero/sales.jpg"
-  ],
+interface PropertyData {
+  id: number;
+  title: string;
+  location: string;
+  price: string;
+  originalPrice?: string;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  floor?: number;
+  totalFloors?: number;
+  buildingType?: string;
+  availableFrom?: string;
+  images: string[];
   amenities: {
-    ac: true,
-    handicap: false,
-    solarHeater: true,
-    storage: true,
-    sunBalcony: true,
-    boiler: true,
-    mamad: true,
-    elevator: false
-  },
-  specs: [
-    { label: "קומה", value: "4 מתוך 4", icon: ArrowUpFromLine },
-    { label: 'גודל במ"ר', value: "94", icon: Maximize },
-    { label: "חדרים", value: "4.5", icon: LayoutDashboard },
-    { label: "כיווני אוויר", value: "דרום, מערב", icon: Wind },
-  ],
-  description: `ברחוב החשמונאים 15, שכונת גינר ושם, חולון
-
-דירת גג 4.5 חדרים משופצת ומושקעת.
-מטבח חדש, צנרת חדשה, מזגנים בכל החדרים.
-מיקום מעולה קרוב למוסדות חינוך, תחבורה ציבורית ומרכזי קניות.
-נכס מניב עם תשואה גבוהה - שווה לראות!`
-};
+    ac: boolean;
+    handicap: boolean;
+    solarHeater: boolean;
+    storage: boolean;
+    sunBalcony: boolean;
+    boiler: boolean;
+    mamad: boolean;
+    elevator: boolean;
+  };
+  specs: Array<{ label: string; value: string; icon: any }>;
+  description: string;
+  directions?: string[];
+  isSold?: boolean;
+}
 
 export default function ApartmentDetailPage() {
+  const params = useParams();
+  const propertyId = params.id as string;
+
+  const [property, setProperty] = useState<PropertyData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     message: ''
   });
+
+  // Fetch property data from API
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/properties/${propertyId}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch property');
+        }
+
+        const data = await response.json();
+
+        // Map API data to component format
+        const mappedProperty: PropertyData = {
+          id: data.id,
+          title: data.title,
+          location: data.location,
+          price: data.price,
+          originalPrice: data.originalPrice,
+          bedrooms: data.rooms,
+          bathrooms: data.bathrooms,
+          area: data.area,
+          floor: data.floor,
+          images: data.images && data.images.length > 0 ? data.images : ["/images/hero/sales.jpg"],
+          description: data.description || 'אין תיאור זמין',
+          isSold: data.isSold || false,
+          amenities: {
+            ac: data.hasAirConditioning || false,
+            handicap: data.hasDisabledAccess || false,
+            solarHeater: false, // Not in DB, keeping for compatibility
+            storage: data.hasStorage || false,
+            sunBalcony: data.hasSunBalcony || false,
+            boiler: data.hasBoiler || false,
+            mamad: data.hasSafeRoom || false,
+            elevator: data.hasElevator || false,
+          },
+          specs: [
+            {
+              label: "קומה",
+              value: data.floor ? `${data.floor}` : "לא צוין",
+              icon: ArrowUpFromLine
+            },
+            {
+              label: 'גודל במ"ר',
+              value: `${data.area}`,
+              icon: Maximize
+            },
+            {
+              label: "חדרים",
+              value: `${data.rooms}`,
+              icon: LayoutDashboard
+            },
+            {
+              label: "כיווני אוויר",
+              value: data.directions && data.directions.length > 0
+                ? data.directions.join(', ')
+                : "לא צוין",
+              icon: Wind
+            },
+          ],
+          directions: data.directions || [],
+        };
+
+        setProperty(mappedProperty);
+        setError(null);
+        
+        // Track property view
+        analytics.trackPropertyView(propertyId);
+      } catch (err) {
+        console.error('Error fetching property:', err);
+        setError('שגיאה בטעינת הנכס');
+        setProperty(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (propertyId) {
+      fetchProperty();
+    }
+  }, [propertyId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -102,16 +181,62 @@ export default function ApartmentDetailPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
+    // Track contact form submission
+    analytics.trackContactForm(propertyId);
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-warm pt-8 pb-16" dir="rtl">
+        <div className="flex items-center justify-center h-96">
+          <p className="text-gray-600 text-xl">טוען נכס...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error || !property) {
+    return (
+      <div className="min-h-screen bg-warm pt-8 pb-16" dir="rtl">
+        <div className="flex flex-col items-center justify-center h-96">
+          <p className="text-gray-600 text-xl mb-4">{error || 'נכס לא נמצא'}</p>
+          <Link
+            href="/apartments"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#1c3664] text-white font-bold rounded-xl hover:bg-[#152a4f] transition-colors"
+          >
+            <span>חזרה לנכסים</span>
+            <ArrowLeft size={20} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const isSold = property.isSold || false;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white pt-40 pb-16" dir="rtl">
-      <div className="w-full">
+    <div className={`min-h-screen bg-warm pt-8 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
+      {/* Sold Overlay */}
+      {isSold && (
+        <div className="fixed inset-0 bg-gray-900/20 z-40 pointer-events-none"></div>
+      )}
+      
+      {/* Sold Badge - Fixed Position */}
+      {isSold && (
+        <div className="fixed top-20 right-8 z-50 bg-red-600 text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-2 font-bold text-lg">
+          <CheckCircle2 size={24} />
+          <span>נמכר</span>
+        </div>
+      )}
+
+      <div className={`w-full ${isSold ? 'pointer-events-none' : ''}`}>
 
         <div className="w-full px-6 flex justify-end mb-8 px-6 lg:px-12">
           <Link
             href="/apartments"
-            className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#C19A6B] transition-colors duration-300 font-bold text-lg"
+            className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#1c3664] transition-colors duration-300 font-bold text-lg"
           >
             <span>חזרה לנכסים</span>
             <ArrowLeft size={22} className="group-hover:-translate-x-1 transition-transform" />
@@ -134,18 +259,19 @@ export default function ApartmentDetailPage() {
                 modules={[Navigation, Pagination, Thumbs, Autoplay]}
                 navigation
                 pagination={{ clickable: true }}
-                autoplay={{ delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: false }}
+                autoplay={isSold ? false : { delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: false }}
                 loop={true}
                 speed={800}
                 thumbs={{ swiper: thumbsSwiper && !(thumbsSwiper as any).destroyed ? thumbsSwiper : null }}
-                className="rounded-2xl overflow-hidden mb-4 shadow-2xl property-slider"
+                className={`rounded-2xl overflow-hidden mb-4 shadow-2xl property-slider ${isSold ? 'grayscale opacity-60' : ''}`}
                 style={{ height: '85vh' }}
                 dir="ltr"
               >
-                {SAMPLE_PROPERTY.images.map((image, index) => (
+                {property.images.map((image: string, index: number) => (
                   <SwiperSlide key={index}>
                     <div className="relative w-full h-full">
-                      <img src={image} alt="Property" className="w-full h-full object-cover" />
+                      <img src={image} alt="Property" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
+                      {isSold && <div className="absolute inset-0 bg-gray-900/30"></div>}
                     </div>
                   </SwiperSlide>
                 ))}
@@ -170,8 +296,8 @@ export default function ApartmentDetailPage() {
                 }
                 
                 .property-slider .swiper-button-prev:hover, .property-slider .swiper-button-next:hover {
-                  background-color: #C19A6B; 
-                  border-color: #C19A6B; 
+                  background-color: #1c3664; 
+                  border-color: #1c3664; 
                   transform: scale(1.1);
                 }
                 
@@ -185,14 +311,16 @@ export default function ApartmentDetailPage() {
                 .property-slider .swiper-button-next { right: 20px; }
                 
                 .property-slider .swiper-pagination-bullet { background: white; opacity: 0.7; width: 8px; height: 8px; }
-                .property-slider .swiper-pagination-bullet-active { background: #C19A6B; opacity: 1; width: 24px; border-radius: 4px; }
+                .property-slider .swiper-pagination-bullet-active { background: #1c3664; opacity: 1; width: 24px; border-radius: 4px; }
               `}</style>
 
               <Swiper onSwiper={setThumbsSwiper as any} spaceBetween={10} slidesPerView={4} watchSlidesProgress className="rounded-xl">
-                {SAMPLE_PROPERTY.images.map((image, index) => (
-                  <SwiperSlide key={index} className="cursor-pointer">
-                    <div className="relative aspect-video rounded-lg overflow-hidden border-2 border-gray-200 hover:border-[#C19A6B] transition-colors">
-                      <img src={image} alt="Thumb" className="w-full h-full object-cover" />
+                {property.images.map((image: string, index: number) => (
+                  <SwiperSlide key={index} className={isSold ? 'cursor-not-allowed' : 'cursor-pointer'}>
+                    <div className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-colors ${
+                      isSold ? 'border-gray-300 opacity-60' : 'border-gray-200 hover:border-[#1c3664]'
+                    }`}>
+                      <img src={image} alt="Thumb" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
                     </div>
                   </SwiperSlide>
                 ))}
@@ -204,28 +332,36 @@ export default function ApartmentDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white rounded-2xl p-8 mb-8 shadow-lg border border-gray-100"
+              className={`rounded-2xl p-8 mb-8 shadow-lg border ${
+                isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+              }`}
             >
-              <h2 className="text-3xl font-black text-gray-900 mb-6 uppercase">תיאור הנכס</h2>
+              <h2 className={`text-3xl font-black mb-6 uppercase ${
+                isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+              }`}>תיאור הנכס</h2>
               
               <div className="flex flex-wrap gap-4 mb-6 pb-6 border-b border-gray-100">
                 <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-                  <LayoutDashboard size={16} className="text-[#C19A6B]"/>
-                  {SAMPLE_PROPERTY.bedrooms} חדרים
+                  <LayoutDashboard size={16} className="text-[#1c3664]"/>
+                  {property.bedrooms} חדרים
                 </div>
+                {property.floor && (
+                  <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
+                    <ArrowUpFromLine size={16} className="text-[#1c3664]"/>
+                    קומה {property.floor}
+                  </div>
+                )}
                 <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-                  <ArrowUpFromLine size={16} className="text-[#C19A6B]"/>
-                  קומה {SAMPLE_PROPERTY.floor}
-                </div>
-                <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-                  <Maximize size={16} className="text-[#C19A6B]"/>
-                  {SAMPLE_PROPERTY.area} מ״ר
+                  <Maximize size={16} className="text-[#1c3664]"/>
+                  {property.area} מ״ר
                 </div>
               </div>
 
               <div className="prose prose-lg max-w-none">
-                <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line font-medium">
-                  {SAMPLE_PROPERTY.description}
+                <p className={`text-lg leading-relaxed whitespace-pre-line font-medium ${
+                  isSold ? 'text-gray-500' : 'text-gray-800'
+                }`}>
+                  {property.description}
                 </p>
               </div>
             </motion.div>
@@ -235,20 +371,24 @@ export default function ApartmentDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 mb-8"
+              className={`rounded-2xl p-8 shadow-lg border mb-8 ${
+                isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+              }`}
             >
-              <h2 className="text-3xl font-black text-gray-900 mb-6 uppercase">תוספות</h2>
+              <h2 className={`text-3xl font-black mb-6 uppercase ${
+                isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+              }`}>תוספות</h2>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
                 {ALL_AMENITIES.map((item) => {
-                  const isAvailable = SAMPLE_PROPERTY.amenities[item.key as keyof typeof SAMPLE_PROPERTY.amenities];
+                  const isAvailable = property.amenities[item.key as keyof typeof property.amenities];
                   const IconComponent = item.icon;
 
                   return (
                     <div key={item.key} className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
                         ${isAvailable 
-                          ? 'text-[#C19A6B] bg-[#C19A6B]/10' 
+                          ? 'text-[#1c3664] bg-[#1c3664]/10' 
                           : 'text-gray-300 bg-gray-50' 
                         }`}
                       >
@@ -270,22 +410,32 @@ export default function ApartmentDetailPage() {
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                transition={{ duration: 0.6, delay: 0.35 }}
-               className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 mb-8"
+               className={`rounded-2xl p-8 shadow-lg border mb-8 ${
+                 isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+               }`}
             >
-               <h2 className="text-2xl font-black text-gray-900 mb-6">פרטים נוספים</h2>
+               <h2 className={`text-2xl font-black mb-6 ${
+                 isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+               }`}>פרטים נוספים</h2>
                
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 {SAMPLE_PROPERTY.specs.map((spec, index) => {
+                 {property.specs.map((spec: { label: string; value: string; icon: any }, index: number) => {
                    const Icon = spec.icon;
                    return (
-                     <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-[#C19A6B]/30 transition-colors">
+                     <div key={index} className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
+                       isSold 
+                         ? 'bg-gray-200 border-gray-300' 
+                         : 'bg-gray-50 border-gray-100 hover:border-[#1c3664]/30'
+                     }`}>
                        <div className="flex items-center gap-3">
-                         <div className="p-2 bg-white rounded-full shadow-sm text-[#C19A6B]">
+                         <div className={`p-2 rounded-full shadow-sm ${
+                           isSold ? 'bg-gray-300 text-gray-500' : 'bg-white text-[#1c3664]'
+                         }`}>
                            <Icon size={18} />
                          </div>
-                         <span className="text-gray-500 font-semibold">{spec.label}:</span>
+                         <span className={`font-semibold ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>{spec.label}:</span>
                        </div>
-                       <span className="text-gray-900 font-bold text-lg">{spec.value}</span>
+                       <span className={`font-bold text-lg ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>{spec.value}</span>
                      </div>
                    )
                  })}
@@ -297,9 +447,13 @@ export default function ApartmentDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
+              className={`rounded-2xl p-8 shadow-lg border ${
+                isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+              }`}
             >
-              <h2 className="text-3xl font-black text-gray-900 mb-6 uppercase">מיקום</h2>
+              <h2 className={`text-3xl font-black mb-6 uppercase ${
+                isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+              }`}>מיקום</h2>
               <div className="rounded-xl overflow-hidden shadow-md">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3381.9441877937624!2d34.774577815081994!3d32.01615298119051!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b8b5c4e5e5d%3A0x5c5e5e5d5c4b8b5c!2z15fXldec15XXnw!5e0!3m2!1siw!2sil!4v1234567890123!5m2!1siw!2sil"
@@ -324,48 +478,80 @@ export default function ApartmentDetailPage() {
               className="sticky top-32"
             >
               {/* Price Card */}
-              <div className="bg-gradient-to-br from-[#C19A6B] to-[#A67C52] rounded-2xl p-8 mb-6 text-white shadow-2xl">
+              <div className={`rounded-2xl p-8 mb-6 shadow-2xl ${
+                isSold 
+                  ? 'bg-gray-400 text-white opacity-75' 
+                  : 'bg-gradient-to-br from-[#1c3664] to-[#152a4f] text-white'
+              }`}>
                 <div className="text-sm font-bold mb-2 opacity-90">מחיר:</div>
-                <div className="text-4xl font-black mb-4">
-                  ₪{SAMPLE_PROPERTY.price}
+                <div className={`text-4xl font-black mb-4 ${isSold ? 'line-through' : ''}`}>
+                  {property.price}
                 </div>
-                {SAMPLE_PROPERTY.originalPrice && (
+                {property.originalPrice && (
                   <div className="text-lg font-semibold opacity-75">
-                    מחיר מקורי: ₪{SAMPLE_PROPERTY.originalPrice}
+                    מחיר מקורי: {property.originalPrice}
+                  </div>
+                )}
+                {isSold && (
+                  <div className="mt-4 flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-bold">
+                    <CheckCircle2 size={20} />
+                    <span>נמכר</span>
                   </div>
                 )}
               </div>
 
               {/* Contact Form */}
-              <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100">
-                <h3 className="text-2xl font-black text-gray-900 mb-6 uppercase">
+              <div className={`rounded-2xl p-8 shadow-xl border ${
+                isSold 
+                  ? 'bg-gray-100 border-gray-300 opacity-75' 
+                  : 'bg-white border-gray-100'
+              }`}>
+                <h3 className={`text-2xl font-black mb-6 uppercase ${
+                  isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+                }`}>
                   מעוניין? צור קשר
                 </h3>
+                {isSold ? (
+                  <div className="text-center py-8">
+                    <div className="flex items-center justify-center gap-2 bg-red-100 text-red-700 px-6 py-4 rounded-lg font-bold mb-4">
+                      <CheckCircle2 size={24} />
+                      <span>הנכס נמכר</span>
+                    </div>
+                    <p className="text-gray-500">לא ניתן ליצור קשר לגבי נכס זה</p>
+                  </div>
+                ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-900 mb-2">שם מלא *</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all" placeholder="הזן שם מלא" />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all" placeholder="הזן שם מלא" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-900 mb-2">טלפון *</label>
-                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all" placeholder="050-123-4567" />
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all" placeholder="050-123-4567" />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-900 mb-2">הודעה</label>
-                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#C19A6B] focus:bg-white focus:outline-none transition-all resize-none" placeholder="ספר לנו עוד..." />
+                    <textarea name="message" value={formData.message} onChange={handleChange} rows={4} className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all resize-none" placeholder="ספר לנו עוד..." />
                   </div>
-                  <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full px-6 py-4 bg-[#C19A6B] text-white font-black text-lg uppercase rounded-xl shadow-lg hover:bg-gray-900 transition-all flex items-center justify-center gap-2">
+                  <motion.button type="submit" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full px-6 py-4 bg-[#1c3664] text-white font-black text-lg uppercase rounded-xl shadow-lg hover:bg-[#152a4f] transition-all flex items-center justify-center gap-2">
                     <span>שלח הודעה</span>
                     <Send size={20} className="transform rotate-180" />
                   </motion.button>
                 </form>
+                )}
+                {!isSold && (
                 <div className="mt-6 pt-6 border-t border-gray-200 text-center">
                   <p className="text-sm font-semibold text-gray-600 mb-2">או התקשר ישירות:</p>
-                  <a href="tel:+972123456789" className="inline-flex items-center gap-2 text-xl font-black text-[#C19A6B] hover:text-gray-900 transition-colors">
+                  <a 
+                    href="tel:+972123456789" 
+                    onClick={() => analytics.trackPhoneClick(propertyId)}
+                    className="inline-flex items-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
+                  >
                     <Phone size={20} />
                     <span>03-123-4567</span>
                   </a>
                 </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -373,7 +559,7 @@ export default function ApartmentDetailPage() {
         </div>
 
         {/* Similar Properties Section */}
-        <SimilarProperties currentPropertyId={SAMPLE_PROPERTY.id} limit={3} />
+        <SimilarProperties currentPropertyId={property.id} limit={3} />
       </div>
     </div>
   );

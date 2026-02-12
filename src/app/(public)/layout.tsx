@@ -1,7 +1,8 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import SocialSidebar from "@/components/ui/SocialSidebar";
+import "../(public)/about/about.css";
 
 export default function PublicLayout({
   children,
@@ -11,10 +12,10 @@ export default function PublicLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <Breadcrumbs />
       <main className="flex-grow">{children}</main>
       <Footer />
       <WhatsAppButton />
+      <SocialSidebar />
     </div>
   );
 }

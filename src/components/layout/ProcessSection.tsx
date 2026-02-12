@@ -28,11 +28,11 @@ const ProcessSection: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full py-24 md:py-32 bg-gray-50 overflow-hidden"
+      className="relative w-full py-24 md:py-32 overflow-hidden bg-warm"
     >
       {/* Background Decorative Elements */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-[#C19A6B] rounded-full blur-3xl opacity-10"></div>
-      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#C19A6B] rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute top-20 left-10 w-64 h-64 bg-[#1c3664] rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl opacity-10"></div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
 
@@ -54,7 +54,7 @@ const ProcessSection: React.FC = () => {
             whileInView={{ opacity: 1, scaleX: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-24 h-1 bg-gradient-to-r from-transparent via-[#C19A6B] to-transparent mx-auto"
+            className="w-24 h-1 bg-gradient-to-r from-transparent via-[#1c3664] to-transparent mx-auto"
           ></motion.div>
         </motion.div>
 
@@ -79,7 +79,7 @@ const ProcessSection: React.FC = () => {
                 <div className="relative h-full bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
 
                   {/* Background Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 group-hover:from-[#C19A6B]/90 group-hover:via-gray-800/85 group-hover:to-gray-900/90 transition-all duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 group-hover:from-[#1c3664]/90 group-hover:via-gray-800/85 group-hover:to-gray-900/90 transition-all duration-500"></div>
 
                   {/* Background Pattern */}
                   <div className="absolute inset-0 opacity-10">
@@ -90,7 +90,7 @@ const ProcessSection: React.FC = () => {
                   <div className="relative z-10 p-8 lg:p-10 h-full flex flex-col">
 
                     {/* Number Badge */}
-                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-[#C19A6B] to-[#8B7355] rounded-full flex items-center justify-center shadow-2xl border-4 border-white group-hover:scale-110 transition-transform duration-500">
+                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-[#1c3664] to-[#152a4f] rounded-full flex items-center justify-center shadow-2xl border-4 border-white group-hover:scale-110 transition-transform duration-500">
                       <span className="text-3xl font-black text-white">
                         {step.number}
                       </span>
@@ -98,8 +98,8 @@ const ProcessSection: React.FC = () => {
 
                     {/* Icon */}
                     <div className="mb-6 mt-8">
-                      <div className="w-16 h-16 bg-[#C19A6B]/20 rounded-xl flex items-center justify-center group-hover:bg-[#C19A6B]/30 transition-colors duration-300">
-                        <Icon className="w-8 h-8 text-[#C19A6B] group-hover:text-white transition-colors duration-300" />
+                      <div className="w-16 h-16 bg-[#1c3664]/20 rounded-xl flex items-center justify-center group-hover:bg-[#1c3664]/30 transition-colors duration-300">
+                        <Icon className="w-8 h-8 text-[#1c3664] group-hover:text-white transition-colors duration-300" />
                       </div>
                     </div>
 
@@ -109,7 +109,7 @@ const ProcessSection: React.FC = () => {
                     </h3>
 
                     {/* Divider */}
-                    <div className="w-16 h-1 bg-[#C19A6B] mb-6"></div>
+                    <div className="w-16 h-1 bg-[#1c3664] mb-6"></div>
 
                     {/* Description */}
                     <p className="text-gray-200 text-base md:text-lg leading-relaxed">
@@ -118,7 +118,7 @@ const ProcessSection: React.FC = () => {
                   </div>
 
                   {/* Bottom Accent */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#C19A6B] to-transparent"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#1c3664] to-transparent"></div>
                 </div>
               </motion.div>
             );

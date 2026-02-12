@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import Script from "next/script";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
+import Providers from "@/components/Providers";
 import "./globals.css";
 
 const openSansHebrew = localFont({
@@ -38,13 +39,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${openSansHebrew.variable} antialiased`}>
-        {children}
-
-        {/* Sienna Accessibility Widget */}
-        <Script
-          src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
-          strategy="lazyOnload"
-        />
+        <Providers>
+          {children}
+          <AccessibilityWidget />
+        </Providers>
       </body>
     </html>
   );

@@ -1,81 +1,149 @@
-import Card from "@/components/ui/Card";
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Card, Statistic, Button, Spin, Typography } from 'antd';
+import {
+  HomeOutlined,
+  PhoneOutlined,
+  PlusOutlined,
+  ShoppingOutlined,
+  KeyOutlined,
+  CheckCircleOutlined,
+  AppstoreOutlined,
+} from '@ant-design/icons';
+import Link from 'next/link';
+
+const { Title } = Typography;
 
 export default function AdminDashboard() {
-  const stats = [
-    { title: "Всего квартир", value: "156", change: "+12", icon: "🏠" },
-    { title: "Активных бронирований", value: "45", change: "+5", icon: "📅" },
-    { title: "Пользователей", value: "892", change: "+23", icon: "👥" },
-    { title: "Доход за месяц", value: "₽ 2.5M", change: "+8%", icon: "💰" },
-  ];
+  const [stats, setStats] = useState({
+    total: 0,
+    forSale: 0,
+    forRent: 0,
+    active: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const recentBookings = [
-    { id: 1, apartment: "2-комн. на Ленина", user: "Иван Петров", date: "2026-02-05", status: "Подтверждено" },
-    { id: 2, apartment: "Студия в центре", user: "Мария Сидорова", date: "2026-02-06", status: "Ожидание" },
-    { id: 3, apartment: "3-комн. на Гагарина", user: "Петр Иванов", date: "2026-02-07", status: "Подтверждено" },
-  ];
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/admin/properties');
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Response is not JSON');
+      }
+
+      const properties = await response.json();
+
+      const total = properties.length;
+      const forSale = properties.filter((p: any) => p.dealType === 'sale').length;
+      const forRent = properties.filter((p: any) => p.dealType === 'rent').length;
+      const active = properties.filter((p: any) => p.isActive).length;
+
+      setStats({ total, forSale, forRent, active });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      setStats({ total: 0, forSale: 0, forRent: 0, active: 0 });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Панель управления</h1>
+      <Title level={2} style={{ marginBottom: '24px', color: '#141414' }}>
+        לוח בקרה
+      </Title>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                <p className="text-sm text-green-600 mt-1">{stat.change}</p>
-              </div>
-              <div className="text-4xl">{stat.icon}</div>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">Последние бронирования</h2>
-          <div className="space-y-4">
-            {recentBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between py-3 border-b last:border-b-0">
-                <div>
-                  <p className="font-medium">{booking.apartment}</p>
-                  <p className="text-sm text-gray-600">{booking.user}</p>
-                  <p className="text-sm text-gray-500">{booking.date}</p>
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+            <Col xs={24} sm={12} lg={6}>
+              <Card
+                style={{ borderTop: '3px solid #1890ff' }}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 600 }}>סה״כ נכסים במערכת</span>}
+                  value={stats.total}
+                  prefix={<AppstoreOutlined style={{ color: '#1890ff' }} />}
+                  valueStyle={{ color: '#141414', fontWeight: 700, fontSize: '28px' }}
+                />
+                <div style={{ marginTop: '12px' }}>
+                  <Link href="/admin/properties" style={{ color: '#1890ff', fontWeight: 600, fontSize: '13px' }}>
+                    צפה בהכל ←
+                  </Link>
                 </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    booking.status === "Подтверждено"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {booking.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
+              </Card>
+            </Col>
 
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">Быстрые действия</h2>
-          <div className="space-y-3">
-            <button className="w-full text-left px-4 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
-              <div className="font-medium">Добавить новую квартиру</div>
-              <div className="text-sm text-gray-600">Создать новое объявление</div>
-            </button>
-            <button className="w-full text-left px-4 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
-              <div className="font-medium">Просмотреть заявки</div>
-              <div className="text-sm text-gray-600">5 новых заявок ожидают</div>
-            </button>
-            <button className="w-full text-left px-4 py-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors">
-              <div className="font-medium">Управление пользователями</div>
-              <div className="text-sm text-gray-600">Добавить или редактировать</div>
-            </button>
-          </div>
-        </Card>
-      </div>
+            <Col xs={24} sm={12} lg={6}>
+              <Card
+                style={{ borderTop: '3px solid #52c41a' }}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 600 }}>נכסים למכירה</span>}
+                  value={stats.forSale}
+                  prefix={<ShoppingOutlined style={{ color: '#52c41a' }} />}
+                  valueStyle={{ color: '#141414', fontWeight: 700, fontSize: '28px' }}
+                />
+                <div style={{ marginTop: '12px' }}>
+                  <Link href="/admin/properties?type=sale" style={{ color: '#52c41a', fontWeight: 600, fontSize: '13px' }}>
+                    צפה בהכל ←
+                  </Link>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} lg={6}>
+              <Card
+                style={{ borderTop: '3px solid #1890ff' }}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 600 }}>נכסים להשכרה</span>}
+                  value={stats.forRent}
+                  prefix={<KeyOutlined style={{ color: '#1890ff' }} />}
+                  valueStyle={{ color: '#141414', fontWeight: 700, fontSize: '28px' }}
+                />
+                <div style={{ marginTop: '12px' }}>
+                  <Link href="/admin/properties?type=rent" style={{ color: '#1890ff', fontWeight: 600, fontSize: '13px' }}>
+                    צפה בהכל ←
+                  </Link>
+                </div>
+              </Card>
+            </Col>
+
+            <Col xs={24} sm={12} lg={6}>
+              <Card
+                style={{ borderTop: '3px solid #faad14' }}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 600 }}>נכסים פעילים</span>}
+                  value={stats.active}
+                  prefix={<CheckCircleOutlined style={{ color: '#faad14' }} />}
+                  valueStyle={{ color: '#141414', fontWeight: 700, fontSize: '28px' }}
+                />
+                <div style={{ marginTop: '12px' }}>
+                  <Link href="/admin/properties" style={{ color: '#faad14', fontWeight: 600, fontSize: '13px' }}>
+                    צפה בהכל ←
+                  </Link>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 }

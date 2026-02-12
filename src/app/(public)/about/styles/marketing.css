@@ -1,0 +1,129 @@
+/* Marketing Section Styles */
+.marketing-section {
+  padding: 80px 20px;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+.marketing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.marketing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.marketing-content {
+  padding: 20px;
+}
+
+.marketing-intro {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.marketing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+
+.marketing-feature {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.feature-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 14px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.feature-text h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.feature-text p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #718096;
+}
+
+.marketing-footer {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin-top: 30px;
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 12px;
+  border: 2px solid #667eea40;
+  font-weight: 500;
+}
+
+.marketing-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+.marketing-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.marketing-image:hover img {
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .marketing-section {
+    padding: 60px 20px;
+  }
+
+  .marketing-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .marketing-feature {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .marketing-intro {
+    font-size: 1rem;
+  }
+
+  .feature-text h3 {
+    font-size: 1rem;
+  }
+
+  .marketing-footer {
+    font-size: 0.95rem;
+    padding: 20px;
+  }
+}
