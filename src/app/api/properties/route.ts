@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
     // Filter by max price if provided (client-side filtering since price is stored as string)
     if (maxPrice) {
       const maxPriceNum = parseInt(maxPrice);
-      properties = properties.filter(prop => {
+      properties = properties.filter((prop: any) => {
         const priceNum = extractNumericPrice(prop.price);
         return priceNum > 0 && priceNum <= maxPriceNum;
       });
