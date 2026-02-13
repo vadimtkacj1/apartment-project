@@ -1,7 +1,7 @@
 /* ===== Why Us Section ===== */
 .why-us-section {
   /* Теплый фон (bg warn/beige) */
-  background-color: #fdfbf7; 
+  background-color: #faf7f2; 
   padding: 6rem 2rem;
   width: 100%;
   direction: rtl; /* Важно для иврита */
@@ -44,16 +44,16 @@
 
 .feature-card {
   /* Карточки теперь белые, чтобы выделяться на теплом фоне */
-  background: #ffffff;
+  background: #faf7f2;
   padding: 2.5rem 2rem;
   border-radius: 20px;
   text-align: center; /* Центрируем контент внутри карточки */
-  
+
   /* Дефолтная тень и переход */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(28, 54, 100, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -72,7 +72,7 @@
   width: 80px;
   height: 80px;
   /* Светло-голубой фон под иконкой для стиля */
-  background: #f0f7ff; 
+  background: #faf7f2;
   border-radius: 50%; /* Круглая подложка */
   padding: 1rem;
   margin-bottom: 1.5rem;

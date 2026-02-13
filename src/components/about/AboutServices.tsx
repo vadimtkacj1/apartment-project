@@ -35,7 +35,7 @@ export default function AboutServices() {
   return (
     <section 
       ref={servicesRef} 
-      className="py-24 w-full bg-[#fdfbf7]" // Теплый фон секции
+      className="py-24 w-full bg-[#faf7f2]" // Теплый фон секции
       dir="rtl" 
     >
       <div className="max-w-[1300px] mx-auto px-6">
@@ -55,10 +55,9 @@ export default function AboutServices() {
           </p>
         </motion.div>
 
-        {/* Сетка услуг (Grid) */}
-        <motion.div 
-          // lg:grid-cols-4 выравнивает все 4 элемента в один ряд на ПК
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
+        {/* Сетка услуг (Grid) - Clean design без фона */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12"
           initial="hidden"
           animate={servicesInView ? "visible" : "hidden"}
           variants={{
@@ -68,52 +67,40 @@ export default function AboutServices() {
           {services.map((service, index) => (
             <motion.div
               key={index}
-              // УБРАЛ: bg-white, shadow, border. Оставил только отступы и выравнивание.
-              className="group h-full p-4 text-center flex flex-col items-center hover:-translate-y-2 transition-transform duration-300"
+              className="group relative"
               variants={{
                 hidden: { y: 20, opacity: 0 },
                 visible: { y: 0, opacity: 1 }
               }}
             >
-              {/* Иконка (без цветного круга, просто чистая иконка, как просили без фона) */}
-              <div className="w-24 h-24 mb-6 flex items-center justify-center transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3">
-                 {/* Если хотите оставить легкий круг под иконкой, раскомментируйте div ниже */}
-                 {/* <div className="absolute inset-0 bg-blue-50/50 rounded-full blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" /> */}
-                
-                <Image 
-                  src={service.icon} 
-                  alt={service.title} 
-                  width={80} 
-                  height={80} 
-                  className="object-contain drop-shadow-md"
-                />
+              <div className="flex items-start gap-6 text-right">
+                {/* Icon - larger and with subtle hover */}
+                <div className="flex-shrink-0 w-24 h-24 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Image
+                    src={service.icon}
+                    alt={service.title}
+                    width={80}
+                    height={80}
+                    className="object-contain drop-shadow-lg"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#1c3664] mb-3 leading-tight">
+                    {service.title}
+                  </h3>
+
+                  <p className="text-slate-600 text-lg leading-relaxed">
+                    {service.description}
+                  </p>
+                </div>
               </div>
 
-              <h3 className="text-2xl font-bold text-[#1c3664] mb-4">
-                {service.title}
-              </h3>
-              
-              <p className="text-slate-500 text-[1.05rem] leading-relaxed">
-                {service.description}
-              </p>
+              {/* Subtle bottom border for separation */}
+              <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-transparent via-slate-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.div>
           ))}
-        </motion.div>
-
-        {/* Футер секции (Темно-синий блок) */}
-        <motion.div
-          className="bg-[#1c3664] text-white p-8 md:p-12 rounded-3xl text-center shadow-xl shadow-blue-900/10 relative overflow-hidden"
-          initial={{ y: 30, opacity: 0 }}
-          animate={servicesInView ? { y: 0, opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          {/* Декоративный блик */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-
-          <p className="text-lg md:text-xl font-medium leading-relaxed max-w-4xl mx-auto relative z-10">
-            המטרה שלנו היא להקל על בעלי הנכסים ולחסוך לכם זמן וכסף.
-            אנחנו מטפלים בהכל – מצילום ושיווק, דרך סינון קונים ועד לסגירת העסקה.
-          </p>
         </motion.div>
 
       </div>

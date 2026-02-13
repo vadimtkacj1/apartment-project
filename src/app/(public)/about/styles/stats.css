@@ -1,7 +1,7 @@
 /* ===== Stats Section ===== */
 .stats-section {
   padding: 5rem 2rem;
-  background: linear-gradient(to bottom, #1a1a1a 0%, #ffffff 100%);
+  background: #faf7f2;
 }
 
 .stats-container {
@@ -16,7 +16,7 @@
 }
 
 .stat-card {
-  background: #ffffff;
+  background: #faf7f2;
   padding: 3rem 2rem;
   border-radius: 20px;
   text-align: center;

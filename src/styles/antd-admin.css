@@ -15,7 +15,7 @@
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
-  font-family: var(--font-opensans-hebrew), 'Open Sans Hebrew', Arial, Helvetica, sans-serif;
+  font-family: var(--font-assistant), 'Assistant', Arial, Helvetica, sans-serif;
   color: #141414;
   font-size: 14px;
   line-height: 1.6;

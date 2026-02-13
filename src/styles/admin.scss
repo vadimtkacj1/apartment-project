@@ -9,13 +9,13 @@
 
 // Global form font fix - must be before admin-wrapper
 input, textarea, select {
-  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+  font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
 }
 
 // Wrap admin-specific styles in .admin-wrapper for isolation from Tailwind
 .admin-wrapper {
   // Unified font family for admin panel - same as main site
-  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+  font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 15px;
@@ -28,7 +28,7 @@ input, textarea, select {
 
   // Better text rendering for form elements
   input, textarea, select, button {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -177,7 +177,7 @@ input, textarea, select {
     color: #495057;
     margin-bottom: 0.5rem;
     font-size: 14px;
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
   }
 
   // CoreUI form components with high specificity
@@ -194,7 +194,7 @@ input, textarea, select {
   input[type="password"],
   textarea,
   select {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
@@ -207,7 +207,7 @@ input, textarea, select {
 
     &::placeholder {
       color: #6c757d !important;
-      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
       font-size: 14px !important;
       opacity: 0.7;
     }
@@ -229,13 +229,13 @@ input, textarea, select {
   // CoreUI specific components
   .form-control-sm,
   .form-select-sm {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 14px !important;
   }
 
   .form-control-lg,
   .form-select-lg {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 16px !important;
   }
 
@@ -244,7 +244,7 @@ input, textarea, select {
   textarea {
     min-height: 120px;
     resize: vertical;
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     line-height: 1.6 !important;
   }
 
@@ -252,12 +252,12 @@ input, textarea, select {
   select.form-select,
   .form-select,
   select {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 15px !important;
     cursor: pointer;
     
     option {
-      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
       font-size: 15px !important;
       padding: 0.5rem;
     }
@@ -267,7 +267,7 @@ input, textarea, select {
   .input-group {
     .form-control,
     .form-select {
-      font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+      font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
       font-size: 15px !important;
     }
   }
@@ -354,7 +354,7 @@ input, textarea, select {
   input[type="search"],
   textarea,
   select {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 15px !important;
     font-weight: 400 !important;
     line-height: 1.5 !important;
@@ -366,7 +366,7 @@ input, textarea, select {
   input.form-control,
   select.form-select,
   textarea.form-control {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 15px !important;
     font-weight: 400 !important;
   }
@@ -374,14 +374,14 @@ input, textarea, select {
   // Select options
   select option,
   .form-select option {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 15px !important;
   }
 
   // Placeholders
   input::placeholder,
   textarea::placeholder {
-    font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif !important;
+    font-family: var(--font-assistant), Arial, Helvetica, sans-serif !important;
     font-size: 14px !important;
   }
 }

@@ -3,6 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 
+// 1. Define an interface to solve the TypeScript error
+interface NavLink {
+  label: string;
+  href: string;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; // Optional property
+  submenu?: { label: string; href: string }[];
+}
+
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
@@ -16,11 +24,12 @@ export default function Header() {
     }
   };
 
-  const navLinks = [
+  // 2. Apply the NavLink type to your array
+  const navLinks: NavLink[] = [
     { label: "דף הבית", href: "/" },
     { label: "נכסים", href: "/apartments" },
     {
-      label: "מידע חשוב למוכרים\\רוכשים",
+      label: "מידע מקצועי בנדל״ן",
       href: "#",
       submenu: [
         { label: "מוכרים דירה", href: "/selling-apartment" },
@@ -28,7 +37,7 @@ export default function Header() {
       ],
     },
     {
-      label: "מגזין נדל\"ן חולון/בת ים",
+      label: "אזור המידע והכלים",
       href: "#",
       submenu: [
         { label: "קישורים שימושיים", href: "/links" },
@@ -36,12 +45,14 @@ export default function Header() {
       ],
     },
     { label: "אודות", href: "/about" },
-    { label: "צור קשר", href: "/#contact", onClick: handleContactClick },
+    // Example of using the handleContactClick if you wanted to add it here:
+    // { label: "צור קשר", href: "#contact", onClick: handleContactClick }
   ];
 
   return (
     <header dir="rtl" className="bg-white py-2 shadow-md border-b border-gray-100 sticky top-0 z-50">
-      <nav className="relative max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center min-h-[60px]">
+      {/* 3. Optimized Tailwind classes: max-w-360 and min-h-15 */}
+      <nav className="relative max-w-360 mx-auto px-6 lg:px-10 flex justify-between items-center min-h-15">
         
         {/* LOGO RIGHT */}
         <div className="z-20">
@@ -58,7 +69,7 @@ export default function Header() {
             <div key={link.label} className="relative group">
               <Link
                 href={link.href}
-                onClick={link.onClick}
+                onClick={link.onClick} // No longer errors out!
                 className="text-[15px] font-bold tracking-wide transition-all duration-300 flex items-center gap-1 text-slate-900 py-4"
               >
                 {link.label}
@@ -72,7 +83,8 @@ export default function Header() {
 
               {/* SINGLE LEVEL DROPDOWN */}
               {link.submenu && (
-                <div className="absolute top-[100%] right-0 w-72 bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                /* 4. Optimized Tailwind class: top-full */
+                <div className="absolute top-full right-0 w-72 bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                   <ul className="py-2">
                     {link.submenu.map((sub) => (
                       <li key={sub.label}>

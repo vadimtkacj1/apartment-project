@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Form, Input, Button, Alert } from 'antd';
 import { UserOutlined, LockOutlined, HomeOutlined } from '@ant-design/icons';
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
 
@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
         justifyContent: 'center',
         background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
         padding: '20px',
-        fontFamily: 'var(--font-opensans-hebrew), Arial, Helvetica, sans-serif',
+        fontFamily: 'var(--font-assistant), Arial, Helvetica, sans-serif',
       }}
     >
       {/* Background overlay pattern */}
@@ -214,5 +214,26 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div
+        dir="rtl"
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+        }}
+      >
+        <div style={{ color: '#fff', fontSize: '18px' }}>טוען...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

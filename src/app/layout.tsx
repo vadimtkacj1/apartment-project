@@ -4,26 +4,36 @@ import AccessibilityWidget from "@/components/AccessibilityWidget";
 import Providers from "@/components/Providers";
 import "./globals.css";
 
-const openSansHebrew = localFont({
+const assistant = localFont({
   src: [
     {
-      path: '../../public/fonts/OpenSansHebrew-Regular.ttf',
+      path: '../../public/fonts/static/Assistant-Regular.ttf',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/OpenSansHebrew-Bold.ttf',
+      path: '../../public/fonts/static/Assistant-Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/static/Assistant-SemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/static/Assistant-Bold.ttf',
       weight: '700',
       style: 'normal',
     },
     {
-      path: '../../public/fonts/OpenSansHebrew-BoldItalic.ttf',
-      weight: '700',
-      style: 'italic',
+      path: '../../public/fonts/static/Assistant-ExtraBold.ttf',
+      weight: '800',
+      style: 'normal',
     },
   ],
   display: 'swap',
-  variable: '--font-opensans-hebrew',
+  variable: '--font-assistant',
 });
 
 export const metadata: Metadata = {
@@ -38,7 +48,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${openSansHebrew.variable} antialiased`}>
+      <body className={`${assistant.variable} antialiased`}>
         <Providers>
           {children}
           <AccessibilityWidget />

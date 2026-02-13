@@ -45,7 +45,16 @@ const SocialSidebar = () => {
 
   const handlePhoneClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    analytics.trackPhoneClick();
     setIsContactPopupOpen(true);
+  };
+
+  const handleInstagramClick = () => {
+    analytics.trackButtonClick('instagram-sidebar');
+  };
+
+  const handleFacebookClick = () => {
+    analytics.trackButtonClick('facebook-sidebar');
   };
 
   const socialLinks = [
@@ -65,12 +74,14 @@ const SocialSidebar = () => {
       icon: <Instagram size={20} />,
       href: instagram,
       bgColor: 'bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500',
+      onClick: handleInstagramClick,
     },
     {
       name: 'Facebook',
       icon: <Facebook size={20} />,
       href: facebook,
       bgColor: 'bg-[#1877F2]',
+      onClick: handleFacebookClick,
     },
     {
       name: 'Phone',

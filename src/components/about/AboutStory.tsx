@@ -36,7 +36,7 @@ export default function AboutStory() {
   return (
     <section 
       ref={storyRef} 
-      className="py-24 w-full bg-[#fdfbf7]" // Warm background color
+      className="py-24 w-full bg-[#faf7f2]" // Warm background color
       dir="rtl" 
     >
       <div className="max-w-[1300px] mx-auto px-6">

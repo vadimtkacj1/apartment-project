@@ -27,19 +27,18 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero section - full screen image */}
-      <div className="h-screen w-full relative">
+      {/* Hero section - sticky so content scrolls over it */}
+      <div className="w-full sticky top-0 z-0">
         <Hero
-          img="/images/hero/main-hero.jpg"
+          img="/images/hero/second-hero.jpg"
         />
       </div>
 
       {/* Content that scrolls over the hero */}
       <div className="relative z-10 bg-warm">
-        {/* <HotPropositions /> */}
+        <HotPropositions />
         <AboutSection />
         <ValuesSection />
-        {/* <Stats /> */}
         <Testimonials />
         <FeaturedProperties />
         <ContactForm />

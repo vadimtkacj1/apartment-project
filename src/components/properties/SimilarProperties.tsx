@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropertyCard from './PropertyCard';
 
+// Define the Property interface to avoid 'any' types
 interface Property {
   id: number;
   image: string;
@@ -33,7 +34,6 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
     const fetchSimilarProperties = async () => {
       try {
         setLoading(true);
-        // Fetch properties from API
         const response = await fetch('/api/properties');
 
         if (!response.ok) {
@@ -42,9 +42,8 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
 
         const data = await response.json();
 
-        // Map and filter properties
         const mappedProperties: Property[] = data
-          .filter((prop: any) => prop.id !== currentPropertyId) // Exclude current property
+          .filter((prop: any) => prop.id !== currentPropertyId)
           .map((prop: any) => ({
             id: prop.id,
             title: prop.title,
@@ -58,15 +57,15 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
             image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
             isSold: prop.isSold || false,
           }))
-          .sort((a, b) => {
-            // Sort: sold properties at the end, then randomize
+          // FIXED: Explicitly typed parameters 'a' and 'b' to resolve TS7006 error
+          .sort((a: Property, b: Property) => {
             const aSold = a.isSold || false;
             const bSold = b.isSold || false;
             if (aSold && !bSold) return 1;
             if (!aSold && bSold) return -1;
-            return Math.random() - 0.5; // Randomize non-sold properties
+            return Math.random() - 0.5;
           })
-          .slice(0, limit); // Limit results
+          .slice(0, limit);
 
         setProperties(mappedProperties);
       } catch (error) {
@@ -80,10 +79,9 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
     fetchSimilarProperties();
   }, [currentPropertyId, limit]);
 
-  // Show loading state
   if (loading) {
     return (
-      <section className="w-full py-16 bg-gradient-to-b from-gray-50 to-slate-50" dir="rtl">
+      <section className="w-full py-16 bg-[#fdfbf7]" dir="rtl">
         <div className="px-6 lg:px-12">
           <div className="text-center py-10">
             <p className="text-gray-600">טוען נכסים דומים...</p>
@@ -93,32 +91,31 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
     );
   }
 
-  // Don't show if no properties
   if (properties.length === 0) {
     return null;
   }
 
   return (
-    <section className="w-full py-16 bg-gradient-to-b from-white to-slate-50" dir="rtl">
-      <div className="px-6 lg:px-12">
-        {/* Заголовок секции */}
+    <section className="w-full py-24 " dir="rtl">
+      <div className="max-w-[1300px] mx-auto px-6 lg:px-12">
+        
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 uppercase">
+          <h2 className="text-4xl md:text-5xl font-black text-[#1c3664] mb-4 uppercase">
             נכסים דומים
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-[#1c3664] to-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg font-medium">
+          <p className="text-slate-500 text-lg font-medium">
             נכסים נוספים שעשויים לעניין אותך
           </p>
         </motion.div>
 
-        {/* Сетка карточек */}
+        {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {properties.map((property, index) => (
             <motion.div

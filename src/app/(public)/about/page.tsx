@@ -2,20 +2,20 @@
 
 import Hero from '@/components/layout/Hero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import AboutIntro from '@/components/about/AboutIntro';
-import AboutWhyUs from '@/components/about/AboutWhyUs';
-import AboutServices from '@/components/about/AboutServices';
-import AboutStory from '@/components/about/AboutStory';
+import AboutMainIntro from '@/components/about/AboutMainIntro';
+import AboutLocalExpertise from '@/components/about/AboutLocalExpertise';
+import AboutServicesNew from '@/components/about/AboutServicesNew';
+import AboutMarketing from '@/components/about/AboutMarketing';
+import AboutStoryNew from '@/components/about/AboutStoryNew';
 import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
-import AboutCTA from '@/components/about/AboutCTA';
 
 export default function AboutPage() {
   return (
     <div className="about-page" dir="rtl">
       {/* Hero with Background Image */}
       <Hero
-        img="/images/hero/other-hero.jpeg"
+        img="/7.png"
         staticTitle="אודות"
         centered={true}
       />
@@ -23,26 +23,26 @@ export default function AboutPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs />
 
-      {/* Intro Section - Compact intro with stats */}
-      <AboutIntro />
+      {/* Main Intro: רם וחיים שיווק נכסים */}
+      <AboutMainIntro />
 
-      {/* Why Choose Us - Features and benefits */}
-      <AboutWhyUs />
+      {/* Local Expertise: מומחיות מקומית בחולון */}
+      <AboutLocalExpertise />
 
-      {/* Services Section */}
-      <AboutServices />
+      {/* Services: השכרה, מכירה וניהול נכסים */}
+      <AboutServicesNew />
 
-      {/* Story Section */}
-      <AboutStory />
+      {/* Marketing: שיווק נדל"ן בגישה מתקדמת */}
+      <AboutMarketing />
 
-      {/* Owners Section */}
+      {/* Story: הסיפור שלנו */}
+      <AboutStoryNew />
+
+      {/* Founders: המייסדים שלנו */}
       <AboutOwners />
 
-      {/* Team Section */}
+      {/* Team: הצוות המקצועי */}
       <AboutTeam />
-
-      {/* CTA Section */}
-      <AboutCTA />
     </div>
   );
 }

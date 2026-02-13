@@ -50,9 +50,7 @@ export default function AboutTeam() {
                 key={member.id}
                 member={member}
                 index={index}
-                // isEven logic: 
-                // index 0, 2, 4 = true (Normal layout)
-                // index 1, 3, 5 = false (Reverse layout)
+
                 isEven={index % 2 === 0} 
               />
             ))

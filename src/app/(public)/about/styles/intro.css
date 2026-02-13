@@ -1,7 +1,7 @@
 /* ===== Intro Section ===== */
 .intro-section {
   padding: 6rem 2rem 4rem;
-  background: var(--warm-sand); /* Ensure this variable is defined */
+  background: #faf7f2; /* Ensure this variable is defined */
 }
 
 .intro-container {

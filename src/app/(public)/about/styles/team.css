@@ -1,7 +1,7 @@
 /* ===== Team Section ===== */
 .team-section {
   padding: 6rem 2rem;
-  background: white;
+  background: #faf7f2;
 }
 
 .team-container {
@@ -29,7 +29,7 @@
 }
 
 .agent-card-horizontal {
-  background: #ffffff;
+  background: #faf7f2;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);

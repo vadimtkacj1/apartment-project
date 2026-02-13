@@ -1,7 +1,7 @@
 /* ===== Owners Section ===== */
 .owners-section {
   padding: 6rem 2rem;
-  background: var(--warm-light);
+  background: #faf7f2;
 }
 
 .owners-container {
@@ -21,7 +21,7 @@
 }
 
 .owner-card {
-  background: #ffffff;
+  background: #faf7f2;
   border-radius: 25px;
   overflow: hidden;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.08);

@@ -9,7 +9,7 @@ const AboutSection: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full pt-24 md:pt-32 pb-0 overflow-hidden bg-warm"
+      className="relative w-full pt-24 md:pt-32 pb-12 overflow-hidden bg-warm"
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -22,21 +22,17 @@ const AboutSection: React.FC = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="relative order-1 lg:order-2"
           >
-            <div className="relative w-full h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl">
+            {/* Контейнер без теней и лишних эффектов */}
+            <div className="relative w-full h-[500px] lg:h-[600px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/buildings.jpeg"
+                src="/6.png"
                 alt="רם שיווק נכסים & חיים ענבי"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
+                priority
               />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             </div>
-
-            {/* Decorative elements */}
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#1c3664] rounded-full blur-3xl opacity-30"></div>
-            <div className="absolute -top-6 -right-6 w-40 h-40 bg-[#1c3664] rounded-full blur-3xl opacity-20"></div>
           </motion.div>
 
           {/* Left Side - Content */}
@@ -89,7 +85,7 @@ const AboutSection: React.FC = () => {
             >
               <Link
                 href="/about"
-                className="inline-flex items-center gap-3 px-10 py-5 bg-[#1c3664] text-white font-black text-xl rounded-sm shadow-xl hover:bg-[#152a4f] hover:scale-105 transition-all duration-300 active:scale-95"
+                className="inline-flex items-center gap-3 px-10 py-5 bg-[#1c3664] text-white font-black text-xl rounded-sm hover:bg-[#152a4f] hover:scale-105 transition-all duration-300 active:scale-95"
               >
                 קראו עוד על המשרד
                 <ArrowLeft className="w-6 h-6" />

@@ -8,7 +8,7 @@ export default function FAQPage() {
   return (
     <>
       <Hero
-        img="/images/hero/other-hero.jpeg"
+        img="/7.png"
         staticTitle="שאלות ותשובות"
         centered={true}
       />
@@ -16,7 +16,7 @@ export default function FAQPage() {
       {/* Breadcrumbs */}
       <Breadcrumbs />
 
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-warm">
         <FAQ />
       </main>
     </>

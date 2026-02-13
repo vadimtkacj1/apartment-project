@@ -26,6 +26,7 @@ interface PropertyCardProps extends Partial<Property> {
   mapUrl?: string;
   images?: string[];
   isSold?: boolean;
+  showImage?: boolean; // Control whether to show image section
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -54,7 +55,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   kitchen,
   vacancyDate,
   features,
-  isSold
+  isSold,
+  showImage = true // Default to showing images
 }) => {
 
   // --- Helper functions for Hebrew localization ---
@@ -157,50 +159,81 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         }}
         dir="rtl"
       >
-      {/* Property Image */}
-      <div className="relative h-64 overflow-hidden bg-gray-100">
-        <Image
-          src={displayImage}
-          alt={title}
-          fill
-          className={`object-cover transition-transform duration-700 ${
-            isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
-          }`}
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-        
-        {/* Dark overlay for text contrast if needed */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
-          isSold ? 'opacity-40' : 'opacity-60'
-        }`}></div>
-        
-        {/* Gray overlay for sold properties */}
-        {isSold && (
-          <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
-        )}
+      {/* Property Image - only show if showImage is true */}
+      {showImage && (
+        <div className="relative h-64 overflow-hidden bg-gray-100">
+          <Image
+            src={displayImage}
+            alt={title}
+            fill
+            className={`object-cover transition-transform duration-700 ${
+              isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
+            }`}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          
+          {/* Dark overlay for text contrast if needed */}
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
+            isSold ? 'opacity-40' : 'opacity-60'
+          }`}></div>
+          
+          {/* Gray overlay for sold properties */}
+          {isSold && (
+            <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
+          )}
 
-        {/* Sold Badge - Red with icon */}
-        {isSold && (
-          <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5 z-10">
-            <CheckCircle2 size={16} />
-            <span>נמכר</span>
-          </div>
-        )}
+          {/* Sold Badge - Red with icon */}
+          {isSold && (
+            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5 z-10">
+              <CheckCircle2 size={16} />
+              <span>נמכר</span>
+            </div>
+          )}
 
-        {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
-        {status && !isSold && (
-          <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
-            {status}
-          </div>
-        )}
+          {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
+          {status && !isSold && (
+            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+              {status}
+            </div>
+          )}
 
-        {/* Property Type Badge (e.g., Apartment, Villa) */}
-        {propertyType && (
-          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
-            {getPropertyTypeLabel(propertyType)}
+          {/* Property Type Badge (e.g., Apartment, Villa) */}
+          {propertyType && (
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+              {getPropertyTypeLabel(propertyType)}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Status and Property Type badges when image is hidden */}
+      {!showImage && (
+        <div className="relative p-4 bg-gray-50 border-b border-gray-200">
+          <div className="flex items-center justify-between gap-2">
+            {/* Sold Badge */}
+            {isSold && (
+              <div className="bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5">
+                <CheckCircle2 size={16} />
+                <span>נמכר</span>
+              </div>
+            )}
+            
+            {/* Status Badge */}
+            {status && !isSold && (
+              <div className="bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+                {status}
+              </div>
+            )}
+            
+            {/* Property Type Badge */}
+            {propertyType && (
+              <div className="bg-white border border-gray-200 text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+                {getPropertyTypeLabel(propertyType)}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Card Content */}
       <div className={`p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>

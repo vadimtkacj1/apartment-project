@@ -124,7 +124,7 @@ function ApartmentsPageContent() {
 
       {/* Hero Section */}
       <Hero
-        img="/images/hero/other-hero.jpeg"
+        img="/7.png"
         staticTitle="נכסים למכירה והשכרה"
         centered={true}
       />

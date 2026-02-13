@@ -6,22 +6,22 @@ import Image from 'next/image';
 
 const stats = [
   { 
-    icon: '/3d-render-hand-throw-paper-plane.jpg', 
+    icon: '/3d-render-hand-throw-paper-plane.svg', 
     value: '20+', 
     label: 'שנות ניסיון' 
   },
   { 
-    icon: '/3d-render-handshake-icon.jpg', 
+    icon: '/3d-render-handshake-icon.svg', 
     value: '1000+', 
     label: 'לקוחות מרוצים' 
   },
   { 
-    icon: '/3d-hand-hold-money-bag-sack.jpg', 
+    icon: '/3d-hand-hold-money-bag-sack.svg', 
     value: '500M+', 
     label: 'שווי עסקאות' 
   },
   { 
-    icon: '/3d-render-thumb-up-sign.jpg', 
+    icon: '/3d-render-thumb-up-sign.svg', 
     value: '98%', 
     label: 'שביעות רצון' 
   }

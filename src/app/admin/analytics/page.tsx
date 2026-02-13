@@ -49,6 +49,7 @@ interface AnalyticsSummary {
     property?: { id: number; title: string; location: string } | null;
   }>;
   clickTypes: Array<{ eventType: string; count: number }>;
+  topUsersByClicks?: Array<{ ipAddress: string; clicks: number; userAgent: string | null }>;
 }
 
 interface PropertyView {
@@ -97,11 +98,12 @@ export default function AnalyticsPage() {
   const [clicks, setClicks] = useState<ClickEvent[]>([]);
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
+  const [selectedIP, setSelectedIP] = useState<string>('all');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [dateRange, selectedProperty]);
+  }, [dateRange, selectedProperty, selectedIP]);
 
   const fetchAnalytics = async () => {
     try {
@@ -114,6 +116,9 @@ export default function AnalyticsPage() {
       }
       if (selectedProperty !== 'all') {
         params.append('propertyId', selectedProperty);
+      }
+      if (selectedIP !== 'all') {
+        params.append('ipAddress', selectedIP);
       }
 
       const queryString = params.toString();
@@ -275,6 +280,29 @@ export default function AnalyticsPage() {
       dataIndex: 'ipAddress',
       key: 'ipAddress',
       width: 140,
+      render: (ip) => (
+        <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
+          {ip}
+        </span>
+      ),
+    },
+    {
+      title: 'דפדפן',
+      dataIndex: 'userAgent',
+      key: 'userAgent',
+      width: 150,
+      ellipsis: true,
+      render: (userAgent) => {
+        if (!userAgent) return '-';
+        const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+        const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
+        const mobile = userAgent.includes('Mobile') ? '📱' : '💻';
+        return (
+          <span title={userAgent} style={{ fontSize: '0.9em' }}>
+            {mobile} {browser}
+          </span>
+        );
+      },
     },
     {
       title: 'תאריך',
@@ -288,11 +316,15 @@ export default function AnalyticsPage() {
 
   const clicksColumns: ColumnsType<ClickEvent> = [
     {
-      title: 'ID',
-      dataIndex: 'propertyId',
-      key: 'propertyId',
-      width: 80,
-      render: (id) => id ? <Tag>#{id}</Tag> : '-',
+      title: 'נכס',
+      dataIndex: 'property',
+      key: 'property',
+      render: (property, record) => property ? (
+        <div>
+          <div style={{ fontWeight: 600 }}>{property.title}</div>
+          <div style={{ fontSize: '0.85em', color: '#999' }}>#{record.propertyId}</div>
+        </div>
+      ) : record.propertyId ? <Tag>#{record.propertyId}</Tag> : '-',
     },
     {
       title: 'פעולה',
@@ -306,10 +338,34 @@ export default function AnalyticsPage() {
       ),
     },
     {
-      title: 'נכס',
-      dataIndex: 'property',
-      key: 'property',
-      render: (property) => property ? property.title : '-',
+      title: 'כתובת IP',
+      dataIndex: 'ipAddress',
+      key: 'ipAddress',
+      width: 140,
+      render: (ip) => (
+        <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
+          {ip}
+        </span>
+      ),
+    },
+    {
+      title: 'דפדפן',
+      dataIndex: 'userAgent',
+      key: 'userAgent',
+      width: 200,
+      ellipsis: true,
+      render: (userAgent) => {
+        if (!userAgent) return '-';
+        // Extract browser info
+        const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+        const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
+        const mobile = userAgent.includes('Mobile') ? '📱' : '💻';
+        return (
+          <span title={userAgent} style={{ fontSize: '0.9em' }}>
+            {mobile} {browser}
+          </span>
+        );
+      },
     },
     {
       title: 'תאריך',
@@ -397,7 +453,7 @@ export default function AnalyticsPage() {
               onChange={setSelectedProperty}
               placeholder="בחר נכס"
               showSearch
-              filterOption={(input, option) => 
+              filterOption={(input, option) =>
                 (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
@@ -409,8 +465,67 @@ export default function AnalyticsPage() {
               ))}
             </Select>
           </Col>
+          <Col xs={24} md={12} lg={8}>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי משתמש (IP):</div>
+            <Select
+              style={{ width: '100%' }}
+              value={selectedIP}
+              onChange={setSelectedIP}
+              placeholder="בחר כתובת IP"
+              showSearch
+              filterOption={(input, option) =>
+                (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              <Select.Option value="all">הצג הכל</Select.Option>
+              {(summary?.topUsersByClicks || []).map((user) => (
+                <Select.Option key={user.ipAddress} value={user.ipAddress}>
+                  {user.ipAddress} ({user.clicks} לחיצות)
+                </Select.Option>
+              ))}
+            </Select>
+          </Col>
         </Row>
       </Card>
+
+      {/* Selected User Info */}
+      {selectedIP !== 'all' && (
+        <Card
+          style={{
+            marginBottom: '24px',
+            borderRadius: '8px',
+            backgroundColor: '#e6f7ff',
+            border: '2px solid #1890ff'
+          }}
+        >
+          <Row align="middle" gutter={16}>
+            <Col>
+              <UserOutlined style={{ fontSize: '32px', color: '#1890ff' }} />
+            </Col>
+            <Col flex="auto">
+              <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
+                פעילות משתמש: <span style={{ fontFamily: 'monospace', color: '#1890ff' }}>{selectedIP}</span>
+              </div>
+              <div style={{ color: '#666' }}>
+                {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
+                  <>
+                    {summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks} לחיצות סה״כ
+                  </>
+                )}
+              </div>
+            </Col>
+            <Col>
+              <Button
+                type="primary"
+                onClick={() => setSelectedIP('all')}
+                icon={<ReloadOutlined />}
+              >
+                נקה סינון
+              </Button>
+            </Col>
+          </Row>
+        </Card>
+      )}
 
       {/* Key Metrics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
@@ -526,46 +641,125 @@ export default function AnalyticsPage() {
         </Col>
       </Row>
 
-      {/* Bar Chart - Popular Properties */}
-      {barChartData.length > 0 && (
-        <Card
-          title={<span style={{ fontWeight: 600 }}>נכסים מובילים (לפי פעולות)</span>}
-          style={{ marginBottom: '24px', borderRadius: '8px' }}
-        >
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" />
-              <YAxis 
-                dataKey="name" 
-                type="category" 
-                width={150} 
-                tick={{ fontSize: 12 }} 
-              />
-              <Tooltip 
-                cursor={{ fill: 'transparent' }}
-                content={({ active, payload, label }) => {
-                    if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        return (
-                            <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
-                                <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
-                                <p style={{ margin: 0, color: '#52c41a' }}>{data.clicks} לחיצות</p>
-                            </div>
-                        );
-                    }
-                    return null;
-                }}
-              />
-              <Bar dataKey="clicks" name="לחיצות" radius={[0, 4, 4, 0]} barSize={24}>
-                {barChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </Card>
-      )}
+      {/* Charts Row - Properties & Users */}
+      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+        {/* Bar Chart - Popular Properties */}
+        {barChartData.length > 0 && (
+          <Col xs={24} lg={12}>
+            <Card
+              title={<span style={{ fontWeight: 600 }}>נכסים מובילים (לפי פעולות)</span>}
+              style={{ borderRadius: '8px', height: '100%' }}
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={150}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                                <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
+                                    <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
+                                    <p style={{ margin: 0, color: '#52c41a' }}>{data.clicks} לחיצות</p>
+                                </div>
+                            );
+                        }
+                        return null;
+                    }}
+                  />
+                  <Bar dataKey="clicks" name="לחיצות" radius={[0, 4, 4, 0]} barSize={24}>
+                    {barChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        )}
+
+        {/* Top Users by Clicks */}
+        {summary?.topUsersByClicks && summary.topUsersByClicks.length > 0 && (
+          <Col xs={24} lg={barChartData.length > 0 ? 12 : 24}>
+            <Card
+              title={<span style={{ fontWeight: 600 }}>משתמשים פעילים (לפי כתובת IP)</span>}
+              style={{ borderRadius: '8px', height: '100%' }}
+            >
+              <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                {summary.topUsersByClicks.map((user, index) => {
+                  const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+                  const browser = user.userAgent ? browsers.find(b => user.userAgent!.includes(b)) || 'Unknown' : 'Unknown';
+                  const mobile = user.userAgent?.includes('Mobile') ? '📱' : '💻';
+
+                  return (
+                    <div
+                      key={user.ipAddress}
+                      onClick={() => setSelectedIP(user.ipAddress)}
+                      style={{
+                        padding: '12px 16px',
+                        marginBottom: '8px',
+                        backgroundColor: selectedIP === user.ipAddress ? '#bae7ff' : (index < 3 ? '#f0f7ff' : '#fafafa'),
+                        borderRadius: '8px',
+                        border: selectedIP === user.ipAddress ? '2px solid #0050b3' : (index < 3 ? '2px solid #1890ff' : '1px solid #e8e8e8'),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (selectedIP !== user.ipAddress) {
+                          e.currentTarget.style.backgroundColor = '#e6f7ff';
+                          e.currentTarget.style.transform = 'translateX(-2px)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (selectedIP !== user.ipAddress) {
+                          e.currentTarget.style.backgroundColor = index < 3 ? '#f0f7ff' : '#fafafa';
+                          e.currentTarget.style.transform = 'translateX(0)';
+                        }
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <Tag color={selectedIP === user.ipAddress ? 'blue' : (index < 3 ? 'blue' : 'default')}>#{index + 1}</Tag>
+                          <span style={{ fontFamily: 'monospace', fontSize: '0.95em', fontWeight: 600, color: '#1890ff' }}>
+                            {user.ipAddress}
+                          </span>
+                          {selectedIP === user.ipAddress && (
+                            <Tag color="processing">מסונן</Tag>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.85em', color: '#888' }}>
+                          {mobile} {browser}
+                        </div>
+                      </div>
+                      <div style={{
+                        fontSize: '1.5em',
+                        fontWeight: 'bold',
+                        color: index < 3 ? '#1890ff' : '#52c41a',
+                        minWidth: '60px',
+                        textAlign: 'center'
+                      }}>
+                        {user.clicks}
+                        <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>לחיצות</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </Col>
+        )}
+      </Row>
 
       {/* Recent Activity Tables */}
       <Row gutter={[24, 24]}>

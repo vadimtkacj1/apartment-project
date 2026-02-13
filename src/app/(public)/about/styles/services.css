@@ -1,7 +1,7 @@
 /* ===== Services Section ===== */
 .services-section {
   padding: 6rem 2rem;
-  background: var(--warm-cream);
+  background: #faf7f2;
 }
 
 .services-container {
@@ -38,7 +38,7 @@
 }
 
 .service-card {
-  background: #f8fafc;
+  background: #faf7f2;
   padding: 2.5rem 2rem;
   border-radius: 16px;
   text-align: center;
@@ -47,7 +47,7 @@
 }
 
 .service-card:hover {
-  background: white;
+  background: #faf7f2;
   border-color: #1c3664;
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(28, 54, 100, 0.12);
@@ -59,7 +59,7 @@
   justify-content: center;
   width: 88px;
   height: 88px;
-  background: white;
+  background: #faf7f2;
   border-radius: 16px;
   padding: 0.875rem;
   margin-bottom: 1.5rem;

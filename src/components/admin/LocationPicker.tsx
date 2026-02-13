@@ -92,11 +92,18 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
       import('leaflet').then((L) => {
         // Fix Leaflet default icon issue in Next.js
         // Use CDN URLs for icons to avoid SSR issues
-        if (L.default && L.default.Icon && L.default.Icon.Default && L.default.Icon.Default.prototype._getIconUrl) {
-          delete (L.default.Icon.Default.prototype as any)._getIconUrl;
-        }
-        if (L.default && L.default.Icon && L.default.Icon.Default) {
-          L.default.Icon.Default.mergeOptions({
+        const Leaflet = L.default || L;
+        if (Leaflet && Leaflet.Icon && Leaflet.Icon.Default) {
+          const DefaultIcon = Leaflet.Icon.Default;
+          const prototype = DefaultIcon.prototype as any;
+          
+          // Remove _getIconUrl if it exists
+          if (prototype && '_getIconUrl' in prototype) {
+            delete prototype._getIconUrl;
+          }
+          
+          // Set icon URLs using CDN
+          DefaultIcon.mergeOptions({
             iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
             iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',

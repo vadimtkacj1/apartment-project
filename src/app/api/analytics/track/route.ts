@@ -115,6 +115,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'views' | 'clicks' | 'summary'
     const propertyId = searchParams.get('propertyId');
+    const ipAddress = searchParams.get('ipAddress');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
@@ -181,6 +182,36 @@ export async function GET(request: NextRequest) {
         },
       }).catch(() => []);
 
+      // Get top users by clicks (IP addresses with most clicks)
+      const topUsersByClicksRaw = await prisma.clickEvent.groupBy({
+        by: ['ipAddress'],
+        _count: {
+          id: true,
+        },
+        orderBy: {
+          _count: {
+            id: 'desc',
+          },
+        },
+        take: 10,
+      }).catch(() => []);
+
+      // Get user agent for each IP
+      const topUsersByClicks = await Promise.all(
+        (Array.isArray(topUsersByClicksRaw) ? topUsersByClicksRaw : []).map(async (u) => {
+          const clickEvent = await prisma.clickEvent.findFirst({
+            where: { ipAddress: u.ipAddress },
+            select: { userAgent: true },
+            orderBy: { createdAt: 'desc' },
+          }).catch(() => null);
+          return {
+            ipAddress: u.ipAddress,
+            clicks: u._count.id,
+            userAgent: clickEvent?.userAgent || null,
+          };
+        })
+      );
+
       return NextResponse.json({
         totalViews,
         totalClicks,
@@ -194,12 +225,14 @@ export async function GET(request: NextRequest) {
           eventType: c.eventType,
           count: c._count.id,
         })) : [],
+        topUsersByClicks: topUsersByClicks,
       });
     }
 
     if (type === 'views') {
       const where: any = {};
       if (propertyId) where.propertyId = parseInt(propertyId);
+      if (ipAddress) where.ipAddress = ipAddress;
       if (startDate || endDate) {
         where.createdAt = {};
         if (startDate) where.createdAt.gte = new Date(startDate);
@@ -229,6 +262,7 @@ export async function GET(request: NextRequest) {
     if (type === 'clicks') {
       const where: any = {};
       if (propertyId) where.propertyId = parseInt(propertyId);
+      if (ipAddress) where.ipAddress = ipAddress;
       if (startDate || endDate) {
         where.createdAt = {};
         if (startDate) where.createdAt.gte = new Date(startDate);

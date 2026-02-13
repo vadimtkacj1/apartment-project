@@ -43,10 +43,10 @@ export default function AboutWhyUs() {
   const whyInView = useInView(whyRef, { once: true, amount: 0.2 });
 
   return (
-    <section 
-      ref={whyRef} 
-      className="py-24 w-full bg-[#fdfbf7]" 
-      dir="rtl" 
+    <section
+      ref={whyRef}
+      className="py-24 w-full bg-[#faf7f2]"
+      dir="rtl"
     >
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Заголовок */}

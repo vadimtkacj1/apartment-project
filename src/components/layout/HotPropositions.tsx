@@ -3,7 +3,7 @@
 import React, { useMemo, memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
-import PropertyCard from "@/components/properties/PropertyCard";
+import HotPropositionCard from "@/components/properties/HotPropositionCard";
 
 // Type for apartment data
 interface Property {
@@ -19,6 +19,7 @@ interface Property {
   images?: string[];
   status?: string;
   isSold?: boolean;
+  floor?: number;
 }
 
 /**
@@ -45,10 +46,10 @@ const MarqueeRow = ({
   if (isMobile) {
     return (
       <div className="flex w-full overflow-x-auto scrollbar-hide" style={{ direction: 'ltr' }}>
-        <div className="flex gap-6 py-4">
+        <div className="flex gap-4 py-4">
           {items.map((item: Property, i: number) => (
-            <div key={`property-card-mobile-${i}`} className="w-[340px] md:w-[380px] shrink-0">
-              <PropertyCard {...item} index={i} />
+            <div key={`hot-proposition-card-mobile-${i}`} className="w-[260px] md:w-[280px] shrink-0">
+              <HotPropositionCard {...item} index={i} />
             </div>
           ))}
         </div>
@@ -59,8 +60,8 @@ const MarqueeRow = ({
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
       <motion.div
-        key={`properties-marquee-${direction}-${duration}`}
-        className="flex gap-6 md:gap-8 py-4"
+        key={`hot-propositions-marquee-${direction}-${duration}`}
+        className="flex gap-4 md:gap-5 py-4"
         style={{ willChange: 'transform' }}
         initial={{ x: direction === "left" ? "0%" : "-33.33%" }}
         animate={{ x: direction === "left" ? "-33.33%" : "0%" }}
@@ -71,8 +72,8 @@ const MarqueeRow = ({
         }}
       >
         {duplicatedItems.map((item: Property, i: number) => (
-          <div key={`property-card-${direction}-${i}`} className="w-[340px] md:w-[380px] shrink-0">
-            <PropertyCard {...item} index={i} />
+          <div key={`hot-proposition-card-${direction}-${i}`} className="w-[260px] md:w-[280px] shrink-0">
+            <HotPropositionCard {...item} index={i} />
           </div>
         ))}
       </motion.div>
@@ -101,7 +102,7 @@ function HotPropositions() {
 
         const data = await response.json();
 
-        // Map properties to format expected by PropertyCard
+        // Map properties to format expected by HotPropositionCard
         const mappedProperties: Property[] = data.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
@@ -115,6 +116,7 @@ function HotPropositions() {
           images: prop.images,
           status: prop.status,
           isSold: prop.isSold || false,
+          floor: prop.floor,
         }));
 
         setProperties(mappedProperties);

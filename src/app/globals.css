@@ -20,17 +20,19 @@
 html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
+  background: #faf7f2;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+  font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
+  background: #faf7f2;
 }
 
 @layer utilities {
   .bg-warm {
-    background-color: var(--warm-sand) !important;
+    background-color: #faf7f2 !important;
   }
 
   .text-balance {
