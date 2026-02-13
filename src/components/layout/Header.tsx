@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
 
 // 1. Define an interface to solve the TypeScript error
 interface NavLink {
@@ -14,6 +16,7 @@ interface NavLink {
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -58,7 +61,21 @@ export default function Header() {
         <div className="z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
-              <Image src="/images/logo.png" alt="Logo" width={56} height={56} className="object-contain" priority />
+              <Image 
+                src="/images/logo.PNG" 
+                alt="Logo" 
+                width={56} 
+                height={56} 
+                className="object-contain" 
+                priority 
+                onError={(e) => {
+                  // Fallback to jpeg if PNG fails
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== '/images/logo.jpeg') {
+                    target.src = '/images/logo.jpeg';
+                  }
+                }}
+              />
             </div>
           </Link>
         </div>
@@ -103,16 +120,90 @@ export default function Header() {
           ))}
         </div>
 
-        {/* LOGO LEFT */}
-        <div className="z-20">
+        {/* BURGER MENU BUTTON - MOBILE */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="xl:hidden z-30 p-2 text-gray-700 hover:text-[#1c3664] transition-colors"
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? (
+            <X size={24} className="text-[#1c3664]" />
+          ) : (
+            <Menu size={24} />
+          )}
+        </button>
+
+        {/* LOGO LEFT - DESKTOP */}
+        <div className="z-20 hidden xl:block">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
-              <Image src="/images/logo.png" alt="Logo" width={56} height={56} className="object-contain" priority />
+              <Image 
+                src="/images/logo.PNG" 
+                alt="Logo" 
+                width={56} 
+                height={56} 
+                className="object-contain" 
+                priority 
+                onError={(e) => {
+                  // Fallback to jpeg if PNG fails
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== '/images/logo.jpeg') {
+                    target.src = '/images/logo.jpeg';
+                  }
+                }}
+              />
             </div>
           </Link>
         </div>
 
       </nav>
+
+      {/* MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div className="xl:hidden fixed inset-0 top-[72px] bg-white z-40 overflow-y-auto">
+          <div className="px-6 py-4 space-y-1">
+            {navLinks.map((link) => (
+              <div key={link.label} className="border-b border-gray-100 last:border-0">
+                <Link
+                  href={link.href}
+                  onClick={(e) => {
+                    if (link.onClick) {
+                      link.onClick(e);
+                    }
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block py-4 text-base font-bold text-slate-900 hover:text-[#1c3664] transition-colors"
+                >
+                  {link.label}
+                </Link>
+                {link.submenu && (
+                  <ul className="pl-4 pb-2 space-y-1">
+                    {link.submenu.map((sub) => (
+                      <li key={sub.label}>
+                        <Link
+                          href={sub.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block py-2 text-sm text-slate-600 hover:text-[#1c3664] transition-colors"
+                        >
+                          {sub.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* OVERLAY FOR MOBILE MENU */}
+      {isMobileMenuOpen && (
+        <div
+          className="xl:hidden fixed inset-0 bg-black/50 z-30 top-[72px]"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </header>
   );
 }
