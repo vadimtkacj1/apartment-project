@@ -59,6 +59,27 @@ jobs:
             cp -r public/. deploy/public/
           fi
 
+          # Copy Prisma schema and migrations (CRITICAL for database)
+          echo "📦 Copying Prisma files..."
+          if [ -d "prisma" ]; then
+            mkdir -p deploy/prisma
+            cp -r prisma/. deploy/prisma/
+          fi
+
+          # Copy package.json for postinstall script
+          echo "📦 Copying package.json..."
+          cp package.json deploy/
+
+          # Copy package-lock.json if exists
+          if [ -f "package-lock.json" ]; then
+            cp package-lock.json deploy/
+          fi
+
+          # Copy next.config.ts if exists
+          if [ -f "next.config.ts" ]; then
+            cp next.config.ts deploy/
+          fi
+
           # Verify critical files
           echo "🔍 Verifying deployment package..."
           if [ ! -f "deploy/server.js" ]; then
@@ -71,10 +92,15 @@ jobs:
             exit 1
           fi
 
+          if [ ! -d "deploy/prisma" ]; then
+            echo "❌ Error: prisma directory not found"
+            exit 1
+          fi
+
           echo "📋 Deployment structure:"
           ls -la deploy/
-          ls -la deploy/.next/
-          ls -la deploy/.next/static/ | head -5
+          echo "📋 Prisma files:"
+          ls -la deploy/prisma/ || echo "No prisma files"
 
           echo "✅ Deployment package created"
           tar -czf deploy.tar.gz deploy/
@@ -124,6 +150,24 @@ jobs:
             PORT=$PORT
             HOSTNAME=0.0.0.0
             EOF
+
+            # Install dependencies if package.json exists
+            if [ -f "package.json" ]; then
+              echo "📦 Installing production dependencies..."
+              npm ci --production --ignore-scripts || npm install --production --ignore-scripts
+            fi
+
+            # Generate Prisma Client on server
+            if [ -d "prisma" ]; then
+              echo "📦 Generating Prisma Client..."
+              npx prisma generate || echo "⚠️ Warning: Prisma generate failed"
+            fi
+
+            # Run database migrations if needed
+            if [ -d "prisma/migrations" ]; then
+              echo "📦 Running database migrations..."
+              npx prisma migrate deploy || echo "⚠️ Warning: Migrations failed (database might already be up to date)"
+            fi
 
             # Install PM2 if not present
             if ! command -v pm2 &> /dev/null; then
