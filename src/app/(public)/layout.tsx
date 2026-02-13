@@ -1,7 +1,9 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import SocialSidebar from "@/components/ui/SocialSidebar";
+import AccessibilityWidget from "@/components/AccessibilityWidget";
+import "../(public)/about/about.css";
 
 export default function PublicLayout({
   children,
@@ -9,12 +11,13 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-warm">
       <Header />
-      <Breadcrumbs />
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow bg-warm">{children}</main>
       <Footer />
       <WhatsAppButton />
+      <SocialSidebar />
+      <AccessibilityWidget />
     </div>
   );
 }

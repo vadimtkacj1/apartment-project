@@ -26,7 +26,7 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
       <motion.div
         whileHover={{ scale: 1.1, rotate: 5 }}
         transition={{ type: "spring", stiffness: 300 }}
-        className="mb-4 text-[#C19A6B]"
+        className="mb-4 text-[#1c3664]"
       >
         {icon}
       </motion.div>
@@ -80,7 +80,7 @@ const Stats: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full pt-24 md:pt-32 pb-12 bg-white overflow-hidden"
+      className="relative w-full pt-24 md:pt-32 pb-12 overflow-hidden bg-warm"
     >
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Stats Grid */}

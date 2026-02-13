@@ -26,9 +26,9 @@ export default function AboutCTA() {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <h2 className="cta-title">מוכנים למצוא את הנכס המושלם?</h2>
+        <h2 className="cta-title">יעוצקמה תווצה</h2>
         <p className="cta-subtitle">
-          הצוות שלנו כאן כדי להפוך את החלום שלכם למציאות
+          .הקסעה תריגסל דעו ינושארה שופיחה בלשמ – בלש לכב םכל רוזעל ידכ ןאכ ונלש םיחמומה נדל"נה ינכוס
         </p>
         <div className="cta-buttons">
           <Link href="/apartments">

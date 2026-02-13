@@ -1,0 +1,153 @@
+/* ===== Story Section ===== */
+.story-section {
+  padding: 6rem 2rem;
+  background: #faf7f2;
+}
+
+.story-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.story-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.story-header .section-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #1c3664;
+  margin: 0 0 1rem 0;
+}
+
+.story-header .section-subtitle {
+  font-size: clamp(1.125rem, 2vw, 1.375rem);
+  color: #64748b;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.story-intro {
+  max-width: 900px;
+  margin: 0 auto 4rem;
+  text-align: center;
+}
+
+.story-intro p {
+  font-size: clamp(1.063rem, 2vw, 1.188rem);
+  color: #475569;
+  line-height: 1.8;
+  margin: 0 0 1.5rem 0;
+}
+
+.story-intro p:last-child {
+  margin-bottom: 0;
+}
+
+/* Milestones Grid */
+.milestones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.milestone-card {
+  background: #faf7f2;
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.milestone-card:hover {
+  transform: translateY(-4px);
+  border-color: #1c3664;
+  box-shadow: 0 8px 30px rgba(28, 54, 100, 0.12);
+}
+
+.milestone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  background: #faf7f2;
+  border-radius: 50%;
+  padding: 1rem;
+  margin: 0 auto 1.5rem;
+}
+
+.milestone-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.milestone-title {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.75rem 0;
+}
+
+.milestone-description {
+  font-size: 1.063rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.story-footer {
+  background: #faf7f2;
+  padding: 2.5rem;
+  border-radius: 16px;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+}
+
+.story-footer p {
+  font-size: clamp(1.063rem, 2vw, 1.188rem);
+  color: #475569;
+  line-height: 1.8;
+  margin: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .story-section {
+    padding: 4rem 1.5rem;
+  }
+
+  .story-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .story-intro {
+    margin-bottom: 3rem;
+  }
+
+  .milestones-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .milestone-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .milestone-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .story-footer {
+    padding: 2rem 1.5rem;
+  }
+}
+

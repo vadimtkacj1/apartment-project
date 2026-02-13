@@ -1,0 +1,109 @@
+/* ===== Intro Section ===== */
+.intro-section {
+  padding: 6rem 2rem 4rem;
+  background: #faf7f2; /* Ensure this variable is defined */
+}
+
+.intro-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.intro-content {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+/* Typography styles */
+.intro-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: #1c3664;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.2;
+}
+
+.intro-subtitle {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  color: #475569;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.5;
+}
+
+.intro-description {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #64748b;
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Stats Grid Layout */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 4rem;
+  text-align: center;
+}
+
+/* Stat Item (No background card) */
+.stat-card {
+  background: transparent; /* Removed white background */
+  box-shadow: none;        /* Removed shadow */
+  border: none;            /* Removed border */
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-10px); /* Only movement on hover */
+}
+
+/* Icon Container */
+.stat-icon {
+  width: 140px;  /* Much larger size */
+  height: 140px; /* Much larger size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: transparent; /* Clean background */
+}
+
+.stat-value {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+  font-weight: 800;
+  color: #1c3664;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.25rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stat-icon {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

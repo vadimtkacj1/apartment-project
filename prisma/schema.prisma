@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// User model for authentication
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String   // Hashed password
+  name      String?
+  email     String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Contact information (singleton)
+model ContactInfo {
+  id            Int      @id @default(autoincrement())
+  phone         String
+  phoneLink     String   // tel: format
+  email         String
+  emailLink     String   // mailto: format
+  address       String
+  city          String
+  latitude      Float?   // GPS latitude coordinate
+  longitude     Float?   // GPS longitude coordinate
+  mapUrl        String?
+  weekdayHours  String   // "ראשון - חמישי: 9:00 - 18:00"
+  fridayHours   String   // "שישי: 9:00 - 13:00"
+  facebook      String?
+  instagram     String?
+  linkedin      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// Property model for real estate listings
+model Property {
+  id              Int      @id @default(autoincrement())
+
+  // Deal Type
+  dealType        String   // 'sale' | 'rent'
+
+  // Location
+  city            String   // 'holon' | 'batyam' | 'rishon' | 'telaviv'
+  neighborhood    String?
+  street          String?
+  streetNumber    String?
+  apartmentNumber String?
+  latitude        Float?   // GPS latitude coordinate
+  longitude       Float?   // GPS longitude coordinate
+
+  // Property Details
+  propertyType    String   // 'apartment' | 'garden-apartment' | 'cottage' | etc.
+  floor           Int?
+  parking         String   // 'none' | 'single' | 'double' | etc.
+  position        String?  // 'front' | 'back' | 'front-back' | 'side' | 'corner'
+  furniture       String   // 'none' | 'partial' | 'full'
+  directions      String   @default("[]") // JSON array of directions: ['north', 'south', 'east', 'west']
+  kitchen         String?  // 'upgraded' | 'standard'
+
+  // Measurements
+  rooms           String
+  area            Int
+  builtArea       Int?
+
+  // Additional Info
+  vacancyDate     String?
+
+  // Features (8 boolean fields)
+  hasAirConditioning Boolean @default(false)
+  hasDisabledAccess  Boolean @default(false)
+  hasSunBalcony      Boolean @default(false)
+  hasStorage         Boolean @default(false)
+  hasSunroom         Boolean @default(false)
+  hasBoiler          Boolean @default(false)
+  hasSafeRoom        Boolean @default(false)
+  hasElevator        Boolean @default(false)
+
+  // Display Info
+  title           String
+  description     String
+  price           String
+  originalPrice   String?
+  images          String   @default("[]") // JSON array of image URLs
+  status          String?  // 'Exclusive' | 'New' | 'Opportunity' | etc.
+  location        String   // Display location (Hebrew)
+
+  // For compatibility with old schema
+  bedrooms        String   // Same as rooms
+  bathrooms       Int      @default(1)
+
+  // Category (for backward compatibility)
+  category        String?  // 'sales' | 'rentals' | 'management' | 'land' | 'commercial'
+
+  // Active status (for soft delete)
+  isActive        Boolean  @default(true)
+
+  // Sold status
+  isSold          Boolean  @default(false)
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Indexes for better query performance
+  @@index([city])
+  @@index([dealType])
+  @@index([propertyType])
+  @@index([isActive])
+  @@index([isSold])
+
+  // Relations
+  views PropertyView[]
+  clicks ClickEvent[]
+}
+
+// Analytics: Property Views
+model PropertyView {
+  id          Int      @id @default(autoincrement())
+  propertyId  Int
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  // User information
+  ipAddress   String
+  userAgent   String?
+  referer     String?
+  
+  // Session tracking
+  sessionId   String?
+  
+  // Location (if available)
+  country     String?
+  city        String?
+  region      String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@index([propertyId])
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+// Analytics: Click Events
+model ClickEvent {
+  id          Int      @id @default(autoincrement())
+  propertyId  Int?
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  
+  // Event details
+  eventType   String   // 'property_click', 'phone_click', 'email_click', 'whatsapp_click', 'contact_form', etc.
+  elementId   String?  // ID of clicked element
+  elementType String?  // 'button', 'link', 'card', etc.
+  url         String?  // URL where click happened
+  
+  // User information
+  ipAddress   String
+  userAgent   String?
+  referer     String?
+  
+  // Session tracking
+  sessionId   String?
+  
+  // Location (if available)
+  country     String?
+  city        String?
+  region      String?
+  
+  // Additional metadata
+  metadata    String?  // JSON string for additional data
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@index([propertyId])
+  @@index([eventType])
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([sessionId])
+}

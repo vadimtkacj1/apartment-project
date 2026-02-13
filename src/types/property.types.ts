@@ -4,29 +4,29 @@ export type DealType = 'sale' | 'rent';
 
 export type City = 'holon' | 'batyam' | 'rishon' | 'telaviv' | 'all';
 
-export type PropertyType = 
+export type PropertyType =
   | 'apartment'        // דירה
   | 'garden-apartment' // דירת גן
   | 'cottage'          // קוטג
   | 'house'            // בית
   | 'duplex'           // דופלקס
   | 'penthouse'        // פנטהאוס
-  | 'rooftop'          // דירת גג
-  | 'unit'             // יחידת דיור
+  | 'roof-apartment'   // דירת גג
+  | 'housing-unit'     // יחידת דיור
   | 'divided'          // מחולקת
   | 'studio'           // סטודיו
-  | 'basement'         // דירת מרתף
+  | 'basement-apartment' // דירת מרתף
   | 'villa';           // וילה
 
-export type ParkingType = 
-  | 'none'      // אין
-  | 'single'    // יש
-  | 'double'    // כפולה
-  | 'shared'    // משותפת
-  | 'covered'   // מקורה
-  | 'triple'    // שלוש
-  | 'robotic'   // רובוטית
-  | 'multiple'; // מכפיל
+export type ParkingType =
+  | 'yes'        // יש
+  | 'none'       // אין
+  | 'double'     // כפולה
+  | 'shared'     // משותפת
+  | 'covered'    // מקורה
+  | 'three'      // שלוש
+  | 'robotic'    // רובוטית
+  | 'multiplier'; // מכפיל
 
 export type Position = 
   | 'front'        // חזית
@@ -42,7 +42,9 @@ export type FurnitureLevel =
 
 export type Direction = 'north' | 'south' | 'east' | 'west';
 
-export type KitchenType = 
+export type Rooms = '1' | '1.5' | '2' | '2.5' | '3' | '3.5' | '4' | '4.5' | '5' | '5.5' | '6' | '6+';
+
+export type KitchenType =
   | 'upgraded'  // משופר
   | 'standard'; // סטנדרט
 
@@ -78,7 +80,7 @@ export interface Property {
   kitchen?: KitchenType;        // מטבח
   
   // Measurements
-  rooms: number;                // מס' חדרים
+  rooms: string;                // מס' חדרים
   area: number;                 // מס' מטר מרובע
   builtArea?: number;           // מס' מטר מרובע בנוי
   
@@ -94,7 +96,7 @@ export interface Property {
   images: string[];
   status?: string;
   location: string;             // Display location
-  bedrooms: number;             // For compatibility
+  bedrooms: string;             // For compatibility
   bathrooms: number;            // For compatibility
 }
 
@@ -103,8 +105,8 @@ export interface FilterState {
   city: City;
   neighborhood?: string;
   propertyType?: PropertyType | 'all';
-  minRooms?: number;
-  maxRooms?: number;
+  minRooms?: string;
+  maxRooms?: string;
   minArea?: number;
   maxArea?: number;
   minPrice?: number;

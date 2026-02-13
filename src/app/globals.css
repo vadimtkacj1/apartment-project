@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f9f6f0;
   --foreground: #171717;
+  --warm-beige: #faf7f2;
+  --warm-sand: #f9f6f0;
+  --warm-cream: #fdfbf7;
+  --warm-light: #fcf9f5;
+  --warm-lighter: #fefcfa;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,15 +20,21 @@
 html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
+  background: #faf7f2;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-opensans-hebrew), Arial, Helvetica, sans-serif;
+  font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
+  background: #faf7f2;
 }
 
 @layer utilities {
+  .bg-warm {
+    background-color: #faf7f2 !important;
+  }
+
   .text-balance {
     text-wrap: balance;
   }

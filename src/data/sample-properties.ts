@@ -11,12 +11,12 @@ export const sampleProperties: Property[] = [
     apartmentNumber: '8',
     propertyType: 'apartment',
     floor: 3,
-    parking: 'single',
+    parking: 'yes',
     position: 'front',
     furniture: 'partial',
     directions: ['south', 'west'],
     kitchen: 'upgraded',
-    rooms: 3.5,
+    rooms: '3.5',
     area: 85,
     builtArea: 75,
     vacancyDate: '2026-03-15',
@@ -37,7 +37,7 @@ export const sampleProperties: Property[] = [
     images: ['/images/hero/rentals.webp'],
     status: 'חדש',
     location: 'תל אביב, פלורנטין',
-    bedrooms: 3.5,
+    bedrooms: '3.5',
     bathrooms: 2
   },
   {
@@ -55,7 +55,7 @@ export const sampleProperties: Property[] = [
     furniture: 'full',
     directions: ['north', 'east', 'south'],
     kitchen: 'upgraded',
-    rooms: 5,
+    rooms: '5',
     area: 140,
     builtArea: 120,
     vacancyDate: '2026-04-01',
@@ -75,7 +75,7 @@ export const sampleProperties: Property[] = [
     images: ['/images/hero/sales.jpg'],
     status: 'דירוג מעולה',
     location: 'חולון, רמת אפעל',
-    bedrooms: 5,
+    bedrooms: '5',
     bathrooms: 3
   },
   {
@@ -92,7 +92,7 @@ export const sampleProperties: Property[] = [
     furniture: 'none',
     directions: ['north'],
     kitchen: 'standard',
-    rooms: 4,
+    rooms: '4',
     area: 110,
     builtArea: 95,
     vacancyDate: '2026-05-01',
@@ -111,7 +111,7 @@ export const sampleProperties: Property[] = [
     price: '2,200,000',
     images: ['/images/hero/rent.png'],
     location: 'ראשון לציון, שכונת הגפן',
-    bedrooms: 4,
+    bedrooms: '4',
     bathrooms: 2
   },
   {
@@ -129,7 +129,7 @@ export const sampleProperties: Property[] = [
     furniture: 'full',
     directions: ['east'],
     kitchen: 'standard',
-    rooms: 1.5,
+    rooms: '1.5',
     area: 40,
     builtArea: 38,
     vacancyDate: '2026-03-01',
@@ -149,7 +149,7 @@ export const sampleProperties: Property[] = [
     images: ['/images/hero/rentals.webp'],
     status: 'מבצע',
     location: 'בת ים, רמת יוסף',
-    bedrooms: 1.5,
+    bedrooms: '1.5',
     bathrooms: 1
   },
   {
@@ -167,7 +167,7 @@ export const sampleProperties: Property[] = [
     furniture: 'partial',
     directions: ['south', 'east', 'west'],
     kitchen: 'upgraded',
-    rooms: 6,
+    rooms: '6',
     area: 180,
     builtArea: 160,
     vacancyDate: '2026-06-01',
@@ -187,7 +187,7 @@ export const sampleProperties: Property[] = [
     images: ['/images/hero/sales.jpg'],
     status: 'יוקרה',
     location: 'תל אביב, נווה צדק',
-    bedrooms: 6,
+    bedrooms: '6',
     bathrooms: 3
   }
 ];

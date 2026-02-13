@@ -1,8 +1,5 @@
 "use client";
 import { useEffect } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectFade } from 'swiper/modules';
-import { heroSlides } from '@/data/hero.data';
 import Hero from '@/components/layout/Hero';
 import Header from '@/components/layout/Header';
 import Stats from '@/components/layout/Stats';
@@ -13,12 +10,6 @@ import Testimonials from '@/components/layout/Testimonials';
 import FeaturedProperties from '@/components/layout/FeaturedProperties';
 import ContactForm from '@/components/layout/ContactForm';
 import ValuesSection from '@/components/layout/ValuesSection';
-
-// Swiper styles
-import 'swiper/css';
-import 'swiper/css/effect-fade';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 import MarketingMessage from '@/components/layout/MarketingMessage';
 
 export default function Home() {
@@ -36,37 +27,18 @@ export default function Home() {
 
   return (
     <>
-      {/* Hero section with sticky positioning */}
-      <div className="h-screen w-full sticky top-0 z-0">
-        <Swiper
-          spaceBetween={0}
-          speed={2500}
-          autoplay={{ delay: 6000, disableOnInteraction: false }}
-          effect={"fade"}
-          fadeEffect={{ crossFade: true }}
-          modules={[Autoplay, EffectFade]}
-          className="h-full w-full"
-        >
-          {heroSlides.map((slide) => (
-            <SwiperSlide key={slide.id}>
-              <Hero
-                img={slide.img}
-                mainText=""
-                subText="הנכס שלכם שווה יותר. אנחנו נדאג למצוא את הקונה המתאים במחיר המקסימלי."
-                staticTitle="רם וחיים שיווק נכסים"
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      {/* Hero section - sticky so content scrolls over it */}
+      <div className="w-full sticky top-0 z-0">
+        <Hero
+          img="/images/hero/second-hero.jpg"
+        />
       </div>
 
       {/* Content that scrolls over the hero */}
-      <div className="relative z-10 bg-white">
+      <div className="relative z-10 bg-warm">
         <HotPropositions />
-        <Stats />
-        <MarketingMessage/>
-        <ValuesSection />
         <AboutSection />
+        <ValuesSection />
         <Testimonials />
         <FeaturedProperties />
         <ContactForm />

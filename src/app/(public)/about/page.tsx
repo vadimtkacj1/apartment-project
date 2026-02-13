@@ -1,35 +1,48 @@
 'use client';
 
-import './about.css';
-import SkewedSlider from '@/components/layout/SkewedSlider';
-import AboutHero from '@/components/about/AboutHero';
-import AboutStory from '@/components/about/AboutStory';
+import Hero from '@/components/layout/Hero';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import AboutMainIntro from '@/components/about/AboutMainIntro';
+import AboutLocalExpertise from '@/components/about/AboutLocalExpertise';
+import AboutServicesNew from '@/components/about/AboutServicesNew';
+import AboutMarketing from '@/components/about/AboutMarketing';
+import AboutStoryNew from '@/components/about/AboutStoryNew';
 import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
-import AboutCTA from '@/components/about/AboutCTA';
 
 export default function AboutPage() {
   return (
     <div className="about-page" dir="rtl">
-      {/* Skewed Slider Section */}
-      <section className="slider-section">
-        <SkewedSlider />
-      </section>
+      {/* Hero with Background Image */}
+      <Hero
+        img="/7.png"
+        staticTitle="אודות"
+        centered={true}
+      />
 
-      {/* Hero Section */}
-      <AboutHero />
+      {/* Breadcrumbs */}
+      <Breadcrumbs />
 
-      {/* Story Section */}
-      <AboutStory />
+      {/* Main Intro: רם וחיים שיווק נכסים */}
+      <AboutMainIntro />
 
-      {/* Owners Section */}
+      {/* Local Expertise: מומחיות מקומית בחולון */}
+      <AboutLocalExpertise />
+
+      {/* Services: השכרה, מכירה וניהול נכסים */}
+      <AboutServicesNew />
+
+      {/* Marketing: שיווק נדל"ן בגישה מתקדמת */}
+      <AboutMarketing />
+
+      {/* Story: הסיפור שלנו */}
+      <AboutStoryNew />
+
+      {/* Founders: המייסדים שלנו */}
       <AboutOwners />
 
-      {/* Team Section */}
+      {/* Team: הצוות המקצועי */}
       <AboutTeam />
-
-      {/* CTA Section */}
-      <AboutCTA />
     </div>
   );
 }
