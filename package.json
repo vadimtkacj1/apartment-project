@@ -5,10 +5,12 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "prisma generate",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "seed:admin": "node prisma/seed.mjs"
+    "lint": "next lint .",
+    "seed:admin": "node prisma/seed.mjs",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
