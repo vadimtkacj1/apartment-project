@@ -21,6 +21,9 @@ html {
   overflow-y: scroll;
   scrollbar-gutter: stable;
   background: #faf7f2;
+  /* Fix mobile viewport height issues */
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -28,6 +31,10 @@ body {
   padding: 0;
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
   background: #faf7f2;
+  min-height: 100%;
+  /* Smooth scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
 }
 
 @layer utilities {
@@ -53,5 +60,20 @@ body {
 @media (min-width: 768px) {
   button[style*="--shadow-desktop"] {
     box-shadow: var(--shadow-desktop) !important;
+  }
+}
+
+/* Mobile scroll optimization - prevent jumping on hero section */
+@media (max-width: 768px) {
+  /* Fix for mobile browsers where viewport height changes with address bar */
+  .sticky {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  html, body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
   }
 }
