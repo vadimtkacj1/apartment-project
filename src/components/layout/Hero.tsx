@@ -46,23 +46,18 @@ const Hero: React.FC<HeroProps> = ({ img, staticTitle, centered = false }) => {
       dir="rtl"
       className="relative w-full overflow-hidden bg-black cursor-pointer"
       onClick={handleHeroClick}
-      style={{
-        /* Prevent layout shift on mobile */
-        WebkitBackfaceVisibility: 'hidden',
-        backfaceVisibility: 'hidden',
-        willChange: 'auto'
-      }}
     >
       {/* Ограничиваем высоту контейнера, чтобы контент не "тонул" */}
-      <div className={`relative w-full ${
-        staticTitle ? 'h-[40vh] md:h-[45vh]' : 'h-[80vh] md:h-[85vh]'
-      }`}
-      style={{
-        /* Use dvh (dynamic viewport height) on supporting browsers to prevent jumps */
-        height: staticTitle
-          ? 'clamp(400px, 40dvh, 45vh)'
-          : 'clamp(600px, 80dvh, 85vh)',
-      }}
+      <div
+        className={`relative w-full ${
+          staticTitle ? 'h-[40vh] md:h-[45vh]' : 'h-[80vh] md:h-[85vh]'
+        }`}
+        style={{
+          /* Use dvh (dynamic viewport height) to prevent jumps when mobile browser address bar hides */
+          height: staticTitle
+            ? 'clamp(400px, 40dvh, 45vh)'
+            : 'clamp(600px, 80dvh, 85vh)',
+        }}
       >
         <Image
           src={img}
