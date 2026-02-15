@@ -344,8 +344,9 @@
 
 .layout-dashboard .ant-table-tbody > tr > td,
 .layout-dashboard .ant-table-thead > tr > th {
-  padding: 14px 20px;
-  white-space: nowrap;
+  padding: 14px 16px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* ===== BUTTONS ===== */
@@ -561,4 +562,39 @@
 .layout-dashboard .ant-switch-inner-checked,
 .layout-dashboard .ant-switch-inner-unchecked {
   font-size: 12px;
+}
+
+/* ===== TABLE IMPROVEMENTS ===== */
+.layout-dashboard .ant-table {
+  overflow-x: auto;
+}
+
+.layout-dashboard .ant-table-wrapper {
+  overflow-x: auto;
+}
+
+.layout-dashboard .ant-table-cell {
+  vertical-align: top;
+}
+
+/* Ellipsis styles for table cells */
+.layout-dashboard .ant-table-cell-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Better text wrapping in table cells */
+.layout-dashboard .ant-table-tbody > tr > td > div {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Responsive table wrapper */
+.layout-dashboard .ant-card-body .ant-table-wrapper {
+  margin: -20px -24px;
+}
+
+.layout-dashboard .ant-card-body .ant-table {
+  margin: 0;
 }

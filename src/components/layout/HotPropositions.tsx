@@ -185,7 +185,7 @@ function HotPropositions() {
           <MarqueeRow
             items={properties}
             direction="left"
-            duration={30}
+            duration={60}
             isMobile={isMobile}
           />
         </div>

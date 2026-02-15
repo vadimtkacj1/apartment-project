@@ -33,57 +33,54 @@ const Hero: React.FC<HeroProps> = ({ img, staticTitle, centered = false }) => {
   };
 
   const itemVariants: Variants = {
-    hidden: { opacity: 0, x: 50, filter: 'blur(10px)' },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      x: 0,
-      filter: 'blur(0px)',
+      y: 0,
       transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
     },
   };
 
   return (
-    /* 1. Changed h-full to relative. Removed absolute from background wrapper */
     <section
       dir="rtl"
       className="relative w-full overflow-hidden bg-black cursor-pointer"
       onClick={handleHeroClick}
     >
-      {/* Background Image Wrapper - No longer absolute, so it defines the height */}
-      <div className={`relative z-0 w-full ${staticTitle ? 'h-[40vh] md:h-[45vh]' : ''}`}>
+      {/* Ограничиваем высоту контейнера, чтобы контент не "тонул" */}
+      <div className={`relative w-full ${
+        staticTitle ? 'h-[40vh] md:h-[45vh]' : 'h-[80vh] md:h-[85vh]'
+      }`}>
         <Image
           src={img}
           alt="Real Estate background"
           priority
+          fill
           className="object-cover object-center"
-          sizes='100vw'
-          width={0}
-          height={0}
-          style={staticTitle ? { width: '100%', height: '100%' } : { width: '100%', height: 'auto' }}
+          sizes="100vw"
         />
 
-        {/* Overlay - Stretches to the height defined by the image above */}
-        <div className="absolute inset-0 bg-black/40 z-10" />
+        <div className="absolute inset-0 bg-black/50 z-10" />
 
-        {/* 2. Main Content - Absolute inset-0 to overlay the text on top of the image */}
         <motion.div
           variants={shouldAnimate ? containerVariants : undefined}
           initial={shouldAnimate ? "hidden" : "visible"}
           animate="visible"
-          className={`absolute inset-0 z-20 flex items-center w-full px-6 ${
-            centered 
-              ? 'flex flex-col justify-center items-center text-center' 
-              : 'md:pr-32 lg:pr-40 flex flex-col justify-center items-start text-right'
+          /* На мобилке (sm) выравниваем по центру, на десктопе (md) - по правому краю */
+          className={`absolute inset-0 z-20 flex flex-col justify-center px-4 md:px-20 lg:px-32 ${
+            centered || staticTitle
+              ? 'items-center text-center'
+              : 'items-center text-center md:items-start md:text-right'
           }`}
         >
           {/* Title */}
-          <motion.div variants={shouldAnimate ? itemVariants : undefined}>
+          <motion.div variants={shouldAnimate ? itemVariants : undefined} className="w-full">
             <h1
-              className="font-black leading-tight mb-4 text-white uppercase"
+              className="font-black leading-[1.1] mb-4 text-white uppercase"
               style={{
-                fontSize: 'clamp(3.5rem, 8vw, 9rem)',
-                letterSpacing: '-0.02em',
-                filter: 'drop-shadow(0 5px 15px rgba(0,0,0,0.5))'
+                /* Уменьшили мобильный шрифт до 1.8rem, оставили огромный 9rem для десктопа */
+                fontSize: 'clamp(1.8rem, 6vw, 9rem)',
+                textShadow: '0 4px 15px rgba(0,0,0,0.5)'
               }}
             >
               {displayTitle}
@@ -94,10 +91,9 @@ const Hero: React.FC<HeroProps> = ({ img, staticTitle, centered = false }) => {
           {!staticTitle && (
             <motion.div variants={shouldAnimate ? itemVariants : undefined}>
               <p
-                className="text-white/95 font-medium leading-relaxed mb-8 max-w-2xl"
+                className="text-white/95 font-medium leading-relaxed mb-8 max-w-xl md:max-w-2xl"
                 style={{
-                  fontSize: 'clamp(1rem, 1.5vw, 1.4rem)',
-                  textShadow: '0 2px 10px rgba(0,0,0,0.8)'
+                  fontSize: 'clamp(0.95rem, 1.5vw, 1.4rem)'
                 }}
               >
                 {subText}
@@ -107,26 +103,26 @@ const Hero: React.FC<HeroProps> = ({ img, staticTitle, centered = false }) => {
 
           {/* Buttons */}
           {!staticTitle && (
-            <motion.div variants={shouldAnimate ? itemVariants : undefined}>
-              <div className="flex flex-col sm:flex-row gap-4" onClick={(e) => e.stopPropagation()}>
+            <motion.div variants={shouldAnimate ? itemVariants : undefined} className="w-full md:w-auto">
+              {/* На мобилке кнопки в колонку и фиксированной ширины, на десктопе в ряд */}
+              <div 
+                className="flex flex-col md:flex-row gap-4 items-center md:items-start justify-center" 
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Link
                   href="/apartments?dealType=sale"
-                  className="group bg-[#1c3664] text-white px-8 py-3 rounded-lg font-bold text-base md:text-lg shadow-xl hover:bg-white hover:text-[#1c3664] transition-all duration-300 active:scale-95 border border-white/10 flex items-center justify-center gap-3"
+                  className="w-full max-w-[280px] md:w-auto group bg-[#1c3664] text-white px-8 py-3.5 rounded-lg font-bold text-base md:text-lg shadow-xl hover:bg-white hover:text-[#1c3664] transition-all duration-300 flex items-center justify-center gap-3 border border-white/10"
                 >
                   נכסים למכירה
-                  <span className="text-xl group-hover:translate-x-[-4px] transition-transform duration-300">
-                    ←
-                  </span>
+                  <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
                 </Link>
 
                 <Link
                   href="/apartments?dealType=rent"
-                  className="group bg-white/10 backdrop-blur-md text-white px-8 py-3 rounded-lg font-bold text-base md:text-lg shadow-xl hover:bg-white hover:text-[#1c3664] transition-all duration-300 active:scale-95 border border-white/30 flex items-center justify-center gap-3"
+                  className="w-full max-w-[280px] md:w-auto group bg-white/10 backdrop-blur-md text-white px-8 py-3.5 rounded-lg font-bold text-base md:text-lg shadow-xl hover:bg-white hover:text-[#1c3664] transition-all duration-300 flex items-center justify-center gap-3 border border-white/30"
                 >
                   נכסים להשכרה
-                  <span className="text-xl group-hover:translate-x-[-4px] transition-transform duration-300">
-                    ←
-                  </span>
+                  <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
                 </Link>
               </div>
             </motion.div>

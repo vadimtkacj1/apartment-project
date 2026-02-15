@@ -271,15 +271,20 @@ export default function AnalyticsPage() {
       title: 'נכס',
       dataIndex: 'property',
       key: 'property',
+      width: '35%',
+      ellipsis: { showTitle: true },
       render: (property) => property ? (
-        <span style={{ fontWeight: 500 }}>{property.title} <span style={{color: '#999', fontSize: '0.9em'}}>({property.location})</span></span>
+        <div style={{ fontWeight: 500 }}>
+          <div>{property.title}</div>
+          <div style={{color: '#999', fontSize: '0.85em', marginTop: '2px'}}>{property.location}</div>
+        </div>
       ) : <span style={{color: '#ccc'}}>לא זמין</span>,
     },
     {
       title: 'כתובת IP',
       dataIndex: 'ipAddress',
       key: 'ipAddress',
-      width: 140,
+      width: '20%',
       render: (ip) => (
         <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
           {ip}
@@ -290,8 +295,7 @@ export default function AnalyticsPage() {
       title: 'דפדפן',
       dataIndex: 'userAgent',
       key: 'userAgent',
-      width: 150,
-      ellipsis: true,
+      width: '20%',
       render: (userAgent) => {
         if (!userAgent) return '-';
         const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
@@ -308,7 +312,7 @@ export default function AnalyticsPage() {
       title: 'תאריך',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 160,
+      width: '25%',
       render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm'),
       sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
     },
@@ -319,6 +323,8 @@ export default function AnalyticsPage() {
       title: 'נכס',
       dataIndex: 'property',
       key: 'property',
+      width: '25%',
+      ellipsis: { showTitle: true },
       render: (property, record) => property ? (
         <div>
           <div style={{ fontWeight: 600 }}>{property.title}</div>
@@ -330,7 +336,7 @@ export default function AnalyticsPage() {
       title: 'פעולה',
       dataIndex: 'eventType',
       key: 'eventType',
-      width: 140,
+      width: '15%',
       render: (eventType) => (
         <Tag color={getEventTypeColor(eventType)}>
           {getEventTypeLabel(eventType)}
@@ -341,7 +347,7 @@ export default function AnalyticsPage() {
       title: 'כתובת IP',
       dataIndex: 'ipAddress',
       key: 'ipAddress',
-      width: 140,
+      width: '18%',
       render: (ip) => (
         <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
           {ip}
@@ -352,8 +358,7 @@ export default function AnalyticsPage() {
       title: 'דפדפן',
       dataIndex: 'userAgent',
       key: 'userAgent',
-      width: 200,
-      ellipsis: true,
+      width: '17%',
       render: (userAgent) => {
         if (!userAgent) return '-';
         // Extract browser info
@@ -371,7 +376,7 @@ export default function AnalyticsPage() {
       title: 'תאריך',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 160,
+      width: '25%',
       render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm'),
       sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
     },
@@ -775,6 +780,7 @@ export default function AnalyticsPage() {
                 rowKey="id"
                 pagination={false}
                 size="small"
+                scroll={{ x: 800 }}
                 />
                 <div style={{ padding: '12px', textAlign: 'center' }}>
                     <Button type="link">צפה בכל הפעולות</Button>
@@ -794,6 +800,7 @@ export default function AnalyticsPage() {
                 rowKey="id"
                 pagination={false}
                 size="small"
+                scroll={{ x: 700 }}
                 />
                 <div style={{ padding: '12px', textAlign: 'center' }}>
                     <Button type="link">צפה בכל הצפיות</Button>
