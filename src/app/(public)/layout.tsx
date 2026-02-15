@@ -15,7 +15,6 @@ export default function PublicLayout({
       <Header />
       <main className="flex-grow bg-warm">{children}</main>
       <Footer />
-      <WhatsAppButton />
       <SocialSidebar />
       <AccessibilityWidget />
     </div>
