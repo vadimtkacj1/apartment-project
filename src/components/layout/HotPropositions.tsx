@@ -36,43 +36,32 @@ const MarqueeRow = ({
   duration?: number,
   isMobile?: boolean
 }) => {
-  // Use 2x duplication on mobile for better performance, 3x on desktop
   const duplicatedItems = useMemo(
     () => isMobile ? [...items, ...items] : [...items, ...items, ...items],
     [items, isMobile]
   );
 
-  // On mobile, use simpler animation or disable it
-  if (isMobile) {
-    return (
-      <div className="flex w-full overflow-x-auto scrollbar-hide" style={{ direction: 'ltr' }}>
-        <div className="flex gap-4 py-4">
-          {items.map((item: Property, i: number) => (
-            <div key={`hot-proposition-card-mobile-${i}`} className="w-[260px] md:w-[280px] shrink-0">
-              <HotPropositionCard {...item} index={i} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const animationDuration = isMobile ? duration * 1.5 : duration;
+
+  const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
+  const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
 
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
       <motion.div
-        key={`hot-propositions-marquee-${direction}-${duration}`}
-        className="flex gap-4 md:gap-5 py-4"
+        key={`hot-propositions-marquee-${direction}-${animationDuration}`}
+        className="flex gap-4 md:gap-6 py-4 md:py-6"
         style={{ willChange: 'transform' }}
-        initial={{ x: direction === "left" ? "0%" : "-33.33%" }}
-        animate={{ x: direction === "left" ? "-33.33%" : "0%" }}
+        initial={{ x: xInitial }}
+        animate={{ x: xAnimate }}
         transition={{
-          duration: duration,
+          duration: animationDuration,
           ease: "linear",
           repeat: Infinity,
         }}
       >
         {duplicatedItems.map((item: Property, i: number) => (
-          <div key={`hot-proposition-card-${direction}-${i}`} className="w-[260px] md:w-[280px] shrink-0">
+          <div key={`hot-proposition-card-${direction}-${i}`} className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0">
             <HotPropositionCard {...item} index={i} />
           </div>
         ))}
@@ -86,14 +75,12 @@ function HotPropositions() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch hot propositions from API
   useEffect(() => {
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
-        // Fetch properties from center area for sale
-        const response = await fetch('/api/properties?region=center&dealType=sale&limit=12', {
-          next: { revalidate: 300 } // Cache for 5 minutes
+        const response = await fetch('/api/properties?dealType=sale&limit=12', {
+          next: { revalidate: 300 }
         });
 
         if (!response.ok) {
@@ -101,8 +88,8 @@ function HotPropositions() {
         }
 
         const data = await response.json();
+        console.log('HotPropositions: fetched data', data);
 
-        // Map properties to format expected by HotPropositionCard
         const mappedProperties: Property[] = data.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
@@ -119,6 +106,7 @@ function HotPropositions() {
           floor: prop.floor,
         }));
 
+        console.log('HotPropositions: mapped properties', mappedProperties);
         setProperties(mappedProperties);
       } catch (error) {
         console.error('Error fetching hot properties:', error);
@@ -131,57 +119,47 @@ function HotPropositions() {
     fetchHotProperties();
   }, []);
 
-  // Show loading state or empty state
   if (loading) {
     return (
-      <section className="relative pt-24 md:pt-32 pb-12 overflow-hidden w-full" dir="rtl">
-        <div className="text-center">
-          <p className="text-gray-600">טוען נכסים...</p>
+      <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
+        <div className="text-center py-20">
+          <p className="text-gray-600 text-lg">טוען נכסים...</p>
         </div>
       </section>
     );
   }
 
   if (properties.length === 0) {
-    return null;
+    return (
+      <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full bg-red-50" dir="rtl">
+        <div className="text-center py-20">
+          <p className="text-red-600 text-lg font-bold">אין נכסים להצגה (properties.length = 0)</p>
+          <p className="text-gray-600 text-sm mt-2">בדוק את הקונסול לפרטים</p>
+        </div>
+      </section>
+    );
   }
 
   return (
-    <section className="relative pt-24 md:pt-32 pb-12 overflow-hidden w-full" dir="rtl">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-10 w-72 h-72 bg-[#1c3664]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#1c3664]/10 rounded-full blur-3xl"></div>
-      </div>
+    <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
+      {/* Decorative Background Elements удалены, чтобы убрать синие пятна */}
 
       <div className="relative z-10 w-full">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          className="text-center mb-16 px-6"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="inline-block mb-4"
-          >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+        <div className="text-center mb-10 md:mb-16 px-4 md:px-6">
+          <div className="inline-block mb-3 md:mb-4">
+            <span className="text-[#1c3664] font-bold text-sm md:text-lg uppercase tracking-wider">
               הצעות מיוחדות
             </span>
-          </motion.div>
+          </div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 md:mb-6 uppercase tracking-tight">
             הצעות חמות
           </h2>
-        </motion.div>
+        </div>
 
         {/* Scrolling Rows */}
-        <div className="flex flex-col gap-6 md:gap-8 w-full">
+        <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">
           <MarqueeRow
             items={properties}
             direction="left"

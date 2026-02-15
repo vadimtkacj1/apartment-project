@@ -82,6 +82,7 @@ export default async function Footer() {
           <div>
             <h4 className="text-[15px] font-bold mb-4 text-white">משאבים</h4>
             <ul className="space-y-2 text-[13px] text-gray-400 font-medium">
+              <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">מרכז עזרה</Link></li>
               <li><Link href="/links" className="hover:text-white transition-colors">קישורים שימושיים</Link></li>
             </ul>

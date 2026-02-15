@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Pagination, EffectCoverflow } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
@@ -22,145 +21,45 @@ const Testimonials: React.FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
 
   const testimonials: Testimonial[] = [
-    {
-      id: 1,
-      name: "רותם כנפי",
-      rating: 5,
-      text: "אדם נעים, ישר והגון. בדיוק מי שרוצים לידכם בעסקת נדל״ן. ממליץ לכל מי שמחפש תיווך איכותי."
-    },
-    {
-      id: 2,
-      name: "אלון שמואלי",
-      rating: 5,
-      text: "שילוב של מקצועיות ואנושיות. תמיד בגובה העיניים ובלי משחקים. בדיוק מה שצריך בעולם הנדל״ן."
-    },
-    {
-      id: 3,
-      name: "אורי גלילי",
-      rating: 5,
-      text: "מקצועיות יוצאת דופן. הבין בדיוק את הצרכים שלנו והתאים נכס בצורה מדויקת. חסך לנו חודשים של חיפושים."
-    },
-    {
-      id: 4,
-      name: "עידו בר-לב",
-      rating: 5,
-      text: "פנינו לרם אחרי תקופה ארוכה שניסינו למכור לבד ללא הצלחה. מהרגע הראשון הרגשנו שיש על מי לסמוך. התהליך נוהל בצורה מסודרת, שקופה ומקצועית ובסוף נמכר במחיר טוב משציפינו."
-    },
-    {
-      id: 5,
-      name: "מיכל דרור",
-      rating: 5,
-      text: "עברנו כמה מתווכים לפניו — ההבדל היה משמעותי. סדר, ארגון ותחושת ביטחון מהרגע הראשון."
-    },
-    {
-      id: 6,
-      name: "יובל פרקש",
-      rating: 5,
-      text: "ניהול נכס ברמה גבוהה. לא היינו צריכים להתעסק עם כלום — טיפול בתקלות, חוזים ושוכרים הכל עבר דרכו בצורה חלקה."
-    },
-    {
-      id: 7,
-      name: "לירון ברקאי",
-      rating: 5,
-      text: "ניהל עבורנו השכרת נכס — הכל נעשה מסודר, חוזים ברורים ושוכרים מצוינים. ראש שקט אמיתי."
-    },
-    {
-      id: 8,
-      name: "דנה קסטן",
-      rating: 5,
-      text: "מקצוען אמיתי. בדק את השוק לעומק, תימחר נכון והביא קונים רציניים בלבד. חסך לנו המון זמן והתעסקות."
-    },
-    {
-      id: 9,
-      name: "נועם רפאלי",
-      rating: 5,
-      text: "חיים ליווה אותנו ברכישת דירה ראשונה. הסביר הכל בסבלנות, בדק פרטים שלא חשבנו עליהם ונתן ביטחון לאורך כל הדרך."
-    },
-    {
-      id: 10,
-      name: "אוראל סויסה",
-      rating: 5,
-      text: "לא רק מתווך אלא יועץ. הסביר כל שלב בתהליך והיה זמין תמיד. הרגשנו שיש מי שמייצג אותנו באמת."
-    },
-    {
-      id: 11,
-      name: "רוני אבידן",
-      rating: 5,
-      text: "היה זמין תמיד גם מעבר לשעות העבודה. כל התהליך עבר בצורה נעימה וללא הפתעות."
-    },
-    {
-      id: 12,
-      name: "שירה מלמד",
-      rating: 5,
-      text: "קיבלנו ליווי מלא מהשלב הראשון ועד חתימה. כל שאלה קיבלה מענה במהירות ובסבלנות. רם ידע להרגיע ברגעים מלחיצים ולנווט את העסקה בצורה חכמה."
-    },
-    {
-      id: 13,
-      name: "בר פלד",
-      rating: 5,
-      text: "שירות אישי ואכפתי. הרגשנו שהוא באמת רוצה שנעשה עסקה נכונה ולא סתם לסגור עסקה."
-    },
-    {
-      id: 14,
-      name: "גל סער",
-      rating: 5,
-      text: "משא ומתן חכם והוגן לשני הצדדים. הרגשנו שמדובר באדם ישר שמכבד גם מוכרים וגם קונים."
-    },
-    {
-      id: 15,
-      name: "הילה בר-און",
-      rating: 5,
-      text: "מהפגישה הראשונה ידענו שאנחנו בידיים טובות. מכר את הדירה במהירות ובמחיר מצוין. ממליצה בחום."
-    },
-    {
-      id: 16,
-      name: "תומר כהנא",
-      rating: 5,
-      text: "עבדנו עם הרבה אנשי מקצוע בעבר, אבל רמת הדיוק, האמינות והיחס האישי שקיבלנו כאן הייתה מעל הכל. דאג לאינטרסים שלנו ולא לחץ לשום החלטה."
-    },
-    {
-      id: 17,
-      name: "עדן שלו",
-      rating: 5,
-      text: "חיים ידע להעריך נכון את שווי הדירה ולהביא קונים מתאימים בלבד. מכירה מהירה ומדויקת."
-    },
-    {
-      id: 18,
-      name: "מאיה הדרי",
-      rating: 5,
-      text: "השכרנו דירה דרך רם והוא מצא שוכרים איכותיים בזמן קצר מאוד. ההתנהלות הייתה נעימה וברורה לאורך כל הדרך."
-    },
-    {
-      id: 19,
-      name: "איתן מורג",
-      rating: 5,
-      text: "העסקה נראתה תקועה אבל חיים הצליח לפתור את המחלוקות ולהוביל לחתימה. מקצוען אמיתי."
-    },
-    {
-      id: 20,
-      name: "נטלי רוזן",
-      rating: 5,
-      text: "העסקה הייתה מורכבת מאוד, אבל רם ניהל משא ומתן בצורה חכמה והצליח לגשר בין הצדדים. שירות ברמה גבוהה."
-    }
+    { id: 1, name: "רותם כנפי", rating: 5, text: "אדם נעים, ישר והגון. בדיוק מי שתרצו לצידכם בעסקת מקרקעין. ממליץ בחום לכל מי שמחפש תיווך איכותי." },
+    { id: 2, name: "אלון שמואלי", rating: 5, text: "שילוב של מקצועיות ואנושיות. תמיד בגובה העיניים ובלי משחקים. בדיוק מה שצריך בעולם הנדל\"ן." },
+    { id: 3, name: "אורי גלילי", rating: 5, text: "מקצועיות יוצאת דופן. הבין את הצרכים שלנו בצורה מושלמת והתאים את הנכס במדויק. חסך לנו חודשים של חיפושים." },
+    { id: 4, name: "עידו בר-לב", rating: 5, text: "פנינו לרם אחרי תקופה ארוכה שניסינו למכור לבד ללא הצלחה. מהרגע הראשון הרגשנו שיש על מי לסמוך. התהליך נוהל במקצועיות והדירה נמכרה במחיר גבוה מהמצופה." },
+    { id: 5, name: "מיכל דרור", rating: 5, text: "עברנו כמה מתווכים לפניו - ההבדל היה משמעותי. סדר, ארגון ותחושת ביטחון מהרגע הראשון." },
+    { id: 6, name: "יובל פרקש", rating: 5, text: "ניהול נכסים ברמה גבוהה. לא היינו צריכים להתעסק בכלום - טיפול בתיקונים, חוזים ודיירים, הכל עבר דרכו בצורה חלקה." },
+    { id: 7, name: "לירון ברקאי", rating: 5, text: "ניהל עבורנו השכרת נכס - הכל נעשה בצורה מסודרת, חוזים ברורים ודיירים מצוינים. שקט נפשי אמיתי." },
+    { id: 8, name: "דנה קסטן", rating: 5, text: "מקצוען אמיתי. למד את השוק לעומק, תמחר נכון והביא רק קונים רציניים. חסך לנו המון זמן וכאב ראש." },
+    { id: 9, name: "נועם רפאלי", rating: 5, text: "חיים ליווה אותנו ברכישת הדירה הראשונה שלנו. הסביר הכל בסבלנות, בדק פרטים שלא חשבנו עליהם ונתן לנו ביטחון לאורך כל הדרך." },
+    { id: 10, name: "אוראל סויסה", rating: 5, text: "לא רק מתווך אלא יועץ. הסביר כל שלב והיה זמין תמיד. הרגשנו שיש מישהו שבאמת מייצג אותנו." },
+    { id: 11, name: "רוני אבידן", rating: 5, text: "היה זמין תמיד גם מעבר לשעות העבודה. כל התהליך עבר בנעימים וללא הפתעות." },
+    { id: 12, name: "שירה מלמד", rating: 5, text: "קיבלנו ליווי מלא מהשלב הראשון ועד החתימה. כל שאלה נענתה במהירות ובסבלנות. רם ידע להרגיע ברגעים לחוצים." },
+    { id: 13, name: "בר פלד", rating: 5, text: "שירות אישי ואכפתי. הרגשנו שהוא באמת רוצה שנעשה את העסקה הנכונה ולא רק לסגור מכירה." },
+    { id: 14, name: "גל סער", rating: 5, text: "ניהול משא ומתן חכם והוגן לשני הצדדים. הרגשנו שאנחנו עובדים עם אדם ישר שמכבד גם את המוכרים וגם את הקונים." },
+    { id: 15, name: "הילה בר-און", rating: 5, text: "מהפגישה הראשונה ידענו שאנחנו בידיים טובות. מכר את הדירה במהירות ובמחיר מצוין. ממליצה בחום." },
+    { id: 16, name: "תומר כהנא", rating: 5, text: "עבדנו עם הרבה אנשי מקצוע, אבל רמת הדיוק, האמינות והיחס האישי שקיבלנו כאן הייתה מעל הכל. היה לו חשוב האינטרס שלנו." },
+    { id: 17, name: "עדן שליו", rating: 5, text: "חיים ידע להעריך נכון את שווי הדירה ולהביא רק קונים מתאימים. מכירה מהירה ומדויקת." },
+    { id: 18, name: "מיה הדרי", rating: 5, text: "השכרנו דירה דרך רם והוא מצא דיירים איכותיים בזמן קצר מאוד. ההתנהלות הייתה נעימה וברורה לאורך כל הדרך." },
+    { id: 19, name: "איתן מורג", rating: 5, text: "העסקה נראתה תקועה, אבל חיים הצליח לפתור את המחלוקות ולהוביל לחתימה. מקצוען אמיתי." },
+    { id: 20, name: "נתלי רוזן", rating: 5, text: "העסקה הייתה מורכבת מאוד, אבל רם ניהל את המשא ומתן בתבונה וגישר על הפערים. שירות ברמה גבוהה." }
   ];
 
   return (
-    <section dir="rtl" className="relative w-full py-20 overflow-hidden bg-warm">
-      <div className="relative z-10 max-w-[1300px] mx-auto px-6">
+    <section className="relative w-full py-12 md:py-20 overflow-hidden bg-warm" dir="rtl">
+      <div className="relative z-10 max-w-[1300px] mx-auto px-4">
         
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-black text-[#1c3664]">הלקוחות שלנו משתפים</h2>
+        <div className="text-center mb-8 md:mb-12">
+          <h2 className="text-3xl md:text-5xl font-black text-[#1c3664]">מה הלקוחות שלנו אומרים</h2>
         </div>
 
-        <div className="relative px-2 md:px-16">
+        <div className="relative">
           <Swiper
             modules={[Navigation, Autoplay, Pagination, EffectCoverflow]}
             effect={'coverflow'}
             grabCursor={true}
             centeredSlides={true}
-            slidesPerView={1.2}
+            slidesPerView={1.15}
             loop={true}
-            autoplay={{ delay: 5000 }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
             coverflowEffect={{
               rotate: 0,
               stretch: 0,
@@ -179,35 +78,32 @@ const Testimonials: React.FC = () => {
               bulletClass: 'testimonial-bullet',
               bulletActiveClass: 'testimonial-bullet-active',
             }}
-            className="!pt-5 overflow-visible"
+            className="!pt-5 !pb-12 overflow-visible"
           >
             {testimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
                 {({ isActive }) => (
                   <div className={`
-                    relative bg-white rounded-[2.5rem] p-10 md:p-14 flex flex-col items-center text-center transition-all duration-700
+                    relative bg-white rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-14 flex flex-col items-center text-center transition-all duration-700 h-full shadow-none
                     ${isActive 
-                      ? 'shadow-[0_40px_100px_-20px_rgba(28,54,100,0.15)] scale-100 opacity-100 z-20' 
-                      : 'shadow-none scale-90 opacity-40 blur-[1px] z-10'}
+                      ? 'scale-100 opacity-100' 
+                      : 'scale-90 opacity-40 blur-[0.5px]'}
                   `}>
                     
-                    {/* Звезды */}
-                    <div className="flex gap-1.5 mb-8">
+                    <div className="flex gap-1.5 mb-6">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={22} className="fill-amber-400 text-amber-400" />
+                        <Star key={i} size={20} className="fill-amber-400 text-amber-400" />
                       ))}
                     </div>
 
-                    {/* Текст */}
-                    <div className="min-h-[140px] flex items-center">
-                      <p className={`text-xl md:text-2xl leading-[1.8] transition-colors duration-500
-                        ${isActive ? 'text-gray-700 font-medium' : 'text-gray-400'}`}>
+                    <div className="min-h-[120px] md:min-h-[140px] flex items-center">
+                      <p className={`text-lg md:text-2xl leading-[1.6] md:leading-[1.8] transition-colors duration-500
+                        ${isActive ? 'text-gray-700 font-medium italic' : 'text-gray-400'}`}>
                         "{testimonial.text}"
                       </p>
                     </div>
 
-                    {/* Имя */}
-                    <h4 className={`text-2xl md:text-3xl font-black mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
+                    <h4 className={`text-xl md:text-3xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
                       {testimonial.name}
                     </h4>
                   </div>
@@ -216,39 +112,43 @@ const Testimonials: React.FC = () => {
             ))}
           </Swiper>
 
-          {/* Синие кнопки */}
-          <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-30 pointer-events-none flex justify-between px-0 md:px-4">
+          {/* Buttons: Desktop only */}
+          <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 right-0 z-30 pointer-events-none justify-between px-4">
             <button 
-              onClick={() => swiperInstance?.slidePrev()}
-              className="pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+              onClick={() => swiperInstance?.slideNext()} // במצב RTL, Next זה שמאלה
+              className="pointer-events-auto w-14 h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
             >
               <ChevronRight size={32} />
             </button>
             <button 
-              onClick={() => swiperInstance?.slideNext()}
-              className="pointer-events-auto w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 active:scale-95 transition-all"
+              onClick={() => swiperInstance?.slidePrev()} // במצב RTL, Prev זה ימינה
+              className="pointer-events-auto w-14 h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
             >
               <ChevronLeft size={32} />
             </button>
           </div>
 
-          <div className="testimonial-pagination flex items-center justify-center gap-2.5 mt-10"></div>
+          <div className="testimonial-pagination flex items-center justify-center gap-2 mt-4 md:mt-10"></div>
         </div>
       </div>
 
       <style jsx global>{`
         .testimonial-bullet {
-          width: 10px;
-          height: 10px;
+          width: 8px;
+          height: 8px;
           background: #D1D5DB;
           border-radius: 50%;
           transition: all 0.4s ease;
           cursor: pointer;
         }
         .testimonial-bullet-active {
-          width: 35px;
+          width: 30px;
           background: #1c3664;
           border-radius: 10px;
+        }
+        @media (min-width: 768px) {
+          .testimonial-bullet { width: 10px; height: 10px; }
+          .testimonial-bullet-active { width: 35px; }
         }
       `}</style>
     </section>
