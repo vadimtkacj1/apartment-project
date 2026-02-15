@@ -8,7 +8,7 @@ export default function FAQPage() {
   return (
     <>
       <Hero
-        img="/7.png"
+        img="/7.jpg"
         staticTitle="שאלות ותשובות"
         centered={true}
       />

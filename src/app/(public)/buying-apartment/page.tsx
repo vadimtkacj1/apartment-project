@@ -82,7 +82,7 @@ export default function BuyingApartmentPage() {
     <div dir="rtl" className="min-h-screen bg-warm">
       {/* Hero Section */}
       <Hero
-        img="/7.png"
+        img="/7.jpg"
         staticTitle="קונים דירה"
         centered={true}
       />

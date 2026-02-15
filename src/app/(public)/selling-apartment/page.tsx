@@ -124,7 +124,7 @@ export default function SellingApartmentPage() {
     <div dir="rtl" className="min-h-screen bg-warm">
       {/* Hero Section */}
       <Hero
-        img="/7.png"
+        img="/7.jpg"
         staticTitle="תהליך מכירת דירה עם משרד תיווך מקצועי"
         centered={true}
       />

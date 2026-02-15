@@ -31,7 +31,7 @@ export const owners = [
 export const team = [
   {
     id: 1,
-    name: 'ליאור',
+    name: 'תומר',
     role: 'סוכן נדל״ן',
     image: '/agent-second.jpg',
     phone: '09-7407500',
@@ -42,7 +42,7 @@ export const team = [
   },
   {
     id: 2,
-    name: 'תמר',
+    name: 'ליאור',
     role: 'סוכנת נדל״ן',
     image: '/agent-fisrt.jpg',
     phone: '09-7407500',

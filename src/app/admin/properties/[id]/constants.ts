@@ -68,7 +68,6 @@ export const PROPERTY_TYPE_OPTIONS = [
   { value: 'penthouse', label: 'פנטהאוס' },
   { value: 'roof-apartment', label: 'דירת גג' },
   { value: 'housing-unit', label: 'יחידת דיור' },
-  { value: 'divided', label: 'מחולקת' },
   { value: 'studio', label: 'סטודיו' },
   { value: 'basement-apartment', label: 'דירת מרתף' },
   { value: 'villa', label: 'וילה' },
