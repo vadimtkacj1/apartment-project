@@ -28,14 +28,28 @@ export default function Home() {
   return (
     <>
       {/* Hero section - sticky so content scrolls over it */}
-      <div className="w-full sticky top-0 z-0">
+      <div
+        className="w-full sticky top-0 z-0"
+        style={{
+          /* Optimize sticky performance on mobile */
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
+          willChange: 'auto'
+        }}
+      >
         <Hero
           img="/images/hero/second-hero.jpg"
         />
       </div>
 
       {/* Content that scrolls over the hero */}
-      <div className="relative z-10 bg-warm">
+      <div className="relative z-10 bg-warm"
+        style={{
+          /* Ensure smooth scrolling */
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)'
+        }}
+      >
         <HotPropositions />
         <AboutSection />
         <ValuesSection />
