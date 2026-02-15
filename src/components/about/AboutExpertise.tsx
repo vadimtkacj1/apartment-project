@@ -46,7 +46,7 @@ export default function AboutExpertise() {
             transition={{ duration: 0.8 }}
           >
             <Image
-              src="/7.png"
+              src="/7.jpg"
               alt="מומחיות מקומית בחולון"
               width={600}
               height={400}

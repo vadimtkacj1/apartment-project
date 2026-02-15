@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { prisma } from '@/lib/prisma';
 
 interface ContactInfo {
   phone: string;
@@ -14,12 +15,19 @@ interface ContactInfo {
 
 async function getContactInfo(): Promise<ContactInfo | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/contact-info`, {
-      next: { revalidate: 3600 } // Revalidate every hour
+    const contactInfo = await prisma.contactInfo.findFirst({
+      select: {
+        phone: true,
+        phoneLink: true,
+        email: true,
+        emailLink: true,
+        facebook: true,
+        instagram: true,
+        linkedin: true,
+      },
     });
 
-    if (!res.ok) return null;
-    return res.json();
+    return contactInfo;
   } catch (error) {
     console.error('Error fetching contact info:', error);
     return null;

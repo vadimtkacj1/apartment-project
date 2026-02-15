@@ -15,7 +15,7 @@ export default function AboutPage() {
     <div className="about-page" dir="rtl">
       {/* Hero with Background Image */}
       <Hero
-        img="/7.png"
+        img="/7.jpg"
         staticTitle="אודות"
         centered={true}
       />

@@ -71,7 +71,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       'penthouse': 'פנטהאוס',
       'rooftop': 'דירת גג',
       'unit': 'יחידת דיור',
-      'divided': 'מחולקת',
       'studio': 'סטודיו',
       'basement': 'דירת מרתף',
       'villa': 'וילה'

@@ -60,7 +60,7 @@ export default function LinksPage() {
   return (
     <div dir="rtl" className="min-h-screen text-right bg-warm">
       <Hero
-        img="/7.png"
+        img="/7.jpg"
         staticTitle="קישורים שימושיים"
         centered={true}
       />

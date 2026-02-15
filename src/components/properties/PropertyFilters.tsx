@@ -96,7 +96,6 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
             <option value="penthouse">פנטהאוס</option>
             <option value="roof-apartment">דירת גג</option>
             <option value="housing-unit">יחידת דיור</option>
-            <option value="divided">מחולקת</option>
             <option value="studio">סטודיו</option>
             <option value="basement-apartment">דירת מרתף</option>
             <option value="villa">וילה</option>

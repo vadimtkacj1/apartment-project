@@ -13,7 +13,6 @@ export type PropertyType =
   | 'penthouse'        // פנטהאוס
   | 'roof-apartment'   // דירת גג
   | 'housing-unit'     // יחידת דיור
-  | 'divided'          // מחולקת
   | 'studio'           // סטודיו
   | 'basement-apartment' // דירת מרתף
   | 'villa';           // וילה
