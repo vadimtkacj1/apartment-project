@@ -235,29 +235,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       )}
 
       {/* Card Content */}
-      <div className={`p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
-        
+      <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
+
         {/* Address & Title */}
-        <div className="mb-4">
-          <div className={`flex items-center gap-1.5 text-sm font-medium mb-2 ${
+        <div className="mb-3 sm:mb-4">
+          <div className={`flex items-center gap-1.5 text-xs sm:text-sm font-medium mb-2 ${
             isSold ? 'text-gray-400' : 'text-gray-500'
           }`}>
-            <MapPin size={16} className={isSold ? 'text-gray-400' : 'text-[#1c3664]'} />
+            <MapPin size={14} className={`sm:w-4 sm:h-4 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
             <span className="truncate">
-              {location} 
+              {location}
               {neighborhood && ` • ${neighborhood}`}
               {street && ` • ${street} ${streetNumber || ''}`}
             </span>
           </div>
           <div className="flex items-center gap-2 mb-2">
-            <h3 className={`text-xl font-bold leading-snug line-clamp-2 min-h-[3.5rem] flex-1 ${
+            <h3 className={`text-lg sm:text-xl font-bold leading-snug line-clamp-2 min-h-12 sm:min-h-14 flex-1 ${
               isSold ? 'text-gray-500 line-through' : 'text-gray-900'
             }`}>
               {title}
             </h3>
             {isSold && (
-              <div className="flex items-center gap-1 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
-                <CheckCircle2 size={14} />
+              <div className="flex items-center gap-1 bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
+                <CheckCircle2 size={12} className="sm:w-3.5 sm:h-3.5" />
                 <span>נמכר</span>
               </div>
             )}
@@ -265,68 +265,68 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         </div>
 
         {/* Main Statistics Grid (Rooms, Floor, Area) */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4 sm:mb-5">
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
             isSold ? 'bg-gray-200' : 'bg-gray-50'
           }`}>
-            <Bed size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+            <Bed size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
               {displayRooms} חדרים
             </span>
           </div>
-          
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
             isSold ? 'bg-gray-200' : 'bg-gray-50'
           }`}>
-            <Building size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+            <Building size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
                {floor !== undefined ? `קומה ${floor}` : '-'}
             </span>
           </div>
 
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 ${
+          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
             isSold ? 'bg-gray-200' : 'bg-gray-50'
           }`}>
-            <Maximize size={20} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+            <Maximize size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
               {area} מ״ר
             </span>
           </div>
         </div>
 
         {/* Detailed Information List */}
-        <div className="space-y-2 mb-5 text-sm text-gray-700">
+        <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5 text-xs sm:text-sm text-gray-700">
           {parking && (
-            <div className="flex items-center gap-2">
-              <Car size={16} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Car size={14} className="sm:w-4 sm:h-4 text-gray-400" />
               <span className="text-gray-500">חניה:</span>
               <span className="font-semibold mr-auto">{getParkingLabel(parking)}</span>
             </div>
           )}
           {position && (
-            <div className="flex items-center gap-2">
-              <Home size={16} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Home size={14} className="sm:w-4 sm:h-4 text-gray-400" />
               <span className="text-gray-500">מיקום:</span>
               <span className="font-semibold mr-auto">{getPositionLabel(position)}</span>
             </div>
           )}
           {furniture && furniture !== 'none' && (
-            <div className="flex items-center gap-2">
-              <Home size={16} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Home size={14} className="sm:w-4 sm:h-4 text-gray-400" />
               <span className="text-gray-500">ריהוט:</span>
               <span className="font-semibold mr-auto">{getFurnitureLabel(furniture)}</span>
             </div>
           )}
           {directions && directions.length > 0 && (
-             <div className="flex items-center gap-2">
-               <Compass size={16} className="text-gray-400" />
+             <div className="flex items-center gap-1.5 sm:gap-2">
+               <Compass size={14} className="sm:w-4 sm:h-4 text-gray-400" />
                <span className="text-gray-500">כיוונים:</span>
                <span className="font-semibold mr-auto">{getDirectionsLabel(directions)}</span>
              </div>
           )}
           {vacancyDate && (
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-gray-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Calendar size={14} className="sm:w-4 sm:h-4 text-gray-400" />
               <span className="text-gray-500">תאריך פינוי:</span>
               <span className="font-semibold mr-auto">{new Date(vacancyDate).toLocaleDateString('he-IL')}</span>
             </div>
@@ -335,66 +335,67 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
         {/* Feature Tags */}
         {features && (
-          <div className="flex flex-wrap gap-2 mb-5">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
             {features.hasAirConditioning && (
-              <div className="flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-md text-xs font-semibold text-blue-700">
-                <Wind size={14} /> <span>מיזוג</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-blue-700">
+                <Wind size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מיזוג</span>
               </div>
             )}
             {features.hasElevator && (
-              <div className="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-md text-xs font-semibold text-purple-700">
-                <ArrowUpDown size={14} /> <span>מעלית</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-purple-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-purple-700">
+                <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מעלית</span>
               </div>
             )}
             {features.hasStorage && (
-              <div className="flex items-center gap-1 bg-orange-50 px-2 py-1 rounded-md text-xs font-semibold text-orange-700">
-                <Warehouse size={14} /> <span>מחסן</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-orange-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-orange-700">
+                <Warehouse size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מחסן</span>
               </div>
             )}
             {features.hasSafeRoom && (
-              <div className="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-md text-xs font-semibold text-green-700">
-                <Shield size={14} /> <span>ממ״ד</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-green-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-green-700">
+                <Shield size={12} className="sm:w-3.5 sm:h-3.5" /> <span>ממ״ד</span>
               </div>
             )}
             {features.hasSunBalcony && (
-              <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md text-xs font-semibold text-yellow-700">
-                <Sun size={14} /> <span>מ. שמש</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-yellow-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-yellow-700">
+                <Sun size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מ. שמש</span>
               </div>
             )}
             {features.hasBoiler && (
-              <div className="flex items-center gap-1 bg-red-50 px-2 py-1 rounded-md text-xs font-semibold text-red-700">
-                <Droplet size={14} /> <span>דוד</span>
+              <div className="flex items-center gap-0.5 sm:gap-1 bg-red-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-red-700">
+                <Droplet size={12} className="sm:w-3.5 sm:h-3.5" /> <span>דוד</span>
               </div>
             )}
           </div>
         )}
 
         {/* Footer: Price & Action Button */}
-        <div className={`mt-auto border-t pt-4 flex items-center justify-between ${
+        <div className={`mt-auto border-t pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
           isSold ? 'border-gray-300' : 'border-gray-100'
         }`}>
-          <div>
+          <div className="w-full sm:w-auto">
             {originalPrice && (
               <p className="text-xs text-gray-400 line-through mb-0.5">
                 {originalPrice}
               </p>
             )}
-            <p className={`text-2xl font-black ${
+            <p className={`text-xl sm:text-2xl font-black ${
               isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
             }`}>
               {price}
             </p>
           </div>
-          
+
           {isSold ? (
-            <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-400 text-white font-bold rounded-xl opacity-60">
+            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-400 text-white font-bold text-sm sm:text-base rounded-xl opacity-60 w-full sm:w-auto justify-center">
               נמכר
               <CheckCircle2 size={18} />
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-6 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl">
+            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center">
               לפרטים נוספים
-              <ArrowLeft size={18} />
+              <ArrowLeft size={16} className="sm:hidden" />
+              <ArrowLeft size={18} className="hidden sm:block" />
             </div>
           )}
         </div>
