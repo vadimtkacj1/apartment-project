@@ -29,7 +29,9 @@
       "Bash(AboutMarketing)",
       "Bash(AboutStoryNew)",
       "Bash(AboutFounders)",
-      "Bash(AboutTeamNew \")"
+      "Bash(AboutTeamNew \")",
+      "Bash(ssh:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

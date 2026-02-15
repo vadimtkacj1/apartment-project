@@ -1,18 +1,16 @@
 "use client";
-import React, { useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
-import type { Swiper as SwiperType } from 'swiper';
+import { Pagination, Autoplay } from 'swiper/modules';
 
+// Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 interface ValueCard {
   id: number;
-  image: string; // הנתיב למחרוזת מה-public
+  image: string;
   title: string;
   description: string;
 }
@@ -20,7 +18,7 @@ interface ValueCard {
 const values: ValueCard[] = [
   {
     id: 1,
-    image: "/Business deal-rafiki.svg", // נתיב ישיר לתיקיית public
+    image: "/Business deal-rafiki.svg",
     title: "יחס אישי וליווי צמוד",
     description: "אנו מאמינים שכל נכס וכל לקוח הם עולם בפני עצמו. לכן, אנו מלווים אתכם באופן אישי לאורך כל הדרך, זמינים לכל שאלה ומנהלים את התהליך בצורה שקופה, רגועה ומקצועית."
   },
@@ -39,14 +37,22 @@ const values: ValueCard[] = [
 ];
 
 const ValuesSection: React.FC = () => {
-  const swiperRef = useRef<SwiperType | null>(null);
-
   return (
-    <section
-      dir="rtl"
-      className="relative w-full py-20 md:py-32 overflow-hidden bg-warm"
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 relative z-10" style={{ maxWidth: '1400px' }}>
+    <section dir="rtl" className="relative w-full py-20 md:py-32 overflow-hidden bg-warm">
+      {/* סגנון CSS לתיקון המיקום של הנקודות במובייל */}
+      <style jsx global>{`
+        .values-swiper .swiper-pagination {
+          position: relative !important;
+          bottom: 0 !important;
+          margin-top: 24px !important;
+        }
+        .values-swiper .swiper-pagination-bullet-active {
+          background: #1e3a8a !important; /* צבע כחול כהה לנקודה הפעילה */
+        }
+      `}</style>
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16" style={{ maxWidth: '1400px' }}>
+        
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -63,7 +69,35 @@ const ValuesSection: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Desktop View - Grid */}
+        {/* Mobile View - Swiper (Visible on < 1024px) */}
+        <div className="block lg:hidden">
+          <Swiper
+            modules={[Pagination, Autoplay]}
+            spaceBetween={30}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            className="values-swiper"
+          >
+            {values.map((value) => (
+              <SwiperSlide key={value.id}>
+                <div className="flex flex-col items-center text-center px-4">
+                  <div className="flex justify-center mb-6">
+                    <img 
+                      src={value.image} 
+                      alt={value.title} 
+                      className="w-56 h-56 object-contain"
+                    />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{value.title}</h3>
+                  <p className="text-base text-gray-600 leading-relaxed">{value.description}</p>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+
+        {/* Desktop View - Grid (Visible on > 1024px) */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-8">
           {values.map((value, index) => (
             <motion.div
@@ -83,20 +117,12 @@ const ValuesSection: React.FC = () => {
                   />
                 </div>
               </div>
-
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                {value.title}
-              </h3>
-
-              <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                {value.description}
-              </p>
+              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{value.title}</h3>
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed">{value.description}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Mobile View - Swiper (אותו שינוי ל-img) */}
-        {/* ... (שאר הקוד נשאר דומה, רק להשתמש ב-value.image בתור src) */}
       </div>
     </section>
   );

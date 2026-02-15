@@ -49,6 +49,16 @@ body {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Touch scroll optimization */
+  .touch-pan-x {
+    touch-action: pan-x;
+  }
+
+  /* Smooth momentum scrolling on iOS */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Hero button shadow - responsive without hydration issues */

@@ -14,6 +14,9 @@ const routeNames: Record<string, string> = {
   'admin': 'ניהול',
   'settings': 'הגдерות',
   'users': 'משתמשים',
+  'articles': 'מאמרים',
+  'foreign-investors': 'משקיעים זרים',
+  'selling-alone': 'למכור לבד',
 };
 
 export default function Breadcrumbs() {

@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 
-// Define interface for navigation links
 interface NavLink {
   label: string;
   href: string;
@@ -17,8 +16,6 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
-  // State to track which submenu is open in mobile view
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -41,6 +38,7 @@ export default function Header() {
         { label: "קונים דירה", href: "/buying-apartment" }
       ],
     },
+    { label: "מאמרים", href: "/articles" },
     {
       label: "אזור המידע והכלים",
       href: "#",
@@ -52,7 +50,6 @@ export default function Header() {
     { label: "אודות", href: "/about" },
   ];
 
-  // Toggle submenu open/close status
   const toggleSubmenu = (label: string) => {
     setOpenSubmenu(openSubmenu === label ? null : label);
   };
@@ -61,8 +58,7 @@ export default function Header() {
     <header dir="rtl" className="bg-white py-2 shadow-md border-b border-gray-100 sticky top-0 z-50">
       <nav className="relative max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center min-h-[60px]">
         
-        {/* LOGO RIGHT (Always visible) */}
-        <div className="z-20">
+        <div className="hidden xl:block z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
               <Image 
@@ -70,8 +66,7 @@ export default function Header() {
                 alt="Logo" 
                 width={56} 
                 height={56} 
-                className="object-contain" 
-                priority 
+                className="object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   if (target.src !== '/images/logo.jpeg') {
@@ -83,7 +78,14 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* DESKTOP NAVIGATION */}
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="xl:hidden z-30 p-2 text-gray-700 hover:text-[#1c3664] transition-colors"
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X size={24} className="text-[#1c3664]" /> : <Menu size={24} />}
+        </button>
+
         <div className="hidden xl:flex absolute left-0 right-0 mx-auto w-fit items-center gap-6 justify-center">
           {navLinks.map((link) => (
             <div key={link.label} className="relative group">
@@ -99,7 +101,6 @@ export default function Header() {
                 <span className="absolute bottom-3 right-0 w-0 h-0.5 bg-[#1c3664] transition-all duration-300 group-hover:w-full"></span>
               </Link>
 
-              {/* DESKTOP DROPDOWN */}
               {link.submenu && (
                 <div className="absolute top-full right-0 w-72 bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                   <ul className="py-2">
@@ -120,17 +121,7 @@ export default function Header() {
           ))}
         </div>
 
-        {/* MOBILE BURGER BUTTON */}
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="xl:hidden z-30 p-2 text-gray-700 hover:text-[#1c3664] transition-colors"
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? <X size={24} className="text-[#1c3664]" /> : <Menu size={24} />}
-        </button>
-
-        {/* LOGO LEFT - DESKTOP ONLY */}
-        <div className="z-20 hidden xl:block">
+        <div className="z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
               <Image 
@@ -140,13 +131,18 @@ export default function Header() {
                 height={56} 
                 className="object-contain" 
                 priority 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src !== '/images/logo.jpeg') {
+                    target.src = '/images/logo.jpeg';
+                  }
+                }}
               />
             </div>
           </Link>
         </div>
       </nav>
 
-      {/* MOBILE MENU OVERLAY */}
       {isMobileMenuOpen && (
         <div className="xl:hidden fixed inset-0 top-[72px] bg-white z-40 overflow-y-auto">
           <div className="px-6 py-4 space-y-1">
@@ -157,7 +153,7 @@ export default function Header() {
                     href={link.href}
                     onClick={(e) => {
                       if (link.submenu) {
-                        e.preventDefault(); // Don't navigate if it has a submenu
+                        e.preventDefault();
                         toggleSubmenu(link.label);
                       } else {
                         if (link.onClick) link.onClick(e);
@@ -182,7 +178,6 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* MOBILE SUBMENU (Accordion Style) */}
                 {link.submenu && (
                   <div 
                     className={`overflow-hidden transition-all duration-300 ${
@@ -210,7 +205,6 @@ export default function Header() {
         </div>
       )}
 
-      {/* DARK BACKGROUND OVERLAY */}
       {isMobileMenuOpen && (
         <div
           className="xl:hidden fixed inset-0 bg-black/50 z-30 top-[72px]"
