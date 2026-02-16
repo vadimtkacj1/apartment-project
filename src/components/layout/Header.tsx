@@ -125,11 +125,11 @@ export default function Header() {
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 xl:w-20 xl:h-20 bg-white flex items-center justify-center p-1">
               <Image
-                src="/images/logo.PNG"
+                src="/images/logo2.png"
                 alt="Logo"
                 width={56}
                 height={56}
-                className="object-contain xl:w-20! xl:h-20!"
+                className="object-contain xl:!w-20 xl:!h-20"
                 priority
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;

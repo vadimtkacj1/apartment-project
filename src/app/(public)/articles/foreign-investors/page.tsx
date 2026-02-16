@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import './styles.css';
 
@@ -9,9 +9,9 @@ export default function ForeignInvestorsArticle() {
   return (
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
+        title="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
         centered={true}
       />
 

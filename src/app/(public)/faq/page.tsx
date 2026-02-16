@@ -1,15 +1,15 @@
 'use client';
 import React from 'react';
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import FAQ from '@/components/layout/FAQ';
 
 export default function FAQPage() {
   return (
     <>
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="שאלות ותשובות"
+        title="שאלות ותשובות"
         centered={true}
       />
 

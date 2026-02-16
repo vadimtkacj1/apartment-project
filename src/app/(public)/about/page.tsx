@@ -1,6 +1,6 @@
 'use client';
 
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import AboutMainIntro from '@/components/about/AboutMainIntro';
 import AboutLocalExpertise from '@/components/about/AboutLocalExpertise';
@@ -14,9 +14,9 @@ export default function AboutPage() {
   return (
     <div className="about-page" dir="rtl">
       {/* Hero with Background Image */}
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="אודות"
+        title="אודות"
         centered={true}
       />
 
