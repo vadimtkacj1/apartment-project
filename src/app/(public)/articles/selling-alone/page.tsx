@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import '../foreign-investors/styles.css';
 
@@ -9,9 +9,9 @@ export default function SellingAloneArticle() {
   return (
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
-      <Hero
-        img="/images/hero/second-hero.jpg"
-        staticTitle='למכור לבד? כשה"חיסכון" בתיווך עולה לכם עשרות אלפי שקלים'
+      <SecondaryHero
+        img="/7.jpg"
+        title='למכור לבד? כשה"חיסכון" בתיווך עולה לכם עשרות אלפי שקלים'
         centered={true}
       />
 

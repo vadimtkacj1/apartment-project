@@ -14,7 +14,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
   return (
     <Card title="פרטי הנכס" className="mb-4">
       <Row gutter={16}>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <Form.Item label="סוג נכס" name="propertyType">
             <Select
               onChange={(value) => handleChange('propertyType', value)}
@@ -22,7 +22,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <Form.Item label="מיקום בבניין" name="position">
             <Select
               onChange={(value) => handleChange('position', value)}
@@ -30,7 +30,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <Form.Item label="ריהוט" name="furniture">
             <Select
               onChange={(value) => handleChange('furniture', value)}
@@ -38,7 +38,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={12} md={6}>
           <Form.Item label="מטבח" name="kitchen">
             <Select
               onChange={(value) => handleChange('kitchen', value)}
@@ -49,7 +49,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
       </Row>
 
       <Row gutter={16}>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item label="קומה" name="floor">
             <InputNumber
               style={{ width: '100%' }}
@@ -57,7 +57,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item label="חניה" name="parking">
             <Select
               onChange={(value) => handleChange('parking', value)}
@@ -65,7 +65,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item
             label="חדרים"
             name="rooms"
@@ -80,7 +80,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item label="חדרי רחצה" name="bathrooms">
             <InputNumber
               style={{ width: '100%' }}
@@ -89,7 +89,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item
             label="שטח (מ״ר)"
             name="area"
@@ -102,7 +102,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item label="שטח בנוי" name="builtArea">
             <InputNumber
               style={{ width: '100%' }}

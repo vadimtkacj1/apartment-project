@@ -38,6 +38,8 @@ export const INITIAL_FORM: PropertyForm = {
   bedrooms: '3',
   bathrooms: 1,
   isActive: true,
+  isSold: false,
+  isPinned: false,
 };
 
 export const DEAL_TYPE_OPTIONS = [

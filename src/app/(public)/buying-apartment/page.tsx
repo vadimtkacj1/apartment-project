@@ -1,6 +1,6 @@
 'use client';
 
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -81,9 +81,9 @@ export default function BuyingApartmentPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-warm">
       {/* Hero Section */}
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="קונים דירה"
+        title="קונים דירה"
         centered={true}
       />
 

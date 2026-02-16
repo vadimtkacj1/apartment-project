@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal, Search, Mail } from 'lucide-react';
 
 // Component Imports
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import PropertyCard from '@/components/properties/PropertyCard';
 import PropertyFilters from '@/components/properties/PropertyFilters';
@@ -123,9 +123,9 @@ function ApartmentsPageContent() {
       <ContactFormPopup isOpen={isContactPopupOpen} onClose={() => setIsContactPopupOpen(false)} />
 
       {/* Hero Section */}
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="נכסים למכירה והשכרה"
+        title="נכסים למכירה והשכרה"
         centered={true}
       />
 

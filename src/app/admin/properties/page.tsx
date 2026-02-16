@@ -67,6 +67,7 @@ interface Property {
   category: string | null;
   isActive: boolean;
   isSold: boolean;
+  isPinned: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -109,6 +110,15 @@ export default function PropertiesPage() {
     return { total, forSale, forRent, active };
   }, [properties]);
 
+  const getStatusLabel = (status?: string | null) => {
+    const labels: Record<string, string> = {
+      'Exclusive': 'בלעדי',
+      'Opportunity': 'הזדמנות',
+      'New': 'חדש'
+    };
+    return status ? labels[status] || status : '';
+  };
+
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
       const matchesSearch =
@@ -149,7 +159,7 @@ export default function PropertiesPage() {
     }
   };
 
-  const handleStatusChange = async (propertyId: number, field: 'isActive' | 'isSold', value: boolean) => {
+  const handleStatusChange = async (propertyId: number, field: 'isActive' | 'isSold' | 'isPinned', value: boolean) => {
     try {
       const property = properties.find(p => p.id === propertyId);
       if (!property) return;
@@ -171,9 +181,13 @@ export default function PropertiesPage() {
       }
 
       fetchProperties();
-      message.success(field === 'isSold' 
-        ? (value ? 'הנכס סומן כנמכר' : 'הנכס בוטל מסומן כנמכר')
-        : (value ? 'הנכס הופעל' : 'הנכס הושבת'));
+      if (field === 'isSold') {
+        message.success(value ? 'הנכס סומן כנמכר' : 'הנכס בוטל מסומן כנמכר');
+      } else if (field === 'isPinned') {
+        message.success(value ? 'הנכס נצמד לעמוד הבית' : 'הנכס בוטל מהצמדה');
+      } else {
+        message.success(value ? 'הנכס הופעל' : 'הנכס הושבת');
+      }
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
       message.error(`שגיאה בעדכון הסטטוס. נסה שוב.`);
@@ -259,7 +273,7 @@ export default function PropertiesPage() {
           <strong>{text}</strong>
           {record.status && (
             <div>
-              <Badge status="warning" text={record.status} />
+              <Badge status="warning" text={getStatusLabel(record.status)} />
             </div>
           )}
         </div>
@@ -346,6 +360,20 @@ export default function PropertiesPage() {
       ),
     },
     {
+      title: 'נצמד',
+      dataIndex: 'isPinned',
+      key: 'isPinned',
+      width: 100,
+      render: (isPinned: boolean, record: Property) => (
+        <Switch
+          checked={isPinned}
+          onChange={(checked) => handleStatusChange(record.id, 'isPinned', checked)}
+          checkedChildren="נצמד"
+          unCheckedChildren="לא נצמד"
+        />
+      ),
+    },
+    {
       title: 'פעולות',
       key: 'actions',
       width: 120,
@@ -374,14 +402,14 @@ export default function PropertiesPage() {
   ];
 
   return (
-    <div className="tabled">
+    <div className="tabled px-2 sm:px-4 md:px-0">
       <Row gutter={[24, 0]}>
         <Col xs={24} xl={24}>
           {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h1 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>ניהול נכסים</h1>
-            <Link href="/admin/properties/new">
-              <Button type="primary" icon={<PlusOutlined />} size="large">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+            <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 'bold', margin: 0 }}>ניהול נכסים</h1>
+            <Link href="/admin/properties/new" className="w-full sm:w-auto">
+              <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
                 הוסף נכס חדש
               </Button>
             </Link>
@@ -427,24 +455,22 @@ export default function PropertiesPage() {
             </Col>
           </Row>
 
-          {/* Table */}
-          <Card
-            variant="borderless"
-            className="criclebox tablespace mb-24"
-            title="רשימת נכסים"
-            extra={
-              <Space>
-                <Input
-                  placeholder="חפש לפי כותרת, מיקום או עיר..."
-                  prefix={<SearchOutlined />}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ width: 250 }}
-                />
+          {/* Filters */}
+          <Card className="mb-4">
+            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+              <Input
+                placeholder="חפש לפי כותרת, מיקום או עיר..."
+                prefix={<SearchOutlined />}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size="large"
+              />
+              <Space wrap style={{ width: '100%' }}>
                 <Select
                   value={filterDealType}
                   onChange={setFilterDealType}
-                  style={{ width: 150 }}
+                  style={{ minWidth: 150, width: '100%', maxWidth: '200px' }}
+                  size="large"
                 >
                   <Select.Option value="all">כל סוגי העסקאות</Select.Option>
                   <Select.Option value="sale">מכירה</Select.Option>
@@ -453,29 +479,36 @@ export default function PropertiesPage() {
                 <Select
                   value={filterStatus}
                   onChange={setFilterStatus}
-                  style={{ width: 120 }}
+                  style={{ minWidth: 120, width: '100%', maxWidth: '150px' }}
+                  size="large"
                 >
                   <Select.Option value="all">כל הסטטוסים</Select.Option>
                   <Select.Option value="active">פעיל</Select.Option>
                   <Select.Option value="inactive">לא פעיל</Select.Option>
                 </Select>
               </Space>
-            }
+            </Space>
+          </Card>
+
+          {/* Table */}
+          <Card
+            variant="borderless"
+            className="criclebox tablespace mb-24"
+            title="רשימת נכסים"
           >
-            <div className="table-responsive">
-              <Table
-                columns={columns}
-                dataSource={filteredProperties}
-                loading={loading}
-                rowKey="id"
-                pagination={{
-                  pageSize: 10,
-                  showSizeChanger: true,
-                  showTotal: (total) => `סה״כ ${total} נכסים`,
-                }}
-                className="ant-border-space"
-              />
-            </div>
+            <Table
+              columns={columns}
+              dataSource={filteredProperties}
+              loading={loading}
+              rowKey="id"
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total) => `סה״כ ${total} נכסים`,
+              }}
+              className="ant-border-space"
+              scroll={{ x: 1200 }}
+            />
           </Card>
         </Col>
       </Row>

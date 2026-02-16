@@ -1,6 +1,6 @@
 'use client';
 
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { FileText, Home, TrendingUp, DollarSign, Calculator, ExternalLink, LucideIcon } from 'lucide-react';
 
@@ -59,9 +59,9 @@ export default function LinksPage() {
 
   return (
     <div dir="rtl" className="min-h-screen text-right bg-warm">
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="קישורים שימושיים"
+        title="קישורים שימושיים"
         centered={true}
       />
 

@@ -122,6 +122,9 @@ export async function PUT(
 
         // Sold status
         isSold: body.isSold !== undefined ? body.isSold : false,
+
+        // Pin status
+        isPinned: body.isPinned !== undefined ? body.isPinned : false,
       },
     });
 

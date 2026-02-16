@@ -122,6 +122,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     return dirs ? dirs.map(d => labels[d]).join(', ') : '';
   };
 
+  const getStatusLabel = (status?: string) => {
+    const labels: Record<string, string> = {
+      'Exclusive': 'בלעדי',
+      'Opportunity': 'הזדמנות',
+      'New': 'חדש'
+    };
+    return status ? labels[status] || status : '';
+  };
+
   // --- Component Logic ---
   
   // Determine the main image to display
@@ -192,7 +201,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
           {status && !isSold && (
             <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
-              {status}
+              {getStatusLabel(status)}
             </div>
           )}
 
@@ -220,7 +229,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             {/* Status Badge */}
             {status && !isSold && (
               <div className="bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
-                {status}
+                {getStatusLabel(status)}
               </div>
             )}
             
@@ -328,7 +337,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Calendar size={14} className="sm:w-4 sm:h-4 text-gray-400" />
               <span className="text-gray-500">תאריך פינוי:</span>
-              <span className="font-semibold mr-auto">{new Date(vacancyDate).toLocaleDateString('he-IL')}</span>
+              <span className="font-semibold mr-auto">{vacancyDate}</span>
             </div>
           )}
         </div>

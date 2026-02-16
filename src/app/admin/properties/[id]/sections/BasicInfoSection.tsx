@@ -1,6 +1,7 @@
-import { Card, Row, Col, Form, Input, Select, Switch } from 'antd';
+import { Card, Row, Col, Form, Input, Select, Switch, DatePicker } from 'antd';
 import { PropertyFormSectionProps } from '../types';
 import { DEAL_TYPE_OPTIONS, STATUS_OPTIONS } from '../constants';
+import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 
@@ -8,7 +9,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
   return (
     <Card title="מידע בסיסי" className="mb-4">
       <Row gutter={16}>
-        <Col span={16}>
+        <Col xs={24} sm={24} md={16}>
           <Form.Item
             label="כותרת"
             name="title"
@@ -20,7 +21,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={12} md={4}>
           <Form.Item label="סוג עסקה" name="dealType">
             <Select
               onChange={(value) => handleChange('dealType', value)}
@@ -28,7 +29,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col span={4}>
+        <Col xs={12} sm={12} md={4}>
           <Form.Item label="סטטוס" name="status">
             <Select
               onChange={(value) => handleChange('status', value)}
@@ -55,7 +56,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
       </Row>
 
       <Row gutter={16}>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item
             label="מחיר"
             name="price"
@@ -68,7 +69,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={12} md={8}>
           <Form.Item label="מחיר מקורי (אופציונלי)" name="originalPrice">
             <Input
               placeholder="1,500,000"
@@ -77,18 +78,20 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} md={8}>
           <Form.Item label="תאריך פינוי" name="vacancyDate">
-            <Input
-              placeholder="מיידי / 1.3.2024"
-              onChange={(e) => handleChange('vacancyDate', e.target.value)}
+            <DatePicker
+              placeholder="בחר תאריך פינוי"
+              format="DD/MM/YYYY"
+              style={{ width: '100%' }}
+              onChange={(date) => handleChange('vacancyDate', date ? date.format('DD/MM/YYYY') : '')}
             />
           </Form.Item>
         </Col>
       </Row>
 
-      <Row>
-        <Col span={24}>
+      <Row gutter={16}>
+        <Col xs={24} sm={8}>
           <Form.Item name="isActive" valuePropName="checked">
             <Switch
               checkedChildren="פעיל"
@@ -96,6 +99,26 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               onChange={(checked) => handleChange('isActive', checked)}
             />
             <span style={{ marginRight: '8px' }}>נכס פעיל (יוצג באתר)</span>
+          </Form.Item>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Form.Item name="isSold" valuePropName="checked">
+            <Switch
+              checkedChildren="נמכר"
+              unCheckedChildren="לא נמכר"
+              onChange={(checked) => handleChange('isSold', checked)}
+            />
+            <span style={{ marginRight: '8px' }}>נכס נמכר</span>
+          </Form.Item>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Form.Item name="isPinned" valuePropName="checked">
+            <Switch
+              checkedChildren="נצמד"
+              unCheckedChildren="לא נצמד"
+              onChange={(checked) => handleChange('isPinned', checked)}
+            />
+            <span style={{ marginRight: '8px' }}>הצמד לעמוד הבית</span>
           </Form.Item>
         </Col>
       </Row>

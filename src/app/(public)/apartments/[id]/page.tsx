@@ -65,7 +65,12 @@ export default function ApartmentDetailPage() {
             />
             <PropertyAmenities amenities={property.amenities} isSold={isSold} />
             <PropertySpecs specs={property.specs} isSold={isSold} />
-            <PropertyMap isSold={isSold} />
+            <PropertyMap
+              isSold={isSold}
+              latitude={property.latitude}
+              longitude={property.longitude}
+              location={property.location}
+            />
           </div>
 
           {/* Left Side - Contact Form */}

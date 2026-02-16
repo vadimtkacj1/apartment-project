@@ -29,8 +29,8 @@ const FeaturedProperties: React.FC = () => {
     const fetchFeaturedProperties = async () => {
       try {
         setLoading(true);
-        // Fetch properties from center area for sale, limit to 3
-        const response = await fetch('/api/properties?region=center&dealType=sale&limit=3');
+        // Fetch pinned properties from center area for sale, limit to 3
+        const response = await fetch('/api/properties?region=center&dealType=sale&pinned=true&limit=3');
 
         if (!response.ok) {
           throw new Error('Failed to fetch properties');

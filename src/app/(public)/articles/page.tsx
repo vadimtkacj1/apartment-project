@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import './articles.css';
 
@@ -44,9 +44,9 @@ export default function ArticlesPage() {
   return (
     <div className="articles-page" dir="rtl">
       {/* Hero with Background Image */}
-      <Hero
-        img="/images/hero/second-hero.jpg"
-        staticTitle="מאמרים ומדריכים"
+      <SecondaryHero
+        img="/7.jpg"
+        title="מאמרים ומדריכים"
         centered={true}
       />
 

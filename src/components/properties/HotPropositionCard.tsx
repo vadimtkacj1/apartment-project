@@ -24,6 +24,15 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
   isSold,
   index
 }) => {
+  const getStatusLabel = (status?: string) => {
+    const labels: Record<string, string> = {
+      'Exclusive': 'בלעדי',
+      'Opportunity': 'הזדמנות',
+      'New': 'חדש'
+    };
+    return status ? labels[status] || status : '';
+  };
+
   return (
     <Link
       href={`/apartments/${id}`}
@@ -62,7 +71,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               )}
               {status && !isSold && (
                 <div className="bg-white/25 backdrop-blur-sm text-white px-3 py-1.5 text-xs font-bold rounded-lg">
-                  {status}
+                  {getStatusLabel(status)}
                 </div>
               )}
             </div>

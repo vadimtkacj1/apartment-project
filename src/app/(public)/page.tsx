@@ -30,7 +30,7 @@ export default function Home() {
       {/* Hero section - scrolls normally */}
       <div className="w-full">
         <Hero
-          img="/images/hero/second-hero.jpg"
+          img="/images/hero/main-hero.jpg"
         />
       </div>
 

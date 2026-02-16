@@ -61,14 +61,16 @@ export interface PropertyFeatures {
 export interface Property {
   id: number;
   dealType: DealType;           // מכירה / השכרה
-  
+
   // Location
   city: City;                   // עיר
   neighborhood?: string;        // שכונה
   street?: string;              // רחוב
   streetNumber?: string;        // מס' רחוב
   apartmentNumber?: string;     // מס' דירה
-  
+  latitude?: number;            // קו רוחב
+  longitude?: number;           // קו אורך
+
   // Property Details
   propertyType: PropertyType;   // סוג הנכס
   floor?: number;               // קומה
@@ -77,16 +79,16 @@ export interface Property {
   furniture: FurnitureLevel;    // ריהוט
   directions: Direction[];      // כיוונים
   kitchen?: KitchenType;        // מטבח
-  
+
   // Measurements
   rooms: string;                // מס' חדרים
   area: number;                 // מס' מטר מרובע
   builtArea?: number;           // מס' מטר מרובע בנוי
-  
+
   // Additional Info
   vacancyDate?: string;         // תאריך פינוי
   features: PropertyFeatures;   // יש או אין
-  
+
   // Display Info
   title: string;
   description: string;

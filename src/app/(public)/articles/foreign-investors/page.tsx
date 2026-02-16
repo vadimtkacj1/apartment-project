@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import './styles.css';
 
@@ -9,9 +9,9 @@ export default function ForeignInvestorsArticle() {
   return (
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
-      <Hero
-        img="/images/hero/second-hero.jpg"
-        staticTitle="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
+      <SecondaryHero
+        img="/7.jpg"
+        title="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
         centered={true}
       />
 
@@ -149,11 +149,6 @@ export default function ForeignInvestorsArticle() {
                 </p>
               </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-3.jpg" alt="נדל״ן מסחרי" className="content-image" />
-            </div>
           </div>
         </article>
       </div>

@@ -2,6 +2,12 @@ export interface PropertyData {
   id: number;
   title: string;
   location: string;
+  city?: string;
+  street?: string;
+  streetNumber?: string;
+  neighborhood?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   price: string;
   originalPrice?: string;
   bedrooms: number;

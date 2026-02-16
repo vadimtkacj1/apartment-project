@@ -31,7 +31,11 @@
       "Bash(AboutFounders)",
       "Bash(AboutTeamNew \")",
       "Bash(ssh:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm search:*)",
+      "Bash(npm view:*)",
+      "Bash(npm uninstall:*)",
+      "WebFetch(domain:myprojects.geoapify.com)"
     ]
   }
 }

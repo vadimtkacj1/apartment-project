@@ -1,6 +1,6 @@
 'use client';
 
-import Hero from '@/components/layout/Hero';
+import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -123,9 +123,9 @@ export default function SellingApartmentPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-warm">
       {/* Hero Section */}
-      <Hero
+      <SecondaryHero
         img="/7.jpg"
-        staticTitle="תהליך מכירת דירה עם משרד תיווך מקצועי"
+        title="תהליך מכירת דירה עם משרד תיווך מקצועי"
         centered={true}
       />
 

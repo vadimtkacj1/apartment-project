@@ -107,6 +107,9 @@ export async function POST(request: NextRequest) {
 
         // Sold status
         isSold: body.isSold !== undefined ? body.isSold : false,
+
+        // Pin status
+        isPinned: body.isPinned !== undefined ? body.isPinned : false,
       },
     });
 
