@@ -74,3 +74,14 @@ body {
     scroll-behavior: smooth;
   }
 }
+
+.hyper-link {
+  color: rgb(38, 38, 185);
+  cursor: pointer;
+}
+
+.hyper-link:hover {
+  color: rgb(0, 0, 0);
+  text-decoration: underline;
+
+}
