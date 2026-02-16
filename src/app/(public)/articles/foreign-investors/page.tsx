@@ -164,10 +164,10 @@ export default function ForeignInvestorsArticle() {
           flex-direction: row-reverse;
         }
         .text-column {
-          flex: 1.5;
+          flex: 1.3;
         }
         .image-column {
-          flex: 1;
+          flex: 1.2;
         }
         .article-side-img {
           width: 100%;
