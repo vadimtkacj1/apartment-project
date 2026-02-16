@@ -22,8 +22,8 @@ const articles: Article[] = [
     id: 'foreign-investors',
     title: 'נדל"ן בשלט רחוק: כשאתם בחו"ל והלב רוצה',
     description: 'אין תחושה מתסכלת יותר מזו: אתם גרים מעבר לים, עובדים קשה, ורואים איך מחירי הנדל"ן בישראל ממשיכים לטוס למעלה בלעדיכם. אתם רוצים לקנות דירה להשקעה בחולון, דירה מול הים בבת ים, או ראשל"צ ולהבטיח את העתיד של הילדים, אבל המרחק משתק. איך אפשר לקנות דירה בלי לראות אותה? מי ישפץ אותה כשהקבלן יבריז? ומי ירדוף אחרי השוכר בראשון לחודש כשאתם נמצאים באזור זמן אחר לגמרי? באותו רגע, הפחד מניצול או מהונאה גובר על הרצון להשקיע. הכסף נשאר בבנק ונשחק. אז רגע לפני שאתם מוותרים על החלום לדירה בארץ - עצרו רגע. אנחנו במשרד מבינים את המצוקה הזו בדיוק. כבר שנים שאנחנו משמשים כ"עיניים והידיים" של תושבי חוץ ומשקיעים.',
-    image: '/Finance-rafiki.svg',
-    date: '2024-02-15',
+    image: '/images/balconies-blue-sky-clouds-part-residential-building-israel-balconies-blue-sky-clouds-part-199519995.webp',
+    date: '2026-01-15',
     category: 'משקיעים זרים',
     readTime: '8 דקות קריאה',
     tags: ['Israel Real Estate Investment', 'Foreign Investors', 'Property Management', 'תושבי חוץ']
@@ -32,8 +32,8 @@ const articles: Article[] = [
     id: 'selling-alone',
     title: 'למכור לבד? כשה"חיסכון" בתיווך עולה לכם עשרות אלפי שקלים',
     description: 'אין תחושה מפתה יותר מזו: החלטתם למכור את הדירה, עשיתם חישוב מהיר במחשבון, ואמרתם לעצמכם: "למה שנשלם 2% למתווך? נעלה מודעה ליד2, נראה את הבית פעמיים בשבוע, והכסף יישאר בכיס שלנו". על הנייר? זה נשמע גאוני. בין אם אתם מוכרים דירה בקרית שרת בחולון או דירת גן בבת ים, המחשבה הראשונה היא תמיד לחסוך בפועל. זה הרגע שבו הסיוט מתחיל. הטלפון לא מפסיק לצלצל בשעות לא סבירות, אנשים קובעים ולא מגיעים, אלו שכן מגיעים זורקים הערות מעליבות על הנכס שלכם, וההצעות שאתם מקבלים רחוקות שנות אור ממה שחשבתם.',
-    image: '/Problem solving-rafiki.svg',
-    date: '2024-02-14',
+    image: '/images/69ef77086aacb86d69234e7084c060e7.jpg',
+    date: '2026-01-14',
     category: 'קניה ומכירה',
     readTime: '7 דקות קריאה',
     tags: ['מכירת דירה', 'תיווך נדל"ן', 'הערכת שווי נכס', 'מכירה עצמאית']
@@ -54,23 +54,6 @@ export default function ArticlesPage() {
       <Breadcrumbs />
 
       <div className="articles-container">
-        {/* Decorative SVG Elements */}
-        <div className="decorative-elements">
-          <svg className="deco-circle-1" width="120" height="120" viewBox="0 0 120 120" fill="none">
-            <circle cx="60" cy="60" r="58" stroke="#1c3664" strokeWidth="2" opacity="0.1" strokeDasharray="8 8"/>
-            <circle cx="60" cy="60" r="45" stroke="#1c3664" strokeWidth="2" opacity="0.15"/>
-          </svg>
-
-          <svg className="deco-circle-2" width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <circle cx="40" cy="40" r="38" stroke="#d4af37" strokeWidth="2" opacity="0.2"/>
-          </svg>
-
-          <svg className="deco-pattern-1" width="100" height="100" viewBox="0 0 100 100" fill="none">
-            <path d="M20 50 L50 20 L80 50 L50 80 Z" stroke="#1c3664" strokeWidth="2" opacity="0.08" fill="none"/>
-            <circle cx="50" cy="50" r="5" fill="#d4af37" opacity="0.3"/>
-          </svg>
-        </div>
-
         <p className="articles-subtitle">
           ידע מקצועי ותובנות מעולם הנדל"ן בישראל
         </p>

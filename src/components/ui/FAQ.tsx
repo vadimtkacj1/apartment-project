@@ -157,7 +157,8 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
         }
 
         .answer-content :global(strong) {
-          color: #111827;
+          color: #2563eb;
+          font-weight: 600;
         }
 
         @media (max-width: 640px) {

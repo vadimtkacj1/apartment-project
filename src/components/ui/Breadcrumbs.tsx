@@ -40,7 +40,8 @@ export default function Breadcrumbs() {
 
   return (
     <nav
-      className="bg-warm py-5 px-4 md:px-8 border-b border-gray-100"
+      className="py-5 px-4 md:px-8"
+      style={{ backgroundColor: '#faf7f2', borderBottom: '1px solid rgba(0,0,0,0.05)' }}
       aria-label="Breadcrumb"
       dir="rtl" // Standard for Hebrew
     >

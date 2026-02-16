@@ -79,15 +79,6 @@
   position: relative;
 }
 
-.articles-subtitle::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #d4af37, transparent);
-  margin: 1rem auto 0;
-  border-radius: 2px;
-}
 
 /* Categories */
 .categories {
@@ -149,7 +140,7 @@
 .article-card:hover {
   transform: translateY(-12px);
   box-shadow: 0 20px 40px rgba(28, 54, 100, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-color: rgba(212, 175, 55, 0.3);
+  border-color: rgba(37, 99, 235, 0.3);
 }
 
 /* Decorative card accent */
@@ -161,14 +152,14 @@
   height: 0;
   border-style: solid;
   border-width: 0 60px 60px 0;
-  border-color: transparent rgba(212, 175, 55, 0.15) transparent transparent;
+  border-color: transparent rgba(37, 99, 235, 0.15) transparent transparent;
   z-index: 1;
   transition: all 0.3s ease;
 }
 
 .article-card:hover .card-accent {
   border-width: 0 80px 80px 0;
-  border-color: transparent rgba(212, 175, 55, 0.25) transparent transparent;
+  border-color: transparent rgba(37, 99, 235, 0.25) transparent transparent;
 }
 
 .article-image-container {
@@ -224,14 +215,14 @@
   align-items: center;
   gap: 0.4rem;
   transition: all 0.3s ease;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
 .article-card:hover .category-badge {
-  background: rgba(212, 175, 55, 0.95);
+  background: rgba(37, 99, 235, 0.95);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
 }
 
 .badge-icon {
@@ -301,7 +292,7 @@
   color: #1f2937;
   text-decoration: none;
   transition: all 0.3s ease;
-  background: linear-gradient(90deg, #d4af37 0%, #d4af37 100%);
+  background: linear-gradient(90deg, #2563eb 0%, #2563eb 100%);
   background-size: 0% 2px;
   background-repeat: no-repeat;
   background-position: right bottom;
@@ -370,8 +361,8 @@
   align-self: flex-start;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
-  border: 2px solid rgba(212, 175, 55, 0.2);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+  border: 2px solid rgba(37, 99, 235, 0.2);
 }
 
 .read-more:hover {
