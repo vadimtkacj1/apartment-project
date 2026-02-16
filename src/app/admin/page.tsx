@@ -58,8 +58,8 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div>
-      <Title level={2} style={{ marginBottom: '24px', color: '#141414' }}>
+    <div className="px-2 sm:px-4 md:px-0">
+      <Title level={2} style={{ marginBottom: '16px', color: '#141414', fontSize: 'clamp(1.25rem, 5vw, 1.5rem)' }}>
         לוח בקרה
       </Title>
 

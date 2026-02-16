@@ -44,3 +44,4 @@ echo "📋 Test the fix:"
 echo "  npm run seed:admin"
 echo "  pm2 logs apartment-project --lines 20"
 
+

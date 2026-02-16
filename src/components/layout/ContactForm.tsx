@@ -3,6 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
+import dynamic from 'next/dynamic';
+
+// Dynamically import ContactMap with SSR disabled
+const ContactMap = dynamic(() => import('./ContactMap'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ height: '100%', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <span>טוען מפה...</span>
+    </div>
+  )
+});
 
 interface ContactInfo {
   phone: string;
@@ -31,9 +42,16 @@ const ContactForm: React.FC = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('/api/contact-info');
+      const response = await fetch('/api/contact-info', {
+        cache: 'no-store', // Ensure we get fresh data
+      });
       if (response.ok) {
         const data = await response.json();
+        console.log('Contact info loaded:', { 
+          latitude: data?.latitude, 
+          longitude: data?.longitude,
+          address: data?.address 
+        });
         setContactInfo(data);
       }
     } catch (error) {
@@ -50,9 +68,15 @@ const ContactForm: React.FC = () => {
   const emailLink = contactInfo?.emailLink || 'mailto:info@zamir-realestate.co.il';
   const address = contactInfo?.address || 'חולון';
   const city = contactInfo?.city || 'בת ים, ישראל';
-  const mapUrl = contactInfo?.latitude && contactInfo?.longitude
-    ? `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d${contactInfo.longitude}!3d${contactInfo.latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM!5e0!3m2!1siw!2sil!4v1234567890123`
-    : 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d53894.38697624869!2d34.73625!3d32.01624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b7c42d6f5d9%3A0xd9c39a50a4f33e43!2z15fXlNec15XXnywg15nXqdeo15DXnA!5e0!3m2!1siw!2sil!4v1234567890123';
+
+  // Use coordinates from contact info, only use defaults if both are null
+  // This ensures we use the exact coordinates set in admin panel
+  const latitude = contactInfo?.latitude ?? null;
+  const longitude = contactInfo?.longitude ?? null;
+  
+  // Default coordinates for Tel Aviv area if no coordinates are set
+  const mapLatitude = latitude ?? 32.01624;
+  const mapLongitude = longitude ?? 34.73625;
 
   return (
     <section
@@ -120,15 +144,11 @@ const ContactForm: React.FC = () => {
               transition={{ duration: 0.8 }}
               className="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px]"
             >
-              <iframe
-                src={mapUrl}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="מיקום המשרד"
+              <ContactMap
+                latitude={mapLatitude}
+                longitude={mapLongitude}
+                address={address}
+                city={city}
               />
             </motion.div>
 

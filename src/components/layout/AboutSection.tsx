@@ -63,7 +63,7 @@ const AboutSection: React.FC = () => {
               className="space-y-6 text-gray-700 leading-relaxed"
             >
               <p className="text-xl md:text-2xl font-bold text-gray-900">
-                רם שיווק נכסים & חיים ענבי הוא משרד תיווך וקוויק נכסים בעל ניסיון של למעלה מ-24 שנה.
+                רם שיווק נכסים & חיים ענבי הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ24- שנה.
               </p>
 
               <p className="text-lg md:text-xl">

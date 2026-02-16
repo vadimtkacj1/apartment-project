@@ -3,6 +3,7 @@ import { message } from 'antd';
 import { FormInstance } from 'antd';
 import { PropertyForm } from './types';
 import { INITIAL_FORM } from './constants';
+import dayjs from 'dayjs';
 
 export function usePropertyForm(
   propertyId: string | string[] | undefined,
@@ -24,8 +25,15 @@ export function usePropertyForm(
       const response = await fetch(`/api/admin/properties/${propertyId}`);
       if (response.ok) {
         const data = await response.json();
+
+        // Convert vacancyDate string to dayjs object if it exists
+        const formValues = {
+          ...data,
+          vacancyDate: data.vacancyDate ? dayjs(data.vacancyDate, 'DD/MM/YYYY') : null,
+        };
+
         setFormData(data);
-        form.setFieldsValue(data);
+        form.setFieldsValue(formValues);
       }
     } catch (err) {
       message.error('שגיאה בטעינת הנכס');

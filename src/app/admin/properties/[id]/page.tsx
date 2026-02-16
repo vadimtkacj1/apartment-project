@@ -39,10 +39,10 @@ export default function PropertyEditPage() {
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <Title level={2} style={{ margin: 0 }}>
-          <HomeOutlined style={{ marginLeft: '12px' }} />
+    <div className="px-2 sm:px-4 md:px-0">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+        <Title level={2} style={{ margin: 0, fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>
+          <HomeOutlined style={{ marginLeft: '8px' }} />
           {isNew ? 'הוסף נכס חדש' : 'ערוך נכס'}
         </Title>
         <Button
@@ -50,6 +50,7 @@ export default function PropertyEditPage() {
           iconPosition="end"
           onClick={() => router.push('/admin/properties')}
           size="large"
+          className="w-full sm:w-auto"
         >
           חזרה לרשימה
         </Button>
@@ -76,14 +77,19 @@ export default function PropertyEditPage() {
         <div
           style={{
             position: 'sticky',
+            bottom: 0,
             marginTop: '30px',
             zIndex: 10,
+            backgroundColor: 'white',
+            padding: '16px 0',
+            borderTop: '1px solid #f0f0f0',
           }}
         >
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
             <Button
               size="large"
               onClick={() => router.push('/admin/properties')}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               ביטול
             </Button>
@@ -93,6 +99,7 @@ export default function PropertyEditPage() {
               loading={saving}
               size="large"
               icon={<SaveOutlined />}
+              className="w-full sm:w-auto order-1 sm:order-2"
             >
               שמור נכס
             </Button>

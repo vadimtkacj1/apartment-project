@@ -60,12 +60,12 @@ export default function Header() {
         
         <div className="hidden xl:block z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
-            <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
-              <Image 
-                src="/images/logo.PNG" 
-                alt="Logo" 
-                width={56} 
-                height={56} 
+            <div className="w-20 h-20 bg-white flex items-center justify-center p-1">
+              <Image
+                src="/images/logo.PNG"
+                alt="Logo"
+                width={80}
+                height={80}
                 className="object-contain"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -123,14 +123,14 @@ export default function Header() {
 
         <div className="z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
-            <div className="w-14 h-14 bg-white flex items-center justify-center p-1">
-              <Image 
-                src="/images/logo.PNG" 
-                alt="Logo" 
-                width={56} 
-                height={56} 
-                className="object-contain" 
-                priority 
+            <div className="w-14 h-14 xl:w-20 xl:h-20 bg-white flex items-center justify-center p-1">
+              <Image
+                src="/images/logo.PNG"
+                alt="Logo"
+                width={56}
+                height={56}
+                className="object-contain xl:w-20! xl:h-20!"
+                priority
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   if (target.src !== '/images/logo.jpeg') {

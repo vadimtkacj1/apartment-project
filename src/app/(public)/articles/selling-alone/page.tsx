@@ -10,7 +10,7 @@ export default function SellingAloneArticle() {
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
       <Hero
-        img="/images/hero/second-hero.jpg"
+        img="/7.jpg"
         staticTitle='למכור לבד? כשה"חיסכון" בתיווך עולה לכם עשרות אלפי שקלים'
         centered={true}
       />

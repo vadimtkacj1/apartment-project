@@ -45,7 +45,7 @@ export default function ArticlesPage() {
     <div className="articles-page" dir="rtl">
       {/* Hero with Background Image */}
       <Hero
-        img="/images/hero/second-hero.jpg"
+        img="/7.jpg"
         staticTitle="מאמרים ומדריכים"
         centered={true}
       />

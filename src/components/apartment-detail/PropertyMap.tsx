@@ -3,9 +3,18 @@ import { motion } from 'framer-motion';
 
 interface PropertyMapProps {
   isSold: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  location?: string;
 }
 
-export function PropertyMap({ isSold }: PropertyMapProps) {
+export function PropertyMap({ isSold, latitude, longitude, location }: PropertyMapProps) {
+  const hasCoordinates = typeof latitude === 'number' && typeof longitude === 'number';
+  const locationQuery = location?.trim() ? `${location}, Israel` : 'Tel Aviv, Israel';
+  const mapSrc = hasCoordinates
+    ? `https://www.google.com/maps?q=${latitude},${longitude}&z=15&output=embed`
+    : `https://www.google.com/maps?q=${encodeURIComponent(locationQuery)}&z=15&output=embed`;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -20,7 +29,7 @@ export function PropertyMap({ isSold }: PropertyMapProps) {
       }`}>מיקום</h2>
       <div className="rounded-xl overflow-hidden shadow-md">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3381.9441877937624!2d34.774577815081994!3d32.01615298119051!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x151d4b8b5c4e5e5d%3A0x5c5e5e5d5c4b8b5c!2z15fXldec15XXnw!5e0!3m2!1siw!2sil!4v1234567890123!5m2!1siw!2sil"
+          src={mapSrc}
           width="100%"
           height="450"
           style={{ border: 0 }}

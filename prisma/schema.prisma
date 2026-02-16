@@ -107,6 +107,9 @@ model Property {
   // Sold status
   isSold          Boolean  @default(false)
 
+  // Pin status (for home page display)
+  isPinned        Boolean  @default(false)
+
   // Timestamps
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -117,6 +120,7 @@ model Property {
   @@index([propertyType])
   @@index([isActive])
   @@index([isSold])
+  @@index([isPinned])
 
   // Relations
   views PropertyView[]

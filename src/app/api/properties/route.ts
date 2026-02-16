@@ -38,10 +38,16 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const maxPrice = searchParams.get('maxPrice');
     const region = searchParams.get('region'); // 'center' for center area
+    const pinned = searchParams.get('pinned'); // 'true' to filter by isPinned
 
     const where: any = {
       isActive: true,
     };
+
+    // Filter by pinned status if requested
+    if (pinned === 'true') {
+      where.isPinned = true;
+    }
 
     if (dealType && dealType !== 'all') {
       where.dealType = dealType;

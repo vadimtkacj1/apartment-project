@@ -96,6 +96,13 @@ export default function ContactInfoPage() {
         mapUrl,
       };
 
+      // Log coordinates before saving to debug
+      console.log('Saving contact info with coordinates:', {
+        latitude: values.latitude,
+        longitude: values.longitude,
+        mapPosition: mapPosition
+      });
+
       const response = await fetch('/api/admin/contact-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

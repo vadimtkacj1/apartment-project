@@ -36,6 +36,8 @@ export interface PropertyForm {
   bedrooms: string;
   bathrooms: number;
   isActive: boolean;
+  isSold: boolean;
+  isPinned: boolean;
 }
 
 export interface PropertyFormSectionProps {

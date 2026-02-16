@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { Input, Button, Space, message } from 'antd';
+import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
 // @ts-ignore
 import 'leaflet/dist/leaflet.css';
 
-// Dynamically import React-Leaflet components with SSR disabled
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
   { ssr: false, loading: () => <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>טוען מפה...</div> }
@@ -39,14 +40,7 @@ interface Position {
 interface LocationPickerProps {
   position: Position | null;
   onPositionChange: (position: Position) => void;
-  onAddressChange?: (address: AddressData) => void;
-}
-
-interface AddressData {
-  city?: string;
-  street?: string;
-  streetNumber?: string;
-  neighborhood?: string;
+  onAddressChange?: (address: any) => void;
 }
 
 const LocationPicker: React.FC<LocationPickerProps> = ({
@@ -55,29 +49,111 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onAddressChange,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
+  const [searchAddress, setSearchAddress] = useState('');
+  const [searching, setSearching] = useState(false); 
 
-  // Reverse geocoding: get address from coordinates
   const fetchAddressFromCoords = async (lat: number, lng: number) => {
     if (!onAddressChange) return;
-
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`
-      );
+      const response = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
       const data = await response.json();
 
-      if (data && data.address) {
-        const address: AddressData = {
-          city: data.address.city || data.address.town || data.address.village || '',
-          street: data.address.road || '',
-          streetNumber: data.address.house_number || '',
-          neighborhood: data.address.suburb || data.address.neighbourhood || '',
-        };
-
-        onAddressChange(address);
+      if (data.success && data.results?.length > 0) {
+        const result = data.results[0];
+        onAddressChange({
+          city: result.city || '',
+          street: result.street || '',
+          streetNumber: result.streetNumber || '',
+          neighborhood: result.neighborhood || '',
+          postcode: result.postcode || ''
+        });
       }
     } catch (error) {
-      console.error('Error fetching address:', error);
+      console.error('Reverse geocoding error:', error);
+    }
+  };
+
+  const searchAddressOnMap = async () => {
+    const term = searchAddress.trim();
+    if (!term) return;
+
+    setSearching(true);
+    try {
+      // Check if it's a postal code (Israeli postal codes are 5 or 7 digits, may contain spaces or dashes)
+      const normalizedTerm = term.replace(/[\s-]/g, '');
+      const isPostalCode = /^\d{5,7}$/.test(normalizedTerm);
+
+      // Use our server-side geocoding API
+      const params = new URLSearchParams();
+      if (isPostalCode) {
+        params.append('postalCode', normalizedTerm);
+      } else {
+        params.append('address', term);
+      }
+
+      const response = await fetch(`/api/geocode?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+
+      if (data.success && data.results?.length > 0) {
+        const result = data.results[0];
+        let { lat, lng } = result;
+
+        // Validate coordinates
+        if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+          throw new Error('Invalid coordinates received');
+        }
+
+        // Additional validation: ensure coordinates are within reasonable bounds
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          throw new Error('Coordinates out of valid range');
+        }
+
+        // For Israel, validate coordinates are within country bounds (lat: 29-33.5, lng: 34-36)
+        // This helps catch coordinate swap issues
+        const isWithinIsrael = lat >= 29 && lat <= 33.5 && lng >= 34 && lng <= 36;
+        const mightBeSwapped = lng >= 29 && lng <= 33.5 && lat >= 34 && lat <= 36;
+        
+        if (mightBeSwapped && !isWithinIsrael) {
+          console.warn('Coordinates appear to be swapped, fixing...', { lat, lng });
+          // Swap coordinates
+          [lat, lng] = [lng, lat];
+        }
+
+        if (!isWithinIsrael && !mightBeSwapped) {
+          console.warn('Coordinates outside Israel bounds:', { lat, lng });
+          // Still use them but warn - might be intentional for other countries
+        }
+
+        handlePositionChange({ lat, lng });
+
+        // Update address fields if callback provided
+        if (onAddressChange) {
+          onAddressChange({
+            city: result.city || '',
+            street: result.street || '',
+            streetNumber: result.streetNumber || '',
+            neighborhood: result.neighborhood || '',
+            postcode: result.postcode || ''
+          });
+        }
+
+        message.success(`נמצא: ${result.formatted || result.city || term}`);
+      } else {
+        console.log('No results found for term:', term, 'Response:', data);
+        const errorMsg = data.error || 'לא נמצאו תוצאות. בדוק את המיקוד או הכתובת';
+        message.error(errorMsg);
+      }
+    } catch (error: any) {
+      console.error('Search error:', error);
+      const errorMessage = error.message || 'שגיאה בחיפוש';
+      message.error(`שגיאה בחיפוש: ${errorMessage}`);
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -88,77 +164,54 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Initialize Leaflet icon only on client side
       import('leaflet').then((L) => {
-        // Fix Leaflet default icon issue in Next.js
-        // Use CDN URLs for icons to avoid SSR issues
         const Leaflet = L.default || L;
-        if (Leaflet && Leaflet.Icon && Leaflet.Icon.Default) {
+        if (Leaflet?.Icon?.Default) {
           const DefaultIcon = Leaflet.Icon.Default;
           const prototype = DefaultIcon.prototype as any;
-          
-          // Remove _getIconUrl if it exists
-          if (prototype && '_getIconUrl' in prototype) {
-            delete prototype._getIconUrl;
-          }
-          
-          // Set icon URLs using CDN
+          if (prototype && '_getIconUrl' in prototype) delete prototype._getIconUrl;
           DefaultIcon.mergeOptions({
             iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
             iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
           });
         }
-
-        setIsMounted(true);
-      }).catch((error) => {
-        console.error('Error loading Leaflet:', error);
-        // Still try to render even if there's an error
         setIsMounted(true);
       });
     }
   }, []);
 
-  // Default center (Tel Aviv, Israel)
-  const defaultCenter: [number, number] = [32.0853, 34.7818];
-  const center: [number, number] = position
-    ? [position.lat, position.lng]
-    : defaultCenter;
+  const defaultCenter: [number, number] = [32.0158, 34.7874];
+  const center: [number, number] = position ? [position.lat, position.lng] : defaultCenter;
 
-  if (!isMounted || typeof window === 'undefined') {
-    return (
-      <div className="w-100" style={{ height: '400px', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span>טוען מפה...</span>
-      </div>
-    );
-  }
+  if (!isMounted || typeof window === 'undefined') return null;
 
   return (
-    <div className="location-picker" style={{ 
-      height: '500px', 
-      width: '100%', 
-      position: 'relative', 
-      zIndex: 1,
-      borderRadius: '12px',
-      overflow: 'hidden',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      border: '1px solid #dee2e6'
-    }}>
-      <MapContainer
-        center={center}
-        zoom={13}
-        style={{ height: '100%', width: '100%', zIndex: 1 }}
-        scrollWheelZoom={true}
-        doubleClickZoom={false}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <MapClickHandler onPositionChange={handlePositionChange} />
-        <MapCenterer position={position} />
-        {position && <DraggableMarker position={position} onPositionChange={handlePositionChange} />}
-      </MapContainer>
+    <div style={{ width: '100%' }}>
+      <div style={{ marginBottom: '16px' }}>
+        <Space.Compact style={{ width: '100%' }}>
+          <Input
+            size="large"
+            placeholder="הזן מיקוד או כתובת"
+            value={searchAddress}
+            onChange={(e) => setSearchAddress(e.target.value)}
+            onPressEnter={searchAddressOnMap}
+            prefix={<EnvironmentOutlined />}
+          />
+          <Button type="primary" size="large" icon={<SearchOutlined />} onClick={searchAddressOnMap} loading={searching}>
+            חפש
+          </Button>
+        </Space.Compact>
+      </div>
+
+      <div style={{ height: '500px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid #dee2e6' }}>
+        <MapContainer center={center} zoom={16} style={{ height: '100%', width: '100%' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapClickHandler onPositionChange={handlePositionChange} />
+          <MapCenterer position={position} />
+          {position && <DraggableMarker position={position} onPositionChange={handlePositionChange} />}
+        </MapContainer>
+      </div>
     </div>
   );
 };

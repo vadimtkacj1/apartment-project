@@ -29,15 +29,15 @@ export function FeaturesSection({ formData, handleChange }: PropertyFormSectionP
         {FEATURES.map((feature) => {
           const IconComponent = feature.icon;
           return (
-            <Col span={6} key={feature.key}>
+            <Col xs={12} sm={8} md={6} key={feature.key}>
               <Form.Item name={feature.key} valuePropName="checked">
                 <Checkbox
                   onChange={(e) =>
                     handleChange(feature.key as keyof PropertyForm, e.target.checked)
                   }
                 >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <IconComponent size={18} />
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+                    <IconComponent size={16} />
                     {feature.label}
                   </span>
                 </Checkbox>
