@@ -3,9 +3,25 @@
 import React from 'react';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import FAQ, { FAQItem } from '@/components/ui/FAQ';
 import '../foreign-investors/styles.css';
 
 export default function SellingAloneArticle() {
+  const faqItems: FAQItem[] = [
+    {
+      question: '"האם זה אומר שאני אקבל פחות כסף בסוף?"',
+      answer: '<strong>להפך.</strong> הסטטיסטיקה מראה שדירה שנמכרת בעזרת מתווך מנוסה נסגרת במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. זה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.'
+    },
+    {
+      question: '"למה שלא אפרסם לבד ורק אם לא ילך אפנה אליכם?"',
+      answer: '<strong>כי השוק זוכר.</strong> דירה שפורסמה חודשיים ולא נמכרה מקבלת "סטיגמה". הקונים רואים ומציעים הצעות נמוכות. עדיף להתחיל חזק ונכון מהיום הראשון.'
+    },
+    {
+      question: '"אתם עובדים בבלעדיות?"',
+      answer: '<strong>כן, ובשבילכם זה יתרון.</strong> בבלעדיות אנחנו משקיעים כסף בפרסום, צילום מקצועי ושיתופי פעולה, כי אנחנו מחויבים לתוצאה. בלי בלעדיות? אף אחד לא באמת עובד בשבילכם.'
+    }
+  ];
+
   return (
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
@@ -28,21 +44,24 @@ export default function SellingAloneArticle() {
               <p className="lead-paragraph">
                 אין תחושה מפתה יותר מזו: החלטתם למכור את הדירה, עשיתם חישוב מהיר במחשבון, ואמרתם לעצמכם: "למה שנשלם 2% למתווך? נעלה מודעה ליד2, נראה את הבית פעמיים בשבוע, והכסף יישאר בכיס שלנו".
               </p>
-              <p>
-                על הנייר? זה נשמע גאוני. בין אם אתם מוכרים דירה בקרית שרת בחולון או דירת גן בבת ים, המחשבה הראשונה היא תמיד לחסוך בפועל. זה הרגע שבו הסיוט מתחיל. הטלפון לא מפסיק לצלצל בשעות לא סבירות, אנשים קובעים ולא מגיעים, אלו שכן מגיעים זורקים הערות מעליבות על הנכס שלכם, וההצעות שאתם מקבלים רחוקות שנות אור ממה שחשבתם.
-              </p>
-              <p>
-                באותו רגע, התחושה היא שאתם לבד במערכה. שכולם מנסים להוריד אתכם במחיר. אז רגע לפני שאתם מתייאשים ומורידים את המחיר ב-100,000 ש"ח רק כדי "לסיים עם זה" - עצרו רגע.
-              </p>
-              <p>
-                אנחנו במשרד חיים את השטח בחולון, בת ים וראשל"צ כבר 24 שנים. אנחנו יודעים בדיוק למה הדירה שלכם עדיין לא נמכרה, והחדשות הטובות? בהרבה מהמקרים, שינוי אסטרטגיה קטן יכול להביא את הקונה הנכון במחיר המקסימלי.
-              </p>
+              
+              <div className="content-flex-layout">
+                <div className="text-column">
+                  <p>
+                    על הנייר? זה נשמע גאוני. בין אם אתם מוכרים דירה בקרית שרת בחולון או דירת גן בבת ים, המחשבה הראשונה היא תמיד לחסוך בפועל. זה הרגע שבו הסיוט מתחיל. הטלפון לא מפסיק לצלצל בשעות לא סבירות, אנשים קובעים ולא מגיעים, אלו שכן מגיעים זורקים הערות מעליבות על הנכס שלכם, וההצעות שאתם מקבלים רחוקות שנות אור ממה שחשבתם.
+                  </p>
+                  <p>
+                    באותו רגע, התחושה היא שאתם לבד במערכה. שכולם מנסים להוריד אתכם במחיר. אז רגע לפני שאתם מתייאשים ומורידים את המחיר ב-100,000 ש"ח רק כדי "לסיים עם זה" - עצרו רגע.
+                  </p>
+                  <p>
+                    אנחנו במשרד חיים את השטח בחולון, בת ים וראשל"צ כבר 24 שנים. אנחנו יודעים בדיוק למה הדירה שלכם עדיין לא נמכרה, והחדשות הטובות? בהרבה מהמקרים, שינוי אסטרטגיה קטן יכול להביא את הקונה הנכון במחיר המקסימלי.
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/info-card-1.jpg" alt="מכירת דירה" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-1.jpg" alt="מכירת דירה" className="content-image" />
-            </div>
 
             {/* Section 1: Why the apartment is burning */}
             <section className="article-section">
@@ -63,22 +82,24 @@ export default function SellingAloneArticle() {
 
             {/* Section 2: The Biggest Mistake */}
             <section className="article-section">
-              <h2>הטעות הכי גדולה של מוכרים לבד: להיות "מדריך טיולים"</h2>
-              <p>
-                כשאתם מפרסמים לבד, אתם הופכים למוקדייה. כל אדם שמשעמם לו בערב מתקשר. <strong>זו טעות קריטית.</strong>
-              </p>
-              <p>
-                אתם מכניסים הביתה "תיירי נדל"ן" – אנשים שאין להם אישור עקרוני למשכנתא, שרק "בודקים דופק", או שחולמים על פנטהאוז בראשון לציון מערב אבל התקציב שלהם מתאים לדירת 3 חדרים ישנה.
-              </p>
-              <p>
-                אתם מבזבזים זמן יקר, מתסכלים את בני המשפחה, ושוחקים את הנכס. <strong>אצלנו? אף קונה לא נכנס בדלת לפני שעבר סינון קפדני.</strong>
-              </p>
+              <div className="content-flex-layout reverse">
+                <div className="text-column">
+                  <h2>הטעות הכי גדולה של מוכרים לבד: להיות "מדריך טיולים"</h2>
+                  <p>
+                    כשאתם מפרסמים לבד, אתם הופכים למוקדייה. כל אדם שמשעמם לו בערב מתקשר. <strong>זו טעות קריטית.</strong>
+                  </p>
+                  <p>
+                    אתם מכניסים הביתה "תיירי נדל"ן" – אנשים שאין להם אישור עקרוני למשכנתא, שרק "בודקים דופק", או שחולמים על פנטהאוז בראשון לציון מערב אבל התקציב שלהם מתאים לדירת 3 חדרים ישנה.
+                  </p>
+                  <p>
+                    אתם מבזבזים זמן יקר, מתסכלים את בני המשפחה, ושוחקים את הנכס. <strong>אצלנו? אף קונה לא נכנס בדלת לפני שעבר סינון קפדני.</strong>
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/info-card-2.jpg" alt="תיווך נדל״ן" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-2.jpg" alt="תיווך נדל״ן" className="content-image" />
-            </div>
 
             {/* Section 3: Our System */}
             <section className="article-section">
@@ -105,48 +126,59 @@ export default function SellingAloneArticle() {
 
             {/* Section 4: Why Choose Us */}
             <section className="article-section">
-              <h2>למה דווקא אנחנו?</h2>
-              <p>
-                במכירת הדירה היקרה לכם, אין מקום לניסוי וטעייה. מתווך מתחיל אולי ייקח עמלה נמוכה, אבל יעלה לכם ביוקר במחיר הסופי.
-              </p>
-              <p>
-                הוותק שלנו (24 שנים!) והעובדה שאנחנו עובדים ידנית ואישית, מאפשרים לנו להגיע לקונים שנמצאים "מתחת לרדאר" (כמו לדוגמה משקיעים שמחפשים דירות להשקעה ליד הרכבת הקלה) - <strong>משקיעים ולקוחות רציניים שלא יושבים כל היום ביד2.</strong>
-              </p>
+              <div className="content-flex-layout">
+                <div className="text-column">
+                  <h2>למה דווקא אנחנו?</h2>
+                  <p>
+                    במכירת הדירה היקרה לכם, אין מקום לניסוי וטעייה. מתווך מתחיל אולי ייקח עמלה נמוכה, אבל יעלה לכם ביוקר במחיר הסופי.
+                  </p>
+                  <p>
+                    הוותק שלנו (24 שנים!) והעובדה שאנחנו עובדים ידנית ואישית, מאפשרים לנו להגיע לקונים שנמצאים "מתחת לרדאר" (כמו לדוגמה משקיעים שמחפשים דירות להשקעה ליד הרכבת הקלה) - <strong>משקיעים ולקוחות רציניים שלא יושבים כל היום ביד2.</strong>
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/info-card-3.jpg" alt="מכירת נכס" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-3.jpg" alt="מכירת נכס" className="content-image" />
-            </div>
 
             {/* Section 5: FAQ */}
-            <section className="article-section faq-section">
-              <h2>שאלות נפוצות – רם וחיים עונים</h2>
-
-              <div className="faq-item">
-                <h3>"האם זה אומר שאני אקבל פחות כסף בסוף?"</h3>
-                <p>
-                  <strong>להפך.</strong> הסטטיסטיקה מראה שדירה שנמכרת בעזרת מתווך מנוסה נסגרת במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. זה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.
-                </p>
-              </div>
-
-              <div className="faq-item">
-                <h3>"למה שלא אפרסם לבד ורק אם לא ילך אפנה אליכם?"</h3>
-                <p>
-                  <strong>כי השוק זוכר.</strong> דירה שפורסמה חודשיים ולא נמכרה מקבלת "סטיגמה". הקונים רואים ומציעים הצעות נמוכות. עדיף להתחיל חזק ונכון מהיום הראשון.
-                </p>
-              </div>
-
-              <div className="faq-item">
-                <h3>"אתם עובדים בבלעדיות?"</h3>
-                <p>
-                  <strong>כן, ובשבילכם זה יתרון.</strong> בבלעדיות אנחנו משקיעים כסף בפרסום, צילום מקצועי ושיתופי פעולה, כי אנחנו מחויבים לתוצאה. בלי בלעדיות? אף אחד לא באמת עובד בשבילכם.
-                </p>
-              </div>
-            </section>
+            <FAQ items={faqItems} />
           </div>
         </article>
       </div>
+
+      <style jsx>{`
+        .content-flex-layout {
+          display: flex;
+          gap: 40px;
+          align-items: flex-start;
+          margin: 30px 0;
+        }
+        .content-flex-layout.reverse {
+          flex-direction: row-reverse;
+        }
+        .text-column {
+          flex: 1.5;
+        }
+        .image-column {
+          flex: 1;
+        }
+        .article-side-img {
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+        @media (max-width: 768px) {
+          .content-flex-layout, .content-flex-layout.reverse {
+            flex-direction: column;
+          }
+          .image-column {
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }

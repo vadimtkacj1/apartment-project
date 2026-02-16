@@ -3,9 +3,25 @@
 import React from 'react';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import FAQ, { FAQItem } from '@/components/ui/FAQ';
 import './styles.css';
 
 export default function ForeignInvestorsArticle() {
+  const faqItems: FAQItem[] = [
+    {
+      question: '"האם אני חייב להגיע לארץ כדי לחתום?"',
+      answer: '<strong>ברוב המקרים - לא.</strong> בעזרת ייפוי כוח נוטריוני ועורכי הדין שאנחנו עובדים איתם, ניתן לבצע את כל תהליך <em>הרכישה (Buying Property in Israel)</em> מרחוק בצורה מאובטחת וחוקית לחלוטין.'
+    },
+    {
+      question: '"מי מבטיח לי שהשיפוץ יתבצע כמו שצריך?"',
+      answer: '<strong>אנחנו.</strong> אנחנו שולחים לכם וידאו ותמונות בזמן אמת מהשטח. אתם רואים את הריצוף, את הצבע ואת המטבח החדש מתקדם, בלי לצאת מהבית בחו"ל.'
+    },
+    {
+      question: '"אתם מטפלים גם בנכסים מסחריים?"',
+      answer: '<strong>בהחלט.</strong> יש לנו ניסיון רב עם מגרשים, מפעלים ועסקים, כולל ניהול המורכבויות הייחודיות של נדל"ן מסחרי.'
+    }
+  ];
+
   return (
     <div className="article-page" dir="rtl">
       {/* Hero with Background Image */}
@@ -28,21 +44,24 @@ export default function ForeignInvestorsArticle() {
               <p className="lead-paragraph">
                 אין תחושה מתסכלת יותר מזו: אתם גרים מעבר לים, עובדים קשה, ורואים איך מחירי הנדל"ן בישראל ממשיכים לטוס למעלה בלעדיכם. אתם רוצים לקנות דירה להשקעה בחולון, דירה מול הים בבת ים, או ראשל"צ ולהבטיח את העתיד של הילדים, אבל המרחק משתק.
               </p>
-              <p>
-                איך אפשר לקנות דירה בלי לראות אותה? מי ישפץ אותה כשהקבלן יבריז? ומי ירדוף אחרי השוכר בראשון לחודש כשאתם נמצאים באזור זמן אחר לגמרי?
-              </p>
-              <p>
-                באותו רגע, הפחד מניצול או מהונאה גובר על הרצון להשקיע. הכסף נשאר בבנק ונשחק. אז רגע לפני שאתם מוותרים על החלום לדירה בארץ - עצרו רגע.
-              </p>
-              <p>
-                אנחנו במשרד מבינים את המצוקה הזו בדיוק. כבר שנים שאנחנו משמשים כ"עיניים והידיים" של תושבי חוץ ומשקיעים. והחדשות הטובות? <strong>אפשר לנהל נדל"ן בישראל באפס מאמץ</strong>, אם יש לכם ניהול נכס (Property Management) מקצועי בשטח.
-              </p>
+              
+              <div className="content-flex-layout">
+                <div className="text-column">
+                  <p>
+                    איך אפשר לקנות דירה בלי לראות אותה? מי ישפץ אותה כשהקבלן יבריז? ומי ירדוף אחרי השוכר בראשון לחודש כשאתם נמצאים באזור זמן אחר לגמרי?
+                  </p>
+                  <p>
+                    באותו רגע, הפחד מניצול או מהונאה גובר על הרצון להשקיע. הכסף נשאר בבנק ונשחק. אז רגע לפני שאתם מוותרים על החלום לדירה בארץ - עצרו רגע.
+                  </p>
+                  <p>
+                    אנחנו במשרד מבינים את המצוקה הזו בדיוק. כבר שנים שאנחנו משמשים כ"עיניים והידיים" של תושבי חוץ ומשקיעים. והחדשות הטובות? <strong>אפשר לנהל נדל"ן בישראל באפס מאמץ</strong>, אם יש לכם ניהול נכס (Property Management) מקצועי בשטח.
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/LuxuryLiving.jpg" alt="נדל״ן בישראל" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/buildings.jpeg" alt="נדל״ן בישראל" className="content-image" />
-            </div>
 
             {/* Section 1: Why Foreign Investors Fear */}
             <section className="article-section">
@@ -63,22 +82,24 @@ export default function ForeignInvestorsArticle() {
 
             {/* Section 2: The Biggest Mistake */}
             <section className="article-section">
-              <h2>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
-              <p>
-                הרבה משקיעים מפילים את התיק על "דוד שגר בארץ" או מנסים לנהל את השיפוץ בוואטסאפ מול קבלן מזדמן. <strong>זו טעות קריטית.</strong>
-              </p>
-              <p>
-                מעבר לכאב הראש, יש כאן מלכודות פיננסיות: החל מחישוב שגוי של <em>מס רכישה (Purchase Tax)</em> ועד אי-ידיעת החוקים לגבי <em>משכנתא לתושבי חוץ (Mortgage for Foreigners)</em>.
-              </p>
-              <p>
-                הדוד מתעייף, הקבלן מבין שאתם לא בשטח ומעגל פינות, והתשואה שלכם נפגעת. <strong>נדל"ן להשקעה חייב להיות מנוהל כמו עסק, לא כמו טובה משפחתית.</strong>
-              </p>
+              <div className="content-flex-layout reverse">
+                <div className="text-column">
+                  <h2>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
+                  <p>
+                    הרבה משקיעים מפילים את התיק על "דוד שגר בארץ" או מנסים לנהל את השיפוץ בוואטסאפ מול קבלן מזדמן. <strong>זו טעות קריטית.</strong>
+                  </p>
+                  <p>
+                    מעבר לכאב הראש, יש כאן מלכודות פיננסיות: החל מחישוב שגוי של <em>מס רכישה (Purchase Tax)</em> ועד אי-ידיעת החוקים לגבי <em>משכנתא לתושבי חוץ (Mortgage for Foreigners)</em>.
+                  </p>
+                  <p>
+                    הדוד מתעייף, הקבלן מבין שאתם לא בשטח ומעגל פינות, והתשואה שלכם נפגעת. <strong>נדל"ן להשקעה חייב להיות מנוהל כמו עסק, לא כמו טובה משפחתית.</strong>
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/minimalist-tel-aviv-apartment.jpg" alt="ניהול נכסים" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-1.jpg" alt="ניהול נכסים" className="content-image" />
-            </div>
 
             {/* Section 3: Our System */}
             <section className="article-section">
@@ -97,21 +118,23 @@ export default function ForeignInvestorsArticle() {
                 יש לנו <strong>צוותי שיפוץ ותחזוקה משלנו</strong>. אנחנו לא מפנים אתכם לקבלן - אנחנו מפקחים עליו. אנחנו נהפוך חורבה לדירת בונבוניירה שתניב שכירות גבוהה.
               </p>
 
-              <h3>3. מעטפת פיננסית</h3>
-              <p>
-                אנחנו עובדים צמוד עם <strong>אבי בוקעי ("אבי - הבית למשכנתאות")</strong> ועם עורכי דין המתמחים במיסוי לתושבי חוץ, כדי לוודא שהכסף עובר חלק והמימון (משכנתא) מאושר בתנאים הטובים ביותר.
-              </p>
+              <div className="content-flex-layout">
+                <div className="text-column">
+                  <h3>3. מעטפת פיננסית</h3>
+                  <p>
+                    אנחנו עובדים צמוד עם <strong>אבי בוקעי ("אבי - הבית למשכנתאות")</strong> ועם עורכי דין המתמחים במיסוי לתושבי חוץ, כדי לוודא שהכסף עובר חלק והמימון (משכנתא) מאושר בתנאים הטובים ביותר.
+                  </p>
 
-              <h3>4. ניהול שוטף (השקט שלכם)</h3>
-              <p>
-                מציאת שוכרים, גביית תשלומים, ותיקון תקלות. <strong>אתם מקבלים רק את הדיווח בבנק.</strong>
-              </p>
+                  <h3>4. ניהול שוטף (השקט שלכם)</h3>
+                  <p>
+                    מציאת שוכרים, גביית תשלומים, ותיקון תקלות. <strong>אתם מקבלים רק את הדיווח בבנק.</strong>
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/360_F_651602712_C8pj3T2vA73H0oyL1tSF9pvU6ginjecp.jpg" alt="שירותי נדל״ן" className="article-side-img" />
+                </div>
+              </div>
             </section>
-
-            {/* Image */}
-            <div className="article-image-section">
-              <img src="/images/info-card-2.jpg" alt="שירותי נדל״ן" className="content-image" />
-            </div>
 
             {/* Section 4: Why Choose Us */}
             <section className="article-section">
@@ -125,33 +148,42 @@ export default function ForeignInvestorsArticle() {
             </section>
 
             {/* Section 5: FAQ */}
-            <section className="article-section faq-section">
-              <h2>שאלות נפוצות – רם וחיים עונים</h2>
-
-              <div className="faq-item">
-                <h3>"האם אני חייב להגיע לארץ כדי לחתום?"</h3>
-                <p>
-                  <strong>ברוב המקרים - לא.</strong> בעזרת ייפוי כוח נוטריוני ועורכי הדין שאנחנו עובדים איתם, ניתן לבצע את כל תהליך <em>הרכישה (Buying Property in Israel)</em> מרחוק בצורה מאובטחת וחוקית לחלוטין.
-                </p>
-              </div>
-
-              <div className="faq-item">
-                <h3>"מי מבטיח לי שהשיפוץ יתבצע כמו שצריך?"</h3>
-                <p>
-                  <strong>אנחנו.</strong> אנחנו שולחים לכם וידאו ותמונות בזמן אמת מהשטח. אתם רואים את הריצוף, את הצבע ואת המטבח החדש מתקדם, בלי לצאת מהבית בחו"ל.
-                </p>
-              </div>
-
-              <div className="faq-item">
-                <h3>"אתם מטפלים גם בנכסים מסחריים?"</h3>
-                <p>
-                  <strong>בהחלט.</strong> יש לנו ניסיון רב עם מגרשים, מפעלים ועסקים, כולל ניהול המורכבויות הייחודיות של נדל"ן מסחרי.
-                </p>
-              </div>
-            </section>
+            <FAQ items={faqItems} />
           </div>
         </article>
       </div>
+
+      <style jsx>{`
+        .content-flex-layout {
+          display: flex;
+          gap: 40px;
+          align-items: flex-start;
+          margin: 30px 0;
+        }
+        .content-flex-layout.reverse {
+          flex-direction: row-reverse;
+        }
+        .text-column {
+          flex: 1.5;
+        }
+        .image-column {
+          flex: 1;
+        }
+        .article-side-img {
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+          object-fit: cover;
+        }
+        @media (max-width: 768px) {
+          .content-flex-layout, .content-flex-layout.reverse {
+            flex-direction: column;
+          }
+          .image-column {
+            width: 100%;
+          }
+        }
+      `}</style>
     </div>
   );
 }
