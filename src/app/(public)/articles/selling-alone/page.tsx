@@ -58,7 +58,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/info-card-1.jpg" alt="מכירת דירה" className="article-side-img" />
+                  <img src="/images/dom-s-basseinom-v-izraile-pufikhomes-1.jpg" alt="מכירת דירה" className="article-side-img" />
                 </div>
               </div>
             </section>
@@ -96,7 +96,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/info-card-2.jpg" alt="תיווך נדל״ן" className="article-side-img" />
+                  <img src="/images/ryXFV2tdge_0_0_3000_1688_0_x-large.avif" alt="תיווך נדל״ן" className="article-side-img" />
                 </div>
               </div>
             </section>
@@ -137,7 +137,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/info-card-3.jpg" alt="מכירת נכס" className="article-side-img" />
+                  <img src="/images/05IHH-ISRAEL-slide-WRE7-articleLarge.webp" alt="מכירת נכס" className="article-side-img" />
                 </div>
               </div>
             </section>
