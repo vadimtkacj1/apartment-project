@@ -55,7 +55,7 @@ export default function Header() {
   };
 
   return (
-    <header dir="rtl" className="bg-white py-2 shadow-md border-b border-gray-100 sticky top-0 z-50">
+    <header dir="rtl" className="bg-white shadow-md border-b-2 border-blue-200 sticky top-0 z-50">
       <nav className="relative max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center min-h-[60px]">
         
         <div className="hidden xl:block z-20">
@@ -125,7 +125,7 @@ export default function Header() {
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="w-14 h-14 xl:w-20 xl:h-20 bg-white flex items-center justify-center p-1">
               <Image
-                src="/images/logo2.png"
+                src="/images/logo2.svg"
                 alt="Logo"
                 width={56}
                 height={56}
