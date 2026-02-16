@@ -58,7 +58,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/dom-s-basseinom-v-izraile-pufikhomes-1.jpg" alt="מכירת דירה" className="article-side-img" />
+                  <img src="/images/masterkaspler_A_candid_photograph_of_a_stressed_homeowner_sit_6c1f29f0-7069-4770-a24a-f80d5f110b06_2.png" alt="מכירת דירה" className="article-side-img" />
                 </div>
               </div>
             </section>
@@ -96,7 +96,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/ryXFV2tdge_0_0_3000_1688_0_x-large.avif" alt="תיווך נדל״ן" className="article-side-img" />
+                  <img src="/images/Gemini_Generated_Image_u7vh7fu7vh7fu7vh - Edited.png" alt="תיווך נדל״ן" className="article-side-img" />
                 </div>
               </div>
             </section>
@@ -108,25 +108,32 @@ export default function SellingAloneArticle() {
                 כאן נכנס לתמונה הניסיון של הצוות שלנו, בהובלת רם וחיים. התהליך אצלנו עובד כמו מבצע צבאי מדויק:
               </p>
 
-              <h3>תמחור כירורגי</h3>
-              <p>
-                אנחנו לא מנחשים. אנחנו מבצעים <strong>הערכת שווי נכס</strong> המבוססת על עסקאות אמת שנסגרו ברחוב שלכם (בין אם זה בנאות רחל או במתחם האלף) בחודש האחרון.
-              </p>
+              <div className="content-flex-layout">
+                <div className="text-column">
+                  <h3>תמחור כירורגי</h3>
+                  <p>
+                    אנחנו לא מנחשים. אנחנו מבצעים <strong>הערכת שווי נכס</strong> המבוססת על עסקאות אמת שנסגרו ברחוב שלכם (בין אם זה בנאות רחל או במתחם האלף) בחודש האחרון.
+                  </p>
 
-              <h3>סינון פיננסי מקדים</h3>
-              <p>
-                אנחנו מוודאים שלקונה יש יכולת כלכלית (לעתים קרובות בעזרת שותפנו, אבי בוקעי - "אבי הבית למשכנתאות", שבודק להם את הכיס לפני הביקור).
-              </p>
+                  <h3>סינון פיננסי מקדים</h3>
+                  <p>
+                    אנחנו מוודאים שלקונה יש יכולת כלכלית (לעתים קרובות בעזרת שותפנו, אבי בוקעי - "אבי הבית למשכנתאות", שבודק להם את הכיס לפני הביקור).
+                  </p>
 
-              <h3>ניהול מו"מ נטול רגשות</h3>
-              <p>
-                קשה לנהל משא ומתן על הבית שבו גדלו הילדים. כל הערה מרגישה אישית. אנחנו מהווים "חגורת ביטחון", מנטרלים את הרגש ומנהלים מו"מ עסקי קר כדי להעלות את ההצעה למקסימום.
-              </p>
+                  <h3>ניהול מו"מ נטול רגשות</h3>
+                  <p>
+                    קשה לנהל משא ומתן על הבית שבו גדלו הילדים. כל הערה מרגישה אישית. אנחנו מהווים "חגורת ביטחון", מנטרלים את הרגש ומנהלים מו"מ עסקי קר כדי להעלות את ההצעה למקסימום.
+                  </p>
+                </div>
+                <div className="image-column">
+                  <img src="/images/masterkaspler_Macro_photography_of_a_rough_unpolished_dirty_d_9ea3dc86-3e2d-4f5c-81f0-19cc7083f257_2.png" alt="ייעוץ מקצועי" className="article-side-img" />
+                </div>
+              </div>
             </section>
 
             {/* Section 4: Why Choose Us */}
             <section className="article-section">
-              <div className="content-flex-layout">
+              <div className="content-flex-layout reverse">
                 <div className="text-column">
                   <h2>למה דווקא אנחנו?</h2>
                   <p>
@@ -137,7 +144,7 @@ export default function SellingAloneArticle() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/05IHH-ISRAEL-slide-WRE7-articleLarge.webp" alt="מכירת נכס" className="article-side-img" />
+                  <img src="/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png" alt="מכירת נכס" className="article-side-img" />
                 </div>
               </div>
             </section>
@@ -159,10 +166,10 @@ export default function SellingAloneArticle() {
           flex-direction: row-reverse;
         }
         .text-column {
-          flex: 1.5;
+          flex: 1.3;
         }
         .image-column {
-          flex: 1;
+          flex: 1.2;
         }
         .article-side-img {
           width: 100%;
