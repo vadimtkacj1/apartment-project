@@ -7,6 +7,8 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  // NOTE (Prisma v7+): do NOT add `url = env("DATABASE_URL")` here.
+  // Connection URLs for Migrate belong in `prisma.config.ts` (see `datasource.url` there).
 }
 
 // User model for authentication
