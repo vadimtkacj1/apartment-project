@@ -9,6 +9,8 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"],
+    // Prisma v7+: connection URL for Migrate lives here (NOT in schema.prisma).
+    // Keep this CI-friendly by providing a safe default for SQLite projects.
+    url: process.env["DATABASE_URL"] ?? "file:./dev.db",
   },
 });

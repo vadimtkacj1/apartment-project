@@ -24,7 +24,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -168,13 +168,13 @@ jobs:
             # Generate Prisma Client on server
             if [ -d "prisma" ]; then
               echo "📦 Generating Prisma Client..."
-              npx prisma generate || echo "⚠️ Warning: Prisma generate failed"
+              npx prisma@7 generate || echo "⚠️ Warning: Prisma generate failed"
             fi
 
             # Run database migrations if needed
             if [ -d "prisma/migrations" ]; then
               echo "📦 Running database migrations..."
-              npx prisma migrate deploy || echo "⚠️ Warning: Migrations failed (database might already be up to date)"
+              npx prisma@7 migrate deploy || echo "⚠️ Warning: Migrations failed (database might already be up to date)"
             fi
 
             # Install PM2 if not present

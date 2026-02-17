@@ -12,7 +12,8 @@ const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` })
 const prisma = new PrismaClient({ adapter })
 
 const username = process.env.ADMIN_USERNAME || 'admin'
-const password = process.env.ADMIN_PASSWORD || 'admin123'
+// Don't hardcode real credentials; keep the default obviously non-production.
+const password = process.env.ADMIN_PASSWORD || 'change-me'
 
 async function main() {
   console.log('🌱 Starting seed...\n')
