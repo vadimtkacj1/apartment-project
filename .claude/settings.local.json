@@ -36,7 +36,8 @@
       "Bash(npm view:*)",
       "Bash(npm uninstall:*)",
       "WebFetch(domain:myprojects.geoapify.com)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "WebFetch(domain:registry.npmjs.org)"
     ]
   }
 }

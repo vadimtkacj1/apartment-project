@@ -31,7 +31,7 @@ jobs:
           DATABASE_URL: "file:./dev.db"
 
       - name: Generate Prisma Client
-        run: ./node_modules/.bin/prisma generate
+        run: npx -y prisma@7.3.0 generate
         env:
           DATABASE_URL: "file:./dev.db"
 
@@ -40,7 +40,7 @@ jobs:
         continue-on-error: true
 
       - name: Build application
-        run: npm run build
+        run: npx next build
         env:
           NODE_ENV: production
           DATABASE_URL: "file:./dev.db"
