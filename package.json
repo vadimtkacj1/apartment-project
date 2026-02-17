@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint .",
-    "seed:admin": "node prisma/seed.mjs"
+    "seed:admin": "node prisma/seed.mjs",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
