@@ -32,9 +32,10 @@ jobs:
           DATABASE_URL: "file:./dev.db"
 
       - name: Build application
-        run: npm run build
+        run: npx next build
         env:
           NODE_ENV: production
+          DATABASE_URL: "file:./dev.db"
 
       - name: Create deployment package
         run: |
