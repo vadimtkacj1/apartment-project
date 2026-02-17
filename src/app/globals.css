@@ -76,12 +76,12 @@ body {
 }
 
 .hyper-link {
-  color: rgb(38, 38, 185);
+  color: rgb(38, 38, 186);
   cursor: pointer;
 }
 
 .hyper-link:hover {
-  color: rgb(0, 0, 0);
+  color: rgb(2, 2, 2);
   text-decoration: underline;
 
 }
