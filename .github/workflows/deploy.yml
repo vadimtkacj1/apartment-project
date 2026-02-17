@@ -158,14 +158,13 @@ jobs:
             EOF
 
             # Install dependencies if package.json exists
-            # IMPORTANT: Don't use --ignore-scripts for better-sqlite3 native module
             if [ -f "package.json" ]; then
               echo "📦 Installing production dependencies..."
               # Install build tools for native modules
               sudo apt-get update -qq
               sudo apt-get install -y python3 make g++ || true
-              # Install dependencies WITH scripts to compile native modules
-              npm ci --production || npm install --production
+              # Skip scripts: prisma is a devDep and not available; generate runs separately below
+              npm ci --production --ignore-scripts || npm install --production --ignore-scripts
             fi
 
             # Generate Prisma Client on server
