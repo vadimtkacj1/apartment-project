@@ -77,6 +77,11 @@ jobs:
             cp -r prisma/. deploy/prisma/
           fi
 
+          if [ -d "src" ]; then
+            mkdir -p deploy/src
+            cp -r src/. deploy/src/
+          fi
+
           cp package.json deploy/
           if [ -f "package-lock.json" ]; then
             cp package-lock.json deploy/
