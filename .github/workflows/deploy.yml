@@ -105,7 +105,7 @@ jobs:
             set -e
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
-            PORT=80
+            APP_PORT=3000
 
             echo "🚀 Starting deployment..."
 
@@ -120,11 +120,11 @@ jobs:
             echo "📝 Writing .env from GitHub Secrets..."
             {
               echo "NODE_ENV=production"
-              echo "PORT=80"
+              echo "PORT=${APP_PORT}"
               echo "HOSTNAME=0.0.0.0"
               echo "DATABASE_URL=${DATABASE_URL:-file:./dev.db}"
               echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}"
-              echo "NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:80}"
+              echo "NEXTAUTH_URL=${NEXTAUTH_URL}"
             } > .env
 
             if ! command -v pm2 &> /dev/null; then
@@ -136,7 +136,6 @@ jobs:
 
             # Export .env vars into the shell so pm2 inherits them
             set -a
-            # shellcheck source=.env
             source .env
             set +a
 
@@ -145,13 +144,24 @@ jobs:
 
             sleep 5
 
-            if curl -f http://localhost:$PORT > /dev/null 2>&1; then
+            if curl -f http://localhost:${APP_PORT} > /dev/null 2>&1; then
               echo "✅ Deployment successful!"
               pm2 status
             else
               echo "⚠️ Warning: Health check failed"
               pm2 logs $APP_NAME --lines 30
               exit 1
+            fi
+
+            # Configure nginx to proxy port 80 → app port
+            if command -v nginx &> /dev/null; then
+              NGINX_CONF="/etc/nginx/sites-available/${APP_NAME}"
+              printf 'server {\n    listen 80;\n    server_name _;\n    location / {\n        proxy_pass http://127.0.0.1:%s;\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection '"'"'upgrade'"'"';\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_cache_bypass $http_upgrade;\n    }\n}\n' "${APP_PORT}" | sudo tee $NGINX_CONF > /dev/null
+              sudo ln -sf $NGINX_CONF /etc/nginx/sites-enabled/${APP_NAME}
+              sudo nginx -t && sudo systemctl reload nginx
+              echo "✅ nginx configured and reloaded"
+            else
+              echo "ℹ️  nginx not found — app is running on port ${APP_PORT}"
             fi
 
             rm -f /tmp/deploy.tar.gz
