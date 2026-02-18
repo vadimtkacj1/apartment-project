@@ -134,6 +134,12 @@ jobs:
             pm2 stop $APP_NAME || true
             pm2 delete $APP_NAME || true
 
+            # Export .env vars into the shell so pm2 inherits them
+            set -a
+            # shellcheck source=.env
+            source .env
+            set +a
+
             pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
