@@ -4,16 +4,9 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-function createPrismaClient(): PrismaClient {
-  // Check if we're in build phase (Next.js sets this during build)
-  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build'
-  
-  if (isBuildPhase) {
-    // During build, return a minimal client without adapter
-    // This prevents connection attempts during build
-    return new PrismaClient()
-  }
+let prismaClientInstance: PrismaClient | undefined
 
+function createPrismaClient(): PrismaClient {
   // Runtime initialization with adapter
   try {
     // Dynamic import to avoid issues during build
@@ -34,22 +27,47 @@ function createPrismaClient(): PrismaClient {
     const adapter = new PrismaBetterSqlite3(sqlite)
     
     // Create Prisma client with adapter
-    return new PrismaClient({ adapter })
+    return new PrismaClient({ 
+      adapter,
+      log: [],
+      errorFormat: 'minimal',
+    })
   } catch (error) {
     // Fallback: use PrismaClient without adapter
     // This will use the DATABASE_URL from environment or schema.prisma
     console.warn('Could not initialize Prisma with adapter, using default connection')
-    return new PrismaClient()
+    return new PrismaClient({
+      log: [],
+      errorFormat: 'minimal',
+    })
   }
 }
 
-// Lazy initialization to avoid connection during build
+// Lazy initialization - only create client when actually needed (not during build)
 function getPrismaClient(): PrismaClient {
+  // During build phase, return a proxy that will initialize on first use
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    if (!prismaClientInstance) {
+      // Create a minimal client for build time that won't try to connect
+      prismaClientInstance = new PrismaClient({
+        log: [],
+        errorFormat: 'minimal',
+      }) as PrismaClient
+    }
+    return prismaClientInstance
+  }
+
+  // Runtime: use global instance or create new one
   if (globalForPrisma.prisma) {
     return globalForPrisma.prisma
   }
   
+  if (prismaClientInstance) {
+    return prismaClientInstance
+  }
+  
   const client = createPrismaClient()
+  prismaClientInstance = client
   
   if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = client
