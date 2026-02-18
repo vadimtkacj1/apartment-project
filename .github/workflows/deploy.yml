@@ -48,6 +48,13 @@ jobs:
           NODE_ENV: production
           DATABASE_URL: "file:./dev.db"
 
+      - name: Copy Prisma files to standalone
+        run: |
+          mkdir -p .next/standalone/node_modules/.prisma
+          mkdir -p .next/standalone/node_modules/@prisma/client/runtime
+          cp -r node_modules/.prisma/. .next/standalone/node_modules/.prisma/ 2>/dev/null || true
+          cp -r node_modules/@prisma/client/runtime/. .next/standalone/node_modules/@prisma/client/runtime/ 2>/dev/null || true
+
       - name: Create deployment package
         run: |
           mkdir -p deploy

@@ -39,7 +39,8 @@
       "Bash(python3:*)",
       "WebFetch(domain:registry.npmjs.org)",
       "Bash(Select-String -Pattern '@prisma/client' package-lock.json)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git -C:*)"
     ]
   }
 }
