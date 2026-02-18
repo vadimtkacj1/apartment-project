@@ -6,19 +6,12 @@ const globalForPrisma = globalThis as unknown as {
 
 function createPrismaClient(): PrismaClient {
   // Check if we're in build phase (Next.js sets this during build)
-  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
-                       (typeof process !== 'undefined' && process.env.NODE_ENV === 'production' && !process.env.DATABASE_URL)
+  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build'
   
   if (isBuildPhase) {
-    // During build, return a minimal client that won't cause errors
-    // The actual client will be created at runtime
-    return new PrismaClient({
-      datasources: {
-        db: {
-          url: 'file:./dev.db'
-        }
-      }
-    })
+    // During build, return a minimal client without adapter
+    // This prevents connection attempts during build
+    return new PrismaClient()
   }
 
   // Runtime initialization with adapter
@@ -44,14 +37,9 @@ function createPrismaClient(): PrismaClient {
     return new PrismaClient({ adapter })
   } catch (error) {
     // Fallback: use PrismaClient without adapter
+    // This will use the DATABASE_URL from environment or schema.prisma
     console.warn('Could not initialize Prisma with adapter, using default connection')
-    return new PrismaClient({
-      datasources: {
-        db: {
-          url: process.env.DATABASE_URL || 'file:./dev.db'
-        }
-      }
-    })
+    return new PrismaClient()
   }
 }
 
