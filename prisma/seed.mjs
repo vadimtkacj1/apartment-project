@@ -104,6 +104,7 @@ async function main() {
         bathrooms: 2,
         category: 'sales',
         isActive: true,
+        isPinned: true,
       },
       {
         dealType: 'rent',
@@ -184,6 +185,7 @@ async function main() {
         bathrooms: 2,
         category: 'sales',
         isActive: true,
+        isPinned: true,
       },
       {
         dealType: 'rent',
@@ -304,6 +306,7 @@ async function main() {
         bathrooms: 1,
         category: 'sales',
         isActive: true,
+        isPinned: true,
       },
       {
         dealType: 'rent',
