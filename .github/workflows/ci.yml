@@ -49,29 +49,7 @@ jobs:
         run: |
           if [ -d ".next/standalone" ]; then
             echo "✅ Standalone build created successfully"
-            ls -lah .next/standalone/
           else
             echo "❌ Error: Standalone build not found"
-            echo "Please ensure next.config.ts has 'output: standalone'"
             exit 1
           fi
-
-      - name: Check server.js
-        run: |
-          if [ -f ".next/standalone/server.js" ]; then
-            echo "✅ server.js exists"
-          else
-            echo "❌ Error: server.js not found"
-            exit 1
-          fi
-
-      - name: Build summary
-        run: |
-          echo "📊 Build Summary"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Node version: $(node --version)"
-          echo "npm version: $(npm --version)"
-          echo "Build output size:"
-          du -sh .next 2>/dev/null || echo "N/A"
-          echo "Standalone size:"
-          du -sh .next/standalone 2>/dev/null || echo "N/A"

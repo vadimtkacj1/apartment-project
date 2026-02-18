@@ -24,6 +24,15 @@ const nextConfig: NextConfig = {
     // Add domains for image optimization
     domains: [],
   },
+  // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

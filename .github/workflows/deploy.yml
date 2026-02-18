@@ -40,89 +40,30 @@ jobs:
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          # Verify standalone build exists
           if [ ! -d ".next/standalone" ]; then
             echo "❌ Error: .next/standalone not found"
             exit 1
           fi
 
-          # Copy standalone server
-          echo "📦 Copying standalone build..."
           cp -r .next/standalone/. deploy/
-
-          # Copy static files (CRITICAL: Next.js needs these)
-          echo "📦 Copying static assets..."
           mkdir -p deploy/.next/static
           cp -r .next/static/. deploy/.next/static/
 
-          # Copy public files
-          echo "📦 Copying public files..."
           if [ -d "public" ]; then
             mkdir -p deploy/public
             cp -r public/. deploy/public/
           fi
 
-          # Copy Prisma schema and migrations (CRITICAL for database)
-          echo "📦 Copying Prisma files..."
           if [ -d "prisma" ]; then
             mkdir -p deploy/prisma
             cp -r prisma/. deploy/prisma/
           fi
 
-          # Copy package.json for postinstall script
-          echo "📦 Copying package.json..."
           cp package.json deploy/
-
-          # Copy package-lock.json if exists
           if [ -f "package-lock.json" ]; then
             cp package-lock.json deploy/
           fi
 
-          # Copy next.config.ts if exists
-          if [ -f "next.config.ts" ]; then
-            cp next.config.ts deploy/
-          fi
-
-          # Copy src directory (CRITICAL for rebuilding if needed)
-          echo "📦 Copying source files..."
-          if [ -d "src" ]; then
-            mkdir -p deploy/src
-            cp -r src/. deploy/src/
-          fi
-
-          # Copy TypeScript config if exists
-          if [ -f "tsconfig.json" ]; then
-            cp tsconfig.json deploy/
-          fi
-
-          # Copy middleware if exists
-          if [ -f "middleware.ts" ]; then
-            cp middleware.ts deploy/
-          fi
-
-          # Verify critical files
-          echo "🔍 Verifying deployment package..."
-          if [ ! -f "deploy/server.js" ]; then
-            echo "❌ Error: server.js not found"
-            exit 1
-          fi
-
-          if [ ! -d "deploy/.next/static" ]; then
-            echo "❌ Error: .next/static not found"
-            exit 1
-          fi
-
-          if [ ! -d "deploy/prisma" ]; then
-            echo "❌ Error: prisma directory not found"
-            exit 1
-          fi
-
-          echo "📋 Deployment structure:"
-          ls -la deploy/
-          echo "📋 Prisma files:"
-          ls -la deploy/prisma/ || echo "No prisma files"
-
-          echo "✅ Deployment package created"
           tar -czf deploy.tar.gz deploy/
 
       - name: Deploy to server
@@ -146,25 +87,20 @@ jobs:
           timeout: 120s
           script: |
             set -e
-
-            # Configuration
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
             PORT=80
 
             echo "🚀 Starting deployment..."
 
-            # Create app directory
             sudo mkdir -p $APP_DIR
             sudo chown $USER:$USER $APP_DIR
 
-            # Extract deployment
             cd $APP_DIR
             tar -xzf /tmp/deploy.tar.gz
             cp -r deploy/. .
             rm -rf deploy
 
-            # Create environment file
             cat > .env << 'EOF'
             NODE_ENV=production
             PORT=80
@@ -174,47 +110,32 @@ jobs:
             NEXTAUTH_URL=http://localhost:80
             EOF
 
-            # Install dependencies if package.json exists
             if [ -f "package.json" ]; then
-              echo "📦 Installing production dependencies..."
-              # Install build tools for native modules
               sudo apt-get update -qq
               sudo apt-get install -y python3 make g++ || true
-              # Skip scripts: prisma is a devDep and not available; generate runs separately below
               npm ci --production --ignore-scripts || npm install --production --ignore-scripts
             fi
 
-            # Generate Prisma Client on server
             if [ -d "prisma" ]; then
-              echo "📦 Generating Prisma Client..."
               npx prisma@7 generate || echo "⚠️ Warning: Prisma generate failed"
             fi
 
-            # Run database migrations if needed
             if [ -d "prisma/migrations" ]; then
-              echo "📦 Running database migrations..."
-              npx prisma@7 migrate deploy || echo "⚠️ Warning: Migrations failed (database might already be up to date)"
+              npx prisma@7 migrate deploy || echo "⚠️ Warning: Migrations failed"
             fi
 
-            # Install PM2 if not present
             if ! command -v pm2 &> /dev/null; then
-              echo "📦 Installing PM2..."
               npm install -g pm2
             fi
 
-            # Stop existing process
             pm2 stop $APP_NAME || true
             pm2 delete $APP_NAME || true
 
-            # Start application
-            echo "▶️ Starting application..."
             pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
-            # Wait for startup
             sleep 5
 
-            # Health check
             if curl -f http://localhost:$PORT > /dev/null 2>&1; then
               echo "✅ Deployment successful!"
               pm2 status
@@ -224,11 +145,4 @@ jobs:
               exit 1
             fi
 
-            # Cleanup
             rm -f /tmp/deploy.tar.gz
-
-      # Uncomment and set DEPLOYMENT_URL secret to enable health check
-      # - name: Health check
-      #   run: |
-      #     sleep 10
-      #     curl -f "${{ secrets.DEPLOYMENT_URL }}" || echo "⚠️ Health check failed"
