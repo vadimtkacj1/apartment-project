@@ -13,10 +13,17 @@ export interface PropertyData {
   bedrooms: number;
   bathrooms: number;
   area: number;
+  builtArea?: number | null;
   floor?: number;
   totalFloors?: number;
   buildingType?: string;
   availableFrom?: string;
+  propertyType?: string;
+  parking?: string;
+  position?: string;
+  furniture?: string;
+  kitchen?: string;
+  vacancyDate?: string | null;
   images: string[];
   amenities: {
     ac: boolean;

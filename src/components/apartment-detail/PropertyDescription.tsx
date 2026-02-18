@@ -7,10 +7,11 @@ interface PropertyDescriptionProps {
   bedrooms: number;
   floor?: number;
   area: number;
+  builtArea?: number | null;
   isSold: boolean;
 }
 
-export function PropertyDescription({ description, bedrooms, floor, area, isSold }: PropertyDescriptionProps) {
+export function PropertyDescription({ description, bedrooms, floor, area, builtArea, isSold }: PropertyDescriptionProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -39,6 +40,12 @@ export function PropertyDescription({ description, bedrooms, floor, area, isSold
           <Maximize size={16} className="text-[#1c3664]"/>
           {area} מ״ר
         </div>
+        {builtArea && (
+          <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
+            <Maximize size={16} className="text-[#1c3664]"/>
+            {builtArea} מ״ר בנוי
+          </div>
+        )}
       </div>
 
       <div className="prose prose-lg max-w-none">
