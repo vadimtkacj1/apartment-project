@@ -23,16 +23,27 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Cache Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'prisma/**', 'next.config.*', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-
+
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: npm ci
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Generate Prisma Client
-        run: npx -y prisma@7.3.0 generate
+        run: npx prisma generate
         env:
           DATABASE_URL: "file:./dev.db"
 
       - name: Build application
-        run: npx next build
+        run: npm run build
         env:
           NODE_ENV: production
           DATABASE_URL: "file:./dev.db"
@@ -79,12 +90,17 @@ jobs:
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           timeout: 120s
+          envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL
           script: |
             set -e
             APP_DIR="/opt/apartment-project"
@@ -101,27 +117,17 @@ jobs:
             cp -r deploy/. .
             rm -rf deploy
 
-            cat > .env << 'EOF'
+            # Create .env only if it doesn't exist (avoid overwriting server secrets)
+            if [ ! -f ".env" ]; then
+              echo "📝 Creating .env..."
+              cat > .env << EOF
             NODE_ENV=production
             PORT=80
             HOSTNAME=0.0.0.0
-            DATABASE_URL=file:./dev.db
-            NEXTAUTH_SECRET=aksSjY+UUhVgdCJy15IwmSMIaZepc98C3Eq3pOvjnso=
-            NEXTAUTH_URL=http://localhost:80
+            DATABASE_URL=${DATABASE_URL:-file:./dev.db}
+            NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-}
+            NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:80}
             EOF
-
-            if [ -f "package.json" ]; then
-              sudo apt-get update -qq
-              sudo apt-get install -y python3 make g++ || true
-              npm ci --production --ignore-scripts || npm install --production --ignore-scripts
-            fi
-
-            if [ -d "prisma" ]; then
-              npx prisma@7 generate || echo "⚠️ Warning: Prisma generate failed"
-            fi
-
-            if [ -d "prisma/migrations" ]; then
-              npx prisma@7 migrate deploy || echo "⚠️ Warning: Migrations failed"
             fi
 
             if ! command -v pm2 &> /dev/null; then
