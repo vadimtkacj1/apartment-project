@@ -51,6 +51,23 @@ if [ -d "public" ]; then
     cp -r public/. deploy/public/
 fi
 
+# Copy src directory (CRITICAL for rebuilding if needed)
+if [ -d "src" ]; then
+    echo "📦 Copying source files..."
+    mkdir -p deploy/src
+    cp -r src/. deploy/src/
+fi
+
+# Copy TypeScript config if exists
+if [ -f "tsconfig.json" ]; then
+    cp tsconfig.json deploy/
+fi
+
+# Copy middleware if exists
+if [ -f "middleware.ts" ]; then
+    cp middleware.ts deploy/
+fi
+
 # Create production package.json
 cat > deploy/package.json << EOF
 {

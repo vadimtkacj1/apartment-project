@@ -83,6 +83,23 @@ jobs:
             cp next.config.ts deploy/
           fi
 
+          # Copy src directory (CRITICAL for rebuilding if needed)
+          echo "📦 Copying source files..."
+          if [ -d "src" ]; then
+            mkdir -p deploy/src
+            cp -r src/. deploy/src/
+          fi
+
+          # Copy TypeScript config if exists
+          if [ -f "tsconfig.json" ]; then
+            cp tsconfig.json deploy/
+          fi
+
+          # Copy middleware if exists
+          if [ -f "middleware.ts" ]; then
+            cp middleware.ts deploy/
+          fi
+
           # Verify critical files
           echo "🔍 Verifying deployment package..."
           if [ ! -f "deploy/server.js" ]; then
