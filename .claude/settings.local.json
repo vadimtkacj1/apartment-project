@@ -37,7 +37,9 @@
       "Bash(npm uninstall:*)",
       "WebFetch(domain:myprojects.geoapify.com)",
       "Bash(python3:*)",
-      "WebFetch(domain:registry.npmjs.org)"
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(Select-String -Pattern '@prisma/client' package-lock.json)",
+      "Bash(python:*)"
     ]
   }
 }
