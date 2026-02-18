@@ -61,6 +61,7 @@ export default function ApartmentDetailPage() {
               bedrooms={property.bedrooms}
               floor={property.floor}
               area={property.area}
+              builtArea={property.builtArea}
               isSold={isSold}
             />
             <PropertyAmenities amenities={property.amenities} isSold={isSold} />
