@@ -117,15 +117,18 @@ jobs:
             cp -r deploy/. .
             rm -rf deploy
 
-            echo "📝 Writing .env from GitHub Secrets..."
-            {
-              echo "NODE_ENV=production"
-              echo "PORT=80"
-              echo "HOSTNAME=0.0.0.0"
-              echo "DATABASE_URL=${DATABASE_URL:-file:./dev.db}"
-              echo "NEXTAUTH_SECRET=${NEXTAUTH_SECRET}"
-              echo "NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:80}"
-            } > .env
+            # Create .env only if it doesn't exist (avoid overwriting server secrets)
+            if [ ! -f ".env" ]; then
+              echo "📝 Creating .env..."
+              cat > .env << EOF
+            NODE_ENV=production
+            PORT=80
+            HOSTNAME=0.0.0.0
+            DATABASE_URL=${DATABASE_URL:-file:./dev.db}
+            NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-}
+            NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:80}
+            EOF
+            fi
 
             if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
