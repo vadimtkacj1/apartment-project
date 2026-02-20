@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
     const maxPrice = searchParams.get('maxPrice');
     const region = searchParams.get('region'); // 'center' for center area
     const pinned = searchParams.get('pinned'); // 'true' to filter by isPinned
+    const hotProposition = searchParams.get('hotProposition'); // 'true' to filter by isHotProposition
+    const noCommission = searchParams.get('noCommission'); // 'true' to filter by isNoCommission
 
     const where: any = {
       isActive: true,
@@ -47,6 +49,16 @@ export async function GET(request: NextRequest) {
     // Filter by pinned status if requested
     if (pinned === 'true') {
       where.isPinned = true;
+    }
+
+    // Filter by hot proposition status if requested
+    if (hotProposition === 'true') {
+      where.isHotProposition = true;
+    }
+
+    // Filter by no commission status if requested
+    if (noCommission === 'true') {
+      where.isNoCommission = true;
     }
 
     if (dealType && dealType !== 'all') {

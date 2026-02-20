@@ -93,15 +93,16 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
   }
 
   return (
-    <MapContainer
-      key={`map-${validLat}-${validLng}`}
-      center={center}
-      zoom={15}
-      style={{ height: '100%', width: '100%', zIndex: 1 }}
-      scrollWheelZoom={false}
-      dragging={true}
-      zoomControl={true}
-    >
+    <div style={{ height: '100%', width: '100%', position: 'relative', zIndex: 0, isolation: 'isolate' }}>
+      <MapContainer
+        key={`map-${validLat}-${validLng}`}
+        center={center}
+        zoom={15}
+        style={{ height: '100%', width: '100%', zIndex: 0 }}
+        scrollWheelZoom={false}
+        dragging={true}
+        zoomControl={true}
+      >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -117,6 +118,7 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
         )}
       </Marker>
     </MapContainer>
+    </div>
   );
 };
 

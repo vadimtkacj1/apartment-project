@@ -59,7 +59,7 @@ export default function PropertyEditPage() {
       <Form
         form={form}
         layout="vertical"
-        onFinish={(values) => handleSubmit(values)}
+        onFinish={(values) => handleSubmit(values, () => router.push('/admin/properties'))}
         initialValues={formData}
       >
         <BasicInfoSection formData={formData} handleChange={handleChange} />

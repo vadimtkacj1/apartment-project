@@ -79,6 +79,7 @@ export async function PUT(
         // Property Details
         propertyType: body.propertyType,
         floor: body.floor || null,
+        totalFloors: body.totalFloors || null,
         parking: body.parking,
         position: body.position || null,
         furniture: body.furniture,
@@ -89,6 +90,7 @@ export async function PUT(
         rooms: body.rooms,
         area: body.area,
         builtArea: body.builtArea || null,
+        balconySize: body.balconySize || null,
 
         // Additional Info
         vacancyDate: body.vacancyDate || null,
@@ -125,6 +127,10 @@ export async function PUT(
 
         // Pin status
         isPinned: body.isPinned !== undefined ? body.isPinned : false,
+
+        // Homepage section flags
+        isHotProposition: body.isHotProposition !== undefined ? body.isHotProposition : false,
+        isNoCommission: body.isNoCommission !== undefined ? body.isNoCommission : false,
       },
     });
 

@@ -27,6 +27,7 @@ interface PropertyCardProps extends Partial<Property> {
   images?: string[];
   isSold?: boolean;
   showImage?: boolean; // Control whether to show image section
+  totalFloors?: number;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -48,6 +49,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   neighborhood,
   propertyType,
   floor,
+  totalFloors,
   parking,
   position,
   furniture,
@@ -180,6 +182,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           
+          {/* Logo overlay - top left */}
+          <div className="absolute top-4 left-4 z-30 pointer-events-none">
+            <Image
+              src="/images/logos.png"
+              alt="Logo"
+              width={140}
+              height={70}
+              className="object-contain drop-shadow-lg"
+            />
+          </div>
+          
           {/* Dark overlay for text contrast if needed */}
           <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
             isSold ? 'opacity-40' : 'opacity-60'
@@ -190,24 +203,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
           )}
 
-          {/* Sold Badge - Red with icon */}
+          {/* Sold image overlay */}
           {isSold && (
-            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5 z-10">
-              <CheckCircle2 size={16} />
-              <span>נמכר</span>
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
+              <Image
+                src="/images/sold.png"
+                alt="נמכר"
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
             </div>
           )}
 
           {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
           {status && !isSold && (
-            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md z-30">
               {getStatusLabel(status)}
             </div>
           )}
 
           {/* Property Type Badge (e.g., Apartment, Villa) */}
           {propertyType && (
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
               {getPropertyTypeLabel(propertyType)}
             </div>
           )}
@@ -289,7 +307,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           }`}>
             <Building size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
             <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
-               {floor !== undefined ? `קומה ${floor}` : '-'}
+               {floor !== undefined
+                 ? ((totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+                   ? `קומה ${floor} מתוך ${totalFloors}`
+                   : `קומה ${floor}`)
+                 : '-'}
             </span>
           </div>
 

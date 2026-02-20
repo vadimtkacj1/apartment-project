@@ -79,7 +79,27 @@ function HotPropositions() {
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/properties?dealType=sale&limit=12', {
+
+        // First, fetch the homepage settings to determine the mode
+        const settingsResponse = await fetch('/api/admin/homepage-settings');
+        const settings = await settingsResponse.json();
+
+        let apiUrl = '/api/properties?dealType=sale&limit=12';
+
+        if (settings.hotPropositionsMode === 'manual') {
+          // Manual mode: fetch properties tagged as hot propositions
+          apiUrl += '&hotProposition=true';
+        } else if (settings.hotPropositionsMode === 'price' && settings.hotPropositionsMaxPrice) {
+          // Price mode: fetch properties below the max price
+          apiUrl += `&maxPrice=${settings.hotPropositionsMaxPrice}`;
+        } else {
+          // If price mode but no price set, don't show anything
+          setProperties([]);
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch(apiUrl, {
           next: { revalidate: 300 }
         });
 
@@ -88,8 +108,6 @@ function HotPropositions() {
         }
 
         const data = await response.json();
-        console.log('HotPropositions: fetched data', data);
-
         const mappedProperties: Property[] = data.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
@@ -106,7 +124,6 @@ function HotPropositions() {
           floor: prop.floor,
         }));
 
-        console.log('HotPropositions: mapped properties', mappedProperties);
         setProperties(mappedProperties);
       } catch (error) {
         console.error('Error fetching hot properties:', error);
@@ -130,14 +147,7 @@ function HotPropositions() {
   }
 
   if (properties.length === 0) {
-    return (
-      <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full bg-red-50" dir="rtl">
-        <div className="text-center py-20">
-          <p className="text-red-600 text-lg font-bold">אין נכסים להצגה (properties.length = 0)</p>
-          <p className="text-gray-600 text-sm mt-2">בדוק את הקונסול לפרטים</p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (

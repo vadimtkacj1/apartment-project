@@ -26,26 +26,26 @@ export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps)
         isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
       }`}
     >
-      <h2 className={`text-3xl font-black mb-6 uppercase ${
+      <h2 className={`text-3xl font-black mb-8 uppercase ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>תוספות</h2>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-6">
         {ALL_AMENITIES.map((item) => {
           const isAvailable = amenities[item.key as keyof typeof amenities];
           const IconComponent = item.icon;
 
           return (
-            <div key={item.key} className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
+            <div key={item.key} className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors
                 ${isAvailable
                   ? 'text-[#1c3664] bg-[#1c3664]/10'
                   : 'text-gray-300 bg-gray-50'
                 }`}
               >
-                <IconComponent size={20} strokeWidth={isAvailable ? 2 : 1.5} />
+                <IconComponent size={24} strokeWidth={isAvailable ? 2.5 : 1.5} />
               </div>
-              <span className={`font-bold text-sm ${
+              <span className={`font-bold text-base ${
                 isAvailable ? 'text-[#1a1a1a]' : 'text-gray-400 line-through decoration-gray-300'
               }`}>
                 {item.label}

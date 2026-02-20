@@ -49,4 +49,4 @@ deploy.tar.gz
 *.tar.gz
 
 /src/generated/prisma
-nul
+nul/data

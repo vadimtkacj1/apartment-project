@@ -142,7 +142,8 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px]"
+              className="bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
+              style={{ zIndex: 0, isolation: 'isolate' }}
             >
               <ContactMap
                 latitude={mapLatitude}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowUpFromLine, Maximize, LayoutDashboard, Wind, Home, Car, MapPin, Calendar, UtensilsCrossed } from 'lucide-react';
+import { ArrowUpFromLine, Maximize, LayoutDashboard, Wind, Home, Car, MapPin, Calendar, UtensilsCrossed, Sun } from 'lucide-react';
 import { PropertyData } from '@/components/apartment-detail/types';
 import { analytics } from '@/lib/analytics';
 
@@ -59,7 +59,7 @@ const getFurnitureLabel = (furn?: string) => {
 const getKitchenLabel = (kitchen?: string) => {
   const labels: Record<string, string> = {
     'upgraded': 'משודרג',
-    'standard': 'סטנדרטי'
+    'standard': 'סטנדרט'
   };
   return kitchen ? labels[kitchen] || kitchen : '';
 };
@@ -100,13 +100,30 @@ export function usePropertyData(propertyId: string) {
 
         const data = await response.json();
 
+        // Debug: log all data to see what we're working with
+        console.log('Property data received:', {
+          vacancyDate: data.vacancyDate,
+          floor: data.floor,
+          totalFloors: data.totalFloors,
+          builtArea: data.builtArea,
+          bathrooms: data.bathrooms,
+          propertyType: data.propertyType,
+          parking: data.parking,
+          position: data.position,
+          furniture: data.furniture,
+          kitchen: data.kitchen,
+          directions: data.directions
+        });
+
         // Build specs array with all available data
         const specs: Array<{ label: string; value: string; icon: any }> = [];
 
         if (data.floor !== null && data.floor !== undefined) {
           specs.push({
             label: "קומה",
-            value: `${data.floor}`,
+            value: (data.totalFloors !== null && data.totalFloors !== undefined && data.totalFloors > 0)
+              ? `${data.floor} מתוך ${data.totalFloors}`
+              : `${data.floor}`,
             icon: ArrowUpFromLine
           });
         }
@@ -117,11 +134,19 @@ export function usePropertyData(propertyId: string) {
           icon: Maximize
         });
 
-        if (data.builtArea) {
+        if (data.builtArea !== null && data.builtArea !== undefined && data.builtArea > 0) {
           specs.push({
             label: 'שטח בנוי במ"ר',
             value: `${data.builtArea}`,
             icon: Maximize
+          });
+        }
+
+        if (data.balconySize !== null && data.balconySize !== undefined && data.balconySize > 0) {
+          specs.push({
+            label: 'גודל מרפסת שמש (מ״ר)',
+            value: `${data.balconySize}`,
+            icon: Sun
           });
         }
 
@@ -131,7 +156,7 @@ export function usePropertyData(propertyId: string) {
           icon: LayoutDashboard
         });
 
-        if (data.bathrooms) {
+        if (data.bathrooms !== null && data.bathrooms !== undefined && data.bathrooms > 0) {
           specs.push({
             label: "חדרי רחצה",
             value: `${data.bathrooms}`,
@@ -139,7 +164,7 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.propertyType) {
+        if (data.propertyType !== null && data.propertyType !== undefined && data.propertyType !== '') {
           specs.push({
             label: "סוג נכס",
             value: getPropertyTypeLabel(data.propertyType),
@@ -147,7 +172,7 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.parking) {
+        if (data.parking !== null && data.parking !== undefined && data.parking !== '') {
           specs.push({
             label: "חניה",
             value: getParkingLabel(data.parking),
@@ -155,7 +180,7 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.position) {
+        if (data.position !== null && data.position !== undefined && data.position !== '') {
           specs.push({
             label: "מיקום בבניין",
             value: getPositionLabel(data.position),
@@ -163,7 +188,7 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.furniture) {
+        if (data.furniture !== null && data.furniture !== undefined && data.furniture !== '') {
           specs.push({
             label: "ריהוט",
             value: getFurnitureLabel(data.furniture),
@@ -171,7 +196,7 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.kitchen) {
+        if (data.kitchen !== null && data.kitchen !== undefined && data.kitchen !== '') {
           specs.push({
             label: "מטבח",
             value: getKitchenLabel(data.kitchen),
@@ -179,12 +204,54 @@ export function usePropertyData(propertyId: string) {
           });
         }
 
-        if (data.vacancyDate) {
-          specs.push({
-            label: "תאריך פינוי",
-            value: data.vacancyDate,
-            icon: Calendar
-          });
+        // Always show vacancy date if it exists (even if empty string, check for null/undefined)
+        if (data.vacancyDate !== null && data.vacancyDate !== undefined && data.vacancyDate.trim() !== '') {
+          const trimmedDate = data.vacancyDate.trim();
+          
+          // Check if it's "מיד" (immediately)
+          if (trimmedDate === 'מיד' || trimmedDate === 'immediately') {
+            specs.push({
+              label: "תאריך פינוי",
+              value: 'מיד',
+              icon: Calendar
+            });
+          } else {
+            // Format date from ISO string or DD/MM/YYYY to DD/MM/YYYY
+            let formattedDate = trimmedDate;
+            try {
+              // Check if it's an ISO date string (contains T or ends with Z)
+              if (formattedDate.includes('T') || formattedDate.endsWith('Z')) {
+                const date = new Date(formattedDate);
+                if (!isNaN(date.getTime())) {
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const year = date.getFullYear();
+                  formattedDate = `${day}/${month}/${year}`;
+                }
+              } else if (formattedDate.includes('/')) {
+                // Already in DD/MM/YYYY format, use as is
+                formattedDate = formattedDate;
+              } else {
+                // Try to parse as date and format
+                const date = new Date(formattedDate);
+                if (!isNaN(date.getTime())) {
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const year = date.getFullYear();
+                  formattedDate = `${day}/${month}/${year}`;
+                }
+              }
+            } catch (e) {
+              // If parsing fails, use original value
+              console.warn('Failed to format date:', data.vacancyDate, e);
+            }
+            
+            specs.push({
+              label: "תאריך פינוי",
+              value: formattedDate,
+              icon: Calendar
+            });
+          }
         }
 
         if (data.directions && data.directions.length > 0) {
@@ -226,6 +293,7 @@ export function usePropertyData(propertyId: string) {
           area: data.area,
           builtArea: data.builtArea,
           floor: data.floor,
+          totalFloors: data.totalFloors,
           propertyType: data.propertyType,
           parking: data.parking,
           position: data.position,
@@ -238,7 +306,7 @@ export function usePropertyData(propertyId: string) {
           amenities: {
             ac: data.hasAirConditioning || false,
             handicap: data.hasDisabledAccess || false,
-            solarHeater: false, // Not in DB, keeping for compatibility
+            solarHeater: data.hasSunroom || false, // Map hasSunroom to solarHeater
             storage: data.hasStorage || false,
             sunBalcony: data.hasSunBalcony || false,
             boiler: data.hasBoiler || false,

@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { message } from 'antd';
 import { FormInstance } from 'antd';
 import { PropertyForm } from './types';
-import { INITIAL_FORM } from './constants';
+import { INITIAL_FORM, CITY_OPTIONS } from './constants';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
 
 export function usePropertyForm(
   propertyId: string | string[] | undefined,
@@ -27,9 +30,38 @@ export function usePropertyForm(
         const data = await response.json();
 
         // Convert vacancyDate string to dayjs object if it exists
+        // Handle different date formats and "מיד" (immediately) value
+        let vacancyDateValue: any = null;
+        if (data.vacancyDate) {
+          if (data.vacancyDate === 'מיד' || data.vacancyDate === 'immediately') {
+            vacancyDateValue = 'מיד';
+          } else {
+            // Try different date formats
+            try {
+              // Try DD/MM/YYYY format first
+              const parsed = dayjs(data.vacancyDate, 'DD/MM/YYYY', true);
+              if (parsed.isValid()) {
+                vacancyDateValue = parsed;
+              } else {
+                // Try ISO format
+                const isoParsed = dayjs(data.vacancyDate);
+                if (isoParsed.isValid()) {
+                  vacancyDateValue = isoParsed;
+                } else {
+                  // If all parsing fails, keep as string
+                  vacancyDateValue = data.vacancyDate;
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to parse date:', data.vacancyDate, e);
+              vacancyDateValue = data.vacancyDate;
+            }
+          }
+        }
+        
         const formValues = {
           ...data,
-          vacancyDate: data.vacancyDate ? dayjs(data.vacancyDate, 'DD/MM/YYYY') : null,
+          vacancyDate: vacancyDateValue,
         };
 
         setFormData(data);
@@ -43,7 +75,15 @@ export function usePropertyForm(
   };
 
   const handleChange = (field: keyof PropertyForm, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updated = { ...prev, [field]: value };
+      if (field === 'city' || field === 'neighborhood') {
+        const cityLabel = CITY_OPTIONS.find((c) => c.value === updated.city)?.label || updated.city;
+        const parts = [cityLabel, updated.neighborhood].filter(Boolean);
+        updated.location = parts.join(', ');
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (values: any, onSuccess?: () => void) => {
@@ -67,16 +107,19 @@ export function usePropertyForm(
       if (response.ok) {
         message.success('הנכס נשמר בהצלחה');
         if (onSuccess) {
+          // Keep saving=true until redirect to prevent double submission
           setTimeout(onSuccess, 1500);
+          return;
         }
+        setSaving(false);
       } else {
         const errorMessage =
           responseData.error || responseData.message || 'שגיאה בשמירת הנכס';
         message.error(errorMessage);
+        setSaving(false);
       }
     } catch (err: any) {
       message.error(err.message || 'שגיאה בשמירת הנכס');
-    } finally {
       setSaving(false);
     }
   };

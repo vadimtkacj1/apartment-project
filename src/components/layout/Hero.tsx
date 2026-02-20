@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -18,79 +19,79 @@ const Hero: React.FC<HeroProps> = ({ img }) => {
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
 
-  const mainText = "רם נכסים & חיים ענבי";
-  const subText = "הנכס שלכם שווה יותר, אנחנו נדאג למצוא את הקונה המתאים במחיר המקסימלי";
-
   return (
     <section
       ref={containerRef}
       dir="rtl"
-      className="relative w-full overflow-hidden cursor-pointer"
-      style={{ isolation: 'isolate' }}
+      className="relative w-full h-[90vh] md:h-screen overflow-hidden cursor-pointer"
       onClick={() => router.push('/apartments')}
     >
-      <div
-        className="relative w-full overflow-hidden flex items-center h-[75vh] md:h-[90vh]"
-      >
-        {/* רקע עם עוגן לשמאל */}
-        <motion.div
-          className="absolute inset-0 z-0 w-full h-full"
-          style={{
-            backgroundImage: `url(${img})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'left center',
-            y: backgroundY,
-            scale: 1.05,
-            transformOrigin: 'left center' 
-          }}
-        />
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `url(${img})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          y: backgroundY,
+          scale: 1.05
+        }}
+      />
+      
+      <div className="absolute inset-0 z-10" />
 
-        {/* קונטיינר תוכן מיושר לימין */}
-        <div className="relative z-20 w-full px-6 md:px-12 lg:px-20">
-          <div className="flex flex-col mr-0 ml-auto items-start text-right max-w-full md:max-w-[75%] lg:max-w-[65%]">
-
-            <h1
-              className="font-black text-white"
-              style={{
-                fontSize: 'clamp(2.2rem, 7vw, 5.5rem)',
-                lineHeight: '1.2',
-                letterSpacing: '0.02em',
-                textShadow: 'none',
-                whiteSpace: 'nowrap',
-                display: 'inline-block'
-              }}
-            >
-              {mainText}
+      <div className="relative z-20 h-full w-full px-4 md:px-20 flex flex-col justify-center">
+        
+        <div className="flex flex-col items-start text-right max-w-full md:max-w-[95vw] md:mt-[-8vh]">
+          
+          <div className="flex flex-wrap items-center gap-x-1 md:gap-x-2 mb-4">
+            
+            {/* Уменьшен tracking с widest до tight/normal */}
+            <h1 className="font-black text-white leading-none tracking-tight"
+                style={{ fontSize: 'clamp(2.4rem, 8vw, 7.8rem)' }}>
+              חיים ענבי
             </h1>
-
-            <p
-              className="text-white font-medium leading-tight mt-4 mb-8 max-w-xl"
-              style={{ fontSize: 'clamp(0.95rem, 2vw, 1.2rem)' }}
-            >
-              {subText}
-            </p>
-
-            <div
-              className="flex flex-col md:flex-row gap-4 w-full md:w-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Link
-                href="/apartments?dealType=sale"
-                className="bg-[#1c3664] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-white hover:text-[#1c3664] transition-all duration-300 flex items-center justify-center gap-2 border border-white/10"
-              >
-                נכסים למכירה
-                <span className="text-xl">←</span>
-              </Link>
-
-              <Link
-                href="/apartments?dealType=rent"
-                className="bg-black/40 backdrop-blur-md text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-white hover:text-[#1c3664] transition-all duration-300 flex items-center justify-center gap-2 border border-white/20"
-              >
-                נכסים להשכרה
-                <span className="text-xl">←</span>
-              </Link>
+            
+            {/* Уменьшены отступы mx вокруг & */}
+            <div className="relative w-[35px] h-[35px] md:w-[110px] md:h-[110px] flex-shrink-0 mx-1 md:mx-0">
+              <Image 
+                src="/images/and.png" 
+                alt="&" 
+                fill 
+                className="object-contain brightness-0 invert"
+                priority
+              />
             </div>
+
+            <h1 className="font-black text-white leading-none tracking-tight"
+                style={{ fontSize: 'clamp(2.4rem, 8vw, 7.8rem)' }}>
+              רם נכסים
+            </h1>
           </div>
+
+          <p className="text-white font-bold opacity-100 mb-10 md:mb-16 mr-1"
+             style={{ fontSize: 'clamp(0.9rem, 1.8vw, 1.6rem)' }}>
+            מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
+          </p>
+
+          <div 
+            className="flex flex-col gap-3 md:gap-5 w-full md:w-auto" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Link
+              href="/apartments?dealType=rent"
+              className="bg-white text-black px-8 md:px-16 py-3 md:py-4 rounded-md font-extrabold text-lg md:text-2xl hover:bg-gray-100 transition-all w-full md:min-w-[320px] text-center shadow-2xl"
+            >
+              נכסים להשכרה
+            </Link>
+
+            <Link
+              href="/apartments?dealType=sale"
+              className="bg-white text-black px-8 md:px-16 py-3 md:py-4 rounded-md font-extrabold text-lg md:text-2xl hover:bg-gray-100 transition-all w-full md:min-w-[320px] text-center shadow-2xl"
+            >
+              נכסים למכירה
+            </Link>
+          </div>
+
         </div>
       </div>
     </section>

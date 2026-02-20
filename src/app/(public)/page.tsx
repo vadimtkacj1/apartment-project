@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import Hero from '@/components/layout/Hero';
 import Header from '@/components/layout/Header';
 import Stats from '@/components/layout/Stats';
+import NoCommissionSection from '@/components/layout/NoCommissionSection';
 import HotPropositions from '@/components/layout/HotPropositions';
 import AboutSection from '@/components/layout/AboutSection';
 import ProcessSection from '@/components/layout/ProcessSection';
@@ -36,6 +37,7 @@ export default function Home() {
 
       {/* Content below hero */}
       <div className="relative bg-warm">
+        <NoCommissionSection />
         <HotPropositions />
         <AboutSection />
         <ValuesSection />

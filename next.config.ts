@@ -19,8 +19,8 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
-    // Allow unoptimized images in production if needed
-    unoptimized: false,
+    // Allow unoptimized images for development
+    unoptimized: process.env.NODE_ENV === 'development',
     // Add domains for image optimization
     domains: [],
   },
