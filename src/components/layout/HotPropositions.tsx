@@ -3,7 +3,8 @@
 import React, { useMemo, memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
-import HotPropositionCard from "@/components/properties/HotPropositionCard";
+import PropertyCard from "@/components/properties/PropertyCard";
+import { DealType } from "@/types/property.types";
 
 // Type for apartment data
 interface Property {
@@ -20,6 +21,18 @@ interface Property {
   status?: string;
   isSold?: boolean;
   floor?: number;
+  dealType?: DealType;
+  propertyType?: string;
+  totalFloors?: number;
+  neighborhood?: string;
+  street?: string;
+  streetNumber?: string;
+  parking?: string;
+  position?: string;
+  furniture?: string;
+  directions?: string[];
+  vacancyDate?: string;
+  features?: any;
 }
 
 /**
@@ -62,7 +75,7 @@ const MarqueeRow = ({
       >
         {duplicatedItems.map((item: Property, i: number) => (
           <div key={`hot-proposition-card-${direction}-${i}`} className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0">
-            <HotPropositionCard {...item} index={i} />
+            <PropertyCard {...item} index={i} />
           </div>
         ))}
       </motion.div>
@@ -79,27 +92,7 @@ function HotPropositions() {
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
-
-        // First, fetch the homepage settings to determine the mode
-        const settingsResponse = await fetch('/api/admin/homepage-settings');
-        const settings = await settingsResponse.json();
-
-        let apiUrl = '/api/properties?dealType=sale&limit=12';
-
-        if (settings.hotPropositionsMode === 'manual') {
-          // Manual mode: fetch properties tagged as hot propositions
-          apiUrl += '&hotProposition=true';
-        } else if (settings.hotPropositionsMode === 'price' && settings.hotPropositionsMaxPrice) {
-          // Price mode: fetch properties below the max price
-          apiUrl += `&maxPrice=${settings.hotPropositionsMaxPrice}`;
-        } else {
-          // If price mode but no price set, don't show anything
-          setProperties([]);
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(apiUrl, {
+        const response = await fetch('/api/properties?dealType=sale&hotProposition=true&limit=12', {
           next: { revalidate: 300 }
         });
 
@@ -122,6 +115,18 @@ function HotPropositions() {
           status: prop.status,
           isSold: prop.isSold || false,
           floor: prop.floor,
+          dealType: prop.dealType || 'sale',
+          propertyType: prop.propertyType,
+          totalFloors: prop.totalFloors,
+          neighborhood: prop.neighborhood,
+          street: prop.street,
+          streetNumber: prop.streetNumber,
+          parking: prop.parking,
+          position: prop.position,
+          furniture: prop.furniture,
+          directions: prop.directions,
+          vacancyDate: prop.vacancyDate,
+          features: prop.features,
         }));
 
         setProperties(mappedProperties);
@@ -152,17 +157,9 @@ function HotPropositions() {
 
   return (
     <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
-      {/* Decorative Background Elements удалены, чтобы убрать синие пятна */}
-
       <div className="relative z-10 w-full">
         {/* Section Header */}
         <div className="text-center mb-10 md:mb-16 px-4 md:px-6">
-          <div className="inline-block mb-3 md:mb-4">
-            <span className="text-[#1c3664] font-bold text-sm md:text-lg uppercase tracking-wider">
-              הצעות מיוחדות
-            </span>
-          </div>
-
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 md:mb-6 uppercase tracking-tight">
             הצעות חמות
           </h2>

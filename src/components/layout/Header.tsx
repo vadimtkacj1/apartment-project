@@ -46,7 +46,7 @@ export default function Header() {
   };
 
   return (
-    <header dir="rtl" className="bg-[#1c3664] shadow-2xl sticky top-0 z-[100] border-b border-white/10">
+    <header dir="rtl" className="bg-white sticky top-0 z-[100] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
       <nav className="max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center h-[90px]">
         
         {/* Правый логотип */}
@@ -68,7 +68,7 @@ export default function Header() {
         {/* Бургер для мобильных */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="xl:hidden z-30 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+          className="xl:hidden z-30 p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
         >
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -79,7 +79,7 @@ export default function Header() {
             <div key={link.label} className="relative group">
               <Link
                 href={link.href}
-                className="text-[16px] font-bold text-white/90 hover:text-white transition-all flex items-center gap-1 py-4"
+                className="text-[16px] font-bold text-gray-800 hover:text-[#1c3664] transition-all flex items-center gap-1 py-4"
               >
                 {link.label}
                 {link.submenu && (
@@ -124,34 +124,33 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Мобильное меню */}
       {isMobileMenuOpen && (
-        <div className="xl:hidden fixed inset-0 top-[90px] bg-[#1c3664] z-40 p-6 overflow-y-auto">
+        <div className="xl:hidden fixed inset-0 top-[90px] bg-white z-40 p-6 overflow-y-auto shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
           <div className="flex flex-col gap-2">
             {navLinks.map((link) => (
-              <div key={link.label} className="border-b border-white/10 last:border-0">
+              <div key={link.label} className="border-b border-gray-200 last:border-0">
                 <div className="flex items-center justify-between py-4">
                   <Link
                     href={link.href}
                     onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                    className="text-lg font-bold text-white flex-1"
+                    className="text-lg font-bold text-gray-800 flex-1"
                   >
                     {link.label}
                   </Link>
                   {link.submenu && (
-                    <button onClick={() => toggleSubmenu(link.label)} className="text-white p-2">
+                    <button onClick={() => toggleSubmenu(link.label)} className="text-gray-700 p-2">
                       <ChevronDown className={`transition-transform ${openSubmenu === link.label ? "rotate-180" : ""}`} />
                     </button>
                   )}
                 </div>
                 {link.submenu && openSubmenu === link.label && (
-                  <div className="bg-white/5 rounded-lg mb-4">
+                  <div className="bg-gray-50 rounded-lg mb-4">
                     {link.submenu.map((sub) => (
                       <Link
                         key={sub.label}
                         href={sub.href}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="block py-4 px-6 text-blue-200 font-medium border-r-2 border-blue-400"
+                        className="block py-4 px-6 text-[#1c3664] font-medium border-r-2 border-[#1c3664]"
                       >
                         {sub.label}
                       </Link>

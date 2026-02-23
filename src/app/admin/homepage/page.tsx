@@ -1,25 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { Card, Button, message, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Row, Col } from 'antd';
-import { PlusOutlined, DeleteOutlined, HolderOutlined } from '@ant-design/icons';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, message, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber } from 'antd';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import PropertyCard from '@/components/properties/PropertyCard';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 
@@ -74,113 +57,6 @@ interface Property {
   isNoCommission: boolean;
 }
 
-interface HomepageSettings {
-  hotPropositionsMode: 'manual' | 'price';
-  hotPropositionsMaxPrice?: number;
-}
-
-interface SortableItemProps {
-  id: number;
-  property: Property;
-  onRemove: (id: number) => void;
-}
-
-function SortableItem({ id, property, onRemove }: SortableItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="mb-4 relative"
-    >
-      {/* Drag and Delete Overlay */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 20,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '6px 8px',
-          background: 'rgba(0,0,0,0.3)',
-          backdropFilter: 'blur(4px)',
-          borderRadius: '16px 16px 0 0',
-          gap: '6px',
-          transition: 'background 0.2s ease',
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}
-      >
-        <div {...attributes} {...listeners} className="cursor-move p-2 hover:bg-white/20 rounded">
-          <HolderOutlined style={{ fontSize: '18px', color: '#fff' }} />
-        </div>
-        <Button
-          type="primary"
-          danger
-          icon={<DeleteOutlined />}
-          size="small"
-          onClick={() => onRemove(id)}
-        >
-          הסר
-        </Button>
-      </div>
-
-      {/* Property Card */}
-      <PropertyCard
-        id={property.id}
-        title={property.title}
-        location={property.location}
-        price={property.price}
-        originalPrice={property.originalPrice ?? undefined}
-        area={property.area}
-        rooms={String(property.rooms)}
-        floor={property.floor ?? undefined}
-        totalFloors={property.totalFloors ?? undefined}
-        images={property.images}
-        status={property.status ?? undefined}
-        isSold={property.isSold}
-        dealType={property.dealType as DealType}
-        propertyType={property.propertyType as PropertyType}
-        parking={property.parking as ParkingType}
-        position={property.position as Position | undefined}
-        furniture={property.furniture as FurnitureLevel}
-        directions={property.directions as Direction[]}
-        vacancyDate={property.vacancyDate ?? undefined}
-        neighborhood={property.neighborhood ?? undefined}
-        street={property.street ?? undefined}
-        streetNumber={property.streetNumber ?? undefined}
-        features={{
-          hasAirConditioning: property.hasAirConditioning,
-          hasElevator: property.hasElevator,
-          hasStorage: property.hasStorage,
-          hasSafeRoom: property.hasSafeRoom,
-          hasSunBalcony: property.hasSunBalcony,
-          hasBoiler: property.hasBoiler,
-          hasDisabledAccess: property.hasDisabledAccess,
-          hasSunroom: property.hasSunroom,
-        }}
-      />
-    </div>
-  );
-}
-
 export default function HomepagePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -190,32 +66,29 @@ export default function HomepagePage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'hot' | 'noCommission'>('hot');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [hotPropositionsMode, setHotPropositionsMode] = useState<'manual' | 'price'>('manual');
-  const [hotPropositionsMaxPrice, setHotPropositionsMaxPrice] = useState<number | undefined>(undefined);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  // Price filter settings for Hot Propositions
+  const [hotPropositionsMode, setHotPropositionsMode] = useState<'manual' | 'price'>('manual');
+  const [hotPropositionsMaxPrice, setHotPropositionsMaxPrice] = useState<number>(3000000);
+
+  // Load settings from localStorage on mount
+  useEffect(() => {
+    const savedMode = localStorage.getItem('hotPropositionsMode');
+    const savedPrice = localStorage.getItem('hotPropositionsMaxPrice');
+
+    if (savedMode) setHotPropositionsMode(savedMode as 'manual' | 'price');
+    if (savedPrice) setHotPropositionsMaxPrice(parseInt(savedPrice));
+  }, []);
+
+  // Save settings to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('hotPropositionsMode', hotPropositionsMode);
+    localStorage.setItem('hotPropositionsMaxPrice', hotPropositionsMaxPrice.toString());
+  }, [hotPropositionsMode, hotPropositionsMaxPrice]);
 
   useEffect(() => {
     fetchProperties();
-    fetchSettings();
   }, []);
-
-  const fetchSettings = async () => {
-    try {
-      const response = await fetch('/api/admin/homepage-settings');
-      if (!response.ok) throw new Error('Failed to fetch settings');
-      const data: HomepageSettings = await response.json();
-      setHotPropositionsMode(data.hotPropositionsMode);
-      setHotPropositionsMaxPrice(data.hotPropositionsMaxPrice);
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-    }
-  };
 
   const fetchProperties = async () => {
     try {
@@ -235,20 +108,6 @@ export default function HomepagePage() {
     }
   };
 
-  const handleDragEnd = (event: DragEndEvent, type: 'hot' | 'noCommission') => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
-
-    const items = type === 'hot' ? hotProperties : noCommissionProperties;
-    const setItems = type === 'hot' ? setHotProperties : setNoCommissionProperties;
-
-    const oldIndex = items.findIndex((item) => item.id === active.id);
-    const newIndex = items.findIndex((item) => item.id === over.id);
-
-    setItems(arrayMove(items, oldIndex, newIndex));
-  };
-
   const openModal = (type: 'hot' | 'noCommission') => {
     setModalType(type);
     const currentIds = type === 'hot'
@@ -261,19 +120,21 @@ export default function HomepagePage() {
   const handleModalOk = () => {
     const selectedProperties = allProperties.filter(p => selectedIds.includes(p.id));
 
+    // NoCommission only supports 1 property
+    if (modalType === 'noCommission' && selectedProperties.length > 1) {
+      message.warning('ניתן לבחור רק נכס אחד לדירות ללא עמלה');
+      return;
+    }
+
     if (modalType === 'hot') {
       setHotProperties(selectedProperties);
+      message.success('הנכסים נבחרו בהצלחה');
     } else {
-      // For NoCommission, only take the first selected property
-      if (selectedProperties.length > 1) {
-        message.warning('ניתן לבחור רק נכס אחד לדירות ללא עמלה');
-        return;
-      }
       setNoCommissionProperties(selectedProperties);
+      message.success('הנכס נבחר בהצלחה');
     }
 
     setIsModalVisible(false);
-    message.success('הנכסים נבחרו בהצלחה');
   };
 
   const handleRemove = (id: number, type: 'hot' | 'noCommission') => {
@@ -287,16 +148,6 @@ export default function HomepagePage() {
   const handleSaveAll = async () => {
     try {
       setSaving(true);
-
-      // Save homepage settings
-      await fetch('/api/admin/homepage-settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          hotPropositionsMode,
-          hotPropositionsMaxPrice,
-        }),
-      });
 
       // Reset all properties first
       const resetPromises = allProperties.map(prop =>
@@ -313,20 +164,18 @@ export default function HomepagePage() {
 
       await Promise.all(resetPromises);
 
-      // Set hot properties (only in manual mode)
-      if (hotPropositionsMode === 'manual') {
-        const hotPromises = hotProperties.map(prop =>
-          fetch(`/api/admin/properties/${prop.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...prop,
-              isHotProposition: true,
-            }),
-          })
-        );
-        await Promise.all(hotPromises);
-      }
+      // Set hot properties
+      const hotPromises = hotProperties.map(prop =>
+        fetch(`/api/admin/properties/${prop.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...prop,
+            isHotProposition: true,
+          }),
+        })
+      );
+      await Promise.all(hotPromises);
 
       // Set no commission properties
       const noCommissionPromises = noCommissionProperties.map(prop =>
@@ -352,27 +201,22 @@ export default function HomepagePage() {
     }
   };
 
-  const availableProperties = allProperties.filter(p =>
-    modalType === 'hot'
+  const availableProperties = allProperties.filter(p => {
+    // Base filter - exclude properties already in the other section
+    const notInOtherSection = modalType === 'hot'
       ? !noCommissionProperties.some(nc => nc.id === p.id) || selectedIds.includes(p.id)
-      : !hotProperties.some(h => h.id === p.id) || selectedIds.includes(p.id)
-  );
+      : !hotProperties.some(h => h.id === p.id) || selectedIds.includes(p.id);
 
-  // Helper to extract numeric price from string like "₪3,200,000" or "₪5,500"
-  const extractNumericPrice = (priceStr: string): number => {
-    if (!priceStr) return 0;
-    const numericStr = priceStr.replace(/[^\d]/g, '');
-    return parseInt(numericStr) || 0;
-  };
+    if (!notInOtherSection) return false;
 
-  // Calculate properties that would be shown in price mode
-  const priceFilteredProperties = useMemo(() => {
-    if (hotPropositionsMode !== 'price' || !hotPropositionsMaxPrice) return [];
-    return allProperties.filter(p => {
-      const priceNum = extractNumericPrice(p.price);
-      return p.dealType === 'sale' && p.isActive && priceNum > 0 && priceNum <= hotPropositionsMaxPrice;
-    });
-  }, [allProperties, hotPropositionsMode, hotPropositionsMaxPrice]);
+    // Apply price filter for Hot Propositions in price mode
+    if (modalType === 'hot' && hotPropositionsMode === 'price') {
+      const priceNum = parseInt(p.price.replace(/[^0-9]/g, ''));
+      return priceNum <= hotPropositionsMaxPrice;
+    }
+
+    return true;
+  });
 
   if (loading) {
     return (
@@ -402,16 +246,7 @@ export default function HomepagePage() {
         <Card>
           <Space direction="vertical" size="small">
             <Text type="secondary">הצעות חמות</Text>
-            {hotPropositionsMode === 'manual' ? (
-              <Title level={3} style={{ margin: 0 }}>{hotProperties.length} נכסים</Title>
-            ) : (
-              <div>
-                <Title level={3} style={{ margin: 0 }}>מצב אוטומטי</Title>
-                {hotPropositionsMaxPrice && (
-                  <Text type="secondary">מחיר עד {hotPropositionsMaxPrice.toLocaleString()} ₪</Text>
-                )}
-              </div>
-            )}
+            <Title level={3} style={{ margin: 0 }}>{hotProperties.length} נכסים</Title>
           </Space>
         </Card>
         <Card>
@@ -428,159 +263,118 @@ export default function HomepagePage() {
         <Card
           title="הצעות חמות"
           extra={
-            hotPropositionsMode === 'manual' && (
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => openModal('hot')}
-              >
-                הוסף נכסים
-              </Button>
-            )
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => openModal('hot')}
+            >
+              הוסף נכסים
+            </Button>
           }
         >
-          {/* Mode Selection */}
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <div>
-                <Text strong>אופן בחירת נכסים:</Text>
-                <Radio.Group
-                  value={hotPropositionsMode}
-                  onChange={(e) => setHotPropositionsMode(e.target.value)}
-                  className="mt-2 block"
-                >
-                  <Space direction="vertical">
-                    <Radio value="manual">בחירה ידנית - בחר נכסים ספציפיים</Radio>
-                    <Radio value="price">אוטומטי לפי מחיר - הצג נכסים מתחת למחיר מסוים</Radio>
-                  </Space>
-                </Radio.Group>
-              </div>
+          {/* Price Filter Settings */}
+          <div className="mb-4 p-4 bg-gray-50 rounded border">
+            <div className="mb-3">
+              <Text strong>הגדרות תצוגה</Text>
+              <Text type="secondary" style={{ fontSize: '12px', marginLeft: '8px' }}>(נשמר אוטומטית)</Text>
+            </div>
 
-              {hotPropositionsMode === 'price' && (
-                <div>
-                  <Text strong>מחיר מקסימלי:</Text>
-                  <div className="mt-2">
-                    <InputNumber
-                      value={hotPropositionsMaxPrice}
-                      onChange={(value) => setHotPropositionsMaxPrice(value ?? undefined)}
-                      placeholder="הזן מחיר מקסימלי"
-                      style={{ width: '200px' }}
-                      formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      parser={value => value!.replace(/,/g, '')}
-                      addonAfter="₪"
-                      min={0}
-                    />
-                    <div className="text-xs text-gray-500 mt-1">
-                      יוצגו כל הנכסים למכירה במחיר נמוך מהמחיר שהוזן
-                    </div>
-                  </div>
+            <Radio.Group
+              value={hotPropositionsMode}
+              onChange={(e) => setHotPropositionsMode(e.target.value)}
+            >
+              <Space direction="vertical">
+                <Radio value="manual">בחירה ידנית של נכסים</Radio>
+                <Radio value="price">סינון לפי מחיר מקסימלי</Radio>
+              </Space>
+            </Radio.Group>
+
+            {hotPropositionsMode === 'price' && (
+              <div className="mt-4 pt-4 border-t">
+                <Text strong style={{ fontSize: '13px' }}>מחיר מקסימלי:</Text>
+                <InputNumber
+                  value={hotPropositionsMaxPrice}
+                  onChange={(value) => setHotPropositionsMaxPrice(value || 0)}
+                  formatter={value => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  parser={value => value!.replace(/₪\s?|(,*)/g, '') as any}
+                  style={{ width: '100%', marginTop: '8px' }}
+                  size="large"
+                  min={0}
+                  step={100000}
+                />
+                <div className="mt-2 text-xs text-gray-500">
+                  יוצגו נכסים עד ₪{hotPropositionsMaxPrice.toLocaleString('he-IL')}
                 </div>
-              )}
-            </Space>
+              </div>
+            )}
           </div>
 
-          {/* Property List - only show in manual mode */}
-          {hotPropositionsMode === 'manual' && (
-            <>
-              {hotProperties.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  לא נבחרו נכסים. לחץ על "הוסף נכסים" כדי להתחיל
-                </div>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={(e) => handleDragEnd(e, 'hot')}
-                >
-                  <SortableContext
-                    items={hotProperties.map(p => p.id)}
-                    strategy={verticalListSortingStrategy}
+          {hotProperties.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">
+              לא נבחרו נכסים. לחץ על "הוסף נכסים" כדי להתחיל
+            </div>
+          ) : (
+            <div>
+              {hotProperties.map((property) => (
+                <div key={property.id} className="mb-4 relative">
+                  {/* Delete button overlay */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      zIndex: 20,
+                      padding: '6px 8px',
+                    }}
                   >
-                    {hotProperties.map((property) => (
-                      <SortableItem
-                        key={property.id}
-                        id={property.id}
-                        property={property}
-                        onRemove={(id) => handleRemove(id, 'hot')}
-                      />
-                    ))}
-                  </SortableContext>
-                </DndContext>
-              )}
-            </>
-          )}
+                    <Button
+                      type="primary"
+                      danger
+                      icon={<DeleteOutlined />}
+                      size="small"
+                      onClick={() => handleRemove(property.id, 'hot')}
+                    >
+                      הסר
+                    </Button>
+                  </div>
 
-          {/* Price mode info */}
-          {hotPropositionsMode === 'price' && (
-            <div className="py-4">
-              <div className="text-center mb-4">
-                <div className="text-gray-600 mb-2">
-                  במצב אוטומטי לפי מחיר
+                  {/* Property Card */}
+                  <PropertyCard
+                    id={property.id}
+                    title={property.title}
+                    location={property.location}
+                    price={property.price}
+                    originalPrice={property.originalPrice ?? undefined}
+                    area={property.area}
+                    rooms={String(property.rooms)}
+                    floor={property.floor ?? undefined}
+                    totalFloors={property.totalFloors ?? undefined}
+                    images={property.images}
+                    status={property.status ?? undefined}
+                    isSold={property.isSold}
+                    dealType={property.dealType as DealType}
+                    propertyType={property.propertyType as PropertyType}
+                    parking={property.parking as ParkingType}
+                    position={property.position as Position | undefined}
+                    furniture={property.furniture as FurnitureLevel}
+                    directions={property.directions as Direction[]}
+                    vacancyDate={property.vacancyDate ?? undefined}
+                    neighborhood={property.neighborhood ?? undefined}
+                    street={property.street ?? undefined}
+                    streetNumber={property.streetNumber ?? undefined}
+                    features={{
+                      hasAirConditioning: property.hasAirConditioning,
+                      hasElevator: property.hasElevator,
+                      hasStorage: property.hasStorage,
+                      hasSafeRoom: property.hasSafeRoom,
+                      hasSunBalcony: property.hasSunBalcony,
+                      hasBoiler: property.hasBoiler,
+                      hasDisabledAccess: property.hasDisabledAccess,
+                      hasSunroom: property.hasSunroom,
+                    }}
+                  />
                 </div>
-                {hotPropositionsMaxPrice ? (
-                  <div className="text-lg font-semibold text-primary">
-                    יוצגו {priceFilteredProperties.length} נכסים עד {hotPropositionsMaxPrice.toLocaleString()} ₪
-                  </div>
-                ) : (
-                  <div className="text-yellow-600">
-                    הזן מחיר מקסימלי למעלה
-                  </div>
-                )}
-              </div>
-
-              {/* Preview of matching properties */}
-              {priceFilteredProperties.length > 0 && (
-                <div className="mt-4">
-                  <Text type="secondary" className="block mb-4">תצוגה מקדימה של נכסים שיוצגו:</Text>
-                  <div className="max-h-[600px] overflow-y-auto">
-                    <Row gutter={[16, 16]}>
-                      {priceFilteredProperties.slice(0, 12).map((property) => (
-                        <Col key={property.id} xs={24} sm={12} lg={24} xl={12}>
-                          <PropertyCard
-                            id={property.id}
-                            title={property.title}
-                            location={property.location}
-                            price={property.price}
-                            originalPrice={property.originalPrice ?? undefined}
-                            area={property.area}
-                            rooms={String(property.rooms)}
-                            floor={property.floor ?? undefined}
-                            totalFloors={property.totalFloors ?? undefined}
-                            images={property.images}
-                            status={property.status ?? undefined}
-                            isSold={property.isSold}
-                            dealType={property.dealType as DealType}
-                            propertyType={property.propertyType as PropertyType}
-                            parking={property.parking as ParkingType}
-                            position={property.position as Position | undefined}
-                            furniture={property.furniture as FurnitureLevel}
-                            directions={property.directions as Direction[]}
-                            vacancyDate={property.vacancyDate ?? undefined}
-                            neighborhood={property.neighborhood ?? undefined}
-                            street={property.street ?? undefined}
-                            streetNumber={property.streetNumber ?? undefined}
-                            features={{
-                              hasAirConditioning: property.hasAirConditioning,
-                              hasElevator: property.hasElevator,
-                              hasStorage: property.hasStorage,
-                              hasSafeRoom: property.hasSafeRoom,
-                              hasSunBalcony: property.hasSunBalcony,
-                              hasBoiler: property.hasBoiler,
-                              hasDisabledAccess: property.hasDisabledAccess,
-                              hasSunroom: property.hasSunroom,
-                            }}
-                          />
-                        </Col>
-                      ))}
-                    </Row>
-                    {priceFilteredProperties.length > 12 && (
-                      <div className="text-center text-sm text-gray-500 pt-4 pb-2">
-                        ועוד {priceFilteredProperties.length - 12} נכסים נוספים...
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              ))}
             </div>
           )}
         </Card>

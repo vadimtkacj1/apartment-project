@@ -2,7 +2,6 @@
 
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import AboutMainIntro from '@/components/about/AboutMainIntro';
 import AboutLocalExpertise from '@/components/about/AboutLocalExpertise';
 import AboutServicesNew from '@/components/about/AboutServicesNew';
 import AboutMarketing from '@/components/about/AboutMarketing';
@@ -22,9 +21,6 @@ export default function AboutPage() {
 
       {/* Breadcrumbs */}
       <Breadcrumbs />
-
-      {/* Main Intro: רם וחיים שיווק נכסים */}
-      <AboutMainIntro />
 
       {/* Local Expertise: מומחיות מקומית בחולון */}
       <AboutLocalExpertise />

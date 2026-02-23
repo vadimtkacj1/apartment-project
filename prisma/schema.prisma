@@ -26,8 +26,14 @@ model ContactInfo {
   id           Int      @id @default(autoincrement())
   phone        String
   phoneLink    String // tel: format
+  phoneName    String? // Name for phone 1
+  phone2       String? // Second phone number
+  phoneLink2   String? // Second tel: format
+  phoneName2   String? // Name for phone 2
   email        String
   emailLink    String // mailto: format
+  email2       String? // Second email
+  emailLink2   String? // Second mailto: format
   address      String
   city         String
   latitude     Float? // GPS latitude coordinate
@@ -36,8 +42,18 @@ model ContactInfo {
   weekdayHours String // "ראשון - חמישי: 9:00 - 18:00"
   fridayHours  String // "שישי: 9:00 - 13:00"
   facebook     String?
+  facebookName String? // Name for Facebook 1
+  facebook2    String? // Second Facebook
+  facebookName2 String? // Name for Facebook 2
   instagram    String?
+  instagramName String? // Name for Instagram 1
+  instagram2   String? // Second Instagram
+  instagramName2 String? // Name for Instagram 2
   linkedin     String?
+  whatsapp     String? // WhatsApp number
+  whatsappName String? // Name for WhatsApp 1
+  whatsapp2    String? // Second WhatsApp number
+  whatsappName2 String? // Name for WhatsApp 2
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

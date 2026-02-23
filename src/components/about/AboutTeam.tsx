@@ -13,7 +13,7 @@ export default function AboutTeam() {
   return (
     <motion.section
       ref={teamRef}
-      className="py-24 w-full bg-[#fdfbf7]" // Warm beige background
+      className="py-24 w-full bg-[#faf7f2]" // Warm beige background
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={teamInView ? { opacity: 1 } : {}}

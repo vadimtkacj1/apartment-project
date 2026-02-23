@@ -1,30 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
-// @ts-ignore
-import 'leaflet/dist/leaflet.css';
-
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false, loading: () => <div className="h-112.5 flex items-center justify-center bg-gray-100 rounded-xl">טוען מפה...</div> }
-);
-
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-);
-
-const Tooltip = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Tooltip),
-  { ssr: false }
-);
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 interface PropertyMapProps {
   isSold: boolean;
@@ -33,31 +11,90 @@ interface PropertyMapProps {
   location?: string;
 }
 
+const mapContainerStyle = {
+  width: '100%',
+  height: '450px',
+  borderRadius: '12px',
+};
+
+const defaultCenter = {
+  lat: 32.0853,
+  lng: 34.7818, // Tel Aviv
+};
+
+const getMapOptions = (): google.maps.MapOptions => ({
+  disableDefaultUI: false,
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: true,
+  mapTypeControlOptions: {
+    style: 0 as google.maps.MapTypeControlStyle, // HORIZONTAL_BAR = 0
+    position: 3 as google.maps.ControlPosition, // TOP_RIGHT = 3
+    mapTypeIds: ['roadmap', 'satellite'] as google.maps.MapTypeId[]
+  },
+  fullscreenControl: true,
+  mapTypeId: 'roadmap' as google.maps.MapTypeId,
+  gestureHandling: 'cooperative',
+  maxZoom: 18,
+  minZoom: 12,
+  disableDoubleClickZoom: false,
+});
+
 export function PropertyMap({ isSold, latitude, longitude, location }: PropertyMapProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      import('leaflet').then((L) => {
-        const Leaflet = L.default || L;
-        if (Leaflet?.Icon?.Default) {
-          const DefaultIcon = Leaflet.Icon.Default;
-          const prototype = DefaultIcon.prototype as any;
-          if (prototype && '_getIconUrl' in prototype) delete prototype._getIconUrl;
-          DefaultIcon.mergeOptions({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          });
-        }
-        setIsMounted(true);
-      });
-    }
-  }, []);
-
   const hasCoordinates = typeof latitude === 'number' && typeof longitude === 'number';
-  const defaultCenter: [number, number] = [32.0853, 34.7818]; // Tel Aviv
-  const center: [number, number] = hasCoordinates ? [latitude!, longitude!] : defaultCenter;
+  const center = hasCoordinates ? { lat: latitude!, lng: longitude! } : defaultCenter;
+
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: apiKey || '',
+  });
+
+  if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className={`rounded-2xl p-8 shadow-lg border ${
+          isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+        }`}
+      >
+        <h2 className={`text-3xl font-black mb-6 uppercase ${
+          isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+        }`}>מיקום</h2>
+        <div className="rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center" style={{ height: '450px' }}>
+          <div className="text-center p-8">
+            <p className="text-gray-600 mb-2">Google Maps API key is missing</p>
+            <p className="text-sm text-gray-500">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className={`rounded-2xl p-8 shadow-lg border ${
+          isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+        }`}
+      >
+        <h2 className={`text-3xl font-black mb-6 uppercase ${
+          isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+        }`}>מיקום</h2>
+        <div className="rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center" style={{ height: '450px' }}>
+          <div className="text-center p-8">
+            <p className="text-gray-600">טוען מפה...</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -72,25 +109,42 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>מיקום</h2>
 
-      <div dir="ltr" className="rounded-xl overflow-hidden shadow-md" style={{ height: '450px' }}>
-        {isMounted ? (
-          <MapContainer center={center} zoom={17} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            {hasCoordinates && (
-              <Marker position={center}>
-                {location && (
-                  <Tooltip permanent direction="top" offset={[0, 0]}>
-                    <span style={{ fontWeight: 'bold', fontSize: '13px' }}>{location}</span>
-                  </Tooltip>
-                )}
-              </Marker>
-            )}
-          </MapContainer>
-        ) : (
-          <div className="h-full flex items-center justify-center bg-gray-100">
-            <p className="text-gray-500">טוען מפה...</p>
-          </div>
-        )}
+      <div dir="ltr" className="rounded-xl overflow-hidden shadow-md">
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={center}
+          zoom={15}
+          options={getMapOptions()}
+        >
+          {hasCoordinates && (
+            <>
+              <Marker
+                position={center}
+                title={location || 'מיקום הנכס'}
+              />
+              {location && (
+                <InfoWindow 
+                  position={center}
+                  options={{
+                    pixelOffset: typeof window !== 'undefined' && window.google?.maps 
+                      ? new window.google.maps.Size(0, -40)
+                      : undefined
+                  }}
+                >
+                  <div style={{ 
+                    textAlign: 'right', 
+                    fontFamily: 'inherit', 
+                    padding: '6px 8px',
+                    direction: 'rtl',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <strong style={{ fontSize: '11px', fontWeight: 'bold' }}>{location}</strong>
+                  </div>
+                </InfoWindow>
+              )}
+            </>
+          )}
+        </GoogleMap>
       </div>
     </motion.div>
   );

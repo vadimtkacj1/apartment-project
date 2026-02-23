@@ -3,5 +3,14 @@
 .about-page {
   background: #faf7f2;
   min-height: 100vh;
+  position: relative;
+}
+
+/* Ensure content is above parallax decorations */
+.about-page > section,
+.about-page > nav,
+.about-page > div:not(.fixed) {
+  position: relative;
+  z-index: 10;
 }
 

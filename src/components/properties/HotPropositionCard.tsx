@@ -87,8 +87,8 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             <Image
               src="/images/logos.png"
               alt="Logo"
-              width={100}
-              height={50}
+              width={70}
+              height={35}
               className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
             />
           </div>
