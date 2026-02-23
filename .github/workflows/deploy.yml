@@ -132,15 +132,15 @@ jobs:
             # Create .env only if it doesn't exist (avoid overwriting server secrets)
             if [ ! -f ".env" ]; then
               echo "📝 Creating .env..."
-              cat > .env << EOF
-            NODE_ENV=production
-            PORT=80
-            HOSTNAME=0.0.0.0
-            DATABASE_URL=${DATABASE_URL:-file:./dev.db}
-            NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-}
-            NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:80}
-            EOF
+              printf 'NODE_ENV=production\nPORT=80\nHOSTNAME=0.0.0.0\nDATABASE_URL=%s\nNEXTAUTH_SECRET=%s\nNEXTAUTH_URL=%s\n' \
+                "${DATABASE_URL:-file:./dev.db}" \
+                "${NEXTAUTH_SECRET:-}" \
+                "${NEXTAUTH_URL:-http://localhost:80}" > .env
             fi
+
+            # Run database migrations
+            echo "🗄️ Running database migrations..."
+            npx prisma migrate deploy --schema=$APP_DIR/prisma/schema.prisma
 
             if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
@@ -149,7 +149,7 @@ jobs:
             pm2 stop $APP_NAME || true
             pm2 delete $APP_NAME || true
 
-            pm2 start server.js --name $APP_NAME --update-env
+            pm2 start server.js --name $APP_NAME --node-args="--env-file=$APP_DIR/.env"
             pm2 save
 
             sleep 5

@@ -1,30 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
-// @ts-ignore
-import 'leaflet/dist/leaflet.css';
-
-// Dynamically import React-Leaflet components with SSR disabled
-const MapContainer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.MapContainer),
-  { ssr: false, loading: () => <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>טוען מפה...</div> }
-);
-
-const TileLayer = dynamic(
-  () => import('react-leaflet').then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-
-const Marker = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Marker),
-  { ssr: false }
-);
-
-const Popup = dynamic(
-  () => import('react-leaflet').then((mod) => mod.Popup),
-  { ssr: false }
-);
+import React from 'react';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 interface ContactMapProps {
   latitude: number;
@@ -33,90 +10,129 @@ interface ContactMapProps {
   city?: string;
 }
 
+const mapContainerStyle = {
+  width: '100%',
+  height: '100%',
+};
+
+const defaultCenter = {
+  lat: 32.0853,
+  lng: 34.7818, // Tel Aviv
+};
+
+const getMapOptions = (): google.maps.MapOptions => ({
+  disableDefaultUI: false,
+  zoomControl: true,
+  streetViewControl: false,
+  mapTypeControl: true,
+  mapTypeControlOptions: {
+    style: 0 as google.maps.MapTypeControlStyle, // HORIZONTAL_BAR = 0
+    position: 3 as google.maps.ControlPosition, // TOP_RIGHT = 3
+    mapTypeIds: ['roadmap', 'satellite'] as google.maps.MapTypeId[]
+  },
+  fullscreenControl: true,
+  mapTypeId: 'roadmap' as google.maps.MapTypeId,
+  gestureHandling: 'cooperative',
+  maxZoom: 18,
+  minZoom: 12,
+  disableDoubleClickZoom: false,
+});
+
 const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, city }) => {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Initialize Leaflet icon only on client side
-      import('leaflet').then((L) => {
-        // Fix Leaflet default icon issue in Next.js
-        const Leaflet = L.default || L;
-        if (Leaflet && Leaflet.Icon && Leaflet.Icon.Default) {
-          const DefaultIcon = Leaflet.Icon.Default;
-          const prototype = DefaultIcon.prototype as any;
-
-          // Remove _getIconUrl if it exists
-          if (prototype && '_getIconUrl' in prototype) {
-            delete prototype._getIconUrl;
-          }
-
-          // Set icon URLs using CDN
-          DefaultIcon.mergeOptions({
-            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          });
-        }
-
-        setIsMounted(true);
-      }).catch((error) => {
-        console.error('Error loading Leaflet:', error);
-        setIsMounted(true);
-      });
-    }
-  }, []);
 
   // Ensure coordinates are valid numbers
-  // Leaflet uses [latitude, longitude] format
-  const validLat = typeof latitude === 'number' && !isNaN(latitude) ? latitude : 32.0853;
-  const validLng = typeof longitude === 'number' && !isNaN(longitude) ? longitude : 34.7818;
-  
+  const validLat = typeof latitude === 'number' && !isNaN(latitude) ? latitude : defaultCenter.lat;
+  const validLng = typeof longitude === 'number' && !isNaN(longitude) ? longitude : defaultCenter.lng;
+
+  const center = { lat: validLat, lng: validLng };
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+
+  const { isLoaded } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: apiKey || '',
+  });
+
   // Debug logging
-  useEffect(() => {
-    console.log('ContactMap coordinates:', { 
+  React.useEffect(() => {
+    console.log('ContactMap coordinates:', {
       received: { latitude, longitude },
       using: { validLat, validLng },
       address,
       city
     });
   }, [latitude, longitude, validLat, validLng, address, city]);
-  
-  const center: [number, number] = [validLat, validLng];
 
-  if (!isMounted || typeof window === 'undefined') {
+  if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
     return (
-      <div style={{ height: '100%', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span>טוען מפה...</span>
+      <div style={{
+        height: '100%',
+        background: '#e0e0e0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>Google Maps API key is missing</p>
+        <p style={{ fontSize: '14px', color: '#666' }}>Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+      </div>
+    );
+  }
+
+  if (!isLoaded) {
+    return (
+      <div style={{
+        height: '100%',
+        background: '#e0e0e0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <p>טוען מפה...</p>
       </div>
     );
   }
 
   return (
-    <MapContainer
-      key={`map-${validLat}-${validLng}`}
-      center={center}
-      zoom={15}
-      style={{ height: '100%', width: '100%', zIndex: 1 }}
-      scrollWheelZoom={false}
-      dragging={true}
-      zoomControl={true}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Marker position={[validLat, validLng]}>
+    <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={15}
+        options={getMapOptions()}
+      >
+        <Marker
+          position={center}
+          title={address || city || 'מיקום'}
+        />
+
         {(address || city) && (
-          <Popup>
-            <div style={{ textAlign: 'center', fontFamily: 'inherit' }}>
-              <strong>{address}</strong>
-              {city && <div>{city}</div>}
+          <InfoWindow 
+            position={center}
+            options={{
+              pixelOffset: typeof window !== 'undefined' && window.google?.maps 
+                ? new window.google.maps.Size(0, -40)
+                : undefined
+            }}
+          >
+            <div style={{ 
+              textAlign: 'right', 
+              fontFamily: 'inherit', 
+              padding: '6px 8px',
+              direction: 'rtl',
+              whiteSpace: 'nowrap'
+            }}>
+              {address && <strong style={{ fontSize: '11px', fontWeight: 'bold', display: 'block', marginBottom: '3px' }}>{address}</strong>}
+              {city && <div style={{ fontSize: '10px' }}>{city}</div>}
             </div>
-          </Popup>
+          </InfoWindow>
         )}
-      </Marker>
-    </MapContainer>
+      </GoogleMap>
+    </div>
   );
 };
 

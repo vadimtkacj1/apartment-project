@@ -19,7 +19,15 @@ const { Title } = Typography;
 
 interface ContactInfoForm {
   phone: string;
+  phoneName?: string;
+  phone2?: string;
+  phoneName2?: string;
   email: string;
+  email2?: string;
+  whatsapp?: string;
+  whatsappName?: string;
+  whatsapp2?: string;
+  whatsappName2?: string;
   address: string;
   city: string;
   latitude: number | null;
@@ -27,13 +35,27 @@ interface ContactInfoForm {
   weekdayHours: string;
   fridayHours: string;
   facebook: string;
+  facebookName?: string;
+  facebook2?: string;
+  facebookName2?: string;
   instagram: string;
+  instagramName?: string;
+  instagram2?: string;
+  instagramName2?: string;
   linkedin: string;
 }
 
 const INITIAL_FORM: ContactInfoForm = {
   phone: '',
+  phoneName: '',
+  phone2: '',
+  phoneName2: '',
   email: '',
+  email2: '',
+  whatsapp: '',
+  whatsappName: '',
+  whatsapp2: '',
+  whatsappName2: '',
   address: '',
   city: '',
   latitude: null,
@@ -41,7 +63,13 @@ const INITIAL_FORM: ContactInfoForm = {
   weekdayHours: 'ראשון - חמישי: 9:00 - 18:00',
   fridayHours: 'שישי: 9:00 - 13:00',
   facebook: '',
+  facebookName: '',
+  facebook2: '',
+  facebookName2: '',
   instagram: '',
+  instagramName: '',
+  instagram2: '',
+  instagramName2: '',
   linkedin: '',
 };
 
@@ -83,7 +111,10 @@ export default function ContactInfoPage() {
       // Auto-generate links
       const phoneNumber = values.phone.replace(/\D/g, '');
       const phoneLink = `tel:${phoneNumber}`;
+      const phone2Number = values.phone2 ? values.phone2.replace(/\D/g, '') : '';
+      const phoneLink2 = phone2Number ? `tel:${phone2Number}` : '';
       const emailLink = `mailto:${values.email}`;
+      const emailLink2 = values.email2 ? `mailto:${values.email2}` : '';
       const mapUrl = values.latitude && values.longitude
         ? `https://www.google.com/maps?q=${values.latitude},${values.longitude}`
         : '';
@@ -92,7 +123,9 @@ export default function ContactInfoPage() {
       const dataToSave = {
         ...values,
         phoneLink,
+        phoneLink2,
         emailLink,
+        emailLink2,
         mapUrl,
       };
 
@@ -139,11 +172,11 @@ export default function ContactInfoPage() {
         disabled={loading}
       >
         {/* Contact Details */}
-        <Card className="mb-4" title="פרטי יצירת קשר">
+        <Card className="mb-4" title="פרטי יצירת קשר - מספר 1">
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="טלפון"
+                label="טלפון 1"
                 name="phone"
                 rules={[{ required: true, message: 'אנא הכנס מספר טלפון' }]}
               >
@@ -152,7 +185,18 @@ export default function ContactInfoPage() {
             </Col>
             <Col md={12}>
               <Form.Item
-                label="אימייל"
+                label="שם לטלפון 1"
+                name="phoneName"
+                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'יוסי כהן')"
+              >
+                <Input placeholder="יוסי כהן" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={12}>
+              <Form.Item
+                label="אימייל 1"
                 name="email"
                 rules={[
                   { required: true, message: 'אנא הכנס אימייל' },
@@ -160,6 +204,82 @@ export default function ContactInfoPage() {
                 ]}
               >
                 <Input type="email" placeholder="info@example.com" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={12}>
+              <Form.Item
+                label="WhatsApp 1"
+                name="whatsapp"
+                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972501234567)"
+              >
+                <Input placeholder="972501234567" />
+              </Form.Item>
+            </Col>
+            <Col md={12}>
+              <Form.Item
+                label="שם ל-WhatsApp 1"
+                name="whatsappName"
+                tooltip="שם שיופיע בחלון הבחירה"
+              >
+                <Input placeholder="יוסי כהן" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+
+        {/* Second Contact Details */}
+        <Card className="mb-4" title="פרטי יצירת קשר - מספר 2 (אופציונלי)">
+          <Row gutter={16}>
+            <Col md={12}>
+              <Form.Item
+                label="טלפון 2"
+                name="phone2"
+              >
+                <Input placeholder="03-7654321" />
+              </Form.Item>
+            </Col>
+            <Col md={12}>
+              <Form.Item
+                label="שם לטלפון 2"
+                name="phoneName2"
+                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'דוד לוי')"
+              >
+                <Input placeholder="דוד לוי" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={12}>
+              <Form.Item
+                label="אימייל 2"
+                name="email2"
+                rules={[
+                  { type: 'email', message: 'אנא הכנס אימייל תקין' },
+                ]}
+              >
+                <Input type="email" placeholder="info2@example.com" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={12}>
+              <Form.Item
+                label="WhatsApp 2"
+                name="whatsapp2"
+                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972507654321)"
+              >
+                <Input placeholder="972507654321" />
+              </Form.Item>
+            </Col>
+            <Col md={12}>
+              <Form.Item
+                label="שם ל-WhatsApp 2"
+                name="whatsappName2"
+                tooltip="שם שיופיע בחלון הבחירה"
+              >
+                <Input placeholder="דוד לוי" />
               </Form.Item>
             </Col>
           </Row>
@@ -267,21 +387,63 @@ export default function ContactInfoPage() {
         </Card>
 
         {/* Social Media */}
-        <Card className="mb-4" title="רשתות חברתיות">
+        <Card className="mb-4" title="רשתות חברתיות - מספר 1">
           <Row gutter={16}>
             <Col md={8}>
-              <Form.Item label="Facebook" name="facebook">
+              <Form.Item label="Facebook 1 URL" name="facebook">
                 <Input placeholder="https://facebook.com/..." />
               </Form.Item>
             </Col>
             <Col md={8}>
-              <Form.Item label="Instagram" name="instagram">
+              <Form.Item label="שם Facebook 1" name="facebookName">
+                <Input placeholder="יוסי כהן" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={8}>
+              <Form.Item label="Instagram 1 URL" name="instagram">
                 <Input placeholder="https://instagram.com/..." />
               </Form.Item>
             </Col>
             <Col md={8}>
+              <Form.Item label="שם Instagram 1" name="instagramName">
+                <Input placeholder="יוסי כהן" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={8}>
               <Form.Item label="LinkedIn" name="linkedin">
                 <Input placeholder="https://linkedin.com/..." />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+
+        {/* Second Social Media */}
+        <Card className="mb-4" title="רשתות חברתיות - מספר 2 (אופציונלי)">
+          <Row gutter={16}>
+            <Col md={8}>
+              <Form.Item label="Facebook 2 URL" name="facebook2">
+                <Input placeholder="https://facebook.com/..." />
+              </Form.Item>
+            </Col>
+            <Col md={8}>
+              <Form.Item label="שם Facebook 2" name="facebookName2">
+                <Input placeholder="דוד לוי" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col md={8}>
+              <Form.Item label="Instagram 2 URL" name="instagram2">
+                <Input placeholder="https://instagram.com/..." />
+              </Form.Item>
+            </Col>
+            <Col md={8}>
+              <Form.Item label="שם Instagram 2" name="instagramName2">
+                <Input placeholder="דוד לוי" />
               </Form.Item>
             </Col>
           </Row>

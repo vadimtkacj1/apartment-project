@@ -74,6 +74,7 @@ export interface Property {
   // Property Details
   propertyType: PropertyType;   // סוג הנכס
   floor?: number;               // קומה
+  totalFloors?: number;         // סה״כ קומות
   parking: ParkingType;         // חניה
   position?: Position;          // חזית / עורף
   furniture: FurnitureLevel;    // ריהוט
@@ -84,6 +85,7 @@ export interface Property {
   rooms: string;                // מס' חדרים
   area: number;                 // מס' מטר מרובע
   builtArea?: number;           // מס' מטר מרובע בנוי
+  balconySize?: number;        // גודל מרפסת שמש (מ״ר)
 
   // Additional Info
   vacancyDate?: string;         // תאריך פינוי

@@ -174,6 +174,28 @@ export default function ImageUploader({
                   </div>
                 )}
 
+                {/* Logo overlay - top left */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    left: '8px',
+                    zIndex: 3,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <img
+                    src="/images/logos.png"
+                    alt="Logo"
+                    style={{
+                      maxWidth: '140px',
+                      maxHeight: '70px',
+                      objectFit: 'contain',
+                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                    }}
+                  />
+                </div>
+
                 {/* Use regular img tag to avoid Tailwind conflicts */}
                 <img
                   src={url}
@@ -248,16 +270,39 @@ export default function ImageUploader({
             cursor: 'pointer',
           }}
         >
-          <img
-            src={previewImage}
-            alt="Preview"
-            style={{
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              objectFit: 'contain',
-              borderRadius: '8px',
-            }}
-          />
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <img
+              src={previewImage}
+              alt="Preview"
+              style={{
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                objectFit: 'contain',
+                borderRadius: '8px',
+              }}
+            />
+            {/* Logo overlay on preview */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '16px',
+                left: '16px',
+                zIndex: 10,
+                pointerEvents: 'none',
+              }}
+            >
+              <img
+                src="/images/logos.png"
+                alt="Logo"
+                style={{
+                  maxWidth: '200px',
+                  maxHeight: '100px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                }}
+              />
+            </div>
+          </div>
         </div>
       )}
     </div>

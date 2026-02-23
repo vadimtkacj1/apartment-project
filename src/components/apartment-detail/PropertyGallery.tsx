@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Autoplay } from 'swiper/modules';
 
@@ -39,10 +40,29 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
           <SwiperSlide key={index}>
             <div className="relative w-full h-full">
               <img src={image} alt="Property" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
+              {/* Logo overlay - top left */}
+              <div className="absolute top-4 left-4 z-10 pointer-events-none">
+                <img
+                  src="/images/logos.png"
+                  alt="Logo"
+                  className="max-w-[180px] max-h-[90px] object-contain drop-shadow-lg"
+                />
+              </div>
               {isSold && <div className="absolute inset-0 bg-gray-900/30"></div>}
             </div>
           </SwiperSlide>
         ))}
+        {isSold && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+            <Image
+              src="/images/sold.png"
+              alt="נמכר"
+              fill
+              className="object-contain"
+              sizes="100vw"
+            />
+          </div>
+        )}
       </Swiper>
 
       <style jsx global>{`
@@ -95,6 +115,14 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
               isSold ? 'border-gray-300 opacity-60' : 'border-gray-200 hover:border-[#1c3664]'
             }`}>
               <img src={image} alt="Thumb" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
+              {/* Logo overlay - top left */}
+              <div className="absolute top-1 left-1 z-10 pointer-events-none">
+                <img
+                  src="/images/logos.png"
+                  alt="Logo"
+                  className="max-w-[90px] max-h-[45px] object-contain drop-shadow-md"
+                />
+              </div>
             </div>
           </SwiperSlide>
         ))}

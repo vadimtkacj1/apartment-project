@@ -83,5 +83,11 @@ body {
 .hyper-link:hover {
   color: rgb(0, 0, 0);
   text-decoration: underline;
+}
 
+/* Ensure header is always on top */
+header[dir="rtl"] {
+  z-index: 9999 !important;
+  position: sticky !important;
+  top: 0 !important;
 }
