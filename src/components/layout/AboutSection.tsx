@@ -1,11 +1,11 @@
 "use client";
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
-const AboutSection: React.FC = () => {
+const AboutSection: React.FC = memo(() => {
   return (
     <section
       dir="rtl"
@@ -125,6 +125,8 @@ const AboutSection: React.FC = () => {
       </div>
     </section>
   );
-};
+});
+
+AboutSection.displayName = 'AboutSection';
 
 export default AboutSection;

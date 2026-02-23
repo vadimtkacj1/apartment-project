@@ -39,7 +39,7 @@ const Hero: React.FC<HeroProps> = ({ img }) => {
       <div className="absolute inset-0 z-10 bg-black/30" />
 
       {/* Main Container */}
-      <div className="relative z-20 h-full w-full px-6 md:px-24 pt-10 pb-20 md:pb-32 flex flex-col justify-between items-start">
+      <div className="relative z-20 h-full w-full px-6 md:px-24 2xl:px-32 pt-10 pb-20 md:pb-32 flex flex-col justify-between items-start max-w-[1920px] mx-auto">
         
         <div className="flex flex-col items-start text-right w-full mt-2 md:mt-4">
           

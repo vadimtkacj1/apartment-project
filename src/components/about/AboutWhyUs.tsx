@@ -48,7 +48,7 @@ export default function AboutWhyUs() {
       className="py-24 w-full bg-[#faf7f2]"
       dir="rtl"
     >
-      <div className="max-w-[1200px] mx-auto px-6">
+      <div className="max-w-[1200px] 2xl:max-w-[1800px] mx-auto px-6 2xl:px-16">
         {/* Заголовок */}
         <motion.div
           className="text-center mb-20"

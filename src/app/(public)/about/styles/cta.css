@@ -41,6 +41,18 @@
   z-index: 10;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .cta-container {
+    max-width: 1600px;
+    padding: 0 4rem;
+  }
+  
+  .cta-section {
+    padding: 12rem 2rem;
+  }
+}
+
 .cta-title {
   font-size: clamp(2.8rem, 6vw, 5.5rem);
   font-weight: 900;

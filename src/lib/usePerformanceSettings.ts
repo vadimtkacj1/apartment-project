@@ -1,29 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 /**
  * Hook to detect mobile devices for performance optimization
+ * Optimized with debouncing and memoization
  */
 export function usePerformanceSettings() {
   const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    // Check if device is mobile based on screen width
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
+  const checkMobile = useCallback(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
+  useEffect(() => {
     // Initial check
     checkMobile();
 
+    // Debounce resize handler for better performance
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(checkMobile, 150);
+    };
+
     // Listen to window resize
-    window.addEventListener("resize", checkMobile);
+    window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
-      window.removeEventListener("resize", checkMobile);
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [checkMobile]);
 
   return { isMobile };
 }

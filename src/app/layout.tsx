@@ -34,11 +34,41 @@ const assistant = localFont({
   ],
   display: 'swap',
   variable: '--font-assistant',
+  fallback: ['Arial', 'Helvetica', 'sans-serif'],
+  adjustFontFallback: false,
 });
 
 export const metadata: Metadata = {
-  title: "Apartment Project",
-  description: "Next.js apartment project with Tailwind CSS",
+  title: {
+    default: "רם נכסים חיים ענבי - תיווך נדל״ן בחולון",
+    template: "%s | רם נכסים חיים ענבי"
+  },
+  description: "משרד תיווך ושיווק נדל״ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה. ניסיון מצטבר של שנים בעולם הנדל״ן.",
+  keywords: ["תיווך נדל״ן", "דירות למכירה", "דירות להשכרה", "חולון", "נדל״ן", "תיווך"],
+  authors: [{ name: "רם נכסים חיים ענבי" }],
+  openGraph: {
+    type: 'website',
+    locale: 'he_IL',
+    siteName: 'רם נכסים חיים ענבי',
+    title: 'רם נכסים חיים ענבי - תיווך נדל״ן בחולון',
+    description: 'משרד תיווך ושיווק נדל״ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+  },
 };
 
 export default function RootLayout({

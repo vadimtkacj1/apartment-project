@@ -9,6 +9,23 @@
   margin: 0 auto;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .stats-container {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+  
+  .stats-section {
+    padding: 7rem 2rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+  }
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

@@ -45,7 +45,9 @@ const PropertiesBanner: React.FC<PropertiesBannerProps> = ({ img = "/7.jpg" }) =
       </div>
     </section>
   );
-};
+});
+
+PropertiesBanner.displayName = 'PropertiesBanner';
 
 export default PropertiesBanner;
 

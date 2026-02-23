@@ -46,11 +46,27 @@ export default function Header() {
   };
 
   return (
-    <header dir="rtl" className="bg-white sticky top-0 z-[100] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
-      <nav className="max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center h-[90px]">
+    <header dir="rtl" className="bg-[#1c3664] sticky top-0 z-[100] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
+      <nav className="max-w-[1440px] 2xl:max-w-[1800px] mx-auto px-6 lg:px-10 2xl:px-16 flex justify-between items-center h-[90px]">
         
-        {/* Правый логотип */}
-        <div className="z-20">
+        {/* Мобильная версия: логотип слева */}
+        <div className="xl:hidden z-20">
+          <Link href="/" className="transition-transform hover:scale-105 block">
+            <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[60px] h-[60px]">
+              <Image
+                src="/images/logo.PNG"
+                alt="Logo"
+                width={50}
+                height={50}
+                className="object-contain"
+                priority
+              />
+            </div>
+          </Link>
+        </div>
+
+        {/* Десктоп версия: Правый логотип */}
+        <div className="hidden xl:block z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[70px] h-[70px]">
               <Image
@@ -65,10 +81,10 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Бургер для мобильных */}
+        {/* Бургер для мобильных - справа */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="xl:hidden z-30 p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+          className="xl:hidden z-30 p-2 text-white hover:bg-white/20 rounded-full transition-colors"
         >
           {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
@@ -79,7 +95,7 @@ export default function Header() {
             <div key={link.label} className="relative group">
               <Link
                 href={link.href}
-                className="text-[16px] font-bold text-gray-800 hover:text-[#1c3664] transition-all flex items-center gap-1 py-4"
+                className="text-[16px] font-bold text-white hover:text-blue-200 transition-all flex items-center gap-1 py-4"
               >
                 {link.label}
                 {link.submenu && (
@@ -107,8 +123,8 @@ export default function Header() {
           ))}
         </div>
 
-        {/* Левый логотип */}
-        <div className="z-20">
+        {/* Десктоп версия: Левый логотип */}
+        <div className="hidden xl:block z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
             <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[70px] h-[70px]">
               <Image

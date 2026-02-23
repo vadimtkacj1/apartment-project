@@ -56,7 +56,7 @@ export default async function Footer() {
         }}
       />
 
-      <div className="max-w-7xl mx-auto w-full relative z-10">
+      <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full relative z-10 px-4 2xl:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 items-start">
 
           {/* For Renters Section */}
