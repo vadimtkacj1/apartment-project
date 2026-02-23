@@ -12,6 +12,23 @@
   margin: 0 auto;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .why-us-container {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+  
+  .why-us-section {
+    padding: 8rem 2rem;
+  }
+  
+  .features-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 3rem;
+  }
+}
+
 /* Header */
 .section-header {
   text-align: center;

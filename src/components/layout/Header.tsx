@@ -18,18 +18,9 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-  const handleContactClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (pathname === "/") {
-      document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      router.push("/#contact");
-    }
-  };
-
   const navLinks: NavLink[] = [
     { label: "דף הבית", href: "/" },
-    { label: "נכסים", href: "/apartments" },
+    { label: "הנכסים השלנו", href: "/apartments" },
     {
       label: "מידע מקצועי בנדל״ן",
       href: "#",
@@ -55,60 +46,71 @@ export default function Header() {
   };
 
   return (
-    <header dir="rtl" className="bg-white shadow-md border-b-2 border-blue-200 sticky top-0 z-50">
-      <nav className="relative max-w-[1440px] mx-auto px-6 lg:px-10 flex justify-between items-center min-h-[60px]">
+    <header dir="rtl" className="bg-[#1c3664] sticky top-0 z-[100] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
+      <nav className="max-w-[1440px] 2xl:max-w-[1800px] mx-auto px-6 lg:px-10 2xl:px-16 flex justify-between items-center h-[90px]">
         
-        <div className="hidden xl:block z-20">
+        {/* Мобильная версия: логотип слева */}
+        <div className="xl:hidden z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
-            <div className="w-20 h-20 bg-white flex items-center justify-center p-1">
+            <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[60px] h-[60px]">
               <Image
                 src="/images/logo.PNG"
                 alt="Logo"
-                width={80}
-                height={80}
+                width={50}
+                height={50}
                 className="object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (target.src !== '/images/logo.jpeg') {
-                    target.src = '/images/logo.jpeg';
-                  }
-                }}
+                priority
               />
             </div>
           </Link>
         </div>
 
+        {/* Десктоп версия: Правый логотип */}
+        <div className="hidden xl:block z-20">
+          <Link href="/" className="transition-transform hover:scale-105 block">
+            <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[70px] h-[70px]">
+              <Image
+                src="/images/logo.PNG"
+                alt="Logo"
+                width={60}
+                height={60}
+                className="object-contain"
+                priority
+              />
+            </div>
+          </Link>
+        </div>
+
+        {/* Бургер для мобильных - справа */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="xl:hidden z-30 p-2 text-gray-700 hover:text-[#1c3664] transition-colors"
-          aria-label="Toggle menu"
+          className="xl:hidden z-30 p-2 text-white hover:bg-white/20 rounded-full transition-colors"
         >
-          {isMobileMenuOpen ? <X size={24} className="text-[#1c3664]" /> : <Menu size={24} />}
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
 
-        <div className="hidden xl:flex absolute left-0 right-0 mx-auto w-fit items-center gap-6 justify-center">
+        {/* Центральное меню (Десктоп) */}
+        <div className="hidden xl:flex items-center gap-8">
           {navLinks.map((link) => (
             <div key={link.label} className="relative group">
               <Link
                 href={link.href}
-                onClick={link.onClick}
-                className="text-[15px] font-bold tracking-wide transition-all duration-300 flex items-center gap-1 text-slate-900 py-4"
+                className="text-[16px] font-bold text-white hover:text-blue-200 transition-all flex items-center gap-1 py-4"
               >
                 {link.label}
                 {link.submenu && (
                   <ChevronDown className="w-4 h-4 opacity-50 group-hover:rotate-180 transition-transform" />
                 )}
-                <span className="absolute bottom-3 right-0 w-0 h-0.5 bg-[#1c3664] transition-all duration-300 group-hover:w-full"></span>
               </Link>
 
               {link.submenu && (
-                <div className="absolute top-full right-0 w-72 bg-white shadow-xl border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0">
+                <div className="absolute top-full right-0 w-64 bg-white shadow-2xl rounded-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 translate-y-2 group-hover:translate-y-0 border border-gray-100">
                   <ul className="py-2">
                     {link.submenu.map((sub) => (
                       <li key={sub.label}>
                         <Link
                           href={sub.href}
-                          className="block px-5 py-3 text-sm font-medium hover:bg-gray-50 hover:text-[#1c3664] text-slate-700 border-r-4 border-transparent hover:border-[#1c3664] transition-all"
+                          className="block px-6 py-3 text-sm font-bold text-[#1c3664] hover:bg-blue-50 hover:text-blue-600 transition-colors"
                         >
                           {sub.label}
                         </Link>
@@ -121,22 +123,17 @@ export default function Header() {
           ))}
         </div>
 
-        <div className="z-20">
+        {/* Десктоп версия: Левый логотип */}
+        <div className="hidden xl:block z-20">
           <Link href="/" className="transition-transform hover:scale-105 block">
-            <div className="w-14 h-14 xl:w-20 xl:h-20 bg-white flex items-center justify-center p-1">
+            <div className="bg-white p-1.5 rounded-lg shadow-md flex items-center justify-center w-[70px] h-[70px]">
               <Image
                 src="/images/logo2.svg"
                 alt="Logo"
-                width={56}
-                height={56}
-                className="object-contain xl:!w-20 xl:!h-20"
+                width={60}
+                height={60}
+                className="object-contain"
                 priority
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (target.src !== '/images/logo.jpeg') {
-                    target.src = '/images/logo.jpeg';
-                  }
-                }}
               />
             </div>
           </Link>
@@ -144,72 +141,42 @@ export default function Header() {
       </nav>
 
       {isMobileMenuOpen && (
-        <div className="xl:hidden fixed inset-0 top-[72px] bg-white z-40 overflow-y-auto">
-          <div className="px-6 py-4 space-y-1">
+        <div className="xl:hidden fixed inset-0 top-[90px] bg-white z-40 p-6 overflow-y-auto shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_10px_15px_-3px_rgba(0,0,0,0.2),0_20px_25px_-5px_rgba(0,0,0,0.15)]">
+          <div className="flex flex-col gap-2">
             {navLinks.map((link) => (
-              <div key={link.label} className="border-b border-gray-100 last:border-0">
-                <div className="flex items-center justify-between">
+              <div key={link.label} className="border-b border-gray-200 last:border-0">
+                <div className="flex items-center justify-between py-4">
                   <Link
                     href={link.href}
-                    onClick={(e) => {
-                      if (link.submenu) {
-                        e.preventDefault();
-                        toggleSubmenu(link.label);
-                      } else {
-                        if (link.onClick) link.onClick(e);
-                        setIsMobileMenuOpen(false);
-                      }
-                    }}
-                    className="flex-1 py-4 text-base font-bold text-slate-900"
+                    onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
+                    className="text-lg font-bold text-gray-800 flex-1"
                   >
                     {link.label}
                   </Link>
-                  
                   {link.submenu && (
-                    <button 
-                      onClick={() => toggleSubmenu(link.label)}
-                      className="p-4 transition-transform"
-                    >
-                      <ChevronDown 
-                        size={20} 
-                        className={`transition-transform duration-300 ${openSubmenu === link.label ? "rotate-180 text-[#1c3664]" : "text-gray-400"}`} 
-                      />
+                    <button onClick={() => toggleSubmenu(link.label)} className="text-gray-700 p-2">
+                      <ChevronDown className={`transition-transform ${openSubmenu === link.label ? "rotate-180" : ""}`} />
                     </button>
                   )}
                 </div>
-
-                {link.submenu && (
-                  <div 
-                    className={`overflow-hidden transition-all duration-300 ${
-                      openSubmenu === link.label ? "max-h-[500px] opacity-100 mb-2" : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <ul className="pr-4 py-1 space-y-1 bg-gray-50 rounded-lg">
-                      {link.submenu.map((sub) => (
-                        <li key={sub.label}>
-                          <Link
-                            href={sub.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="block py-3 text-sm font-medium text-slate-600 hover:text-[#1c3664] border-r-2 border-transparent hover:border-[#1c3664] pr-3"
-                          >
-                            {sub.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                {link.submenu && openSubmenu === link.label && (
+                  <div className="bg-gray-50 rounded-lg mb-4">
+                    {link.submenu.map((sub) => (
+                      <Link
+                        key={sub.label}
+                        href={sub.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block py-4 px-6 text-[#1c3664] font-medium border-r-2 border-[#1c3664]"
+                      >
+                        {sub.label}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
             ))}
           </div>
         </div>
-      )}
-
-      {isMobileMenuOpen && (
-        <div
-          className="xl:hidden fixed inset-0 bg-black/50 z-30 top-[72px]"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
       )}
     </header>
   );

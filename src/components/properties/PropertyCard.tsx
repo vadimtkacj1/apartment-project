@@ -1,12 +1,12 @@
 "use client";
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
   Bed, Maximize, MapPin, Car, Home, Compass,
   Wind, Warehouse, Sun, Droplet, Shield, ArrowUpDown,
-  Building, Calendar, ArrowLeft, CheckCircle2
+  Building, Calendar, ArrowLeft, CheckCircle2, Tag, DollarSign
 } from 'lucide-react';
 import { Property } from '@/types/property.types';
 import { analytics } from '@/lib/analytics';
@@ -27,9 +27,10 @@ interface PropertyCardProps extends Partial<Property> {
   images?: string[];
   isSold?: boolean;
   showImage?: boolean; // Control whether to show image section
+  totalFloors?: number;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({
+const PropertyCard: React.FC<PropertyCardProps> = memo(({
   id,
   image,
   images,
@@ -48,6 +49,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   neighborhood,
   propertyType,
   floor,
+  totalFloors,
   parking,
   position,
   furniture,
@@ -178,6 +180,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            quality={85}
           />
           
           {/* Dark overlay for text contrast if needed */}
@@ -190,24 +194,47 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
           )}
 
-          {/* Sold Badge - Red with icon */}
+          {/* Sold image overlay */}
           {isSold && (
-            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5 z-10">
-              <CheckCircle2 size={16} />
-              <span>נמכר</span>
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
+              <Image
+                src="/images/sold.png"
+                alt="נמכר"
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                loading="lazy"
+                quality={90}
+              />
+            </div>
+          )}
+
+          {/* Deal Type Badge (Sale/Rent) */}
+          {dealType && (
+            <div className={`absolute bottom-4 right-4 ${
+              dealType === 'sale' 
+                ? 'bg-green-600' 
+                : 'bg-blue-600'
+            } text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg z-30 flex items-center gap-1.5`}>
+              {dealType === 'sale' ? (
+                <DollarSign size={14} className="shrink-0" />
+              ) : (
+                <Tag size={14} className="shrink-0" />
+              )}
+              <span>{dealTypeLabel}</span>
             </div>
           )}
 
           {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
           {status && !isSold && (
-            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md z-30">
               {getStatusLabel(status)}
             </div>
           )}
 
           {/* Property Type Badge (e.g., Apartment, Villa) */}
           {propertyType && (
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
               {getPropertyTypeLabel(propertyType)}
             </div>
           )}
@@ -217,7 +244,23 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Status and Property Type badges when image is hidden */}
       {!showImage && (
         <div className="relative p-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            {/* Deal Type Badge (Sale/Rent) */}
+            {dealType && (
+              <div className={`${
+                dealType === 'sale' 
+                  ? 'bg-green-600' 
+                  : 'bg-blue-600'
+              } text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5`}>
+                {dealType === 'sale' ? (
+                  <DollarSign size={14} className="shrink-0" />
+                ) : (
+                  <Tag size={14} className="shrink-0" />
+                )}
+                <span>{dealTypeLabel}</span>
+              </div>
+            )}
+
             {/* Sold Badge */}
             {isSold && (
               <div className="bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5">
@@ -246,31 +289,28 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Card Content */}
       <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
 
-        {/* Address & Title */}
-        <div className="mb-3 sm:mb-4">
-          <div className={`flex items-center gap-1.5 text-xs sm:text-sm font-medium mb-2 ${
-            isSold ? 'text-gray-400' : 'text-gray-500'
+        {/* Title & Address */}
+        <div className="mb-3">
+          <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
+            isSold ? 'text-gray-500 line-through' : 'text-gray-900'
           }`}>
-            <MapPin size={14} className={`sm:w-4 sm:h-4 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
-            <span className="truncate">
+            {title}
+          </h3>
+          <div className={`flex items-start gap-1.5 text-xs text-gray-500 mb-2 ${
+            isSold ? 'text-gray-400' : ''
+          }`}>
+            <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
+            <span className="break-words">
               {location}
               {neighborhood && ` • ${neighborhood}`}
-              {street && ` • ${street} ${streetNumber || ''}`}
             </span>
           </div>
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className={`text-lg sm:text-xl font-bold leading-snug line-clamp-2 min-h-12 sm:min-h-14 flex-1 ${
-              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-            }`}>
-              {title}
-            </h3>
-            {isSold && (
-              <div className="flex items-center gap-1 bg-red-600 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold whitespace-nowrap shadow-md">
-                <CheckCircle2 size={12} className="sm:w-3.5 sm:h-3.5" />
-                <span>נמכר</span>
-              </div>
-            )}
-          </div>
+          {isSold && (
+            <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
+              <CheckCircle2 size={10} />
+              <span>נמכר</span>
+            </div>
+          )}
         </div>
 
         {/* Main Statistics Grid (Rooms, Floor, Area) */}
@@ -289,7 +329,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           }`}>
             <Building size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
             <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
-               {floor !== undefined ? `קומה ${floor}` : '-'}
+               {floor !== undefined && floor !== null && typeof floor === 'number'
+                 ? ((totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+                   ? `קומה ${floor} מתוך ${totalFloors}`
+                   : `קומה ${floor}`)
+                 : '-'}
             </span>
           </div>
 
@@ -301,45 +345,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               {area} מ״ר
             </span>
           </div>
-        </div>
-
-        {/* Detailed Information List */}
-        <div className="space-y-1.5 sm:space-y-2 mb-4 sm:mb-5 text-xs sm:text-sm text-gray-700">
-          {parking && (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Car size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-              <span className="text-gray-500">חניה:</span>
-              <span className="font-semibold mr-auto">{getParkingLabel(parking)}</span>
-            </div>
-          )}
-          {position && (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Home size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-              <span className="text-gray-500">מיקום:</span>
-              <span className="font-semibold mr-auto">{getPositionLabel(position)}</span>
-            </div>
-          )}
-          {furniture && furniture !== 'none' && (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Home size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-              <span className="text-gray-500">ריהוט:</span>
-              <span className="font-semibold mr-auto">{getFurnitureLabel(furniture)}</span>
-            </div>
-          )}
-          {directions && directions.length > 0 && (
-             <div className="flex items-center gap-1.5 sm:gap-2">
-               <Compass size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-               <span className="text-gray-500">כיוונים:</span>
-               <span className="font-semibold mr-auto">{getDirectionsLabel(directions)}</span>
-             </div>
-          )}
-          {vacancyDate && (
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Calendar size={14} className="sm:w-4 sm:h-4 text-gray-400" />
-              <span className="text-gray-500">תאריך פינוי:</span>
-              <span className="font-semibold mr-auto">{vacancyDate}</span>
-            </div>
-          )}
         </div>
 
         {/* Feature Tags */}
@@ -388,7 +393,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 {originalPrice}
               </p>
             )}
-            <p className={`text-xl sm:text-2xl font-black ${
+            <p className={`text-lg sm:text-xl font-black ${
               isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
             }`}>
               {price}
@@ -401,10 +406,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <CheckCircle2 size={18} />
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center">
-              לפרטים נוספים
-              <ArrowLeft size={16} className="sm:hidden" />
-              <ArrowLeft size={18} className="hidden sm:block" />
+            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center whitespace-nowrap">
+              <span className="whitespace-nowrap">לפרטים נוספים</span>
+              <ArrowLeft size={16} className="sm:hidden shrink-0" />
+              <ArrowLeft size={18} className="hidden sm:block shrink-0" />
             </div>
           )}
         </div>
@@ -412,6 +417,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     </motion.div>
     </Link>
   );
-};
+});
+
+PropertyCard.displayName = 'PropertyCard';
 
 export default PropertyCard;

@@ -5,6 +5,11 @@ import { getToken } from 'next-auth/jwt'
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl
 
+  // Allow public access to uploads and images (no auth required)
+  if (pathname.startsWith('/uploads/') || pathname.startsWith('/api/uploads/')) {
+    return NextResponse.next()
+  }
+
   // Allow login page and NextAuth endpoints
   if (pathname === '/admin/login' || pathname.startsWith('/api/auth')) {
     return NextResponse.next()

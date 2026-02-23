@@ -49,12 +49,14 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
           }`}>
 
             <h1
-              className="font-black text-white"
+              className="font-black text-white inline-block px-6 py-3 md:px-8 md:py-4 rounded-lg"
               style={{
                 fontSize: 'clamp(1.8rem, 6vw, 4.5rem)',
                 lineHeight: '1.3',
                 letterSpacing: '0.02em',
-                textShadow: 'none'
+                textShadow: 'none',
+                backgroundColor: 'rgba(28, 54, 100, 0.75)',
+                backdropFilter: 'blur(10px)'
               }}
             >
               {title}

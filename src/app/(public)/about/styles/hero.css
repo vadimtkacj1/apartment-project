@@ -40,6 +40,14 @@
   max-width: 1400px;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .hero-content {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+}
+
 .hero-title {
   font-size: clamp(4rem, 15vw, 12rem);
   font-weight: 900;

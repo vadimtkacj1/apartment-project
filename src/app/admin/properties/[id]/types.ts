@@ -9,6 +9,7 @@ export interface PropertyForm {
   longitude: number | null;
   propertyType: string;
   floor: number;
+  totalFloors: number;
   parking: string;
   position: string;
   furniture: string;
@@ -17,6 +18,7 @@ export interface PropertyForm {
   rooms: string;
   area: number;
   builtArea: number;
+  balconySize: number | null;
   vacancyDate: string;
   hasAirConditioning: boolean;
   hasDisabledAccess: boolean;
@@ -38,6 +40,8 @@ export interface PropertyForm {
   isActive: boolean;
   isSold: boolean;
   isPinned: boolean;
+  isHotProposition: boolean;
+  isNoCommission: boolean;
 }
 
 export interface PropertyFormSectionProps {

@@ -58,6 +58,14 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={12} sm={8} md={4}>
+          <Form.Item label="סה״כ קומות" name="totalFloors">
+            <InputNumber
+              style={{ width: '100%' }}
+              onChange={(value) => handleChange('totalFloors', value || 0)}
+            />
+          </Form.Item>
+        </Col>
+        <Col xs={12} sm={8} md={4}>
           <Form.Item label="חניה" name="parking">
             <Select
               onChange={(value) => handleChange('parking', value)}
@@ -108,6 +116,15 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
               style={{ width: '100%' }}
               min={0}
               onChange={(value) => handleChange('builtArea', value || 0)}
+            />
+          </Form.Item>
+        </Col>
+        <Col xs={12} sm={8} md={4}>
+          <Form.Item label="גודל מרפסת שמש (מ״ר)" name="balconySize">
+            <InputNumber
+              style={{ width: '100%' }}
+              min={0}
+              onChange={(value) => handleChange('balconySize', value || null)}
             />
           </Form.Item>
         </Col>

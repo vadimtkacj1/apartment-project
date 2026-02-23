@@ -12,6 +12,14 @@
   background: #faf7f2;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .article-container {
+    max-width: 1800px;
+    padding: 3rem 4rem 6rem;
+  }
+}
+
 .article-content {
   background: transparent;
   overflow: hidden;

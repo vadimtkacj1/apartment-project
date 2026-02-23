@@ -23,86 +23,70 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Cache Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'prisma/**', 'next.config.*', 'tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-
+
       - name: Install dependencies
         run: npm ci
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: "file:./dev.db"
 
       - name: Build application
         run: npm run build
         env:
           NODE_ENV: production
+          DATABASE_URL: "file:./dev.db"
+
+      - name: Copy Prisma files to standalone
+        run: |
+          mkdir -p .next/standalone/node_modules/.prisma
+          mkdir -p .next/standalone/node_modules/@prisma/client/runtime
+          cp -r node_modules/.prisma/. .next/standalone/node_modules/.prisma/ 2>/dev/null || true
+          cp -r node_modules/@prisma/client/runtime/. .next/standalone/node_modules/@prisma/client/runtime/ 2>/dev/null || true
 
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          # Verify standalone build exists
           if [ ! -d ".next/standalone" ]; then
             echo "❌ Error: .next/standalone not found"
             exit 1
           fi
 
-          # Copy standalone server
-          echo "📦 Copying standalone build..."
           cp -r .next/standalone/. deploy/
-
-          # Copy static files (CRITICAL: Next.js needs these)
-          echo "📦 Copying static assets..."
           mkdir -p deploy/.next/static
           cp -r .next/static/. deploy/.next/static/
 
-          # Copy public files
-          echo "📦 Copying public files..."
           if [ -d "public" ]; then
             mkdir -p deploy/public
             cp -r public/. deploy/public/
           fi
 
-          # Copy Prisma schema and migrations (CRITICAL for database)
-          echo "📦 Copying Prisma files..."
           if [ -d "prisma" ]; then
             mkdir -p deploy/prisma
             cp -r prisma/. deploy/prisma/
           fi
 
-          # Copy package.json for postinstall script
-          echo "📦 Copying package.json..."
-          cp package.json deploy/
+          if [ -d "src" ]; then
+            mkdir -p deploy/src
+            cp -r src/. deploy/src/
+          fi
 
-          # Copy package-lock.json if exists
+          cp package.json deploy/
           if [ -f "package-lock.json" ]; then
             cp package-lock.json deploy/
           fi
 
-          # Copy next.config.ts if exists
-          if [ -f "next.config.ts" ]; then
-            cp next.config.ts deploy/
-          fi
-
-          # Verify critical files
-          echo "🔍 Verifying deployment package..."
-          if [ ! -f "deploy/server.js" ]; then
-            echo "❌ Error: server.js not found"
-            exit 1
-          fi
-
-          if [ ! -d "deploy/.next/static" ]; then
-            echo "❌ Error: .next/static not found"
-            exit 1
-          fi
-
-          if [ ! -d "deploy/prisma" ]; then
-            echo "❌ Error: prisma directory not found"
-            exit 1
-          fi
-
-          echo "📋 Deployment structure:"
-          ls -la deploy/
-          echo "📋 Prisma files:"
-          ls -la deploy/prisma/ || echo "No prisma files"
-
-          echo "✅ Deployment package created"
           tar -czf deploy.tar.gz deploy/
 
       - name: Deploy to server
@@ -118,84 +102,58 @@ jobs:
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           timeout: 120s
+          envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL
           script: |
             set -e
-
-            # Configuration
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
             PORT=80
 
             echo "🚀 Starting deployment..."
 
-            # Create app directory
             sudo mkdir -p $APP_DIR
             sudo chown $USER:$USER $APP_DIR
 
-            # Extract deployment
             cd $APP_DIR
             tar -xzf /tmp/deploy.tar.gz
             cp -r deploy/. .
             rm -rf deploy
 
-            # Create environment file
-            cat > .env << 'EOF'
-            NODE_ENV=production
-            PORT=80
-            HOSTNAME=0.0.0.0
-            DATABASE_URL=file:./dev.db
-            NEXTAUTH_SECRET=aksSjY+UUhVgdCJy15IwmSMIaZepc98C3Eq3pOvjnso=
-            NEXTAUTH_URL=http://localhost:80
-            EOF
-
-            # Install dependencies if package.json exists
-            # IMPORTANT: Don't use --ignore-scripts for better-sqlite3 native module
-            if [ -f "package.json" ]; then
-              echo "📦 Installing production dependencies..."
-              # Install build tools for native modules
-              sudo apt-get update -qq
-              sudo apt-get install -y python3 make g++ || true
-              # Install dependencies WITH scripts to compile native modules
-              npm ci --production || npm install --production
+            # Create .env only if it doesn't exist (avoid overwriting server secrets)
+            if [ ! -f ".env" ]; then
+              echo "📝 Creating .env..."
+              printf 'NODE_ENV=production\nPORT=80\nHOSTNAME=0.0.0.0\nDATABASE_URL=%s\nNEXTAUTH_SECRET=%s\nNEXTAUTH_URL=%s\n' \
+                "${DATABASE_URL:-file:./dev.db}" \
+                "${NEXTAUTH_SECRET:-}" \
+                "${NEXTAUTH_URL:-http://localhost:80}" > .env
             fi
 
-            # Generate Prisma Client on server
-            if [ -d "prisma" ]; then
-              echo "📦 Generating Prisma Client..."
-              npx prisma generate || echo "⚠️ Warning: Prisma generate failed"
-            fi
+            # Run database migrations
+            echo "🗄️ Running database migrations..."
+            npx prisma migrate deploy --schema=$APP_DIR/prisma/schema.prisma
 
-            # Run database migrations if needed
-            if [ -d "prisma/migrations" ]; then
-              echo "📦 Running database migrations..."
-              npx prisma migrate deploy || echo "⚠️ Warning: Migrations failed (database might already be up to date)"
-            fi
-
-            # Install PM2 if not present
             if ! command -v pm2 &> /dev/null; then
-              echo "📦 Installing PM2..."
               npm install -g pm2
             fi
 
-            # Stop existing process
             pm2 stop $APP_NAME || true
             pm2 delete $APP_NAME || true
 
-            # Start application
-            echo "▶️ Starting application..."
-            pm2 start server.js --name $APP_NAME --update-env
+            pm2 start server.js --name $APP_NAME --node-args="--env-file=$APP_DIR/.env"
             pm2 save
 
-            # Wait for startup
             sleep 5
 
-            # Health check
             if curl -f http://localhost:$PORT > /dev/null 2>&1; then
               echo "✅ Deployment successful!"
               pm2 status
@@ -205,11 +163,4 @@ jobs:
               exit 1
             fi
 
-            # Cleanup
             rm -f /tmp/deploy.tar.gz
-
-      # Uncomment and set DEPLOYMENT_URL secret to enable health check
-      # - name: Health check
-      #   run: |
-      #     sleep 10
-      #     curl -f "${{ secrets.DEPLOYMENT_URL }}" || echo "⚠️ Health check failed"

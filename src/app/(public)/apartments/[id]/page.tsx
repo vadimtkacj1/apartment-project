@@ -8,7 +8,6 @@ import { usePropertyData } from '@/hooks/usePropertyData';
 import {
   LoadingState,
   ErrorState,
-  SoldBadge,
   PropertyGallery,
   PropertyDescription,
   PropertyAmenities,
@@ -38,8 +37,6 @@ export default function ApartmentDetailPage() {
 
   return (
     <div className={`min-h-screen bg-warm pt-8 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
-      <SoldBadge isSold={isSold} />
-
       <div className={`w-full ${isSold ? 'pointer-events-none' : ''}`}>
         {/* Back to apartments link */}
         <div className="w-full px-6 flex justify-end mb-8 px-6 lg:px-12">
@@ -60,7 +57,9 @@ export default function ApartmentDetailPage() {
               description={property.description}
               bedrooms={property.bedrooms}
               floor={property.floor}
+              totalFloors={property.totalFloors}
               area={property.area}
+              builtArea={property.builtArea}
               isSold={isSold}
             />
             <PropertyAmenities amenities={property.amenities} isSold={isSold} />

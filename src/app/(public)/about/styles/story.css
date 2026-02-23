@@ -9,6 +9,18 @@
   margin: 0 auto;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .story-container {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+  
+  .story-section {
+    padding: 8rem 2rem;
+  }
+}
+
 .story-header {
   text-align: center;
   margin-bottom: 3rem;

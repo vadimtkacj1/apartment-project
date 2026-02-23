@@ -9,6 +9,22 @@
   margin: 0 auto;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .expertise-container {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+  
+  .expertise-section {
+    padding: 100px 20px;
+  }
+  
+  .expertise-grid {
+    gap: 80px;
+  }
+}
+
 .expertise-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

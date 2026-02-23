@@ -6,11 +6,13 @@ interface PropertyDescriptionProps {
   description: string;
   bedrooms: number;
   floor?: number;
+  totalFloors?: number;
   area: number;
+  builtArea?: number | null;
   isSold: boolean;
 }
 
-export function PropertyDescription({ description, bedrooms, floor, area, isSold }: PropertyDescriptionProps) {
+export function PropertyDescription({ description, bedrooms, floor, totalFloors, area, builtArea, isSold }: PropertyDescriptionProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,25 +26,33 @@ export function PropertyDescription({ description, bedrooms, floor, area, isSold
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>תיאור הנכס</h2>
 
-      <div className="flex flex-wrap gap-4 mb-6 pb-6 border-b border-gray-100">
-        <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-          <LayoutDashboard size={16} className="text-[#1c3664]"/>
+      <div className="flex flex-wrap gap-5 mb-8 pb-8 border-b border-gray-100">
+        <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
+          <LayoutDashboard size={20} className="text-[#1c3664]"/>
           {bedrooms} חדרים
         </div>
-        {floor && (
-          <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-            <ArrowUpFromLine size={16} className="text-[#1c3664]"/>
-            קומה {floor}
+        {!!floor && (
+          <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
+            <ArrowUpFromLine size={20} className="text-[#1c3664]"/>
+            {(totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+              ? `קומה ${floor} מתוך ${totalFloors}`
+              : `קומה ${floor}`}
           </div>
         )}
-        <div className="px-4 py-2 bg-gray-50 rounded-lg text-sm font-bold text-gray-700 border border-gray-100 flex items-center gap-2">
-          <Maximize size={16} className="text-[#1c3664]"/>
+        <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
+          <Maximize size={20} className="text-[#1c3664]"/>
           {area} מ״ר
         </div>
+        {builtArea && (
+          <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
+            <Maximize size={20} className="text-[#1c3664]"/>
+            {builtArea} מ״ר בנוי
+          </div>
+        )}
       </div>
 
       <div className="prose prose-lg max-w-none">
-        <p className={`text-lg leading-relaxed whitespace-pre-line font-medium ${
+        <p className={`text-xl leading-relaxed whitespace-pre-line font-medium ${
           isSold ? 'text-gray-500' : 'text-gray-800'
         }`}>
           {description}

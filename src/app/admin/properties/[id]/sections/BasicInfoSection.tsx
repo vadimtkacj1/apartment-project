@@ -1,11 +1,23 @@
-import { Card, Row, Col, Form, Input, Select, Switch, DatePicker } from 'antd';
+import { Card, Row, Col, Form, Input, Select, Switch, DatePicker, Radio } from 'antd';
 import { PropertyFormSectionProps } from '../types';
 import { DEAL_TYPE_OPTIONS, STATUS_OPTIONS } from '../constants';
 import dayjs from 'dayjs';
+import { useState, useEffect } from 'react';
 
 const { TextArea } = Input;
 
 export function BasicInfoSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const [vacancyType, setVacancyType] = useState<'date' | 'immediately'>('date');
+
+  // Sync vacancyType with formData
+  useEffect(() => {
+    if (formData.vacancyDate === 'מיד' || formData.vacancyDate === 'immediately') {
+      setVacancyType('immediately');
+    } else if (formData.vacancyDate && formData.vacancyDate.trim() !== '') {
+      setVacancyType('date');
+    }
+  }, [formData.vacancyDate]);
+
   return (
     <Card title="מידע בסיסי" className="mb-4">
       <Row gutter={16}>
@@ -80,12 +92,50 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
         </Col>
         <Col xs={24} sm={24} md={8}>
           <Form.Item label="תאריך פינוי" name="vacancyDate">
-            <DatePicker
-              placeholder="בחר תאריך פינוי"
-              format="DD/MM/YYYY"
-              style={{ width: '100%' }}
-              onChange={(date) => handleChange('vacancyDate', date ? date.format('DD/MM/YYYY') : '')}
-            />
+            <div>
+              <Radio.Group
+                value={vacancyType}
+                onChange={(e) => {
+                  const newType = e.target.value;
+                  setVacancyType(newType);
+                  if (newType === 'immediately') {
+                    handleChange('vacancyDate', 'מיד');
+                  } else {
+                    handleChange('vacancyDate', '');
+                  }
+                }}
+                style={{ marginBottom: '8px', width: '100%' }}
+              >
+                <Radio value="date">בחר תאריך</Radio>
+                <Radio value="immediately">מיד</Radio>
+              </Radio.Group>
+              {vacancyType === 'date' && (
+                <DatePicker
+                  placeholder="בחר תאריך פינוי"
+                  format="DD/MM/YYYY"
+                  style={{ width: '100%' }}
+                  value={formData.vacancyDate && formData.vacancyDate !== 'מיד' && formData.vacancyDate !== 'immediately' 
+                    ? (typeof formData.vacancyDate === 'string' 
+                        ? (dayjs(formData.vacancyDate, 'DD/MM/YYYY', true).isValid() 
+                            ? dayjs(formData.vacancyDate, 'DD/MM/YYYY') 
+                            : null)
+                        : (formData.vacancyDate && dayjs.isDayjs(formData.vacancyDate) ? formData.vacancyDate : null))
+                    : null}
+                  onChange={(date) => {
+                    if (date) {
+                      handleChange('vacancyDate', date.format('DD/MM/YYYY'));
+                    } else {
+                      handleChange('vacancyDate', '');
+                    }
+                  }}
+                />
+              )}
+              {vacancyType === 'immediately' && (
+                <div style={{ padding: '8px 12px', background: '#f0f0f0', borderRadius: '6px', color: '#666' }}>
+                  מיד
+                </div>
+              )}
+            </div>
           </Form.Item>
         </Col>
       </Row>
@@ -119,6 +169,29 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               onChange={(checked) => handleChange('isPinned', checked)}
             />
             <span style={{ marginRight: '8px' }}>הצמד לעמוד הבית</span>
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col xs={24} sm={12}>
+          <Form.Item name="isHotProposition" valuePropName="checked">
+            <Switch
+              checkedChildren="כן"
+              unCheckedChildren="לא"
+              onChange={(checked) => handleChange('isHotProposition', checked)}
+            />
+            <span style={{ marginRight: '8px' }}>הצעה חמה</span>
+          </Form.Item>
+        </Col>
+        <Col xs={24} sm={12}>
+          <Form.Item name="isNoCommission" valuePropName="checked">
+            <Switch
+              checkedChildren="כן"
+              unCheckedChildren="לא"
+              onChange={(checked) => handleChange('isNoCommission', checked)}
+            />
+            <span style={{ marginRight: '8px' }}>ללא עמלה</span>
           </Form.Item>
         </Col>
       </Row>

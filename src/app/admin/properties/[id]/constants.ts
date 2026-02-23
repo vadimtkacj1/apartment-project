@@ -11,6 +11,7 @@ export const INITIAL_FORM: PropertyForm = {
   longitude: null,
   propertyType: 'apartment',
   floor: 0,
+  totalFloors: 0,
   parking: 'none',
   position: 'front',
   furniture: 'none',
@@ -19,6 +20,7 @@ export const INITIAL_FORM: PropertyForm = {
   rooms: '3',
   area: 0,
   builtArea: 0,
+  balconySize: null,
   vacancyDate: '',
   hasAirConditioning: false,
   hasDisabledAccess: false,
@@ -40,6 +42,8 @@ export const INITIAL_FORM: PropertyForm = {
   isActive: true,
   isSold: false,
   isPinned: false,
+  isHotProposition: false,
+  isNoCommission: false,
 };
 
 export const DEAL_TYPE_OPTIONS = [
@@ -90,7 +94,7 @@ export const FURNITURE_OPTIONS = [
 ];
 
 export const KITCHEN_OPTIONS = [
-  { value: 'standard', label: 'רגיל' },
+  { value: 'standard', label: 'סטנדרט' },
   { value: 'upgraded', label: 'משודרג' },
 ];
 
