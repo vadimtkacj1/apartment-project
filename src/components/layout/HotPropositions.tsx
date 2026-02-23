@@ -4,7 +4,7 @@ import React, { useMemo, memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import PropertyCard from "@/components/properties/PropertyCard";
-import { DealType } from "@/types/property.types";
+import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
 // Type for apartment data
 interface Property {
@@ -22,15 +22,15 @@ interface Property {
   isSold?: boolean;
   floor?: number;
   dealType?: DealType;
-  propertyType?: string;
+  propertyType?: PropertyType;
   totalFloors?: number;
   neighborhood?: string;
   street?: string;
   streetNumber?: string;
-  parking?: string;
-  position?: string;
-  furniture?: string;
-  directions?: string[];
+  parking?: ParkingType;
+  position?: Position;
+  furniture?: FurnitureLevel;
+  directions?: Direction[];
   vacancyDate?: string;
   features?: any;
 }
@@ -73,11 +73,18 @@ const MarqueeRow = ({
           repeat: Infinity,
         }}
       >
-        {duplicatedItems.map((item: Property, i: number) => (
-          <div key={`hot-proposition-card-${direction}-${i}`} className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0">
-            <PropertyCard {...item} index={i} />
-          </div>
-        ))}
+        {duplicatedItems.map((item: Property, i: number) => {
+          const cardProps = {
+            ...item,
+            propertyType: item.propertyType as PropertyType | undefined,
+            index: i
+          };
+          return (
+            <div key={`hot-proposition-card-${direction}-${i}`} className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0">
+              <PropertyCard {...cardProps} />
+            </div>
+          );
+        })}
       </motion.div>
     </div>
   );
@@ -116,7 +123,9 @@ function HotPropositions() {
           isSold: prop.isSold || false,
           floor: prop.floor,
           dealType: prop.dealType || 'sale',
-          propertyType: prop.propertyType,
+          propertyType: (prop.propertyType && ['apartment', 'garden-apartment', 'cottage', 'house', 'duplex', 'penthouse', 'roof-apartment', 'housing-unit', 'studio', 'basement-apartment', 'villa'].includes(prop.propertyType)) 
+            ? prop.propertyType as PropertyType 
+            : undefined,
           totalFloors: prop.totalFloors,
           neighborhood: prop.neighborhood,
           street: prop.street,

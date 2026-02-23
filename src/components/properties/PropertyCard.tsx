@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -30,7 +30,7 @@ interface PropertyCardProps extends Partial<Property> {
   totalFloors?: number;
 }
 
-const PropertyCard: React.FC<PropertyCardProps> = ({
+const PropertyCard: React.FC<PropertyCardProps> = memo(({
   id,
   image,
   images,
@@ -180,6 +180,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            quality={85}
           />
           
           {/* Dark overlay for text contrast if needed */}
@@ -201,6 +203,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 fill
                 className="object-contain"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                loading="lazy"
+                quality={90}
               />
             </div>
           )}
@@ -413,6 +417,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     </motion.div>
     </Link>
   );
-};
+});
+
+PropertyCard.displayName = 'PropertyCard';
 
 export default PropertyCard;

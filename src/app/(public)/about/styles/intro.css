@@ -9,6 +9,23 @@
   margin: 0 auto;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .intro-container {
+    max-width: 1800px;
+    padding: 0 4rem;
+  }
+  
+  .intro-section {
+    padding: 8rem 2rem 6rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 3rem;
+  }
+}
+
 .intro-content {
   text-align: center;
   margin-bottom: 5rem;

@@ -91,3 +91,58 @@ header[dir="rtl"] {
   position: sticky !important;
   top: 0 !important;
 }
+
+/* Large screen optimizations (1920px and above) */
+@media (min-width: 1920px) {
+  /* Increase container max-widths for better use of space */
+  .container {
+    max-width: 1800px !important;
+  }
+  
+  /* Better spacing on large screens */
+  body {
+    font-size: 1.05rem;
+  }
+  
+  /* Ensure content doesn't stretch too wide */
+  .max-w-7xl {
+    max-width: 1600px !important;
+  }
+  
+  /* Better padding on large screens */
+  .px-4 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  .px-6 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+  
+  .px-8 {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+  
+  .px-10 {
+    padding-left: 5rem;
+    padding-right: 5rem;
+  }
+  
+  .px-16 {
+    padding-left: 6rem;
+    padding-right: 6rem;
+  }
+}
+
+/* Extra large screens (2560px and above) */
+@media (min-width: 2560px) {
+  .container {
+    max-width: 2400px !important;
+  }
+  
+  .max-w-7xl {
+    max-width: 2200px !important;
+  }
+}

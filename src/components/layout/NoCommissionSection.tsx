@@ -89,6 +89,7 @@ function NoCommissionSection() {
   if (loading || !property) return null;
 
   return (
+    // ✅ ВИПРАВЛЕНО: додано overflow-hidden щоб декоративні елементи не виходили за межі секції
     <section className="relative pt-20 pb-16 overflow-hidden w-full bg-warm" dir="rtl">
 
       {/* Top wave divider */}
@@ -97,16 +98,19 @@ function NoCommissionSection() {
         <path d="M0,0 L1440,0 L1440,36 C1080,56 360,12 0,32 Z" fill="#1e3a8a" opacity="1" />
       </svg>
 
-      {/* Background decorative shapes */}
+      {/* Background decorative shapes — всі з clip через overflow-hidden на батьківській секції */}
+
       {/* Top-right large ring */}
-      <svg className="absolute top-4 right-0 pointer-events-none" width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* ✅ ВИПРАВЛЕНО: зменшено розмір і зміщено щоб не виходило за низ */}
+      <svg className="absolute top-4 right-0 pointer-events-none" width="260" height="260" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="280" cy="40" r="220" stroke="#1e3a8a" strokeWidth="2" opacity="0.18" />
         <circle cx="280" cy="40" r="165" stroke="#1e3a8a" strokeWidth="2" opacity="0.14" />
         <circle cx="280" cy="40" r="110" stroke="#1e3a8a" strokeWidth="1.5" opacity="0.1" />
       </svg>
 
       {/* Bottom-left ring */}
-      <svg className="absolute bottom-0 left-0 pointer-events-none" width="280" height="280" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* ✅ ВИПРАВЛЕНО: тепер clip'ується через overflow-hidden, не виходить за низ */}
+      <svg className="absolute bottom-0 left-0 pointer-events-none" width="220" height="220" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="0" cy="280" r="200" stroke="#1e3a8a" strokeWidth="2" opacity="0.16" />
         <circle cx="0" cy="280" r="140" stroke="#1e3a8a" strokeWidth="2" opacity="0.12" />
         <circle cx="0" cy="280" r="80"  stroke="#1e3a8a" strokeWidth="1.5" opacity="0.09" />
@@ -125,7 +129,8 @@ function NoCommissionSection() {
       </svg>
 
       {/* Bottom-right dot grid */}
-      <svg className="absolute bottom-8 right-12 pointer-events-none" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* ✅ ВИПРАВЛЕНО: змінено з bottom-8 на bottom-4 щоб не виходило за межі */}
+      <svg className="absolute bottom-4 right-12 pointer-events-none" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="80" cy="80" r="5" fill="#1e3a8a" opacity="0.25" />
         <circle cx="55" cy="80" r="5" fill="#1e3a8a" opacity="0.2" />
         <circle cx="30" cy="80" r="5" fill="#1e3a8a" opacity="0.15" />
@@ -148,7 +153,7 @@ function NoCommissionSection() {
         <polygon points="30,12 48,30 30,48 12,30" stroke="#1e3a8a" strokeWidth="1.5" opacity="0.18" />
       </svg>
 
-      <div className="container mx-auto px-4 md:px-8">
+      <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1800px' }}>
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">

@@ -1,17 +1,36 @@
 "use client";
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy } from 'react';
+import dynamic from 'next/dynamic';
 import Hero from '@/components/layout/Hero';
-import Header from '@/components/layout/Header';
-import Stats from '@/components/layout/Stats';
-import NoCommissionSection from '@/components/layout/NoCommissionSection';
-import HotPropositions from '@/components/layout/HotPropositions';
-import AboutSection from '@/components/layout/AboutSection';
-import ProcessSection from '@/components/layout/ProcessSection';
-import Testimonials from '@/components/layout/Testimonials';
-import FeaturedProperties from '@/components/layout/FeaturedProperties';
-import ContactForm from '@/components/layout/ContactForm';
-import ValuesSection from '@/components/layout/ValuesSection';
-import MarketingMessage from '@/components/layout/MarketingMessage';
+
+// Lazy load heavy components below the fold
+const NoCommissionSection = dynamic(() => import('@/components/layout/NoCommissionSection'), {
+  loading: () => <div className="h-64 bg-warm animate-pulse" />,
+});
+
+const HotPropositions = dynamic(() => import('@/components/layout/HotPropositions'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
+const AboutSection = dynamic(() => import('@/components/layout/AboutSection'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
+const ValuesSection = dynamic(() => import('@/components/layout/ValuesSection'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
+const Testimonials = dynamic(() => import('@/components/layout/Testimonials'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
+const FeaturedProperties = dynamic(() => import('@/components/layout/FeaturedProperties'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
+const ContactForm = dynamic(() => import('@/components/layout/ContactForm'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
 
 export default function Home() {
   useEffect(() => {
@@ -35,15 +54,29 @@ export default function Home() {
         />
       </div>
 
-      {/* Content below hero */}
+      {/* Content below hero - lazy loaded */}
       <div className="relative bg-warm">
-        <NoCommissionSection />
-        <HotPropositions />
-        <AboutSection />
-        <ValuesSection />
-        <Testimonials />
-        <FeaturedProperties />
-        <ContactForm />
+        <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
+          <NoCommissionSection />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <HotPropositions />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <AboutSection />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <ValuesSection />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <Testimonials />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <FeaturedProperties />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <ContactForm />
+        </Suspense>
       </div>
     </>
   );

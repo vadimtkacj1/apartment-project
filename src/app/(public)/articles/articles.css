@@ -14,6 +14,14 @@
   z-index: 1;
 }
 
+/* Large screens (1920px and above) */
+@media (min-width: 1920px) {
+  .articles-container {
+    max-width: 1800px;
+    padding: 3rem 4rem 6rem;
+  }
+}
+
 /* Decorative Elements */
 .decorative-elements {
   position: absolute;

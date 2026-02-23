@@ -173,7 +173,7 @@ const ValuesSection: React.FC = () => {
         }
       `}</style>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16" style={{ maxWidth: '1400px' }}>
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-20 max-w-[1400px] 2xl:max-w-[1800px]">
 
         {/* Section Header */}
         <motion.div
