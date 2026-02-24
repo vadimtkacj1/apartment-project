@@ -2,6 +2,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   Bed, Maximize, MapPin, Car, Home, Compass,
@@ -147,7 +148,20 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     }
   };
 
-  const displayImage = image || (images && images.length > 0 ? images[0] : '/images/placeholder.webp');
+  // Use first available image, fallback to local images
+  const getDisplayImage = () => {
+    if (image) return image;
+    if (images && images.length > 0) {
+      // Filter out empty or invalid URLs
+      const validImage = images.find(img => img && img.trim() !== '');
+      if (validImage) return validImage;
+    }
+    // Fallback to local hero images
+    return '/images/hero/sales.jpg';
+  };
+  const displayImage = getDisplayImage();
+  const [imageError, setImageError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(displayImage);
   const displayRooms = rooms || bedrooms || 0;
   const dealTypeLabel = dealType === 'sale' ? 'למכירה' : dealType === 'rent' ? 'להשכרה' : 'למכירה';
 
@@ -179,17 +193,27 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
         {/* Property Image */}
         {showImage && (
           <div className="relative h-64 overflow-hidden bg-gray-100">
-            <Image
-              src={displayImage}
+            <img
+              src={imageSrc}
               alt={title}
-              fill
-              className={`object-cover transition-transform duration-700 ${
+              className={`w-full h-full object-cover transition-transform duration-700 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => {
+                // Fallback to local image if external image fails to load
+                if (imageSrc !== '/images/hero/sales.jpg' && !imageError) {
+                  setImageSrc('/images/hero/sales.jpg');
+                } else {
+                  setImageError(true);
+                }
+              }}
               loading="lazy"
-              quality={85}
             />
+            {imageError && (
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                <span className="text-gray-500 text-sm">תמונה לא זמינה</span>
+              </div>
+            )}
 
             <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
               isSold ? 'opacity-40' : 'opacity-60'

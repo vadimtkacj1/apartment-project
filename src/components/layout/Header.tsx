@@ -55,20 +55,16 @@ export default function Header() {
     { label: "אודות", href: "/about" },
   ];
 
-  // Only use transparent header on home page
   const isHomePage = pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled;
 
   const textColor = shouldBeTransparent ? "#ffffff" : "#1c3664";
-  const logoFilter = shouldBeTransparent ? "brightness(0) invert(1)" : "none";
 
-  // Mouse enter: cancel pending close, open this menu
   const handleMenuEnter = (label: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setActiveDesktopSubmenu(label);
   };
 
-  // Mouse leave: delay close so user can move to dropdown
   const handleMenuLeave = () => {
     closeTimer.current = setTimeout(() => setActiveDesktopSubmenu(null), 120);
   };
@@ -81,7 +77,7 @@ export default function Header() {
         zIndex: 100,
         transition: "background 0.35s ease, box-shadow 0.35s ease",
         background: shouldBeTransparent ? "transparent" : "#ffffff",
-        boxShadow: shouldBeTransparent ? "none" : "0 4px 32px rgba(0,0,0,0.18)",
+        boxShadow: shouldBeTransparent ? "none" : "0 4px 40px rgba(0,0,0,0.18)",
       }}
     >
       <nav
@@ -89,38 +85,42 @@ export default function Header() {
         style={{
           maxWidth: 1440,
           margin: "0 auto",
-          padding: "0 2rem",
-          height: 80,
+          padding: "0 2.5rem",
+          height: 90, // ✅ Увеличена высота хедера
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
         {/* Logos */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexShrink: 0 }}>
           <Link href="/" style={{ display: "block", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={56} height={56}
+            <Image src="/images/logo.PNG" alt="Logo" width={64} height={64}
               className="object-contain" priority
-              style={{ filter: logoFilter, transition: "filter 0.35s ease" }}
+              style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
+          <Image src="/images/second-and.svg" alt="and" width={40} height={40}
+            className="object-contain" priority
+            style={{ transition: "filter 0.35s ease" }}
+          />
           <Link href="/" style={{ display: "block", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={56} height={56}
+            <Image src="/images/logo2.svg" alt="Logo 2" width={64} height={64}
               className="object-contain" priority
-              style={{ filter: logoFilter, transition: "filter 0.35s ease" }}
+              style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
         </div>
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1.8rem" }}>
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "2.4rem" }}> {/* ✅ Увеличен gap */}
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -135,22 +135,22 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: 15,
+                      fontSize: 17, // ✅ Увеличен размер шрифта (было 15)
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",
                       alignItems: "center",
-                      gap: 4,
-                      padding: "6px 0",
+                      gap: 5,
+                      padding: "8px 0", // ✅ Увеличен padding
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                       position: "relative",
+                      letterSpacing: "0.01em", // ✅ Лёгкий letter-spacing для читаемости
                       opacity: 1,
                       transition: "opacity 0.2s",
                     }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
                     onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-                    // If it's a submenu trigger (#), open on click too (mobile-friendly)
                     onClick={e => {
                       if (link.submenu && link.href === "#") {
                         e.preventDefault();
@@ -160,7 +160,7 @@ export default function Header() {
                   >
                     {link.label}
                     {link.submenu && (
-                      <ChevronDown size={14} style={{
+                      <ChevronDown size={16} style={{ // ✅ Увеличена иконка (было 14)
                         opacity: 0.6,
                         transition: "transform 0.25s",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -170,7 +170,7 @@ export default function Header() {
                     <span style={{
                       position: "absolute",
                       bottom: 0, right: 0, left: 0,
-                      height: 2,
+                      height: 2.5, // ✅ Чуть толще подчёркивание
                       borderRadius: 2,
                       background: textColor,
                       transform: isActive ? "scaleX(1)" : "scaleX(0)",
@@ -184,9 +184,9 @@ export default function Header() {
                     <div
                       style={{
                         position: "absolute",
-                        top: "calc(100% + 8px)",
+                        top: "calc(100% + 10px)",
                         right: 0,
-                        width: 210,
+                        width: 230, // ✅ Увеличена ширина дропдауна
                         background: "#ffffff",
                         borderRadius: 14,
                         boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
@@ -206,8 +206,8 @@ export default function Header() {
                           onClick={() => setActiveDesktopSubmenu(null)}
                           style={{
                             display: "block",
-                            padding: "12px 18px",
-                            fontSize: 14,
+                            padding: "14px 20px", // ✅ Увеличен padding в дропдауне
+                            fontSize: 15, // ✅ Увеличен шрифт в дропдауне (было 14)
                             fontWeight: 600,
                             color: "#1c3664",
                             textDecoration: "none",
@@ -244,7 +244,7 @@ export default function Header() {
               justifyContent: "center",
             }}
           >
-            {isMobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         )}
       </nav>
@@ -255,7 +255,7 @@ export default function Header() {
           dir="rtl"
           style={{
             position: "fixed",
-            inset: "80px 0 0 0",
+            inset: "90px 0 0 0", 
             background: "#ffffff",
             zIndex: 40,
             overflowY: "auto",
@@ -266,11 +266,11 @@ export default function Header() {
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {navLinks.map((link) => (
               <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
                   <Link
                     href={link.href}
                     onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                    style={{ fontSize: 17, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1 }}
+                    style={{ fontSize: 18, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1 }}
                   >
                     {link.label}
                   </Link>
@@ -279,7 +279,7 @@ export default function Header() {
                       onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#1c3664" }}
                     >
-                      <ChevronDown size={20} style={{
+                      <ChevronDown size={22} style={{
                         transform: openSubmenu === link.label ? "rotate(180deg)" : "rotate(0)",
                         transition: "transform 0.25s",
                       }} />
@@ -296,8 +296,8 @@ export default function Header() {
                         onClick={() => setIsMobileMenuOpen(false)}
                         style={{
                           display: "block",
-                          padding: "13px 20px",
-                          fontSize: 15,
+                          padding: "14px 20px",
+                          fontSize: 16,
                           fontWeight: 600,
                           color: "#1c3664",
                           textDecoration: "none",
