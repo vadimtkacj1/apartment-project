@@ -14,16 +14,15 @@ const AboutSection: React.FC = memo(() => {
     offset: ["start end", "end start"],
   });
 
-  // Parallax moves top → bottom as you scroll down
   const patternY = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
 
   return (
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative w-full pt-16 md:pt-32 pb-16 md:pb-24 overflow-hidden bg-[#1c3664]"
+      className="relative w-full pt-16 md:pt-32 pb-16 md:pb-24 overflow-hidden bg-[#2a4a8a]"
     >
-      {/* Parallax logo pattern — white base, rotated ~45deg like reference */}
+      {/* Parallax logo pattern — более горизонтальная (~10deg вместо 45deg) */}
       <motion.div
         className="absolute z-0"
         style={{
@@ -42,7 +41,7 @@ const AboutSection: React.FC = memo(() => {
             backgroundSize: '160px',
             backgroundRepeat: 'repeat',
             backgroundPosition: 'center',
-            transform: 'rotate(45deg)',
+            transform: 'rotate(10deg)',  // было 45deg → теперь 10deg
           }}
         />
       </motion.div>
@@ -50,14 +49,14 @@ const AboutSection: React.FC = memo(() => {
       <div className="absolute inset-0 z-10 pointer-events-none">
         {/* Left-side blue */}
         <div
-          className="absolute inset-0 bg-[#1c3664]"
+          className="absolute inset-0 bg-[#2a4a8a]"
           style={{
             clipPath: 'polygon(0 0, 21% 0, 1.5% 100%, 0 100%)'
           }}
         />
         {/* Right-side blue */}
         <div
-          className="absolute inset-0 bg-[#1c3664]"
+          className="absolute inset-0 bg-[#2a4a8a]"
           style={{
             clipPath: 'polygon(35% 0, 100% 0, 100% 100%, 14.5% 100%)'
           }}
