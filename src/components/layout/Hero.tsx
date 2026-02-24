@@ -64,7 +64,7 @@ const Hero: React.FC<HeroProps> = () => {
     <section
       ref={containerRef}
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden bg-black mt-20"
+      className="relative w-full h-[90vh] md:h-screen overflow-hidden mt-20"
     >
       <style>{`
         @keyframes blink {
@@ -111,29 +111,9 @@ const Hero: React.FC<HeroProps> = () => {
           autoPlay loop muted playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/images/hero.mp4" type="video/mp4" />
+          <source src="/hero.mp4" type="video/mp4" />
         </video>
 
-        {/* Основний оверлей */}
-        <div className="absolute inset-0 z-10" style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.78) 100%)'
-        }} />
-        <div className="absolute inset-0 z-10" style={{
-          background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.52) 100%)'
-        }} />
-
-        {/* ── Лёгкий градиент слева для логотипа ── */}
-        <div
-          className="absolute z-10"
-          style={{
-            top: 0,
-            left: 0,
-            width: '320px',
-            height: '120px',
-            background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)',
-            pointerEvents: 'none',
-          }}
-        />
       </div>
 
       {/* ── Контент ── */}
