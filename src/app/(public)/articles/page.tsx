@@ -54,10 +54,6 @@ export default function ArticlesPage() {
       <Breadcrumbs />
 
       <div className="articles-container">
-        <p className="articles-subtitle">
-          ידע מקצועי ותובנות מעולם הנדל"ן בישראל
-        </p>
-
         {/* Articles Grid */}
         <div className="articles-grid">
           {articles.map((article, index) => (

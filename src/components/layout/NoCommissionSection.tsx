@@ -89,73 +89,11 @@ function NoCommissionSection() {
   if (loading || !property) return null;
 
   return (
-    // ✅ ВИПРАВЛЕНО: додано overflow-hidden щоб декоративні елементи не виходили за межі секції
-    <section className="relative pt-20 pb-16 overflow-hidden w-full bg-warm" dir="rtl">
-
-      {/* Top wave divider */}
-      <svg className="absolute top-0 left-0 w-full pointer-events-none" style={{ height: '60px' }} viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,0 L1440,0 L1440,48 C1080,68 360,24 0,44 Z" fill="#2d4f9e" opacity="0.55" />
-        <path d="M0,0 L1440,0 L1440,36 C1080,56 360,12 0,32 Z" fill="#1e3a8a" opacity="1" />
-      </svg>
-
-      {/* Background decorative shapes — всі з clip через overflow-hidden на батьківській секції */}
-
-      {/* Top-right large ring */}
-      {/* ✅ ВИПРАВЛЕНО: зменшено розмір і зміщено щоб не виходило за низ */}
-      <svg className="absolute top-4 right-0 pointer-events-none" width="260" height="260" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="280" cy="40" r="220" stroke="#1e3a8a" strokeWidth="2" opacity="0.18" />
-        <circle cx="280" cy="40" r="165" stroke="#1e3a8a" strokeWidth="2" opacity="0.14" />
-        <circle cx="280" cy="40" r="110" stroke="#1e3a8a" strokeWidth="1.5" opacity="0.1" />
-      </svg>
-
-      {/* Bottom-left ring */}
-      {/* ✅ ВИПРАВЛЕНО: тепер clip'ується через overflow-hidden, не виходить за низ */}
-      <svg className="absolute bottom-0 left-0 pointer-events-none" width="220" height="220" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="0" cy="280" r="200" stroke="#1e3a8a" strokeWidth="2" opacity="0.16" />
-        <circle cx="0" cy="280" r="140" stroke="#1e3a8a" strokeWidth="2" opacity="0.12" />
-        <circle cx="0" cy="280" r="80"  stroke="#1e3a8a" strokeWidth="1.5" opacity="0.09" />
-      </svg>
-
-      {/* Top-left dot grid */}
-      <svg className="absolute top-16 left-12 pointer-events-none" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="10" cy="10" r="5" fill="#1e3a8a" opacity="0.25" />
-        <circle cx="35" cy="10" r="5" fill="#1e3a8a" opacity="0.2" />
-        <circle cx="60" cy="10" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="10" cy="35" r="5" fill="#1e3a8a" opacity="0.2" />
-        <circle cx="35" cy="35" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="60" cy="35" r="5" fill="#1e3a8a" opacity="0.1" />
-        <circle cx="10" cy="60" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="35" cy="60" r="5" fill="#1e3a8a" opacity="0.1" />
-      </svg>
-
-      {/* Bottom-right dot grid */}
-      {/* ✅ ВИПРАВЛЕНО: змінено з bottom-8 на bottom-4 щоб не виходило за межі */}
-      <svg className="absolute bottom-4 right-12 pointer-events-none" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="80" cy="80" r="5" fill="#1e3a8a" opacity="0.25" />
-        <circle cx="55" cy="80" r="5" fill="#1e3a8a" opacity="0.2" />
-        <circle cx="30" cy="80" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="80" cy="55" r="5" fill="#1e3a8a" opacity="0.2" />
-        <circle cx="55" cy="55" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="30" cy="55" r="5" fill="#1e3a8a" opacity="0.1" />
-        <circle cx="80" cy="30" r="5" fill="#1e3a8a" opacity="0.15" />
-        <circle cx="55" cy="30" r="5" fill="#1e3a8a" opacity="0.1" />
-      </svg>
-
-      {/* Left diamond */}
-      <svg className="absolute top-1/2 left-8 -translate-y-1/2 pointer-events-none" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="30,2 58,30 30,58 2,30" stroke="#1e3a8a" strokeWidth="2" opacity="0.25" />
-        <polygon points="30,12 48,30 30,48 12,30" stroke="#1e3a8a" strokeWidth="1.5" opacity="0.18" />
-      </svg>
-
-      {/* Right diamond */}
-      <svg className="absolute top-1/2 right-8 -translate-y-1/2 pointer-events-none" width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="30,2 58,30 30,58 2,30" stroke="#1e3a8a" strokeWidth="2" opacity="0.25" />
-        <polygon points="30,12 48,30 30,48 12,30" stroke="#1e3a8a" strokeWidth="1.5" opacity="0.18" />
-      </svg>
-
+    <section className="relative pt-16 pb-16 w-full bg-warm" dir="rtl">
       <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1800px' }}>
+        
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             דירה ללא עמלת תיווך
           </h2>
@@ -169,7 +107,7 @@ function NoCommissionSection() {
           <Link href={`/apartments/${property.id}`}>
             <div className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
-              {/* Image */}
+              {/* Image Container */}
               <div className="relative h-[200px] md:h-[280px] lg:h-[340px] overflow-hidden">
                 <img
                   src={property.image}
@@ -190,7 +128,7 @@ function NoCommissionSection() {
                   </span>
                 </div>
 
-                {/* Bottom info */}
+                {/* Bottom Overlay Info */}
                 <div className="absolute bottom-0 left-0 right-0 p-4 z-10 text-right">
                   <h3 className="text-lg md:text-xl font-bold text-white mb-1 leading-snug">
                     {property.title}

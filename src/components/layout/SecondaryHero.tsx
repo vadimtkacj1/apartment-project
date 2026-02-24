@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
 
 interface SecondaryHeroProps {
   img: string;
@@ -8,37 +7,28 @@ interface SecondaryHeroProps {
 }
 
 const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = false }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "15%"]);
-
   return (
     <section
-      ref={containerRef}
       dir="rtl"
       className="relative w-full overflow-hidden"
       style={{ isolation: 'isolate' }}
     >
       <div
-        className="relative w-full overflow-hidden flex items-center min-h-[30vh] md:min-h-[40vh]"
+        className="relative w-full overflow-hidden flex items-center min-h-[30vh] md:min-h-[40vh] pt-[90px]"
       >
-        {/* רקע עם עוגן לשמאל */}
-        <motion.div
-          className="absolute inset-0 z-0 w-full h-full"
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 w-full h-full"
           style={{
             backgroundImage: `url(${img})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'left center',
-            y: backgroundY,
-            scale: 1.05,
-            transformOrigin: 'left center'
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
           }}
-        />
+        >
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
 
         {/* קונטיינר תוכן מיושר לימין */}
         <div className="relative z-20 w-full px-6 md:px-12 lg:px-20">
@@ -54,9 +44,7 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
                 fontSize: 'clamp(1.8rem, 6vw, 4.5rem)',
                 lineHeight: '1.3',
                 letterSpacing: '0.02em',
-                textShadow: 'none',
-                backgroundColor: 'rgba(28, 54, 100, 0.75)',
-                backdropFilter: 'blur(10px)'
+                textShadow: 'none'
               }}
             >
               {title}
