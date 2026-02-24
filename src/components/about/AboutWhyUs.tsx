@@ -2,7 +2,6 @@
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-// Импортируем иконки
 import { MapPin, Target, Handshake, Zap, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const features = [
@@ -45,7 +44,7 @@ export default function AboutWhyUs() {
   return (
     <section
       ref={whyRef}
-      className="py-24 w-full bg-[#faf7f2]"
+      className="py-24 w-full bg-white"
       dir="rtl"
     >
       <div className="max-w-[1200px] 2xl:max-w-[1800px] mx-auto px-6 2xl:px-16">
@@ -66,7 +65,7 @@ export default function AboutWhyUs() {
 
         {/* Сетка Grid */}
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
           initial="hidden"
           animate={whyInView ? "visible" : "hidden"}
           variants={{
@@ -78,35 +77,18 @@ export default function AboutWhyUs() {
             return (
               <motion.div
                 key={index}
-                className={`
-                  group p-8 md:p-12 
-                  border-slate-300/50
-                  flex flex-col items-center text-center
-                  transition-all duration-300
-                  
-                  /* Границы сетки */
-                  border-b lg:border-b
-                  ${index % 3 !== 0 ? 'lg:border-r' : ''} /* Вертикальная линия (RTL Desktop) */
-                  ${index % 2 !== 0 ? 'md:max-lg:border-r' : ''} /* Планшет */
-                  ${index >= 3 ? 'lg:border-b-0' : ''} /* Без низа у последнего ряда */
-                  ${index === features.length - 1 ? 'border-b-0' : ''} /* Мобильный фикс */
-                `}
+                className="flex flex-col items-center text-center group"
                 variants={{
                   hidden: { y: 20, opacity: 0 },
                   visible: { y: 0, opacity: 1 }
                 }}
               >
-                {/* Иконка (векторная) */}
-                <div className="mb-6 relative w-20 h-20 flex items-center justify-center 
-                              text-[#1c3664] group-hover:text-blue-600 group-hover:scale-110 
-                              transition-all duration-300 ease-out">
-                  {/* Фоновый круг (еле заметный) */}
-                  <div className="absolute inset-0 bg-blue-100/0 rounded-full group-hover:bg-blue-50/50 transition-colors duration-300 -z-10 scale-0 group-hover:scale-125" />
-                  
+                {/* Иконка */}
+                <div className="mb-6 flex items-center justify-center text-[#1c3664] group-hover:scale-110 transition-transform duration-300 ease-out">
                   <Icon strokeWidth={1.2} className="w-16 h-16" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-[#1c3664] mb-3 group-hover:text-blue-700 transition-colors duration-300">
+                <h3 className="text-2xl font-bold text-[#1c3664] mb-3 transition-colors duration-300">
                   {feature.title}
                 </h3>
                 

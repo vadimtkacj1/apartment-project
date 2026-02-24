@@ -1,95 +1,284 @@
-import React, { useRef } from 'react';
+'use client';
+
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 interface HeroProps {
-  img: string;
+  img?: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ img }) => {
+// ── Typewriter hook ─────────────────────────────────────────────────────────
+function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    let interval: ReturnType<typeof setInterval>;
+    let i = 0;
+
+    timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(interval);
+          setDone(true);
+        }
+      }, charDelay);
+    }, startDelay);
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [text, startDelay, charDelay]);
+
+  return { displayed, done };
+}
+
+const Hero: React.FC<HeroProps> = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"]
+    offset: ['start start', 'end start'],
   });
+  const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '12%']);
 
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const line1 = 'רם נכסים';
+  const line2 = 'חיים ענבי';
+
+  const line1StartDelay = 400;
+  const line1Duration = line1.length * 55;
+  const line2StartDelay = line1StartDelay + line1Duration + 200;
+
+  const { displayed: text1, done: done1 } = useTypewriter(line1, line1StartDelay, 55);
+  const { displayed: text2, done: done2 } = useTypewriter(line2, line2StartDelay, 55);
+
+  const showRest = done2;
 
   return (
     <section
       ref={containerRef}
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden"
+      className="relative w-full h-[90vh] md:h-screen overflow-hidden bg-black mt-20"
     >
-      {/* Background Image Layer */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `url(${img})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          y: backgroundY,
-          scale: 1.05
-        }}
-      />
-      
-      {/* Darker overlay */}
-      <div className="absolute inset-0 z-10 bg-black/30" />
+      <style>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
+        }
+        .cursor {
+          display: inline-block;
+          width: 3px;
+          height: 0.85em;
+          background: #ffffff;
+          margin-right: 4px;
+          vertical-align: middle;
+          animation: blink 750ms steps(1) infinite;
+          border-radius: 1px;
+        }
+        @keyframes goldGlow {
+          0%, 100% { box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4); }
+          50%       { box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4); }
+        }
+        @keyframes shineSwipe {
+          0%   { transform: translateX(-200%) skewX(-20deg); }
+          100% { transform: translateX(400%) skewX(-20deg); }
+        }
+        .btn-primary:hover .btn-shine {
+          animation: shineSwipe 0.5s ease forwards;
+        }
+        .btn-primary {
+          animation: goldGlow 2.5s ease-in-out infinite;
+        }
+        .btn-secondary {
+          transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .btn-secondary:hover {
+          background: rgba(255,255,255,0.13) !important;
+          border-color: rgba(255,255,255,0.7) !important;
+          box-shadow: 0 0 24px rgba(255,255,255,0.12);
+        }
+      `}</style>
 
-      {/* Main Container */}
-      <div className="relative z-20 h-full w-full px-6 md:px-24 2xl:px-32 pt-10 pb-20 md:pb-32 flex flex-col justify-between items-start max-w-[1920px] mx-auto">
-        
-        <div className="flex flex-col items-start text-right w-full mt-2 md:mt-4">
-          
-          <div className="flex items-center justify-start gap-x-1 md:gap-x-2 mb-2 md:mb-4">
-            <h1 className="font-black text-white leading-tight tracking-tight"
-                style={{ fontSize: 'clamp(2rem, 6.5vw, 5.5rem)' }}>
-              רם נכסים
+      {/* ── Відео ── */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay loop muted playsInline preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/images/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Основний оверлей */}
+        <div className="absolute inset-0 z-10" style={{
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.08) 45%, rgba(0,0,0,0.78) 100%)'
+        }} />
+        <div className="absolute inset-0 z-10" style={{
+          background: 'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.52) 100%)'
+        }} />
+
+        {/* ── Лёгкий градиент слева для логотипа ── */}
+        <div
+          className="absolute z-10"
+          style={{
+            top: 0,
+            left: 0,
+            width: '320px',
+            height: '120px',
+            background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      {/* ── Контент ── */}
+      <motion.div
+        style={{ y: contentY }}
+        className="relative z-20 h-full w-full px-6 md:px-24 max-w-screen-2xl mx-auto flex flex-col justify-between pt-10 pb-20"
+      >
+        {/* Top */}
+        <div className="flex flex-col items-start text-right w-full mt-10 md:mt-16">
+
+          {/* Heading row */}
+          <div className="flex items-center justify-start gap-x-3 md:gap-x-5 mb-5">
+
+            {/* "רם נכסים" */}
+            <h1
+              className="font-black text-white leading-none"
+              style={{
+                fontSize: 'clamp(2.8rem, 8vw, 7rem)',
+                textShadow: '0 2px 24px rgba(0,0,0,0.7)',
+                minWidth: '1ch',
+              }}
+            >
+              {text1}
+              {!done1 && <span className="cursor" />}
             </h1>
-            <div className="relative w-[45px] h-[45px] md:w-[110px] md:h-[110px] flex-shrink-0">
-              <Image 
-                src="/images/and.png" 
-                alt="&" 
-                fill 
-                className="object-contain brightness-0 invert"
+
+            {/* Ampersand */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
+              animate={done1 ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.3, rotate: -20 }}
+              transition={{ type: 'spring', stiffness: 120, damping: 12 }}
+              className="relative shrink-0"
+              style={{ width: 'clamp(2.5rem, 5vw, 5.5rem)', height: 'clamp(2.5rem, 5vw, 5.5rem)' }}
+            >
+              <Image
+                src="/images/and.png"
+                alt="&"
+                fill
+                className="object-contain"
+                style={{ filter: 'brightness(0) invert(1)' }}
                 priority
               />
-            </div>
-            <h1 className="font-black text-white leading-tight tracking-tight"
-                style={{ fontSize: 'clamp(2rem, 6.5vw, 5.5rem)' }}>
-              חיים ענבי
+            </motion.div>
+
+            {/* "חיים ענבי" */}
+            <h1
+              className="font-black text-white leading-none"
+              style={{
+                fontSize: 'clamp(2.8rem, 8vw, 7rem)',
+                textShadow: '0 2px 24px rgba(0,0,0,0.7)',
+                minWidth: '1ch',
+              }}
+            >
+              {text2}
+              {!done2 && text2.length > 0 && <span className="cursor" />}
             </h1>
           </div>
 
-          <p className="text-white font-medium opacity-95 max-w-xl text-right leading-relaxed"
-             style={{ fontSize: 'clamp(0.9rem, 1.4vw, 1.25rem)' }}>
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="text-white/75 font-medium max-w-lg leading-relaxed"
+            style={{ fontSize: 'clamp(0.95rem, 1.4vw, 1.25rem)' }}
+          >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
-          </p>
+          </motion.p>
         </div>
 
-        {/* НИЖНЯЯ ЧАСТЬ: Кнопки */}
-        <div 
-          className="flex flex-col gap-4 w-full md:w-auto items-start mb-6" 
-          onClick={(e) => e.stopPropagation()}
+        {/* CTA */}
+        <motion.div
+          className="flex flex-col gap-3 w-full md:w-auto items-start"
+          initial={{ opacity: 0, y: 30 }}
+          animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
         >
-          <Link
-            href="/apartments?dealType=rent"
-            className="bg-white text-black px-12 md:px-16 py-3.5 md:py-4 rounded-lg font-bold text-lg md:text-xl hover:bg-gray-100 transition-all w-full md:min-w-[280px] text-center shadow-2xl"
+          {/* Gold */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -3 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full md:w-auto"
           >
-            נכסים להשכרה
-          </Link>
+            <Link
+              href="/apartments?dealType=rent"
+              className="btn-primary group relative block overflow-hidden w-full md:min-w-[340px] rounded-2xl font-bold text-xl"
+              style={{
+                padding: '1.1rem 2.8rem',
+                background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
+                color: '#1C1000',
+                textAlign: 'center',
+                letterSpacing: '0.04em',
+              }}
+            >
+              <span
+                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
+                  transform: 'translateX(-200%) skewX(-20deg)',
+                }}
+              />
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                נכסים להשכרה
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
+          </motion.div>
 
-          <Link
-            href="/apartments?dealType=sale"
-            className="bg-white text-black px-12 md:px-16 py-3.5 md:py-4 rounded-lg font-bold text-lg md:text-xl hover:bg-gray-100 transition-all w-full md:min-w-[280px] text-center shadow-2xl"
+          {/* Glass */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -3 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full md:w-auto"
           >
-            נכסים למכירה
-          </Link>
-        </div>
-
-      </div>
+            <Link
+              href="/apartments?dealType=sale"
+              className="btn-secondary group relative block overflow-hidden w-full md:min-w-[340px] rounded-2xl font-bold text-xl border-2"
+              style={{
+                padding: '1.1rem 2.8rem',
+                borderColor: 'rgba(255,255,255,0.4)',
+                background: 'rgba(255,255,255,0.07)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+                color: '#ffffff',
+                textAlign: 'center',
+                letterSpacing: '0.04em',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
+              }}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-3">
+                נכסים למכירה
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </span>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

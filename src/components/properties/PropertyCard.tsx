@@ -26,7 +26,7 @@ interface PropertyCardProps extends Partial<Property> {
   mapUrl?: string;
   images?: string[];
   isSold?: boolean;
-  showImage?: boolean; // Control whether to show image section
+  showImage?: boolean;
   totalFloors?: number;
 }
 
@@ -42,7 +42,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   rooms,
   area,
   status,
-  // Extended Property fields
   dealType,
   street,
   streetNumber,
@@ -58,10 +57,8 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   vacancyDate,
   features,
   isSold,
-  showImage = true // Default to showing images
+  showImage = true
 }) => {
-
-  // --- Helper functions for Hebrew localization ---
 
   const getPropertyTypeLabel = (type?: string) => {
     const labels: Record<string, string> = {
@@ -82,16 +79,16 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
   const getParkingLabel = (parkingType?: string) => {
     const labels: Record<string, string> = {
-      'single': 'יש',     
+      'single': 'יש',
       'none': 'אין',
       'double': 'כפולה',
       'shared': 'משותפת',
       'covered': 'מקורה',
-      'triple': 'שלוש',
+      'triple': 'שלש',
       'robotic': 'רובוטית',
       'multiple': 'מכפיל'
     };
-    return parkingType ? labels[parkingType] : 'לא צוין'; // Default: "Not specified"
+    return parkingType ? labels[parkingType] : 'לא צוין';
   };
 
   const getPositionLabel = (pos?: string) => {
@@ -133,15 +130,25 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     return status ? labels[status] || status : '';
   };
 
-  // --- Component Logic ---
-  
-  // Determine the main image to display
+  // Status badge styles — brand colors: gold for exclusive, white/blue for others
+  const getStatusStyle = (status?: string) => {
+    switch (status) {
+      case 'Exclusive':
+        // Brand gold — premium feel, clearly readable
+        return 'bg-[#c5a357] text-[#1c3664]';
+      case 'Opportunity':
+        // White with dark blue text — clean, not loud
+        return 'bg-white/95 text-[#1c3664]';
+      case 'New':
+        // Dark blue with white — consistent with brand
+        return 'bg-[#1c3664] text-white';
+      default:
+        return 'bg-white/90 text-[#1c3664]';
+    }
+  };
+
   const displayImage = image || (images && images.length > 0 ? images[0] : '/images/placeholder.webp');
-  
-  // Normalize room count
   const displayRooms = rooms || bedrooms || 0;
-  
-  // Determine deal type label (Sale/Rent)
   const dealTypeLabel = dealType === 'sale' ? 'למכירה' : dealType === 'rent' ? 'להשכרה' : 'למכירה';
 
   return (
@@ -158,263 +165,244 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
       <motion.div
         whileHover={isSold ? {} : { y: -5 }}
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
-          isSold 
-            ? 'bg-gray-100 border-2 border-gray-300 opacity-75' 
+          isSold
+            ? 'bg-gray-100 border-2 border-gray-300 opacity-75'
             : 'bg-white border border-gray-100'
         }`}
         style={{
-          boxShadow: isSold 
-            ? '0 2px 10px rgba(0, 0, 0, 0.1)' 
+          boxShadow: isSold
+            ? '0 2px 10px rgba(0, 0, 0, 0.1)'
             : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)'
         }}
         dir="rtl"
       >
-      {/* Property Image - only show if showImage is true */}
-      {showImage && (
-        <div className="relative h-64 overflow-hidden bg-gray-100">
-          <Image
-            src={displayImage}
-            alt={title}
-            fill
-            className={`object-cover transition-transform duration-700 ${
-              isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
-            }`}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            loading="lazy"
-            quality={85}
-          />
-          
-          {/* Dark overlay for text contrast if needed */}
-          <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
-            isSold ? 'opacity-40' : 'opacity-60'
-          }`}></div>
-          
-          {/* Gray overlay for sold properties */}
-          {isSold && (
-            <div className="absolute inset-0 bg-gray-900/30 z-0"></div>
-          )}
+        {/* Property Image */}
+        {showImage && (
+          <div className="relative h-64 overflow-hidden bg-gray-100">
+            <Image
+              src={displayImage}
+              alt={title}
+              fill
+              className={`object-cover transition-transform duration-700 ${
+                isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
+              }`}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              loading="lazy"
+              quality={85}
+            />
 
-          {/* Sold image overlay */}
-          {isSold && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <Image
-                src="/images/sold.png"
-                alt="נמכר"
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                loading="lazy"
-                quality={90}
-              />
-            </div>
-          )}
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
+              isSold ? 'opacity-40' : 'opacity-60'
+            }`} />
 
-          {/* Deal Type Badge (Sale/Rent) */}
-          {dealType && (
-            <div className={`absolute bottom-4 right-4 ${
-              dealType === 'sale' 
-                ? 'bg-green-600' 
-                : 'bg-blue-600'
-            } text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg z-30 flex items-center gap-1.5`}>
-              {dealType === 'sale' ? (
-                <DollarSign size={14} className="shrink-0" />
-              ) : (
-                <Tag size={14} className="shrink-0" />
-              )}
-              <span>{dealTypeLabel}</span>
-            </div>
-          )}
+            {isSold && (
+              <div className="absolute inset-0 bg-gray-900/30 z-0" />
+            )}
 
-          {/* Status Badge (e.g., New, Exclusive) - only show if not sold */}
-          {status && !isSold && (
-            <div className="absolute top-4 right-4 bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md z-30">
-              {getStatusLabel(status)}
-            </div>
-          )}
+            {isSold && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center">
+                <Image
+                  src="/images/sold.png"
+                  alt="נמכר"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  loading="lazy"
+                  quality={90}
+                />
+              </div>
+            )}
 
-          {/* Property Type Badge (e.g., Apartment, Villa) */}
-          {propertyType && (
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
-              {getPropertyTypeLabel(propertyType)}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Status and Property Type badges when image is hidden */}
-      {!showImage && (
-        <div className="relative p-4 bg-gray-50 border-b border-gray-200">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            {/* Deal Type Badge (Sale/Rent) */}
+            {/* Deal Type Badge — refined, not dollar-green */}
             {dealType && (
-              <div className={`${
-                dealType === 'sale' 
-                  ? 'bg-green-600' 
-                  : 'bg-blue-600'
-              } text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5`}>
-                {dealType === 'sale' ? (
-                  <DollarSign size={14} className="shrink-0" />
-                ) : (
-                  <Tag size={14} className="shrink-0" />
-                )}
+              <div className={`absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm ${
+                dealType === 'sale'
+                  ? 'bg-[#1c3664]/90 text-white border border-white/20'
+                  : 'bg-[#1c3664]/90 text-white border border-white/20'
+              }`}>
+                <Tag size={13} className="shrink-0" />
                 <span>{dealTypeLabel}</span>
               </div>
             )}
 
-            {/* Sold Badge */}
-            {isSold && (
-              <div className="bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow-lg flex items-center gap-1.5">
-                <CheckCircle2 size={16} />
-                <span>נמכר</span>
-              </div>
-            )}
-            
-            {/* Status Badge */}
+            {/* Status Badge — distinct color per status, never dark-on-dark */}
             {status && !isSold && (
-              <div className="bg-[#1c3664] text-white px-3 py-1 text-sm font-bold rounded shadow-md">
+              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md tracking-wide uppercase ${getStatusStyle(status)}`}>
                 {getStatusLabel(status)}
               </div>
             )}
-            
+
             {/* Property Type Badge */}
             {propertyType && (
-              <div className="bg-white border border-gray-200 text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
                 {getPropertyTypeLabel(propertyType)}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Card Content */}
-      <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
-
-        {/* Title & Address */}
-        <div className="mb-3">
-          <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
-            isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-          }`}>
-            {title}
-          </h3>
-          <div className={`flex items-start gap-1.5 text-xs text-gray-500 mb-2 ${
-            isSold ? 'text-gray-400' : ''
-          }`}>
-            <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
-            <span className="break-words">
-              {location}
-              {neighborhood && ` • ${neighborhood}`}
-            </span>
-          </div>
-          {isSold && (
-            <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
-              <CheckCircle2 size={10} />
-              <span>נמכר</span>
-            </div>
-          )}
-        </div>
-
-        {/* Main Statistics Grid (Rooms, Floor, Area) */}
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
-            isSold ? 'bg-gray-200' : 'bg-gray-50'
-          }`}>
-            <Bed size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
-              {displayRooms} חדרים
-            </span>
-          </div>
-
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
-            isSold ? 'bg-gray-200' : 'bg-gray-50'
-          }`}>
-            <Building size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
-               {floor !== undefined && floor !== null && typeof floor === 'number'
-                 ? ((totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
-                   ? `קומה ${floor} מתוך ${totalFloors}`
-                   : `קומה ${floor}`)
-                 : '-'}
-            </span>
-          </div>
-
-          <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
-            isSold ? 'bg-gray-200' : 'bg-gray-50'
-          }`}>
-            <Maximize size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
-            <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
-              {area} מ״ר
-            </span>
-          </div>
-        </div>
-
-        {/* Feature Tags */}
-        {features && (
-          <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-            {features.hasAirConditioning && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-blue-700">
-                <Wind size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מיזוג</span>
-              </div>
-            )}
-            {features.hasElevator && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-purple-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-purple-700">
-                <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מעלית</span>
-              </div>
-            )}
-            {features.hasStorage && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-orange-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-orange-700">
-                <Warehouse size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מחסן</span>
-              </div>
-            )}
-            {features.hasSafeRoom && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-green-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-green-700">
-                <Shield size={12} className="sm:w-3.5 sm:h-3.5" /> <span>ממ״ד</span>
-              </div>
-            )}
-            {features.hasSunBalcony && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-yellow-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-yellow-700">
-                <Sun size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מ. שמש</span>
-              </div>
-            )}
-            {features.hasBoiler && (
-              <div className="flex items-center gap-0.5 sm:gap-1 bg-red-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-red-700">
-                <Droplet size={12} className="sm:w-3.5 sm:h-3.5" /> <span>דוד</span>
               </div>
             )}
           </div>
         )}
 
-        {/* Footer: Price & Action Button */}
-        <div className={`mt-auto border-t pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-          isSold ? 'border-gray-300' : 'border-gray-100'
-        }`}>
-          <div className="w-full sm:w-auto">
-            {originalPrice && (
-              <p className="text-xs text-gray-400 line-through mb-0.5">
-                {originalPrice}
-              </p>
-            )}
-            <p className={`text-lg sm:text-xl font-black ${
-              isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
+        {/* Badges when image is hidden */}
+        {!showImage && (
+          <div className="relative p-4 bg-gray-50 border-b border-gray-200">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              {dealType && (
+                <div className="bg-[#1c3664] text-white px-4 py-2 text-sm font-bold rounded-lg shadow flex items-center gap-1.5">
+                  <Tag size={14} className="shrink-0" />
+                  <span>{dealTypeLabel}</span>
+                </div>
+              )}
+
+              {isSold && (
+                <div className="bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow flex items-center gap-1.5">
+                  <CheckCircle2 size={16} />
+                  <span>נמכר</span>
+                </div>
+              )}
+
+              {status && !isSold && (
+                <div className={`px-3 py-1 text-xs font-black rounded-md shadow tracking-wide uppercase ${getStatusStyle(status)}`}>
+                  {getStatusLabel(status)}
+                </div>
+              )}
+
+              {propertyType && (
+                <div className="bg-white border border-gray-200 text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm">
+                  {getPropertyTypeLabel(propertyType)}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Card Content */}
+        <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
+
+          {/* Title & Address */}
+          <div className="mb-3">
+            <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
+              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
             }`}>
-              {price}
-            </p>
+              {title}
+            </h3>
+            <div className={`flex items-start gap-1.5 text-xs mb-2 ${
+              isSold ? 'text-gray-400' : 'text-gray-500'
+            }`}>
+              <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
+              <span className="break-words">
+                {location}
+                {neighborhood && ` • ${neighborhood}`}
+              </span>
+            </div>
+            {isSold && (
+              <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
+                <CheckCircle2 size={10} />
+                <span>נמכר</span>
+              </div>
+            )}
           </div>
 
-          {isSold ? (
-            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-400 text-white font-bold text-sm sm:text-base rounded-xl opacity-60 w-full sm:w-auto justify-center">
-              נמכר
-              <CheckCircle2 size={18} />
+          {/* Main Statistics Grid */}
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4 sm:mb-5">
+            <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
+              isSold ? 'bg-gray-200' : 'bg-gray-50'
+            }`}>
+              <Bed size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+              <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+                {displayRooms} חדרים
+              </span>
             </div>
-          ) : (
-            <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-900 text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#1c3664] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center whitespace-nowrap">
-              <span className="whitespace-nowrap">לפרטים נוספים</span>
-              <ArrowLeft size={16} className="sm:hidden shrink-0" />
-              <ArrowLeft size={18} className="hidden sm:block shrink-0" />
+
+            <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
+              isSold ? 'bg-gray-200' : 'bg-gray-50'
+            }`}>
+              <Building size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+              <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+                {floor !== undefined && floor !== null && typeof floor === 'number'
+                  ? ((totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+                    ? `קומה ${floor} מתוך ${totalFloors}`
+                    : `קומה ${floor}`)
+                  : '-'}
+              </span>
+            </div>
+
+            <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
+              isSold ? 'bg-gray-200' : 'bg-gray-50'
+            }`}>
+              <Maximize size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+              <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
+                {area} מ״ר
+              </span>
+            </div>
+          </div>
+
+          {/* Feature Tags */}
+          {features && (
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
+              {features.hasAirConditioning && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-blue-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-blue-700">
+                  <Wind size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מיזוג</span>
+                </div>
+              )}
+              {features.hasElevator && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-purple-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-purple-700">
+                  <ArrowUpDown size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מעלית</span>
+                </div>
+              )}
+              {features.hasStorage && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-orange-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-orange-700">
+                  <Warehouse size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מחסן</span>
+                </div>
+              )}
+              {features.hasSafeRoom && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-green-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-green-700">
+                  <Shield size={12} className="sm:w-3.5 sm:h-3.5" /> <span>ממ״ד</span>
+                </div>
+              )}
+              {features.hasSunBalcony && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-yellow-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-yellow-700">
+                  <Sun size={12} className="sm:w-3.5 sm:h-3.5" /> <span>מ. שמש</span>
+                </div>
+              )}
+              {features.hasBoiler && (
+                <div className="flex items-center gap-0.5 sm:gap-1 bg-red-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-red-700">
+                  <Droplet size={12} className="sm:w-3.5 sm:h-3.5" /> <span>דוד</span>
+                </div>
+              )}
             </div>
           )}
+
+          {/* Footer: Price & Action Button */}
+          <div className={`mt-auto border-t pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
+            isSold ? 'border-gray-300' : 'border-gray-100'
+          }`}>
+            <div className="w-full sm:w-auto">
+              {originalPrice && (
+                <p className="text-xs text-gray-400 line-through mb-0.5">
+                  {originalPrice}
+                </p>
+              )}
+              <p className={`text-lg sm:text-xl font-black ${
+                isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
+              }`}>
+                {price}
+              </p>
+            </div>
+
+            {isSold ? (
+              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-400 text-white font-bold text-sm sm:text-base rounded-xl opacity-60 w-full sm:w-auto justify-center">
+                נמכר
+                <CheckCircle2 size={18} />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#1c3664] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#162d54] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center whitespace-nowrap">
+                <span className="whitespace-nowrap">לפרטים נוספים</span>
+                <ArrowLeft size={16} className="sm:hidden shrink-0" />
+                <ArrowLeft size={18} className="hidden sm:block shrink-0" />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
     </Link>
   );
 });
