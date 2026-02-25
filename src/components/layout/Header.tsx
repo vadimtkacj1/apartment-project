@@ -83,7 +83,7 @@ export default function Header() {
       <nav
         dir="ltr"
         style={{
-          maxWidth: 1440,
+          maxWidth: 2400, // ✅ Увеличена для 3K экранов (было 1440)
           margin: "0 auto",
           padding: "0 2.5rem",
           height: 90, // ✅ Увеличена высота хедера
@@ -120,7 +120,7 @@ export default function Header() {
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "2.4rem" }}> {/* ✅ Увеличен gap */}
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "3rem" }}> {/* ✅ Увеличен gap для 3K экранов */}
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -135,7 +135,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: 17, // ✅ Увеличен размер шрифта (было 15)
+                      fontSize: "clamp(17px, 1.2vw, 22px)", // ✅ Увеличен до 22px для 3K экранов
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",

@@ -130,7 +130,7 @@ function NoCommissionSection() {
       >
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
+          <h2 className="font-bold text-white mb-3" style={{ fontFamily: 'Carmela, sans-serif', fontSize: 'clamp(3.5rem, 6vw, 7rem)' }}>
             דירה ללא עמלת תיווך
           </h2>
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem' }}>
@@ -141,14 +141,14 @@ function NoCommissionSection() {
         {/* Card */}
         <Link href={`/apartments/${property.id}`}>
           <div className="no-commission-card transition-all duration-300">
-            <div className="grid md:grid-cols-5 gap-0 md:min-h-[500px]">
+            <div className="grid md:grid-cols-5 gap-0 md:min-h-95">
 
               {/* Image — 2/5 width */}
-              <div className="md:col-span-2 relative h-[320px] md:h-full overflow-hidden">
+              <div className="md:col-span-2 relative h-70 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.4)' }}>
                 <img
                   src={property.image}
                   alt={property.title}
-                  className="property-image w-full h-full object-cover transition-transform duration-700"
+                  className="property-image w-full h-full object-cover transition-transform duration-700 rounded-2xl"
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">
@@ -163,12 +163,12 @@ function NoCommissionSection() {
 
               {/* Info — 3/5 width, centered */}
               <div
-                className="md:col-span-3 p-8 md:p-10 flex flex-col justify-center items-center text-center"
+                className="md:col-span-3 p-5 md:p-7 flex flex-col justify-center items-center text-center"
                 style={{ background: 'transparent' }}
               >
                 {/* Property Type Badge */}
                 <span
-                  className="inline-block text-xs font-bold px-4 py-1.5 rounded-full mb-5"
+                  className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3"
                   style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', letterSpacing: '0.06em' }}
                 >
                   {property.propertyType === 'apartment' ? 'דירה' :
@@ -178,26 +178,26 @@ function NoCommissionSection() {
                 </span>
 
                 {/* Title */}
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3 leading-tight">
+                <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
                   {property.title}
                 </h3>
 
                 {/* Location */}
-                <div className="flex items-center justify-center gap-2 mb-5">
-                  <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center justify-center gap-1.5 mb-3">
+                  <svg className="w-3.5 h-3.5 shrink-0" style={{ color: 'rgba(255,255,255,0.5)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.95rem' }}>{property.location}</p>
+                  <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.85rem' }}>{property.location}</p>
                 </div>
 
                 {/* Price */}
-                <p className="text-4xl md:text-5xl font-bold mb-6" style={{ color: '#D4AF37' }}>
+                <p className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#D4AF37' }}>
                   {property.price}
                 </p>
 
                 {/* Property Details Grid */}
-                <div className="grid grid-cols-3 gap-3 mb-6 w-full max-w-sm">
+                <div className="grid grid-cols-3 gap-2 mb-4 w-full max-w-xs">
                   {[
                     {
                       icon: (
@@ -223,14 +223,14 @@ function NoCommissionSection() {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      className="text-center p-3 rounded-xl"
+                      className="text-center p-2 rounded-lg"
                       style={{ background: 'rgba(255,255,255,0.06)' }}
                     >
-                      <svg className="w-5 h-5 mx-auto mb-1.5" style={{ color: '#D4AF37' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mx-auto mb-1" style={{ color: '#D4AF37' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {item.icon}
                       </svg>
-                      <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.7rem', marginBottom: '2px' }}>{item.label}</p>
-                      <p className="text-white text-lg font-bold">{item.value}</p>
+                      <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.65rem', marginBottom: '2px' }}>{item.label}</p>
+                      <p className="text-white text-base font-bold">{item.value}</p>
                     </div>
                   ))}
                 </div>
@@ -238,8 +238,8 @@ function NoCommissionSection() {
                 {/* Description */}
                 {property.description && (
                   <p
-                    className="mb-5 leading-relaxed line-clamp-2"
-                    style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', maxWidth: '440px' }}
+                    className="mb-3 leading-relaxed line-clamp-2"
+                    style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', maxWidth: '380px' }}
                   >
                     {property.description}
                   </p>
@@ -247,33 +247,33 @@ function NoCommissionSection() {
 
                 {/* Features */}
                 {(property.hasAirConditioning || property.hasElevator || property.hasStorage || property.hasSafeRoom || property.hasSunBalcony) && (
-                  <div className="flex flex-wrap justify-center gap-2 mb-6">
+                  <div className="flex flex-wrap justify-center gap-1.5 mb-4">
                     {property.hasAirConditioning && (
-                      <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מיזוג</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מיזוג</span>
                     )}
                     {property.hasElevator && (
-                      <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מעלית</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מעלית</span>
                     )}
                     {property.hasStorage && (
-                      <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מחסן</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מחסן</span>
                     )}
                     {property.hasSafeRoom && (
-                      <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>ממ״ד</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>ממ״ד</span>
                     )}
                     {property.hasSunBalcony && (
-                      <span className="text-xs px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מרפסת שמש</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.75)' }}>מרפסת שמש</span>
                     )}
                   </div>
                 )}
 
                 {/* CTA */}
                 <div
-                  className="btn-no-commission group relative text-center py-3 px-10 rounded-xl font-bold text-base overflow-hidden cursor-pointer"
+                  className="btn-no-commission group relative text-center py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
                   style={{
                     background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                     color: '#1C1000',
                     letterSpacing: '0.04em',
-                    minWidth: '200px',
+                    minWidth: '180px',
                   }}
                 >
                   <span
@@ -286,7 +286,7 @@ function NoCommissionSection() {
                   <span className="relative z-10">לפרטים נוספים ←</span>
                 </div>
 
-                <p className="text-sm font-semibold mt-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                <p className="text-xs font-semibold mt-3" style={{ color: 'rgba(255,255,255,0.75)' }}>
                   חסכו את עמלת התיווך — קנו ישירות!
                 </p>
               </div>
