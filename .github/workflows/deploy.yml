@@ -73,9 +73,24 @@ jobs:
             exit 1
           fi
 
+          # Copy standalone build contents
           cp -r .next/standalone/. deploy/
+          
+          # Copy static files to correct location
           mkdir -p deploy/.next/static
           cp -r .next/static/. deploy/.next/static/
+          
+          # Ensure BUILD_ID is in the right place for standalone mode
+          if [ -f ".next/BUILD_ID" ]; then
+            mkdir -p deploy/.next
+            cp .next/BUILD_ID deploy/.next/BUILD_ID
+          fi
+          
+          # If standalone has .next/server, ensure it's accessible
+          if [ -d ".next/standalone/.next/server" ]; then
+            mkdir -p deploy/.next/server
+            cp -r .next/standalone/.next/server/. deploy/.next/server/
+          fi
 
           if [ -d "public" ]; then
             mkdir -p deploy/public
@@ -90,6 +105,23 @@ jobs:
           if [ -d "src" ]; then
             mkdir -p deploy/src
             cp -r src/. deploy/src/
+          fi
+
+          # Copy configuration files needed for building
+          if [ -f "tsconfig.json" ]; then
+            cp tsconfig.json deploy/
+          fi
+          
+          if [ -f "middleware.ts" ]; then
+            cp middleware.ts deploy/
+          fi
+          
+          if [ -f "next.config.ts" ]; then
+            cp next.config.ts deploy/
+          fi
+          
+          if [ -f "next.config.js" ]; then
+            cp next.config.js deploy/
           fi
 
           cp package.json deploy/
@@ -138,6 +170,33 @@ jobs:
             tar -xzf /tmp/deploy.tar.gz
             cp -r deploy/. .
             rm -rf deploy
+            
+            # Create proper .next directory structure for standalone mode
+            # Standalone build needs .next/server and .next/static directories
+            if [ -d ".next/standalone" ]; then
+              echo "📦 Setting up .next directory structure..."
+              # Create .next directory if it doesn't exist
+              mkdir -p .next
+              
+              # Copy server files from standalone
+              if [ -d ".next/standalone/.next/server" ]; then
+                mkdir -p .next/server
+                cp -r .next/standalone/.next/server/. .next/server/ 2>/dev/null || true
+              fi
+              
+              # Ensure static directory exists (should already be copied)
+              if [ ! -d ".next/static" ]; then
+                echo "⚠️  Warning: .next/static not found, creating..."
+                mkdir -p .next/static
+              fi
+              
+              # Create BUILD_ID file if it doesn't exist
+              if [ ! -f ".next/BUILD_ID" ] && [ -f ".next/standalone/.next/BUILD_ID" ]; then
+                cp .next/standalone/.next/BUILD_ID .next/BUILD_ID 2>/dev/null || true
+              fi
+              
+              echo "✓ .next directory structure created"
+            fi
 
             # Debug: Check if environment variables are set
             echo "🔍 Checking environment variables..."
@@ -156,6 +215,20 @@ jobs:
               echo "✓ NEXTAUTH_SECRET generated"
             fi
 
+            # Determine NEXTAUTH_URL
+            if [ -z "$NEXTAUTH_URL" ] || [ "$NEXTAUTH_URL" = "" ]; then
+              # Try to get server IP or use default
+              SERVER_IP=$(hostname -I | awk '{print $1}' 2>/dev/null || echo "")
+              if [ -n "$SERVER_IP" ]; then
+                NEXTAUTH_URL="http://${SERVER_IP}"
+              else
+                NEXTAUTH_URL="http://localhost:3000"
+              fi
+              echo "🔗 Using default NEXTAUTH_URL: $NEXTAUTH_URL"
+            else
+              echo "✓ NEXTAUTH_URL is set: $NEXTAUTH_URL"
+            fi
+
             # Update .env file with current environment variables
             echo "📝 Updating .env..."
             {
@@ -164,7 +237,7 @@ jobs:
               echo "HOSTNAME=0.0.0.0"
               echo "DATABASE_URL=\"${DATABASE_URL}\""
               echo "NEXTAUTH_SECRET=\"${NEXTAUTH_SECRET}\""
-              echo "NEXTAUTH_URL=\"${NEXTAUTH_URL:-http://localhost:3000}\""
+              echo "NEXTAUTH_URL=\"${NEXTAUTH_URL}\""
             } > .env
 
             # Verify .env was created correctly
@@ -210,6 +283,16 @@ jobs:
             pm2 flush || true
 
             echo "▶️ Starting application on port $PORT..."
+            # Verify .env file exists and has content
+            if [ ! -f ".env" ] || [ ! -s ".env" ]; then
+              echo "❌ ERROR: .env file is missing or empty"
+              exit 1
+            fi
+            
+            echo "📋 Environment variables from .env:"
+            grep -E "^(NODE_ENV|PORT|HOSTNAME|DATABASE_URL|NEXTAUTH_SECRET|NEXTAUTH_URL)=" .env | sed 's/=.*/=***/' || true
+            
+            # Start PM2 with environment from .env file
             pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
