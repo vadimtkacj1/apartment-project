@@ -25,12 +25,22 @@ jobs:
 
       - name: Cache Next.js build cache
         uses: actions/cache@v4
+        id: nextjs-cache
         with:
           path: |
             .next/cache
           key: ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'prisma/**', 'next.config.*', 'tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-
+            ${{ runner.os }}-next-cache-
+
+      - name: Post Cache Next.js build cache
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next/cache
+          key: ${{ steps.nextjs-cache.outputs.cache-primary-key }}
 
       - name: Install dependencies
         run: npm ci
@@ -117,7 +127,7 @@ jobs:
             set -e
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
-            PORT=80
+            PORT=3000
 
             echo "🚀 Starting deployment..."
 
@@ -150,11 +160,11 @@ jobs:
             echo "📝 Updating .env..."
             {
               echo "NODE_ENV=production"
-              echo "PORT=80"
+              echo "PORT=3000"
               echo "HOSTNAME=0.0.0.0"
               echo "DATABASE_URL=\"${DATABASE_URL}\""
               echo "NEXTAUTH_SECRET=\"${NEXTAUTH_SECRET}\""
-              echo "NEXTAUTH_URL=\"${NEXTAUTH_URL:-http://localhost:80}\""
+              echo "NEXTAUTH_URL=\"${NEXTAUTH_URL:-http://localhost:3000}\""
             } > .env
 
             # Verify .env was created correctly
@@ -185,10 +195,22 @@ jobs:
               npm install -g pm2
             fi
 
+            # Clean up all old PM2 processes (including any duplicates)
+            echo "🧹 Cleaning up old PM2 processes..."
+            pm2 stop all || true
+            pm2 delete all || true
+            
+            # Remove any processes with similar names
+            pm2 stop "apartmen" || true
+            pm2 delete "apartmen" || true
             pm2 stop $APP_NAME || true
             pm2 delete $APP_NAME || true
+            
+            # Clear PM2 logs
+            pm2 flush || true
 
-            pm2 start server.js --name $APP_NAME --node-args="--env-file=$APP_DIR/.env"
+            echo "▶️ Starting application on port $PORT..."
+            pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
             sleep 5
