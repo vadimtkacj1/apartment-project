@@ -54,7 +54,7 @@ const Hero: React.FC<HeroProps> = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden mt-20"
+      className="relative w-full h-[90vh] md:h-screen overflow-hidden mt-24 md:mt-20"
     >
       <style>{`
         @keyframes blink {
@@ -120,7 +120,7 @@ const Hero: React.FC<HeroProps> = () => {
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(2.8rem, 8.5vw, 11rem)',
+                fontSize: 'clamp(2rem, 8.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
               }}
@@ -135,7 +135,7 @@ const Hero: React.FC<HeroProps> = () => {
               animate={done1 ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.3, rotate: -20 }}
               transition={{ type: 'spring', stiffness: 120, damping: 12 }}
               className="relative shrink-0"
-              style={{ width: 'clamp(2.5rem, 5.5vw, 8.5rem)', height: 'clamp(2.5rem, 5.5vw, 8.5rem)' }}
+              style={{ width: 'clamp(1.8rem, 5.5vw, 4.5rem)', height: 'clamp(1.8rem, 5.5vw, 4.5rem)' }}
             >
               <Image
                 src="/images/and.png"
@@ -151,7 +151,7 @@ const Hero: React.FC<HeroProps> = () => {
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(2.8rem, 8.5vw, 11rem)',
+                fontSize: 'clamp(2rem, 8.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
               }}
@@ -167,7 +167,7 @@ const Hero: React.FC<HeroProps> = () => {
             animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
             className="text-white/75 font-medium max-w-2xl leading-relaxed"
-            style={{ fontSize: 'clamp(0.95rem, 1.6vw, 2rem)' }}
+            style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </motion.p>
@@ -175,7 +175,7 @@ const Hero: React.FC<HeroProps> = () => {
 
         {/* CTA */}
         <motion.div
-          className="flex flex-col gap-3 w-full md:w-auto items-start"
+          className="flex flex-col gap-3 w-full md:w-auto items-center md:items-start"
           initial={{ opacity: 0, y: 30 }}
           animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
@@ -190,12 +190,12 @@ const Hero: React.FC<HeroProps> = () => {
               href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold"
               style={{
-                padding: 'clamp(1.1rem, 1.6vw, 1.6rem) clamp(2.8rem, 3.8vw, 4rem)',
+                padding: 'clamp(0.75rem, 1.6vw, 1.6rem) clamp(1.5rem, 3.8vw, 4rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                 color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(1.15rem, 1.5vw, 1.85rem)',
+                fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
               }}
             >
               <span
@@ -226,7 +226,7 @@ const Hero: React.FC<HeroProps> = () => {
               href="/apartments?dealType=sale"
               className="btn-secondary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
-                padding: 'clamp(1.1rem, 1.6vw, 1.6rem) clamp(2.8rem, 3.8vw, 4rem)',
+                padding: 'clamp(0.75rem, 1.6vw, 1.6rem) clamp(1.5rem, 3.8vw, 4rem)',
                 borderColor: 'rgba(255,255,255,0.4)',
                 background: 'rgba(255,255,255,0.07)',
                 backdropFilter: 'blur(14px)',
@@ -235,7 +235,7 @@ const Hero: React.FC<HeroProps> = () => {
                 textAlign: 'center',
                 letterSpacing: '0.04em',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-                fontSize: 'clamp(1.15rem, 1.5vw, 1.85rem)',
+                fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
               }}
             >
               <span className="relative z-10 flex items-center justify-center gap-3">

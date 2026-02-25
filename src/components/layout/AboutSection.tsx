@@ -41,7 +41,6 @@ const AboutSection: React.FC = memo(() => {
             backgroundSize: '160px',
             backgroundRepeat: 'repeat',
             backgroundPosition: 'center',
-            transform: 'rotate(10deg)',  // было 45deg → теперь 10deg
           }}
         />
       </motion.div>

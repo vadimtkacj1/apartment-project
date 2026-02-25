@@ -98,12 +98,12 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={64} height={64}
+            <Image src="/images/logo.PNG" alt="Logo" width={42} height={42}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
-          <Image src="/images/second-and.svg" alt="and" width={40} height={40}
+          <Image src="/images/second-and.svg" alt="and" width={26} height={26}
             className="object-contain" priority
             style={{ transition: "filter 0.35s ease" }}
           />
@@ -111,7 +111,7 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={64} height={64}
+            <Image src="/images/logo2.svg" alt="Logo 2" width={42} height={42}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />

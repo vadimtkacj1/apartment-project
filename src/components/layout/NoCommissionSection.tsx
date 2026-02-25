@@ -130,7 +130,7 @@ function NoCommissionSection() {
       >
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="font-bold text-white mb-3" style={{ fontFamily: 'Carmela, sans-serif', fontSize: 'clamp(3.5rem, 6vw, 7rem)' }}>
+          <h2 className="font-bold text-white mb-3" style={{ fontFamily: 'var(--font-caramel)', fontSize: 'clamp(4.2rem, 7.2vw, 8.4rem)' }}>
             דירה ללא עמלת תיווך
           </h2>
           <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem' }}>
@@ -143,12 +143,13 @@ function NoCommissionSection() {
           <div className="no-commission-card transition-all duration-300">
             <div className="grid md:grid-cols-5 gap-0 md:min-h-95">
 
-              {/* Image — 2/5 width */}
-              <div className="md:col-span-2 relative h-70 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.4)' }}>
+              {/* Image — 3/5 width */}
+              <div className="md:col-span-3 relative h-70 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4)' }}>
                 <img
                   src={property.image}
                   alt={property.title}
                   className="property-image w-full h-full object-cover transition-transform duration-700 rounded-2xl"
+                  style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.5))' }}
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">
@@ -161,9 +162,9 @@ function NoCommissionSection() {
                 </div>
               </div>
 
-              {/* Info — 3/5 width, centered */}
+              {/* Info — 2/5 width, centered */}
               <div
-                className="md:col-span-3 p-5 md:p-7 flex flex-col justify-center items-center text-center"
+                className="md:col-span-2 p-5 md:p-6 flex flex-col justify-center items-center text-center"
                 style={{ background: 'transparent' }}
               >
                 {/* Property Type Badge */}
