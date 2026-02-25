@@ -32,6 +32,10 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+.font-caramel {
+  font-family: var(--font-caramel), cursive, sans-serif !important;
+}
+
 @layer utilities {
   .bg-warm {
     background-color: #faf7f2 !important;

@@ -38,6 +38,14 @@ const assistant = localFont({
   adjustFontFallback: false,
 });
 
+const caramel = localFont({
+  src: '../../public/fonts/Carmela-Regular.ttf',
+  display: 'swap',
+  variable: '--font-caramel',
+  fallback: ['cursive', 'sans-serif'],
+  adjustFontFallback: false,
+});
+
 export const metadata: Metadata = {
   title: {
     default: "רם נכסים חיים ענבי - תיווך נדל״ן בחולון",
@@ -78,7 +86,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${assistant.variable} antialiased`}>
+      <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
         <Providers>
           {children}
           <AccessibilityWidget />
