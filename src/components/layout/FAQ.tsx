@@ -186,6 +186,7 @@ const FAQ: React.FC = () => {
             <a
               href="/#contact"
               className="inline-block bg-white text-[#1c3664] font-bold text-lg px-8 py-4 rounded-full hover:scale-105 hover:shadow-lg transition-all duration-300"
+              style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
             >
               צור קשר
             </a>

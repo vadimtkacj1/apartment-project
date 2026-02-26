@@ -51,167 +51,79 @@ function LoginForm() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+        background: '#ffffff',
         padding: '20px',
-        fontFamily: 'var(--font-assistant), Arial, Helvetica, sans-serif',
       }}
     >
-      {/* Background overlay pattern */}
       <div
         style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255,255,255,0.05) 0%, transparent 50%),
-                           radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%)`,
-          zIndex: 0,
-        }}
-      />
-
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 1,
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '400px',
+          background: '#fff',
+          padding: '40px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
         }}
       >
-        {/* Logo & Title */}
-        <div
-          style={{
-            textAlign: 'center',
-            marginBottom: '32px',
-          }}
-        >
-          <div
-            style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '18px',
-              background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-              boxShadow: '0 8px 32px rgba(24, 144, 255, 0.4)',
-            }}
-          >
-            <HomeOutlined style={{ fontSize: '36px', color: '#fff' }} />
-          </div>
-          <h1
-            style={{
-              color: '#fff',
-              fontSize: '28px',
-              fontWeight: 700,
-              margin: '0 0 8px',
-              fontFamily: 'inherit',
-            }}
-          >
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <HomeOutlined style={{ fontSize: '48px', color: '#1890ff', marginBottom: '16px' }} />
+          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
             לוח ניהול
           </h1>
-          <p
-            style={{
-              color: 'rgba(255, 255, 255, 0.6)',
-              fontSize: '15px',
-              margin: 0,
-              fontFamily: 'inherit',
-            }}
-          >
-            התחבר כדי לנהל את הנכסים שלך
+          <p style={{ color: '#8c8c8c', marginTop: '8px' }}>
+            התחבר למערכת
           </p>
         </div>
 
-        {/* Login Card */}
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: '16px',
-            padding: '40px 32px',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255,255,255,0.05)',
-          }}
+        {error && (
+          <Alert
+            message={error}
+            type="error"
+            showIcon
+            style={{ marginBottom: 24 }}
+          />
+        )}
+
+        <Form
+          onFinish={onFinish}
+          layout="vertical"
+          size="large"
         >
-          {error && (
-            <Alert
-              message={error}
-              type="error"
-              showIcon
-              style={{ marginBottom: 24, borderRadius: '8px' }}
-            />
-          )}
-
-          <Form
-            onFinish={onFinish}
-            layout="vertical"
-            size="large"
-            requiredMark={false}
+          <Form.Item
+            label="שם משתמש"
+            name="username"
+            rules={[{ required: true, message: 'אנא הכנס שם משתמש!' }]}
           >
-            <Form.Item
-              label={<span style={{ fontWeight: 600, color: '#333', fontSize: '14px' }}>שם משתמש</span>}
-              name="username"
-              rules={[
-                {
-                  required: true,
-                  message: 'אנא הכנס שם משתמש!',
-                },
-              ]}
-            >
-              <Input
-                prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="הכנס שם משתמש"
-                disabled={loading}
-                style={{
-                  borderRadius: '10px',
-                  height: '48px',
-                  fontSize: '15px',
-                }}
-              />
-            </Form.Item>
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="הכנס שם משתמש"
+              disabled={loading}
+            />
+          </Form.Item>
 
-            <Form.Item
-              label={<span style={{ fontWeight: 600, color: '#333', fontSize: '14px' }}>סיסמה</span>}
-              name="password"
-              rules={[
-                {
-                  required: true,
-                  message: 'אנא הכנס סיסמה!',
-                },
-              ]}
-            >
-              <Input.Password
-                prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="הכנס סיסמה"
-                disabled={loading}
-                style={{
-                  borderRadius: '10px',
-                  height: '48px',
-                  fontSize: '15px',
-                }}
-              />
-            </Form.Item>
+          <Form.Item
+            label="סיסמה"
+            name="password"
+            rules={[{ required: true, message: 'אנא הכנס סיסמה!' }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="הכנס סיסמה"
+              disabled={loading}
+            />
+          </Form.Item>
 
-            <Form.Item style={{ marginBottom: 0, marginTop: '8px' }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={loading}
-                block
-                style={{
-                  height: '48px',
-                  borderRadius: '10px',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  background: 'linear-gradient(135deg, #1890ff 0%, #096dd9 100%)',
-                  border: 'none',
-                  boxShadow: '0 4px 16px rgba(24, 144, 255, 0.4)',
-                }}
-              >
-                התחבר
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
+          <Form.Item style={{ marginBottom: 0 }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              block
+            >
+              התחבר
+            </Button>
+          </Form.Item>
+        </Form>
       </div>
     </div>
   );
@@ -227,10 +139,10 @@ export default function AdminLoginPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+          background: '#ffffff',
         }}
       >
-        <div style={{ color: '#fff', fontSize: '18px' }}>טוען...</div>
+        <div style={{ fontSize: '18px' }}>טוען...</div>
       </div>
     }>
       <LoginForm />

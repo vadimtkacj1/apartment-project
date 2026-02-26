@@ -14,6 +14,9 @@ import {
   Space,
   Switch,
   Spin,
+  Table,
+  Tag,
+  Image,
 } from 'antd';
 import {
   PlusOutlined,
@@ -23,8 +26,8 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
-import PropertyCard from '@/components/properties/PropertyCard';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
+import type { ColumnsType } from 'antd/es/table';
 
 interface Property {
   id: number;
@@ -106,7 +109,8 @@ export default function PropertiesPage() {
     const forSale = properties.filter((p) => p.dealType === 'sale').length;
     const forRent = properties.filter((p) => p.dealType === 'rent').length;
     const active = properties.filter((p) => p.isActive).length;
-    return { total, forSale, forRent, active };
+    const sold = properties.filter((p) => p.isSold).length;
+    return { total, forSale, forRent, active, sold };
   }, [properties]);
 
   const filteredProperties = useMemo(() => {
@@ -119,7 +123,9 @@ export default function PropertiesPage() {
       const matchesStatus =
         filterStatus === 'all' ||
         (filterStatus === 'active' && property.isActive) ||
-        (filterStatus === 'inactive' && !property.isActive);
+        (filterStatus === 'inactive' && !property.isActive) ||
+        (filterStatus === 'sold' && property.isSold) ||
+        (filterStatus === 'available' && !property.isSold);
       return matchesSearch && matchesDealType && matchesStatus;
     });
   }, [properties, searchTerm, filterDealType, filterStatus]);
@@ -173,7 +179,7 @@ export default function PropertiesPage() {
     <div className="px-2 sm:px-4 md:px-0">
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 style={{ fontSize: 'clamp(1.25rem, 5vw, 1.75rem)', fontWeight: 'bold', margin: 0 }}>ניהול נכסים</h1>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול נכסים</h1>
         <Link href="/admin/properties/new" className="w-full sm:w-auto">
           <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
             הוסף נכס חדש
@@ -183,17 +189,20 @@ export default function PropertiesPage() {
 
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} lg={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card><Statistic title="סה״כ נכסים" value={stats.total} prefix={<HomeOutlined />} /></Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card><Statistic title="נכסים למכירה" value={stats.forSale} styles={{ content: { color: '#3f8600' } }} /></Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card><Statistic title="נכסים להשכרה" value={stats.forRent} styles={{ content: { color: '#1890ff' } }} /></Card>
         </Col>
-        <Col xs={24} sm={12} lg={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card><Statistic title="נכסים פעילים" value={stats.active} styles={{ content: { color: '#faad14' } }} /></Card>
+        </Col>
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <Card><Statistic title="נכסים שנמכרו" value={stats.sold} styles={{ content: { color: '#cf1322' } }} /></Card>
         </Col>
       </Row>
 
@@ -227,131 +236,206 @@ export default function PropertiesPage() {
               <Select.Option value="all">כל הסטטוסים</Select.Option>
               <Select.Option value="active">פעיל</Select.Option>
               <Select.Option value="inactive">לא פעיל</Select.Option>
+              <Select.Option value="sold">נמכר</Select.Option>
+              <Select.Option value="available">זמין</Select.Option>
             </Select>
           </Space>
         </Space>
       </Card>
 
-      {/* Property Cards Grid */}
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px' }}>
-          <Spin size="large" />
-        </div>
-      ) : filteredProperties.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px', color: '#999' }}>לא נמצאו נכסים</div>
-      ) : (
-        <Row gutter={[24, 24]}>
-          {filteredProperties.map((property) => (
-            <Col key={property.id} xs={24} sm={12} lg={8}>
-              <div style={{ position: 'relative' }}>
-                {/* Admin controls overlay */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 20,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '6px 8px',
-                    background: 'rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(4px)',
-                    borderRadius: '16px 16px 0 0',
-                    flexWrap: 'wrap',
-                    gap: '6px',
-                    transition: 'background 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.7)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.3)'}
-                >
-                  <Space size={4} wrap>
-                    <Switch
-                      size="small"
-                      checked={property.isActive}
-                      onChange={(v) => handleStatusChange(property.id, 'isActive', v)}
-                      checkedChildren="פעיל"
-                      unCheckedChildren="כבוי"
-                    />
-                    <Switch
-                      size="small"
-                      checked={property.isSold}
-                      onChange={(v) => handleStatusChange(property.id, 'isSold', v)}
-                      checkedChildren="נמכר"
-                      unCheckedChildren="פנוי"
-                    />
-                    <Switch
-                      size="small"
-                      checked={property.isPinned}
-                      onChange={(v) => handleStatusChange(property.id, 'isPinned', v)}
-                      checkedChildren="נצמד"
-                      unCheckedChildren="סטנדרט"
-                    />
-                  </Space>
-                  <Space size={4}>
-                    <Link href={`/admin/properties/${property.id}`}>
-                      <Button type="primary" icon={<EditOutlined />} size="small">
-                        ערוך
-                      </Button>
-                    </Link>
-                    <Button
-                      type="primary"
-                      danger
-                      icon={<DeleteOutlined />}
-                      size="small"
-                      onClick={() => {
-                        setSelectedProperty(property.id);
-                        setDeleteModal(true);
-                      }}
-                    >
-                      מחק
-                    </Button>
-                  </Space>
-                </div>
-
-                {/* PropertyCard */}
-                <div style={{ opacity: property.isActive ? 1 : 0.5 }}>
-                  <PropertyCard
-                    id={property.id}
-                    title={property.title}
-                    location={property.location}
-                    price={property.price}
-                    originalPrice={property.originalPrice ?? undefined}
-                    area={property.area}
-                    rooms={String(property.rooms)}
-                    floor={property.floor ?? undefined}
-                    totalFloors={property.totalFloors ?? undefined}
-                    images={property.images}
-                    status={property.status ?? undefined}
-                    isSold={property.isSold}
-                    dealType={property.dealType as DealType}
-                    propertyType={property.propertyType as PropertyType}
-                    parking={property.parking as ParkingType}
-                    position={property.position as Position | undefined}
-                    furniture={property.furniture as FurnitureLevel}
-                    directions={property.directions as Direction[]}
-                    vacancyDate={property.vacancyDate ?? undefined}
-                    neighborhood={property.neighborhood ?? undefined}
-                    street={property.street ?? undefined}
-                    streetNumber={property.streetNumber ?? undefined}
-                    features={{
-                      hasAirConditioning: property.hasAirConditioning,
-                      hasElevator: property.hasElevator,
-                      hasStorage: property.hasStorage,
-                      hasSafeRoom: property.hasSafeRoom,
-                      hasSunBalcony: property.hasSunBalcony,
-                      hasBoiler: property.hasBoiler,
-                      hasDisabledAccess: property.hasDisabledAccess,
-                      hasSunroom: property.hasSunroom,
+      {/* Property Table */}
+      <Card>
+        <Table
+          dataSource={filteredProperties}
+          loading={loading}
+          rowKey="id"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `סה״כ ${total} נכסים`,
+          }}
+          scroll={{ x: 1500 }}
+          locale={{ emptyText: 'לא נמצאו נכסים' }}
+          rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
+          columns={[
+            {
+              title: 'תמונה',
+              dataIndex: 'images',
+              key: 'image',
+              width: 100,
+              render: (images: string[]) => (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '4px',
+                  width: '80px',
+                  height: '80px'
+                }}>
+                  <Image
+                    src={images[0] || '/placeholder.png'}
+                    alt="Property"
+                    width={80}
+                    height={80}
+                    preview={false}
+                    style={{
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      display: 'block',
+                      width: '80px',
+                      height: '80px'
                     }}
+                    fallback="/placeholder.png"
                   />
                 </div>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      )}
+              ),
+            },
+            {
+              title: 'כותרת',
+              dataIndex: 'title',
+              key: 'title',
+              width: 250,
+              ellipsis: {
+                showTitle: true,
+              },
+              render: (text: string) => (
+                <div style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '230px'
+                }}>
+                  {text}
+                </div>
+              ),
+            },
+            {
+              title: 'מיקום',
+              dataIndex: 'location',
+              key: 'location',
+              width: 150,
+              ellipsis: true,
+            },
+            {
+              title: 'עיר',
+              dataIndex: 'city',
+              key: 'city',
+              width: 100,
+              render: (city: string) => {
+                const cityLabels: Record<string, string> = {
+                  'telaviv': 'תל אביב',
+                  'batyam': 'בת ים',
+                  'holon': 'חולון',
+                  'rishon': 'ראשון לציון',
+                  'ramatgan': 'רמת גן',
+                  'givatayim': 'גבעתיים',
+                  'azor': 'אזור',
+                };
+                return cityLabels[city] || city;
+              },
+            },
+            {
+              title: 'סוג עסקה',
+              dataIndex: 'dealType',
+              key: 'dealType',
+              width: 100,
+              render: (dealType: string) => (
+                <Tag color={dealType === 'sale' ? 'green' : 'blue'}>
+                  {dealType === 'sale' ? 'מכירה' : 'השכרה'}
+                </Tag>
+              ),
+            },
+            {
+              title: 'מחיר',
+              dataIndex: 'price',
+              key: 'price',
+              width: 120,
+              render: (price: string) => `₪${price}`,
+            },
+            {
+              title: 'חדרים',
+              dataIndex: 'rooms',
+              key: 'rooms',
+              width: 80,
+              align: 'center',
+            },
+            {
+              title: 'שטח',
+              dataIndex: 'area',
+              key: 'area',
+              width: 80,
+              align: 'center',
+              render: (area: number) => `${area} מ"ר`,
+            },
+            {
+              title: 'קומה',
+              key: 'floor',
+              width: 80,
+              align: 'center',
+              render: (_, record: Property) =>
+                record.floor && record.totalFloors
+                  ? `${record.floor}/${record.totalFloors}`
+                  : record.floor || '-',
+            },
+            {
+              title: 'סטטוס',
+              key: 'status',
+              width: 120,
+              render: (_, record: Property) => (
+                <Space direction="vertical" size={4}>
+                  <Switch
+                    size="small"
+                    checked={record.isActive}
+                    onChange={(v) => handleStatusChange(record.id, 'isActive', v)}
+                    checkedChildren="פעיל"
+                    unCheckedChildren="כבוי"
+                  />
+                  <Switch
+                    size="small"
+                    checked={record.isSold}
+                    onChange={(v) => handleStatusChange(record.id, 'isSold', v)}
+                    checkedChildren="נמכר"
+                    unCheckedChildren="פנוי"
+                  />
+                  <Switch
+                    size="small"
+                    checked={record.isPinned}
+                    onChange={(v) => handleStatusChange(record.id, 'isPinned', v)}
+                    checkedChildren="נצמד"
+                    unCheckedChildren="סטנדרט"
+                  />
+                </Space>
+              ),
+            },
+            {
+              title: 'פעולות',
+              key: 'actions',
+              width: 150,
+              render: (_, record: Property) => (
+                <Space size={4}>
+                  <Link href={`/admin/properties/${record.id}`}>
+                    <Button type="primary" icon={<EditOutlined />} size="small">
+                      ערוך
+                    </Button>
+                  </Link>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    onClick={() => {
+                      setSelectedProperty(record.id);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    מחק
+                  </Button>
+                </Space>
+              ),
+            },
+          ]}
+        />
+      </Card>
 
       {/* Delete Confirmation Modal */}
       <Modal

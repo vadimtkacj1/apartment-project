@@ -93,25 +93,25 @@ export default function Header() {
         }}
       >
         {/* Logos */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexShrink: 0 }}>
-          <Link href="/" style={{ display: "block", transition: "transform 0.2s" }}
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
+          <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={42} height={42}
+            <Image src="/images/logo.PNG" alt="Logo" width={60} height={60}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
-          <Image src="/images/second-and.svg" alt="and" width={26} height={26}
+          <Image src="/images/second-and.svg" alt="and" width={36} height={36}
             className="object-contain" priority
-            style={{ transition: "filter 0.35s ease" }}
+            style={{ transition: "filter 0.35s ease", marginBottom: "10px" }}
           />
-          <Link href="/" style={{ display: "block", transition: "transform 0.2s" }}
+          <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={42} height={42}
+            <Image src="/images/logo2.svg" alt="Logo 2" width={60} height={60}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
@@ -120,7 +120,7 @@ export default function Header() {
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "3rem" }}> {/* ✅ Увеличен gap для 3K экранов */}
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}> {/* ✅ Уменьшен gap между пунктами меню */}
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -135,7 +135,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(17px, 1.2vw, 22px)", // ✅ Увеличен до 22px для 3K экранов
+                      fontSize: "clamp(19px, 1.4vw, 26px)", // ✅ Збільшено для кращої читабельності
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",
@@ -148,6 +148,7 @@ export default function Header() {
                       letterSpacing: "0.01em", // ✅ Лёгкий letter-spacing для читаемости
                       opacity: 1,
                       transition: "opacity 0.2s",
+                      fontFamily: "var(--font-caramel), cursive, sans-serif",
                     }}
                     onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
                     onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
@@ -160,7 +161,7 @@ export default function Header() {
                   >
                     {link.label}
                     {link.submenu && (
-                      <ChevronDown size={16} style={{ // ✅ Увеличена иконка (было 14)
+                      <ChevronDown size={16} style={{ 
                         opacity: 0.6,
                         transition: "transform 0.25s",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
@@ -170,7 +171,7 @@ export default function Header() {
                     <span style={{
                       position: "absolute",
                       bottom: 0, right: 0, left: 0,
-                      height: 2.5, // ✅ Чуть толще подчёркивание
+                      height: 2.5,
                       borderRadius: 2,
                       background: textColor,
                       transform: isActive ? "scaleX(1)" : "scaleX(0)",
@@ -186,7 +187,7 @@ export default function Header() {
                         position: "absolute",
                         top: "calc(100% + 10px)",
                         right: 0,
-                        width: 230, // ✅ Увеличена ширина дропдауна
+                        width: 230, 
                         background: "#ffffff",
                         borderRadius: 14,
                         boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
@@ -206,13 +207,14 @@ export default function Header() {
                           onClick={() => setActiveDesktopSubmenu(null)}
                           style={{
                             display: "block",
-                            padding: "14px 20px", // ✅ Увеличен padding в дропдауне
-                            fontSize: 15, // ✅ Увеличен шрифт в дропдауне (было 14)
+                            padding: "14px 20px", 
+                            fontSize: 17, 
                             fontWeight: 600,
                             color: "#1c3664",
                             textDecoration: "none",
                             borderBottom: i < link.submenu!.length - 1 ? "1px solid rgba(0,0,0,0.05)" : "none",
                             transition: "background 0.15s",
+                            fontFamily: "var(--font-caramel), cursive, sans-serif",
                           }}
                           onMouseEnter={e => (e.currentTarget.style.background = "#f0f4ff")}
                           onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
@@ -270,7 +272,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                    style={{ fontSize: 18, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1 }}
+                    style={{ fontSize: 20, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
                   >
                     {link.label}
                   </Link>
@@ -297,11 +299,12 @@ export default function Header() {
                         style={{
                           display: "block",
                           padding: "14px 20px",
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: 600,
                           color: "#1c3664",
                           textDecoration: "none",
                           borderRight: "3px solid #1c3664",
+                          fontFamily: "var(--font-caramel), cursive, sans-serif",
                         }}
                       >
                         {sub.label}

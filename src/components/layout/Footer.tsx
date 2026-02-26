@@ -61,7 +61,7 @@ export default async function Footer() {
 
           {/* For Renters Section */}
           <div>
-            <h4 style={{ fontSize: 'clamp(15px, 1.1vw, 20px)' }} className="font-bold mb-4 text-white">עבור שוכרים</h4>
+            <h4 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/apartments" className="hover:text-white transition-colors">דירות להשכרה</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">שאלות ותשובות</Link></li>
@@ -71,7 +71,7 @@ export default async function Footer() {
 
           {/* For Owners Section */}
           <div>
-            <h4 style={{ fontSize: 'clamp(15px, 1.1vw, 20px)' }} className="font-bold mb-4 text-white">עבור משכירים</h4>
+            <h4 className="text-xl font-bold mb-4 text-white">עבור משכירים</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors">רכישת נכס</Link></li>
@@ -80,7 +80,7 @@ export default async function Footer() {
 
           {/* Resources Section */}
           <div>
-            <h4 style={{ fontSize: 'clamp(15px, 1.1vw, 20px)' }} className="font-bold mb-4 text-white">משאבים</h4>
+            <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">מרכז עזרה</Link></li>
@@ -90,7 +90,7 @@ export default async function Footer() {
 
           {/* Company Section */}
           <div>
-            <h4 style={{ fontSize: 'clamp(15px, 1.1vw, 20px)' }} className="font-bold mb-4 text-white">החברה</h4>
+            <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
             </ul>
@@ -99,7 +99,7 @@ export default async function Footer() {
           {/* Contact Section */}
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
-              <h4 style={{ fontSize: 'clamp(15px, 1.1vw, 20px)' }} className="font-bold mb-2 text-white">צור קשר</h4>
+              <h4 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h4>
               <div className="space-y-1 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
                 {contactInfo?.phone && <p>טלפון: {contactInfo.phone}</p>}
                 {contactInfo?.email && <p>דוא"ל: {contactInfo.email}</p>}

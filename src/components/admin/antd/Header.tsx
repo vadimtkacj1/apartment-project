@@ -44,7 +44,7 @@ export default function Header({ onPress, name }: HeaderProps) {
             type="text"
             onClick={handleLogout}
             icon={<LogoutOutlined />}
-            style={{ color: '#595959'}}
+            style={{ color: '#595959', fontFamily: "var(--font-assistant), Arial, Helvetica, sans-serif" }}
           >
             התנתק
           </Button>
@@ -54,8 +54,8 @@ export default function Header({ onPress, name }: HeaderProps) {
       <Col style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
         <Breadcrumb
           items={[
-            { title: <Link href="/admin" style={{ color: '#8c8c8c' }}>ניהול</Link> },
-            { title: <span style={{ color: '#141414', fontWeight: 600 }}>{pageName}</span> },
+            { title: <Link href="/admin" style={{ color: '#8c8c8c', fontFamily: "var(--font-assistant), Arial, Helvetica, sans-serif" }}>ניהול</Link> },
+            { title: <span style={{ color: '#141414', fontWeight: 600, fontFamily: "var(--font-assistant), Arial, Helvetica, sans-serif" }}>{pageName}</span> },
           ]}
         />
       </Col>

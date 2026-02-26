@@ -65,7 +65,7 @@ export default function SellingAloneArticle() {
 
             {/* Section 1: Why the apartment is burning */}
             <section className="article-section">
-              <h2>למה הדירה "נשרפת" בשוק?</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה הדירה "נשרפת" בשוק?</h2>
               <p>
                 בשוק הנדל"ן של היום, הרושם הראשוני הוא הכל. קונים פוטנציאליים סורקים עשרות מודעות בדקה ומשווים אתכם לדירות בשכונת אגרובנק בחולון או בפרויקטים החדשים בפארק הים בבת ים הם רואים מה שאנחנו קוראים לו "רמזור":
               </p>
@@ -84,7 +84,7 @@ export default function SellingAloneArticle() {
             <section className="article-section">
               <div className="content-flex-layout reverse">
                 <div className="text-column">
-                  <h2>הטעות הכי גדולה של מוכרים לבד: להיות "מדריך טיולים"</h2>
+                  <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של מוכרים לבד: להיות "מדריך טיולים"</h2>
                   <p>
                     כשאתם מפרסמים לבד, אתם הופכים למוקדייה. כל אדם שמשעמם לו בערב מתקשר. <strong>זו טעות קריטית.</strong>
                   </p>
@@ -103,24 +103,24 @@ export default function SellingAloneArticle() {
 
             {/* Section 3: Our System */}
             <section className="article-section">
-              <h2>איך השיטה שלנו מביאה את המחיר המקסימלי?</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>איך השיטה שלנו מביאה את המחיר המקסימלי?</h2>
               <p>
                 כאן נכנס לתמונה הניסיון של הצוות שלנו, בהובלת רם וחיים. התהליך אצלנו עובד כמו מבצע צבאי מדויק:
               </p>
 
               <div className="content-flex-layout">
                 <div className="text-column">
-                  <h3>תמחור כירורגי</h3>
+                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>תמחור כירורגי</h3>
                   <p>
                     אנחנו לא מנחשים. אנחנו מבצעים <strong>הערכת שווי נכס</strong> המבוססת על עסקאות אמת שנסגרו ברחוב שלכם (בין אם זה בנאות רחל או במתחם האלף) בחודש האחרון.
                   </p>
 
-                  <h3>סינון פיננסי מקדים</h3>
+                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>סינון פיננסי מקדים</h3>
                   <p>
                     אנחנו מוודאים שלקונה יש יכולת כלכלית (לעתים קרובות בעזרת שותפנו, <a href="https://avi-mashkanta.com/" className="hyper-link" target="_blank" title="אבי בוקעי | הבית למשכנתאות"><b>אבי בוקעי - "אבי הבית למשכנתאות"</b></a>, שבונה איתם את תקציב הרכישה המדויק לפני הביקור).
                   </p>
 
-                  <h3>ניהול מו"מ נטול רגשות</h3>
+                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>ניהול מו"מ נטול רגשות</h3>
                   <p>
                     קשה לנהל משא ומתן על הבית שבו גדלו הילדים. כל הערה מרגישה אישית. אנחנו מהווים "חגורת ביטחון", מנטרלים את הרגש ומנהלים מו"מ עסקי קר כדי להעלות את ההצעה למקסימום.
                   </p>
@@ -135,7 +135,7 @@ export default function SellingAloneArticle() {
             <section className="article-section">
               <div className="content-flex-layout reverse">
                 <div className="text-column">
-                  <h2>למה דווקא אנחנו?</h2>
+                  <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה דווקא אנחנו?</h2>
                   <p>
                     במכירת הדירה היקרה לכם, אין מקום לניסוי וטעייה. מתווך מתחיל אולי ייקח עמלה נמוכה, אבל יעלה לכם ביוקר במחיר הסופי.
                   </p>

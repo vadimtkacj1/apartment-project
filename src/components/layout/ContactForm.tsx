@@ -71,7 +71,7 @@ const ContactForm: React.FC = () => {
     <section
       id="contact"
       dir="rtl"
-      className="relative w-full py-14 md:py-32 bg-[#faf7f2]"
+      className="relative w-full py-16 md:py-20 bg-[#faf7f2]"
     >
       <div className="relative max-w-7xl mx-auto px-6 lg:px-12 z-10">
         {/* Section Header */}
@@ -82,7 +82,7 @@ const ContactForm: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl md:text-6xl font-black text-[#1c3664] mb-6 uppercase tracking-tight">
+          <h2 className="text-5xl md:text-6xl font-black text-[#1c3664] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             בואו נדבר
           </h2>
           <p className="text-xl md:text-2xl text-slate-500 font-semibold max-w-3xl mx-auto">
@@ -130,7 +130,7 @@ const ContactForm: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200 space-y-4 md:space-y-6"
             >
-              <h3 className="text-2xl font-black text-[#1c3664] mb-6 uppercase tracking-tight">
+              <h3 className="text-2xl font-black text-[#1c3664] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                 פרטי התקשרות
               </h3>
 

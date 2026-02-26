@@ -216,3 +216,21 @@ model ClickEvent {
   @@index([createdAt])
   @@index([sessionId])
 }
+
+// Homepage section titles (singleton)
+model HomepageSettings {
+  id Int @id @default(autoincrement())
+  
+  // Section titles
+  hotPropositionsTitle String @default("הצעות חמות")
+  featuredPropertiesTitle String @default("נכסים באיזור המרכז")
+  featuredPropertiesSubtitle String @default("מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז")
+  valuesSectionTitle String @default("למה לבחור בנו?")
+  aboutSectionTitle String @default("אודות")
+  processSectionTitle String @default("מה חשוב לדעת כשקונים נכס?")
+  testimonialsTitle String @default("מה הלקוחות שלנו אומרים")
+  noCommissionTitle String @default("דירה ללא עמלת תיווך")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

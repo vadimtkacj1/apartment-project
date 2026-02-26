@@ -65,7 +65,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
             className="flex items-center gap-2 px-8 py-3 bg-white border border-slate-300 text-slate-700 rounded-full hover:bg-slate-50 transition-all hover:border-[#1c3664]"
           >
             <Mail size={18} />
-            <span className="font-medium">צור קשר</span>
+            <span className="font-medium" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</span>
           </a>
         </div>
       </div>

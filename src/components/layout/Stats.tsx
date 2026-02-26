@@ -41,7 +41,8 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
           type: "spring",
           stiffness: 100
         }}
-        className="text-4xl md:text-5xl font-black text-gray-900 mb-2 tracking-tight"
+        className="text-3xl font-black text-gray-900 mb-2 tracking-tight"
+        style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
       >
         {value}
       </motion.div>

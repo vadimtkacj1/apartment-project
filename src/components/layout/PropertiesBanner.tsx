@@ -31,10 +31,10 @@ const PropertiesBanner: React.FC<PropertiesBannerProps> = ({ img = "/7.jpg" }) =
 
       {/* Blue/Teal Overlay Rectangle with Text - Centered */}
       <div className="absolute inset-0 flex items-center justify-center z-10 m-0 p-0">
-        <h2 
-          className="text-white text-2xl md:text-4xl lg:text-5xl font-bold text-center whitespace-nowrap px-6 py-3 md:px-8 md:py-4 rounded-lg inline-block" 
-          style={{ 
-            fontFamily: 'var(--font-assistant), Arial, sans-serif',
+        <h2
+          className="text-white text-3xl font-bold text-center whitespace-nowrap px-6 py-3 md:px-8 md:py-4 rounded-lg inline-block"
+          style={{
+            fontFamily: 'var(--font-assistant), Arial, Helvetica, sans-serif',
             letterSpacing: '0.02em',
             textShadow: 'none',
             backgroundColor: 'rgba(28, 54, 100, 0.75)',

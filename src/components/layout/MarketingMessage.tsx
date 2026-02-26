@@ -21,7 +21,7 @@ const MarketingMessage: React.FC = () => {
         </h3>
 
         {/* Main Headline with Gradient Text */}
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black leading-tight px-2">
+        <h2 className="text-3xl font-black leading-tight px-2" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
           <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#1c3664] via-[#2d4a7a] to-[#1c3664] pb-2">
             ליווי אישי, תמחור מדויק ושיווק ממוקד
           </span>

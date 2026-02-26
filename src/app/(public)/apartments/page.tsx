@@ -76,7 +76,9 @@ function ApartmentsPageContent() {
         if (filters.city && filters.city !== 'all') params.append('city', filters.city);
         if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
 
-        const response = await fetch(`/api/properties?${params.toString()}`);
+        const response = await fetch(`/api/properties?${params.toString()}`, {
+          next: { revalidate: 60 }
+        });
         if (!response.ok) throw new Error('Failed');
         const data = await response.json();
 

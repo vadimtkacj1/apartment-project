@@ -1,5 +1,5 @@
 "use client";
-import React, { memo, useRef } from 'react';
+import React, { memo, useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,6 +8,27 @@ import { ArrowLeft } from 'lucide-react';
 const AboutSection: React.FC = memo(() => {
   const sectionRef = useRef<HTMLElement>(null);
   const logoPattern = "url('/images/about-logo.svg')";
+  const [title, setTitle] = useState('אודות');
+
+  useEffect(() => {
+    const fetchTitle = async () => {
+      try {
+        const response = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTitle(data.aboutSectionTitle || 'אודות');
+        }
+      } catch (error) {
+        console.error('Error fetching title:', error);
+      }
+    };
+    fetchTitle();
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -20,9 +41,9 @@ const AboutSection: React.FC = memo(() => {
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative w-full pt-16 md:pt-32 pb-16 md:pb-24 overflow-hidden bg-[#2a4a8a]"
+      className="relative w-full py-16 md:py-20 overflow-hidden"
+      style={{ background: 'rgb(42, 74, 138)' }}
     >
-      {/* Parallax logo pattern — более горизонтальная (~10deg вместо 45deg) */}
       <motion.div
         className="absolute z-0"
         style={{
@@ -48,14 +69,14 @@ const AboutSection: React.FC = memo(() => {
       <div className="absolute inset-0 z-10 pointer-events-none">
         {/* Left-side blue */}
         <div
-          className="absolute inset-0 bg-[#2a4a8a]"
+          className="absolute inset-0 bg-[#2A4A8A]"
           style={{
             clipPath: 'polygon(0 0, 21% 0, 1.5% 100%, 0 100%)'
           }}
         />
         {/* Right-side blue */}
         <div
-          className="absolute inset-0 bg-[#2a4a8a]"
+          className="absolute inset-0 bg-[#2A4A8A]"
           style={{
             clipPath: 'polygon(35% 0, 100% 0, 100% 100%, 14.5% 100%)'
           }}
@@ -73,8 +94,13 @@ const AboutSection: React.FC = memo(() => {
             transition={{ duration: 0.8 }}
             className="order-2 lg:order-1 lg:col-span-3 text-white"
           >
-            <motion.h2 className="text-4xl sm:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
-              אודות
+            <div className="mb-4">
+              <span className="text-white/80 font-bold text-lg uppercase tracking-wider">
+                קצת עלינו
+              </span>
+            </div>
+            <motion.h2 className="text-5xl md:text-6xl font-black mb-6 uppercase tracking-tight text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+              {title}
             </motion.h2>
 
             <div className="space-y-6">

@@ -63,6 +63,7 @@
   text-shadow:
     0 4px 30px rgba(0, 0, 0, 0.8),
     0 2px 15px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-caramel), cursive, sans-serif;
 }
 
 .cta-subtitle {
@@ -94,6 +95,7 @@
   align-items: center;
   gap: 1rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  font-family: var(--font-caramel), cursive, sans-serif;
 }
 
 .cta-btn.primary {
