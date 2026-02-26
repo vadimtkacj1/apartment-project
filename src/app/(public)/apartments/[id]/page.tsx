@@ -36,7 +36,7 @@ export default function ApartmentDetailPage() {
   const isSold = property.isSold || false;
 
   return (
-    <div className={`min-h-screen bg-warm pt-8 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
+    <div className={`min-h-screen bg-warm pt-32 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
       <div className={`w-full ${isSold ? 'pointer-events-none' : ''}`}>
         {/* Back to apartments link */}
         <div className="w-full px-6 flex justify-end mb-8 px-6 lg:px-12">
@@ -78,7 +78,7 @@ export default function ApartmentDetailPage() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="sticky top-32"
+              className="sticky top-24"
             >
               <PriceCard
                 price={property.price}

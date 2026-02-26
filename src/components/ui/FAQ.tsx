@@ -22,7 +22,7 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
   return (
     <section className="faq-section">
       <div className="faq-header">
-        <h2>{title}</h2>
+        <h2 style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>{title}</h2>
         <div className="faq-subtitle">כל מה שרציתם לדעת במקום אחד</div>
       </div>
 
@@ -70,7 +70,7 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
           margin: 60px auto;
           padding: 0 20px;
           direction: rtl;
-          font-family: system-ui, -apple-system, sans-serif;
+          font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
         }
 
         .faq-header {
@@ -79,11 +79,12 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
         }
 
         .faq-header h2 {
-          font-size: 2.25rem;
+          font-size: 1.875rem; /* text-3xl */
           color: #111827;
           font-weight: 700;
           margin-bottom: 12px;
           letter-spacing: -0.025em;
+          font-family: var(--font-caramel), cursive, sans-serif;
         }
 
         .faq-subtitle {
@@ -163,7 +164,7 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
 
         @media (max-width: 640px) {
           .faq-header h2 {
-            font-size: 1.75rem;
+            font-size: 1.875rem; /* text-3xl */
           }
           
           .question-text {

@@ -107,7 +107,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-black text-[#1c3664] mb-4 uppercase">
+          <h2 className="text-3xl font-black text-[#1c3664] mb-4 uppercase" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             נכסים דומים
           </h2>
           <p className="text-slate-500 text-lg font-medium">

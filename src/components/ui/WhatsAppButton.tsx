@@ -51,7 +51,7 @@ const WhatsAppButton: React.FC = () => {
       </svg>
 
       {/* Tooltip */}
-      <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl">
+      <span className="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
         צור קשר בוואטסאפ
       </span>
     </motion.a>

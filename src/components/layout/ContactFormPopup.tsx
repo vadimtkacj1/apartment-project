@@ -70,7 +70,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
             >
               {/* Header - Fixed at the top, no scrollbar here */}
               <div className="px-8 py-6 flex items-center justify-between border-b border-gray-100 bg-white z-20">
-                <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight">
+                <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                   צור קשר
                 </h2>
                 <button

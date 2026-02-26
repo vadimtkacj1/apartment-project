@@ -15,7 +15,7 @@
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
-  font-family: var(--font-assistant), 'Assistant', Arial, Helvetica, sans-serif;
+  font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
   color: #141414;
   font-size: 14px;
   line-height: 1.6;
@@ -602,4 +602,64 @@
 
 .layout-dashboard .ant-card-body .ant-table {
   margin: 0;
+}
+
+/* ===== SOLD PROPERTY STYLING ===== */
+.layout-dashboard .sold-property-row {
+  background-color: #f5f5f5 !important;
+  opacity: 0.65;
+}
+
+.layout-dashboard .sold-property-row:hover > td {
+  background-color: #ececec !important;
+}
+
+.layout-dashboard .sold-property-row td {
+  color: #8c8c8c !important;
+}
+
+.layout-dashboard .sold-property-row .ant-image {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.layout-dashboard .sold-property-row .ant-tag {
+  opacity: 0.7;
+}
+
+/* ===== MOBILE FULL WIDTH ===== */
+@media (max-width: 639px) {
+  /* Remove margin and padding from content area */
+  .layout-dashboard .content-ant {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Remove margin from header */
+  .layout-dashboard .ant-layout-header {
+    margin: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Remove margin from footer */
+  .layout-dashboard .ant-layout-footer {
+    margin: 0 !important;
+  }
+
+  /* Cards full width with no border radius */
+  .layout-dashboard .ant-card {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+
+  /* Card body padding adjustment */
+  .layout-dashboard .ant-card-body {
+    padding: 16px !important;
+  }
+
+  /* Card header padding adjustment */
+  .layout-dashboard .ant-card-head {
+    padding: 12px 16px !important;
+  }
 }

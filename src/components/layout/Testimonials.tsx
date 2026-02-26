@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay, Pagination, EffectCoverflow } from 'swiper/modules';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
@@ -19,6 +19,27 @@ interface Testimonial {
 
 const Testimonials: React.FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
+  const [title, setTitle] = useState<string>('מה הלקוחות שלנו אומרים');
+
+  useEffect(() => {
+    const fetchTitle = async () => {
+      try {
+        const response = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTitle(data.testimonialsTitle || 'מה הלקוחות שלנו אומרים');
+        }
+      } catch (error) {
+        console.error('Error fetching title:', error);
+      }
+    };
+    fetchTitle();
+  }, []);
 
   const testimonials: Testimonial[] = [
     { id: 1, name: "רותם כנפי", rating: 5, text: "אדם נעים, ישר והגון. בדיוק מי שתרצו לצידכם בעסקת מקרקעין. ממליץ בחום לכל מי שמחפש תיווך איכותי." },
@@ -44,11 +65,19 @@ const Testimonials: React.FC = () => {
   ];
 
   return (
-    <section className="relative w-full py-12 md:py-20 overflow-hidden bg-warm" dir="rtl">
+    <section className="relative w-full py-16 md:py-20 overflow-hidden bg-warm" dir="rtl">
       <div className="relative z-10 max-w-[1300px] mx-auto px-4">
         
-        <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-3xl md:text-5xl font-black text-[#1c3664]">מה הלקוחות שלנו אומרים</h2>
+        <div className="text-center mb-16">
+          <div className="inline-block mb-4">
+            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+              חוות דעת
+            </span>
+          </div>
+
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {title || 'מה הלקוחות שלנו אומרים'}
+          </h2>
         </div>
 
         <div className="relative">
@@ -103,7 +132,7 @@ const Testimonials: React.FC = () => {
                       </p>
                     </div>
 
-                    <h4 className={`text-xl md:text-3xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
+                    <h4 className={`text-xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
                       {testimonial.name}
                     </h4>
                   </div>

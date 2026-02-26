@@ -23,12 +23,32 @@ interface Property {
 const FeaturedProperties: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [titles, setTitles] = useState({
+    featuredPropertiesTitle: 'נכסים באיזור המרכז',
+    featuredPropertiesSubtitle: 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
+  });
 
   // Fetch featured properties from API
   useEffect(() => {
     const fetchFeaturedProperties = async () => {
       try {
         setLoading(true);
+        
+        // Fetch titles
+        const titlesResponse = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (titlesResponse.ok) {
+          const titlesData = await titlesResponse.json();
+          setTitles({
+            featuredPropertiesTitle: titlesData.featuredPropertiesTitle || 'נכסים באיזור המרכז',
+            featuredPropertiesSubtitle: titlesData.featuredPropertiesSubtitle || 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
+          });
+        }
+        
         // Fetch pinned properties from center area for sale, limit to 3
         const response = await fetch('/api/properties?region=center&dealType=sale&pinned=true&limit=3');
 
@@ -89,7 +109,7 @@ const FeaturedProperties: React.FC = () => {
   return (
 <section
   dir="rtl"
-  className="relative w-full pt-24 md:pt-32 pb-0 bg-warm overflow-hidden"
+  className="relative w-full py-16 md:py-20 bg-warm overflow-hidden"
 >
       {/* Decorative background */}
       <div className="absolute inset-0 opacity-5">
@@ -118,13 +138,13 @@ const FeaturedProperties: React.FC = () => {
             </span>
           </motion.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
-נכסים באיזור המרכז
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {titles.featuredPropertiesTitle}
           </h2>
 
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
-מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז
-</p>
+            {titles.featuredPropertiesSubtitle}
+          </p>
         </motion.div>
 
         {/* Properties Grid */}
@@ -150,6 +170,7 @@ const FeaturedProperties: React.FC = () => {
           <Link
             href="/apartments"
             className="inline-flex items-center gap-3 px-12 py-5 bg-[#1c3664] text-white font-black text-xl uppercase tracking-tight rounded-2xl shadow-2xl hover:bg-[#152a4f] transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
+            style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
           >
             <span>כל הנכסים</span>
             <ArrowLeft

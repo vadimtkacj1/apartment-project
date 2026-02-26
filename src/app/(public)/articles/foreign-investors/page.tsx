@@ -65,7 +65,7 @@ export default function ForeignInvestorsArticle() {
 
             {/* Section 1: Why Foreign Investors Fear */}
             <section className="article-section">
-              <h2>למה משקיעים מחו"ל (Foreign Investors) מפחדים לקנות?</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה משקיעים מחו"ל (Foreign Investors) מפחדים לקנות?</h2>
               <p>
                 המרחק יוצר חוסר ודאות. כשאתם לא כאן, כל דבר קטן נראה כמו הר ענק:
               </p>
@@ -84,7 +84,7 @@ export default function ForeignInvestorsArticle() {
             <section className="article-section">
               <div className="content-flex-layout reverse">
                 <div className="text-column">
-                  <h2>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
+                  <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
                   <p>
                     הרבה משקיעים מפילים את התיק על "דוד שגר בארץ" או מנסים לנהל את השיפוץ בוואטסאפ מול קבלן מזדמן. <strong>זו טעות קריטית.</strong>
                   </p>
@@ -103,29 +103,29 @@ export default function ForeignInvestorsArticle() {
 
             {/* Section 3: Our System */}
             <section className="article-section">
-              <h2>איך המעטפת שלנו עובדת?</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>איך המעטפת שלנו עובדת?</h2>
               <p>
                 כאן נכנס לתמונה היתרון העצום שלנו – <strong>אנחנו לא רק מתווכים, אנחנו מנהלי פרויקטים.</strong> התהליך אצלנו עובד מקצה לקצה:
               </p>
 
-              <h3>1. איתור ההזדמנות</h3>
+              <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>1. איתור ההזדמנות</h3>
               <p>
                 בזכות הוותק, אנחנו מגיעים לנכסים (דירות, מגרשים, מסחרי) עוד לפני שהם יוצאים לשוק - כולל פרויקטים של <strong>התחדשות עירונית (Urban Renewal)</strong> בחולון והזדמנויות ליד הרכבת הקלה בבת ים.
               </p>
 
-              <h3>2. שיפוץ והשבחה</h3>
+              <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>2. שיפוץ והשבחה</h3>
               <p>
                 יש לנו <strong>צוותי שיפוץ ותחזוקה משלנו</strong>. אנחנו לא מפנים אתכם לקבלן - אנחנו מפקחים עליו. אנחנו נהפוך חורבה לדירת בונבוניירה שתניב שכירות גבוהה.
               </p>
 
               <div className="content-flex-layout">
                 <div className="text-column">
-                  <h3>3. מעטפת פיננסית</h3>
+                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>3. מעטפת פיננסית</h3>
                   <p>
                     אנחנו עובדים צמוד עם <strong>אבי בוקעי ("אבי - הבית למשכנתאות")</strong> ועם עורכי דין המתמחים במיסוי לתושבי חוץ, כדי לוודא שהכסף עובר חלק והמימון (משכנתא) מאושר בתנאים הטובים ביותר.
                   </p>
 
-                  <h3>4. ניהול שוטף (השקט שלכם)</h3>
+                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>4. ניהול שוטף (השקט שלכם)</h3>
                   <p>
                     מציאת שוכרים, גביית תשלומים, ותיקון תקלות. <strong>אתם מקבלים רק את הדיווח בבנק.</strong>
                   </p>
@@ -138,7 +138,7 @@ export default function ForeignInvestorsArticle() {
 
             {/* Section 4: Why Choose Us */}
             <section className="article-section">
-              <h2>למה דווקא אנחנו?</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה דווקא אנחנו?</h2>
               <p>
                 בניהול נכסים בשלט רחוק, <strong>אמון הוא המטבע החשוב ביותר</strong>. עם 24 שנות ניסיון ותעודות, אנחנו גוף יציב עם כתובת פיזית ומוניטין של אמינות וזמינות.
               </p>

@@ -1,9 +1,31 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Home, Calculator, FileCheck } from 'lucide-react';
 
 const ProcessSection: React.FC = () => {
+  const [title, setTitle] = useState('מה חשוב לדעת כשקונים נכס?');
+
+  useEffect(() => {
+    const fetchTitle = async () => {
+      try {
+        const response = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTitle(data.processSectionTitle || 'מה חשוב לדעת כשקונים נכס?');
+        }
+      } catch (error) {
+        console.error('Error fetching title:', error);
+      }
+    };
+    fetchTitle();
+  }, []);
+
   const steps = [
     {
       number: "01",
@@ -44,18 +66,21 @@ const ProcessSection: React.FC = () => {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
-            מה חשוב לדעת כשקונים נכס?
-          </h2>
-
-          {/* Decorative Line */}
           <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            whileInView={{ opacity: 1, scaleX: 1 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-24 h-1 bg-gradient-to-r from-transparent via-[#1c3664] to-transparent mx-auto"
-          ></motion.div>
+            className="inline-block mb-4"
+          >
+            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+              מדריך
+            </span>
+          </motion.div>
+
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {title}
+          </h2>
         </motion.div>
 
         {/* Cards Grid */}
@@ -104,7 +129,7 @@ const ProcessSection: React.FC = () => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-2xl md:text-3xl font-black text-white mb-4 uppercase tracking-tight">
+                    <h3 className="text-2xl font-black text-white mb-4 uppercase tracking-tight">
                       {step.title}
                     </h3>
 

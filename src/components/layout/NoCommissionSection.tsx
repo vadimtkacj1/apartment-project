@@ -34,15 +34,41 @@ interface Property {
 function NoCommissionSection() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [title, setTitle] = useState('דירה ללא עמלת תיווך');
 
   useEffect(() => {
     const fetchNoCommissionProperty = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        // Fetch title (non-blocking - if it fails, just use default)
+        try {
+          const titlesResponse = await fetch('/api/homepage-titles', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache'
+            }
+          });
+          if (titlesResponse.ok) {
+            const titlesData = await titlesResponse.json();
+            if (titlesData.noCommissionTitle) {
+              setTitle(titlesData.noCommissionTitle);
+            }
+          }
+        } catch (titleError) {
+          console.warn('Could not load custom title, using default:', titleError);
+        }
+
         const response = await fetch('/api/properties?noCommission=true&limit=1', {
           next: { revalidate: 300 }
         });
-        if (!response.ok) throw new Error('Failed to fetch property');
+
+        if (!response.ok) {
+          throw new Error('שגיאה בטעינת הנכסים');
+        }
+
         const data = await response.json();
         if (data && data.length > 0) {
           const prop = data[0];
@@ -78,6 +104,7 @@ function NoCommissionSection() {
         }
       } catch (error) {
         console.error('Error fetching no commission property:', error);
+        setError(error instanceof Error ? error.message : 'אירעה שגיאה בטעינת הנכסים');
         setProperty(null);
       } finally {
         setLoading(false);
@@ -86,41 +113,86 @@ function NoCommissionSection() {
     fetchNoCommissionProperty();
   }, []);
 
-  if (loading || !property) return null;
+  // Loading state
+  if (loading) {
+    return (
+      <section
+        className="relative py-16 md:py-20 w-full overflow-hidden"
+        dir="rtl"
+        style={{ background: 'rgb(42, 74, 138)' }}
+      >
+        <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1200px' }}>
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+            <p className="text-white mt-4 text-lg">טוען...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error or no property - don't show section
+  if (error || !property) return null;
 
   return (
     <section
-      className="relative py-16 w-full overflow-hidden"
+      className="relative py-16 md:py-24 w-full overflow-hidden"
       dir="rtl"
-      style={{ background: 'rgb(42, 74, 138)' }}
+      style={{ background: 'linear-gradient(135deg, rgb(42, 74, 138) 0%, rgb(35, 62, 115) 100%)' }}
     >
       <style>{`
         @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4); }
-          50%       { box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4); }
+          0%, 100% { box-shadow: 0 0 30px 3px rgba(212,168,67,0.4), 0 8px 24px rgba(0,0,0,0.3); }
+          50%       { box-shadow: 0 0 50px 10px rgba(212,168,67,0.7), 0 8px 32px rgba(0,0,0,0.3); }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
           100% { transform: translateX(400%) skewX(-20deg); }
         }
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
         .btn-no-commission:hover .btn-shine {
-          animation: shineSwipe 0.5s ease forwards;
+          animation: shineSwipe 0.6s ease forwards;
         }
         .btn-no-commission {
-          animation: goldGlow 2.5s ease-in-out infinite;
-          transition: transform 0.2s ease;
+          animation: goldGlow 3s ease-in-out infinite;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-no-commission:hover {
-          transform: scale(1.02) translateY(-3px);
+          transform: scale(1.05) translateY(-4px);
+          box-shadow: 0 0 60px 15px rgba(212,168,67,0.8), 0 12px 40px rgba(0,0,0,0.4);
         }
         .btn-no-commission:active {
-          transform: scale(0.97);
+          transform: scale(0.98);
         }
         .no-commission-card {
           overflow: hidden;
+          animation: fadeInUp 0.6s ease-out;
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .no-commission-card:hover {
+          transform: translateY(-8px);
         }
         .no-commission-card:hover .property-image {
-          transform: scale(1.05);
+          transform: scale(1.1);
+        }
+        .property-image {
+          transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-tag {
+          backdrop-filter: blur(10px);
+          transition: all 0.2s ease;
+        }
+        .feature-tag:hover {
+          background: rgba(255,255,255,0.12) !important;
         }
       `}</style>
 
@@ -129,27 +201,26 @@ function NoCommissionSection() {
         style={{ maxWidth: '1200px' }}
       >
         {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="font-bold text-white mb-3" style={{ fontFamily: 'var(--font-caramel)', fontSize: 'clamp(4.2rem, 7.2vw, 8.4rem)' }}>
-            דירה ללא עמלת תיווך
+        <div className="text-center mb-4 md:mb-6">
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {title}
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1rem' }}>
+          <p className="text-xl md:text-2xl font-semibold max-w-3xl mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>
             חסכו אלפי שקלים — קנו ישירות ללא עמלה
           </p>
         </div>
 
         {/* Card */}
         <Link href={`/apartments/${property.id}`}>
-          <div className="no-commission-card transition-all duration-300">
-            <div className="grid md:grid-cols-5 gap-0 md:min-h-95">
+          <div className="no-commission-card transition-all duration-300 max-w-2xl mx-auto">
+            <div className="grid md:grid-cols-5 gap-0 md:min-h-48">
 
               {/* Image — 3/5 width */}
-              <div className="md:col-span-3 relative h-70 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4)' }}>
+              <div className="md:col-span-3 relative h-36 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
                 <img
                   src={property.image}
                   alt={property.title}
                   className="property-image w-full h-full object-cover transition-transform duration-700 rounded-2xl"
-                  style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.5))' }}
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">
@@ -179,7 +250,7 @@ function NoCommissionSection() {
                 </span>
 
                 {/* Title */}
-                <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight">
+                <h3 className="text-2xl font-bold text-white mb-2 leading-tight">
                   {property.title}
                 </h3>
 
@@ -284,7 +355,7 @@ function NoCommissionSection() {
                       transform: 'translateX(-200%) skewX(-20deg)',
                     }}
                   />
-                  <span className="relative z-10">לפרטים נוספים ←</span>
+                  <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים ←</span>
                 </div>
 
                 <p className="text-xs font-semibold mt-3" style={{ color: 'rgba(255,255,255,0.75)' }}>

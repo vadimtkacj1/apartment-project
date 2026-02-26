@@ -123,6 +123,7 @@ const Hero: React.FC<HeroProps> = () => {
                 fontSize: 'clamp(2rem, 8.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
+                fontFamily: 'var(--font-caramel), cursive, sans-serif'
               }}
             >
               {text1}
@@ -154,6 +155,7 @@ const Hero: React.FC<HeroProps> = () => {
                 fontSize: 'clamp(2rem, 8.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
+                fontFamily: 'var(--font-caramel), cursive, sans-serif'
               }}
             >
               {text2}
@@ -196,6 +198,7 @@ const Hero: React.FC<HeroProps> = () => {
                 textAlign: 'center',
                 letterSpacing: '0.04em',
                 fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
+                fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
               <span
@@ -236,6 +239,7 @@ const Hero: React.FC<HeroProps> = () => {
                 letterSpacing: '0.04em',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
                 fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
+                fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
               <span className="relative z-10 flex items-center justify-center gap-3">

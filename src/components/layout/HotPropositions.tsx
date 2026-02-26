@@ -94,11 +94,25 @@ function HotPropositions() {
   const { isMobile } = usePerformanceSettings();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [title, setTitle] = useState('הצעות חמות');
 
   useEffect(() => {
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
+        
+        // Fetch title
+        const titlesResponse = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (titlesResponse.ok) {
+          const titlesData = await titlesResponse.json();
+          setTitle(titlesData.hotPropositionsTitle || 'הצעות חמות');
+        }
+        
         const response = await fetch('/api/properties?dealType=sale&hotProposition=true&limit=12', {
           next: { revalidate: 300 }
         });
@@ -165,14 +179,32 @@ function HotPropositions() {
   }
 
   return (
-    <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
+    <section className="relative py-16 md:py-20 overflow-hidden w-full" dir="rtl">
       <div className="relative z-10 w-full">
         {/* Section Header */}
-        <div className="text-center mb-10 md:mb-16 px-4 md:px-6">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 mb-4 md:mb-6 uppercase tracking-tight">
-            הצעות חמות
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16 px-4 md:px-6"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-block mb-4"
+          >
+            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+              מבחר נכסים
+            </span>
+          </motion.div>
+
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {title}
           </h2>
-        </div>
+        </motion.div>
 
         {/* Scrolling Rows */}
         <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">

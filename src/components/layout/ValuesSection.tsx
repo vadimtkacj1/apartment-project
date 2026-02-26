@@ -1,6 +1,7 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 
@@ -36,8 +37,30 @@ const values: ValueCard[] = [
 ];
 
 const ValuesSection: React.FC = () => {
+  const [title, setTitle] = useState('למה לבחור בנו?');
+
+  useEffect(() => {
+    const fetchTitle = async () => {
+      try {
+        const response = await fetch('/api/homepage-titles', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTitle(data.valuesSectionTitle || 'למה לבחור בנו?');
+        }
+      } catch (error) {
+        console.error('Error fetching title:', error);
+      }
+    };
+    fetchTitle();
+  }, []);
+
   return (
-    <section dir="rtl" className="relative w-full py-20 md:py-32 bg-[#faf7f2] overflow-hidden">
+    <section dir="rtl" className="relative w-full py-16 md:py-20 bg-[#faf7f2] overflow-hidden">
 
       {/* ── Geometric background ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -102,12 +125,25 @@ const ValuesSection: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-black text-[#1c3664] mb-4 tracking-tight">
-            למה לבחור בנו?
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-block mb-4"
+          >
+            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+              היתרונות שלנו
+            </span>
+          </motion.div>
+
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            {title}
           </h2>
-          <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto">
+
+          <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             שלושת העמודים המרכזיים שעליהם בנוי השירות שלנו
           </p>
         </motion.div>
@@ -126,7 +162,7 @@ const ValuesSection: React.FC = () => {
               <SwiperSlide key={value.id}>
                 <div className="flex flex-col items-center text-center px-4">
                   <div className="flex justify-center mb-6">
-                    <img src={value.image} alt={value.title} className="w-64 h-64 object-contain"/>
+                    <Image src={value.image} alt={value.title} width={256} height={256} className="object-contain" loading="lazy" />
                   </div>
                   <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
                   <p className="text-base text-slate-500 leading-relaxed">{value.description}</p>
@@ -148,11 +184,11 @@ const ValuesSection: React.FC = () => {
               className="text-center"
             >
               <div className="flex justify-center mb-8">
-                <div className="w-64 h-64">
-                  <img src={value.image} alt={value.title} className="w-full h-full object-contain"/>
+                <div className="w-64 h-64 relative">
+                  <Image src={value.image} alt={value.title} fill className="object-contain" loading="lazy" />
                 </div>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
+              <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
               <p className="text-base md:text-lg text-slate-500 leading-relaxed">{value.description}</p>
             </motion.div>
           ))}

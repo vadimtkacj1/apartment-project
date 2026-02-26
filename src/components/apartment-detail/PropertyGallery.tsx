@@ -39,13 +39,16 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
         {images.map((image: string, index: number) => (
           <SwiperSlide key={index}>
             <div className="relative w-full h-full">
-              <img src={image} alt="Property" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
+              <Image src={image} alt="Property" fill className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="100vw" />
               {/* Logo overlay - top left */}
               <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                <img
+                <Image
                   src="/images/logos.png"
                   alt="Logo"
-                  className="max-w-[180px] max-h-[90px] object-contain drop-shadow-lg"
+                  width={180}
+                  height={90}
+                  className="object-contain drop-shadow-lg"
+                  loading="lazy"
                 />
               </div>
               {isSold && <div className="absolute inset-0 bg-gray-900/30"></div>}
@@ -114,15 +117,7 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
             <div className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-colors ${
               isSold ? 'border-gray-300 opacity-60' : 'border-gray-200 hover:border-[#1c3664]'
             }`}>
-              <img src={image} alt="Thumb" className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-60' : ''}`} />
-              {/* Logo overlay - top left */}
-              <div className="absolute top-1 left-1 z-10 pointer-events-none">
-                <img
-                  src="/images/logos.png"
-                  alt="Logo"
-                  className="max-w-[90px] max-h-[45px] object-contain drop-shadow-md"
-                />
-              </div>
+              <Image src={image} alt="Thumb" fill className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
             </div>
           </SwiperSlide>
         ))}

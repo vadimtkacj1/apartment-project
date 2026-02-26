@@ -41,12 +41,12 @@ export default function AboutSplitSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Main Title */}
-            <h1 className="text-5xl lg:text-6xl font-extrabold text-[#1c3664] mb-4">
+            <h1 className="text-4xl font-extrabold text-[#1c3664] mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               אודות
             </h1>
 
             {/* Subtitle/Tagline - Bold */}
-            <h2 className="text-xl lg:text-2xl font-bold text-[#1c3664] leading-[1.6] mb-6">
+            <h2 className="text-3xl font-bold text-[#1c3664] leading-[1.6] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               רם שיווק נכסים & חיים עגבי הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ24- שנה.
             </h2>
 

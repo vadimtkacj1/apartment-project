@@ -38,7 +38,7 @@ export function ContactForm({ propertyId, isSold }: ContactFormProps) {
     }`}>
       <h3 className={`text-2xl font-black mb-6 uppercase ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-      }`}>
+      }`} style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
         מעוניין? צור קשר
       </h3>
       {isSold ? (

@@ -407,7 +407,7 @@ export default function AnalyticsPage() {
     }));
 
   return (
-    <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: '24px', backgroundColor: '#ffffff', minHeight: '100vh' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>

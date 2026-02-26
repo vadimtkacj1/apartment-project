@@ -44,7 +44,8 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
                 fontSize: 'clamp(1.8rem, 6vw, 4.5rem)',
                 lineHeight: '1.3',
                 letterSpacing: '0.02em',
-                textShadow: 'none'
+                textShadow: 'none',
+                fontFamily: 'var(--font-caramel), cursive, sans-serif'
               }}
             >
               {title}

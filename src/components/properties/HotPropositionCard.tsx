@@ -67,7 +67,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
         dir="rtl"
       >
         {/* Property Image */}
-        <div className="relative h-56 sm:h-64 md:h-72 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
           <Image
             src={displayImage}
             alt={title}
@@ -143,7 +143,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
 
           {/* Title and Location */}
           <div className="flex-1 mb-5">
-            <h3 className={`text-xl sm:text-2xl font-bold leading-tight mb-4 line-clamp-2 min-h-[3.5rem] ${
+            <h3 className={`text-2xl font-bold leading-tight mb-4 line-clamp-2 min-h-[3.5rem] ${
               isSold ? 'text-gray-400 line-through' : 'text-gray-900'
             }`}>
               {title}
@@ -169,7 +169,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               </div>
             ) : (
               <button className="w-full group/btn">
-                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#1c3664] to-[#2a4a7a] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#1c3664] to-[#2a4a7a] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                   <span>לפרטים נוספים</span>
                   <ArrowLeft size={18} className="transition-transform duration-300 group-hover/btn:-translate-x-1" />
                 </div>

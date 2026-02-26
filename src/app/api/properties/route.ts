@@ -29,6 +29,8 @@ function extractNumericPrice(priceStr: string): number {
 }
 
 // GET all active properties (public endpoint)
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -98,7 +100,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json(properties.map(formatProperty));
+    const response = NextResponse.json(properties.map(formatProperty));
+    
+    // Add caching headers for better performance
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    
+    return response;
   } catch (error) {
     console.error('Error fetching properties:', error);
     return NextResponse.json(
