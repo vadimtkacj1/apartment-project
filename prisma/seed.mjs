@@ -1306,11 +1306,32 @@ async function main() {
 
   console.log(`✅ Created ${properties.length} sample properties`)
 
+  // ===== 4. Create Homepage Settings =====
+  const existingHomepageSettings = await prisma.homepageSettings.findFirst()
+  if (existingHomepageSettings) {
+    console.log('✅ Homepage settings already exist')
+  } else {
+    await prisma.homepageSettings.create({
+      data: {
+        hotPropositionsTitle: 'הצעות חמות',
+        featuredPropertiesTitle: 'נכסים באיזור המרכז',
+        featuredPropertiesSubtitle: 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
+        valuesSectionTitle: 'למה לבחור בנו?',
+        aboutSectionTitle: 'אודות',
+        processSectionTitle: 'מה חשוב לדעת כשקונים נכס?',
+        testimonialsTitle: 'מה הלקוחות שלנו אומרים',
+        noCommissionTitle: 'דירה ללא עמלת תיווך',
+      },
+    })
+    console.log('✅ Created homepage settings')
+  }
+
   console.log('\n🎉 Seed completed successfully!')
   console.log('\n📋 Summary:')
   console.log(`   Users: ${await prisma.user.count()}`)
   console.log(`   Properties: ${await prisma.property.count()}`)
   console.log(`   Contact Info: ${await prisma.contactInfo.count()}`)
+  console.log(`   Homepage Settings: ${await prisma.homepageSettings.count()}`)
 }
 
 main()

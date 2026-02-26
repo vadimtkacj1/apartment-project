@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, message, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag } from 'antd';
+import { Card, Button, message, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 
@@ -119,7 +119,6 @@ export default function HomepagePage() {
       if (!response.ok) {
         if (response.status === 401) {
           console.warn('Not authenticated - using default titles');
-          // Use default values if not authenticated yet
           titlesForm.setFieldsValue(sectionTitles);
           return;
         }
@@ -131,7 +130,6 @@ export default function HomepagePage() {
       titlesForm.setFieldsValue(data);
     } catch (error) {
       console.error('Error fetching section titles:', error);
-      // Don't show error to user - just use defaults
       console.warn('Using default section titles');
       titlesForm.setFieldsValue(sectionTitles);
     } finally {
@@ -156,12 +154,10 @@ export default function HomepagePage() {
       }
       
       const data = await response.json();
-      // Update both state and form with saved values
       if (data.settings) {
         setSectionTitles(data.settings);
         titlesForm.setFieldsValue(data.settings);
       } else if (data) {
-        // Fallback: if settings is not nested, use data directly
         setSectionTitles(data);
         titlesForm.setFieldsValue(data);
       }
@@ -202,10 +198,21 @@ export default function HomepagePage() {
     setIsModalVisible(true);
   };
 
+  const handleRadioChange = (e: RadioChangeEvent) => {
+    setSelectedIds([e.target.value]);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.length === availableProperties.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(availableProperties.map(p => p.id));
+    }
+  };
+
   const handleModalOk = () => {
     const selectedProperties = allProperties.filter(p => selectedIds.includes(p.id));
 
-    // NoCommission only supports 1 property
     if (modalType === 'noCommission' && selectedProperties.length > 1) {
       message.warning('ניתן לבחור רק נכס אחד לדירות ללא עמלה');
       return;
@@ -234,7 +241,6 @@ export default function HomepagePage() {
     try {
       setSaving(true);
 
-      // Reset all properties first
       const resetPromises = allProperties.map(prop =>
         fetch(`/api/admin/properties/${prop.id}`, {
           method: 'PUT',
@@ -249,7 +255,6 @@ export default function HomepagePage() {
 
       await Promise.all(resetPromises);
 
-      // Set hot properties
       const hotPromises = hotProperties.map(prop =>
         fetch(`/api/admin/properties/${prop.id}`, {
           method: 'PUT',
@@ -262,7 +267,6 @@ export default function HomepagePage() {
       );
       await Promise.all(hotPromises);
 
-      // Set no commission properties
       const noCommissionPromises = noCommissionProperties.map(prop =>
         fetch(`/api/admin/properties/${prop.id}`, {
           method: 'PUT',
@@ -277,7 +281,7 @@ export default function HomepagePage() {
       await Promise.all(noCommissionPromises);
 
       message.success('כל השינויים נשמרו בהצלחה!');
-      fetchProperties(); // Refresh data
+      fetchProperties();
     } catch (error) {
       console.error('Error saving:', error);
       message.error('שגיאה בשמירת השינויים');
@@ -287,14 +291,12 @@ export default function HomepagePage() {
   };
 
   const availableProperties = allProperties.filter(p => {
-    // Base filter - exclude properties already in the other section
     const notInOtherSection = modalType === 'hot'
       ? !noCommissionProperties.some(nc => nc.id === p.id) || selectedIds.includes(p.id)
       : !hotProperties.some(h => h.id === p.id) || selectedIds.includes(p.id);
 
     if (!notInOtherSection) return false;
 
-    // Apply price filter for Hot Propositions in price mode
     if (modalType === 'hot' && hotPropositionsMode === 'price') {
       const priceNum = parseInt(p.price.replace(/[^0-9]/g, ''));
       return priceNum <= hotPropositionsMaxPrice;
@@ -302,6 +304,103 @@ export default function HomepagePage() {
 
     return true;
   });
+
+  const tableColumns = (type: 'hot' | 'noCommission') => [
+    {
+      title: 'תמונה',
+      dataIndex: 'images',
+      key: 'image',
+      width: 100,
+      render: (images: string[]) => (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '4px',
+          width: '80px',
+          height: '80px'
+        }}>
+          <Image
+            src={images[0] || '/placeholder.png'}
+            alt="נכס"
+            width={80}
+            height={80}
+            preview={false}
+            style={{
+              objectFit: 'cover',
+              borderRadius: '8px',
+              display: 'block',
+              width: '80px',
+              height: '80px'
+            }}
+            fallback="/placeholder.png"
+          />
+        </div>
+      ),
+    },
+    {
+      title: 'כותרת',
+      dataIndex: 'title',
+      key: 'title',
+      width: 250,
+      ellipsis: { showTitle: true },
+      render: (text: string) => (
+        <div style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '230px'
+        }}>
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: 'מיקום',
+      dataIndex: 'location',
+      key: 'location',
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: 'מחיר',
+      dataIndex: 'price',
+      key: 'price',
+      width: 120,
+      render: (price: string) => `₪${price}`,
+    },
+    {
+      title: 'חדרים',
+      dataIndex: 'rooms',
+      key: 'rooms',
+      width: 80,
+      align: 'center' as const,
+    },
+    {
+      title: 'שטח',
+      dataIndex: 'area',
+      key: 'area',
+      width: 80,
+      align: 'center' as const,
+      render: (area: number) => `${area} מ"ר`,
+    },
+    {
+      title: 'פעולות',
+      key: 'actions',
+      width: 150,
+      render: (_: any, record: Property) => (
+        <Button
+          type="primary"
+          danger
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={() => handleRemove(record.id, type)}
+        >
+          הסר
+        </Button>
+      ),
+    },
+  ];
 
   if (loading) {
     return (
@@ -322,105 +421,77 @@ export default function HomepagePage() {
           </div>
         </div>
 
-      {/* Section Titles Editor */}
-      <Card
-        title="עריכת כותרות סעיפים"
-        className="rounded-lg"
-        style={{ marginBottom: '24px' }}
-        loading={titlesLoading}
-      >
-        <Form
-          form={titlesForm}
-          layout="vertical"
-          onFinish={(values) => {
-            // Prevent default form submission
-            handleSaveTitles();
-          }}
+        {/* Section Titles Editor */}
+        <Card
+          title="עריכת כותרות סעיפים"
+          className="rounded-lg"
+          style={{ marginBottom: '24px' }}
+          loading={titlesLoading}
         >
-          <Tabs
-            items={[
-              {
-                key: 'main',
-                label: 'סעיפים ראשיים',
-                children: (
-                  <Space direction="vertical" className="w-full" size="large">
-                    <Form.Item
-                      label="כותרת: הצעות חמות"
-                      name="hotPropositionsTitle"
-                    >
-                      <Input placeholder="הצעות חמות" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="כותרת: נכסים נבחרים"
-                      name="featuredPropertiesTitle"
-                    >
-                      <Input placeholder="נכסים באיזור המרכז" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="תת-כותרת: נכסים נבחרים"
-                      name="featuredPropertiesSubtitle"
-                    >
-                      <Input placeholder="מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="כותרת: למה לבחור בנו?"
-                      name="valuesSectionTitle"
-                    >
-                      <Input placeholder="למה לבחור בנו?" disabled={titlesLoading} />
-                    </Form.Item>
-                  </Space>
-                ),
-              },
-              {
-                key: 'secondary',
-                label: 'סעיפים נוספים',
-                children: (
-                  <Space direction="vertical" className="w-full" size="large">
-                    <Form.Item
-                      label="כותרת: אודות"
-                      name="aboutSectionTitle"
-                    >
-                      <Input placeholder="אודות" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="כותרת: מה חשוב לדעת"
-                      name="processSectionTitle"
-                    >
-                      <Input placeholder="מה חשוב לדעת כשקונים נכס?" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="כותרת: מה הלקוחות אומרים"
-                      name="testimonialsTitle"
-                    >
-                      <Input placeholder="מה הלקוחות שלנו אומרים" disabled={titlesLoading} />
-                    </Form.Item>
-                    <Form.Item
-                      label="כותרת: דירה ללא עמלה"
-                      name="noCommissionTitle"
-                    >
-                      <Input placeholder="דירה ללא עמלת תיווך" disabled={titlesLoading} />
-                    </Form.Item>
-                  </Space>
-                ),
-              },
-            ]}
-          />
+          <Form
+            form={titlesForm}
+            layout="vertical"
+            onFinish={() => handleSaveTitles()}
+          >
+            <Tabs
+              items={[
+                {
+                  key: 'main',
+                  label: 'סעיפים ראשיים',
+                  children: (
+                    <Space direction="vertical" className="w-full" size="large">
+                      <Form.Item label="כותרת: הצעות חמות" name="hotPropositionsTitle">
+                        <Input placeholder="הצעות חמות" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: נכסים נבחרים" name="featuredPropertiesTitle">
+                        <Input placeholder="נכסים באיזור המרכז" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="תת-כותרת: נכסים נבחרים" name="featuredPropertiesSubtitle">
+                        <Input placeholder="מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: למה לבחור בנו?" name="valuesSectionTitle">
+                        <Input placeholder="למה לבחור בנו?" disabled={titlesLoading} />
+                      </Form.Item>
+                    </Space>
+                  ),
+                },
+                {
+                  key: 'secondary',
+                  label: 'סעיפים נוספים',
+                  children: (
+                    <Space direction="vertical" className="w-full" size="large">
+                      <Form.Item label="כותרת: אודות" name="aboutSectionTitle">
+                        <Input placeholder="אודות" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: מה חשוב לדעת" name="processSectionTitle">
+                        <Input placeholder="מה חשוב לדעת כשקונים נכס?" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: מה הלקוחות אומרים" name="testimonialsTitle">
+                        <Input placeholder="מה הלקוחות שלנו אומרים" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: דירה ללא עמלה" name="noCommissionTitle">
+                        <Input placeholder="דירה ללא עמלת תיווך" disabled={titlesLoading} />
+                      </Form.Item>
+                    </Space>
+                  ),
+                },
+              ]}
+            />
 
-          {/* Save button inside the card */}
-          <div style={{ marginTop: '24px', textAlign: 'right' }}>
-            <Button
-              type="primary"
-              size="large"
-              loading={titlesSaving}
-              onClick={handleSaveTitles}
-              icon={<EditOutlined />}
-              style={{ minWidth: '150px' }}
-            >
-              שמור כותרות
-            </Button>
-          </div>
-        </Form>
-      </Card>
+            <div style={{ marginTop: '24px', textAlign: 'right' }}>
+              <Button
+                type="primary"
+                size="large"
+                loading={titlesSaving}
+                onClick={handleSaveTitles}
+                icon={<EditOutlined />}
+                style={{ minWidth: '150px' }}
+              >
+                שמור כותרות
+              </Button>
+            </div>
+          </Form>
+        </Card>
 
         {/* Properties Section Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -443,20 +514,14 @@ export default function HomepagePage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 gap-6 mb-6">
-          <Card
-            bordered={true}
-            className="rounded-lg"
-          >
+          <Card bordered={true} className="rounded-lg">
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <Text type="secondary" style={{ fontSize: '14px' }}>הצעות חמות</Text>
               <Title level={3} style={{ margin: 0 }}>{hotProperties.length} נכסים</Title>
             </Space>
           </Card>
 
-          <Card
-            bordered={true}
-            className="rounded-lg"
-          >
+          <Card bordered={true} className="rounded-lg">
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <Text type="secondary" style={{ fontSize: '14px' }}>דירות ללא עמלה (מקסימום 1)</Text>
               <Title level={3} style={{ margin: 0 }}>{noCommissionProperties.length}/1 נכס</Title>
@@ -481,20 +546,16 @@ export default function HomepagePage() {
                 icon={<PlusOutlined />}
                 onClick={() => openModal('hot')}
                 size="middle"
-                style={{
-                  borderRadius: '8px',
-                  fontWeight: 500
-                }}
+                style={{ borderRadius: '8px', fontWeight: 500 }}
               >
                 הוסף נכסים
               </Button>
             }
-            style={{
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-            }}
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            styles={{ body: { padding: 0, paddingBottom: 0 } }}
           >
             {/* Compact Price Filter Settings */}
-            <div className="mb-3 p-3 rounded-lg" style={{ background: '#f8f9fa', border: '1px solid #e8e8e8' }}>
+            <div className="mb-3 p-3 mx-6 mt-6 rounded-lg" style={{ background: '#f8f9fa', border: '1px solid #e8e8e8' }}>
               <Radio.Group
                 value={hotPropositionsMode}
                 onChange={(e) => setHotPropositionsMode(e.target.value)}
@@ -522,92 +583,31 @@ export default function HomepagePage() {
               )}
             </div>
 
-          {hotProperties.length === 0 ? (
-            <div className="text-center py-8" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
-              <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>אין נכסים מוצגים</Text>
-              <Button
-                type="primary"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={() => openModal('hot')}
-              >
-                הוסף נכסים
-              </Button>
-            </div>
-          ) : (
-            <Table
-              dataSource={hotProperties}
-              rowKey="id"
-              pagination={false}
-              size="small"
-              scroll={{ x: 'max-content' }}
-              columns={[
-                {
-                  title: 'תמונה',
-                  dataIndex: 'images',
-                  key: 'image',
-                  width: 80,
-                  render: (images: string[]) => (
-                    <Image
-                      src={images[0] || '/images/placeholder.jpg'}
-                      alt="נכס"
-                      width={60}
-                      height={60}
-                      style={{ objectFit: 'cover', borderRadius: '4px' }}
-                    />
-                  ),
-                },
-                {
-                  title: 'כותרת',
-                  dataIndex: 'title',
-                  key: 'title',
-                  ellipsis: true,
-                },
-                {
-                  title: 'מיקום',
-                  dataIndex: 'location',
-                  key: 'location',
-                  ellipsis: true,
-                },
-                {
-                  title: 'מחיר',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (price: string) => <strong>{price}</strong>,
-                },
-                {
-                  title: 'חדרים',
-                  dataIndex: 'rooms',
-                  key: 'rooms',
-                  width: 80,
-                },
-                {
-                  title: 'שטח',
-                  dataIndex: 'area',
-                  key: 'area',
-                  width: 80,
-                  render: (area: number) => `${area} מ"ר`,
-                },
-                {
-                  title: 'פעולות',
-                  key: 'actions',
-                  width: 100,
-                  render: (_: any, record: Property) => (
-                    <Button
-                      type="primary"
-                      danger
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleRemove(record.id, 'hot')}
-                    >
-                      הסר
-                    </Button>
-                  ),
-                },
-              ]}
-            />
-          )}
-        </Card>
+            {hotProperties.length === 0 ? (
+              <div className="text-center py-8 mx-6 mb-6" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>אין נכסים מוצגים</Text>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => openModal('hot')}
+                >
+                  הוסף נכסים
+                </Button>
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <Table
+                  dataSource={hotProperties}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{ x: 'max-content' }}
+                  style={{ margin: 0 }}
+                  columns={tableColumns('hot')}
+                />
+              </div>
+            )}
+          </Card>
 
           {/* No Commission Section */}
           <Card
@@ -630,20 +630,16 @@ export default function HomepagePage() {
                 onClick={() => openModal('noCommission')}
                 disabled={noCommissionProperties.length >= 1}
                 size="middle"
-                style={{
-                  borderRadius: '8px',
-                  fontWeight: 500
-                }}
+                style={{ borderRadius: '8px', fontWeight: 500 }}
               >
                 {noCommissionProperties.length >= 1 ? 'נבחר נכס' : 'בחר נכס'}
               </Button>
             }
-            style={{
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-            }}
+            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+            styles={{ body: { padding: 0, paddingBottom: 0 } }}
           >
             {noCommissionProperties.length === 0 ? (
-              <div className="text-center py-8" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
+              <div className="text-center py-8 mx-6 mb-6" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
                 <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>לא נבחר נכס</Text>
                 <Button
                   type="primary"
@@ -655,80 +651,19 @@ export default function HomepagePage() {
                 </Button>
               </div>
             ) : (
-            <Table
-              dataSource={noCommissionProperties}
-              rowKey="id"
-              pagination={false}
-              size="small"
-              scroll={{ x: 'max-content' }}
-              columns={[
-                {
-                  title: 'תמונה',
-                  dataIndex: 'images',
-                  key: 'image',
-                  width: 80,
-                  render: (images: string[]) => (
-                    <Image
-                      src={images[0] || '/images/placeholder.jpg'}
-                      alt="נכס"
-                      width={60}
-                      height={60}
-                      style={{ objectFit: 'cover', borderRadius: '4px' }}
-                    />
-                  ),
-                },
-                {
-                  title: 'כותרת',
-                  dataIndex: 'title',
-                  key: 'title',
-                  ellipsis: true,
-                },
-                {
-                  title: 'מיקום',
-                  dataIndex: 'location',
-                  key: 'location',
-                  ellipsis: true,
-                },
-                {
-                  title: 'מחיר',
-                  dataIndex: 'price',
-                  key: 'price',
-                  render: (price: string) => <strong>{price}</strong>,
-                },
-                {
-                  title: 'חדרים',
-                  dataIndex: 'rooms',
-                  key: 'rooms',
-                  width: 80,
-                },
-                {
-                  title: 'שטח',
-                  dataIndex: 'area',
-                  key: 'area',
-                  width: 80,
-                  render: (area: number) => `${area} מ"ר`,
-                },
-                {
-                  title: 'פעולות',
-                  key: 'actions',
-                  width: 100,
-                  render: (_: any, record: Property) => (
-                    <Button
-                      type="primary"
-                      danger
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleRemove(record.id, 'noCommission')}
-                    >
-                      הסר
-                    </Button>
-                  ),
-                },
-              ]}
-            />
-          )}
-        </Card>
-      </div>
+              <div style={{ overflowX: 'auto' }}>
+                <Table
+                  dataSource={noCommissionProperties}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{ x: 'max-content' }}
+                  style={{ margin: 0 }}
+                  columns={tableColumns('noCommission')}
+                />
+              </div>
+            )}
+          </Card>
+        </div>
 
         {/* Property Selector Modal */}
         <Modal
@@ -759,34 +694,77 @@ export default function HomepagePage() {
             style: { borderRadius: '8px' }
           }}
         >
-        <div className="max-h-96 overflow-y-auto">
-          <Checkbox.Group
-            value={selectedIds}
-            onChange={(values) => setSelectedIds(values as number[])}
-            className="w-full"
-          >
-            <Space direction="vertical" className="w-full">
-              {availableProperties.map((property) => (
-                <Card key={property.id} size="small" className="w-full">
-                  <Checkbox value={property.id} className="w-full">
-                    <div className="flex items-center gap-3 ml-2">
-                      <img
-                        src={property.images[0] || '/images/placeholder.jpg'}
-                        alt={property.title}
-                        className="w-12 h-12 object-cover rounded"
-                      />
-                      <div className="flex-1">
-                        <div className="font-semibold text-sm">{property.title}</div>
-                        <div className="text-xs text-gray-500">{property.location}</div>
-                        <div className="text-xs font-bold text-primary">{property.price}</div>
-                      </div>
-                    </div>
-                  </Checkbox>
-                </Card>
-              ))}
-            </Space>
-          </Checkbox.Group>
-        </div>
+          <div>
+            {modalType === 'hot' && (
+              <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
+                <Checkbox
+                  checked={selectedIds.length === availableProperties.length && availableProperties.length > 0}
+                  indeterminate={selectedIds.length > 0 && selectedIds.length < availableProperties.length}
+                  onChange={handleSelectAll}
+                >
+                  <strong>בחר הכל ({selectedIds.length}/{availableProperties.length})</strong>
+                </Checkbox>
+              </div>
+            )}
+
+            <div className="max-h-96 overflow-y-auto">
+              {modalType === 'noCommission' ? (
+                <Radio.Group
+                  value={selectedIds[0]}
+                  onChange={handleRadioChange}
+                  className="w-full"
+                >
+                  <Space direction="vertical" className="w-full">
+                    {availableProperties.map((property) => (
+                      <Card key={property.id} size="small" className="w-full">
+                        <Radio value={property.id} className="w-full">
+                          <div className="flex items-center gap-3 ml-2">
+                            <img
+                              src={property.images[0] || '/images/placeholder.jpg'}
+                              alt={property.title}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm">{property.title}</div>
+                              <div className="text-xs text-gray-500">{property.location}</div>
+                              <div className="text-xs font-bold text-primary">{property.price}</div>
+                            </div>
+                          </div>
+                        </Radio>
+                      </Card>
+                    ))}
+                  </Space>
+                </Radio.Group>
+              ) : (
+                <Checkbox.Group
+                  value={selectedIds}
+                  onChange={(values) => setSelectedIds(values as number[])}
+                  className="w-full"
+                >
+                  <Space direction="vertical" className="w-full">
+                    {availableProperties.map((property) => (
+                      <Card key={property.id} size="small" className="w-full">
+                        <Checkbox value={property.id} className="w-full">
+                          <div className="flex items-center gap-3 ml-2">
+                            <img
+                              src={property.images[0] || '/images/placeholder.jpg'}
+                              alt={property.title}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm">{property.title}</div>
+                              <div className="text-xs text-gray-500">{property.location}</div>
+                              <div className="text-xs font-bold text-primary">{property.price}</div>
+                            </div>
+                          </div>
+                        </Checkbox>
+                      </Card>
+                    ))}
+                  </Space>
+                </Checkbox.Group>
+              )}
+            </div>
+          </div>
         </Modal>
       </div>
     </div>

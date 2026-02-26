@@ -170,6 +170,28 @@ jobs:
             tar -xzf /tmp/deploy.tar.gz
             cp -r deploy/. .
             rm -rf deploy
+
+            # ==========================================
+            # DATABASE PERSISTENCE FIX
+            # ==========================================
+            # This section ensures the database is NOT deleted on each deployment
+            # For SQLite: Store database file outside deployment directory
+            # For PostgreSQL/MySQL: No changes needed, DATABASE_URL points to external server
+            # ==========================================
+            DB_DIR="/var/lib/apartment-project"
+            sudo mkdir -p $DB_DIR
+            sudo chown $USER:$USER $DB_DIR
+
+            # Update DATABASE_URL to point to persistent location (only for SQLite)
+            if [[ "$DATABASE_URL" == *"file:"* ]]; then
+              # Extract filename from DATABASE_URL (e.g., "file:./dev.db" -> "dev.db")
+              DB_FILE=$(echo "$DATABASE_URL" | sed 's/.*file:\(\.\/\)\?//' | sed 's/?.*//')
+              # Update DATABASE_URL to use persistent path
+              DATABASE_URL="file:${DB_DIR}/${DB_FILE}"
+              echo "📁 Using persistent SQLite database: $DATABASE_URL"
+            else
+              echo "📁 Using external database (PostgreSQL/MySQL/etc.): ${DATABASE_URL:0:30}..."
+            fi
             
             # Create proper .next directory structure for standalone mode
             # Standalone build needs .next/server and .next/static directories
@@ -235,6 +257,7 @@ jobs:
               echo "NODE_ENV=production"
               echo "PORT=3000"
               echo "HOSTNAME=0.0.0.0"
+              echo "# Database stored in persistent location: $DB_DIR"
               echo "DATABASE_URL=\"${DATABASE_URL}\""
               echo "NEXTAUTH_SECRET=\"${NEXTAUTH_SECRET}\""
               echo "NEXTAUTH_URL=\"${NEXTAUTH_URL}\""
