@@ -44,15 +44,15 @@ async function main() {
   } else {
     await prisma.contactInfo.create({
       data: {
-        phone: '03-5551234',
-        phoneLink: 'tel:035551234',
-        email: 'info@apartment-realty.co.il',
-        emailLink: 'mailto:info@apartment-realty.co.il',
-        address: 'רחוב סוקולוב 50',
+        phone: '050-549-6626',
+        phoneLink: 'tel:0505496626',
+        email: 'rammiz800@gmail.com',
+        emailLink: 'mailto:rammiz800@gmail.com',
+        address: 'חנקין 83',
         city: 'חולון',
         mapUrl: 'https://maps.google.com/?q=32.0167,34.7794',
-        weekdayHours: 'ראשון - חמישי: 9:00 - 18:00',
-        fridayHours: 'שישי: 9:00 - 13:00',
+        weekdayHours: 'ראשון - חמישי: 8:00 - 20:00',
+        fridayHours: 'שישי: 8:00 - 14:00',
         facebook: 'https://facebook.com/apartment-realty',
         instagram: 'https://instagram.com/apartment-realty',
         linkedin: 'https://linkedin.com/company/apartment-realty',
@@ -1328,12 +1328,82 @@ async function main() {
     console.log('✅ Created homepage settings')
   }
 
+  // ===== 5. Create Owners =====
+  const existingOwners = await prisma.owner.count()
+  if (existingOwners > 0) {
+    console.log(`✅ Owners already exist (${existingOwners} found)`)
+  } else {
+    await prisma.owner.createMany({
+      data: [
+        {
+          name: 'רם מזרחי',
+          title: 'מייסד ומתווך נדל"ן',
+          image: '/images/owner1.jpg',
+          phone: '050-549-6626',
+          email: 'rammiz800@gmail.com',
+          description: 'רם הוא מתווך נדל"ן מנוסה המתמחה בשיווק דירות למכירה בחולון. הוא ידוע בגישה הישירה, ביכולת להבין במהירות את צרכי הלקוח ובניהול משא ומתן מדויק שמוביל לתוצאות.',
+          order: 1,
+          isActive: true,
+        },
+        {
+          name: 'חיים ענבי',
+          title: 'מייסד ומתווך נדל"ן',
+          image: '/images/owner2.jpg',
+          phone: '050-675-9999',
+          email: 'hd.nadlan@gmail.com',
+          description: 'חיים מביא ניסיון רב בתחום התיווך והשיווק, עם הכרות מעמיקה של שכונות חולון והסביבה. חיים מתמקד בליווי אישי, זמינות גבוהה ושירות מקצועי לכל לקוח.',
+          order: 2,
+          isActive: true,
+        }
+      ]
+    })
+    console.log('✅ Created 2 owners')
+  }
+
+  // ===== 6. Create Team Members =====
+  const existingTeamMembers = await prisma.teamMember.count()
+  if (existingTeamMembers > 0) {
+    console.log(`✅ Team members already exist (${existingTeamMembers} found)`)
+  } else {
+    await prisma.teamMember.createMany({
+      data: [
+        {
+          name: 'תומר גל',
+          role: 'סוכן נדל״ן',
+          image: '/agent-second.jpg',
+          phone: '050-901-7800',
+          mobile: '050-901-7800',
+          fax: '',
+          email: 'twmr0560@gmail.com',
+          description: 'סוכן נדל״ן מנוסה המתמחה בחולון ובת-ים, עם היכרות עמוקה של השכונות והקונים המקומיים. משלב תמחור מדויק, שיווק חכם וניהול מו״מ חד כדי להביא לעסקה מהירה ובתנאים הטובים ביותר',
+          order: 1,
+          isActive: true,
+        },
+        {
+          name: 'ליאור גמיש',
+          role: 'סוכנת נדל״ן',
+          image: '/agent-fisrt.jpg',
+          phone: '',
+          mobile: '',
+          fax: '',
+          email: '',
+          description: 'סוכנת נדל״ן מנוסה הפועלת מזה מספר שנים באזור חולון ובת-ים, עם היכרות מעמיקה של השכונות, מחירי השוק וקהל הקונים המקומי. מתמחה בליווי מוכרים ורוכשים משלב התמחור והבדיקות ועד סגירת העסקה, תוך התאמה אישית לצרכים ולמטרות הלקוח. משלבת שיווק מדויק, ניהול משא ומתן מקצועי וזמינות מלאה כדי להגיע לתוצאה בטוחה ובתנאים הטובים ביותר',
+          order: 2,
+          isActive: true,
+        }
+      ]
+    })
+    console.log('✅ Created 2 team members')
+  }
+
   console.log('\n🎉 Seed completed successfully!')
   console.log('\n📋 Summary:')
   console.log(`   Users: ${await prisma.user.count()}`)
   console.log(`   Properties: ${await prisma.property.count()}`)
   console.log(`   Contact Info: ${await prisma.contactInfo.count()}`)
   console.log(`   Homepage Settings: ${await prisma.homepageSettings.count()}`)
+  console.log(`   Owners: ${await prisma.owner.count()}`)
+  console.log(`   Team Members: ${await prisma.teamMember.count()}`)
 }
 
 main()

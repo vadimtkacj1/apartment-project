@@ -83,10 +83,11 @@ export default function Header() {
       <nav
         dir="ltr"
         style={{
-          maxWidth: 2400, // ✅ Увеличена для 3K экранов (было 1440)
+          maxWidth: 2400,
           margin: "0 auto",
-          padding: "0 2.5rem",
-          height: 90, // ✅ Увеличена высота хедера
+          /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
+          padding: isMobile ? "0 1rem" : "0 2.5rem",
+          height: 90,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -104,7 +105,7 @@ export default function Header() {
             />
           </Link>
           <Image src="/images/second-and.svg" alt="and" width={36} height={36}
-            className="object-contain" priority
+            className="object-contain"
             style={{ transition: "filter 0.35s ease", marginBottom: "10px" }}
           />
           <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
@@ -112,7 +113,7 @@ export default function Header() {
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
             <Image src="/images/logo2.svg" alt="Logo 2" width={60} height={60}
-              className="object-contain" priority
+              className="object-contain"
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
@@ -120,7 +121,7 @@ export default function Header() {
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}> {/* ✅ Уменьшен gap между пунктами меню */}
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -135,17 +136,17 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(19px, 1.4vw, 26px)", // ✅ Збільшено для кращої читабельності
+                      fontSize: "clamp(19px, 1.4vw, 26px)",
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",
                       alignItems: "center",
                       gap: 5,
-                      padding: "8px 0", // ✅ Увеличен padding
+                      padding: "8px 0",
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                       position: "relative",
-                      letterSpacing: "0.01em", // ✅ Лёгкий letter-spacing для читаемости
+                      letterSpacing: "0.01em",
                       opacity: 1,
                       transition: "opacity 0.2s",
                       fontFamily: "var(--font-caramel), cursive, sans-serif",
@@ -251,20 +252,44 @@ export default function Header() {
         )}
       </nav>
 
-      {/* Mobile menu */}
+      {/* ✅ Mobile menu — fullscreen, zIndex above header, X button inside */}
       {isMobile && isMobileMenuOpen && (
         <div
           dir="rtl"
           style={{
             position: "fixed",
-            inset: "90px 0 0 0", 
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             background: "#ffffff",
-            zIndex: 40,
+            zIndex: 200, /* ✅ выше хедера (100) */
             overflowY: "auto",
-            padding: "1.5rem",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+            paddingTop: "1.5rem",
+            paddingLeft: "1.5rem",
+            paddingRight: "1.5rem",
+            paddingBottom: "1.5rem",
           }}
         >
+          {/* ✅ Крестик закрытия внутри меню */}
+          <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "1rem" }}>
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#1c3664",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 8,
+                borderRadius: 10,
+              }}
+            >
+              <X size={32} />
+            </button>
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {navLinks.map((link) => (
               <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>

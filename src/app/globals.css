@@ -10,26 +10,47 @@
   --warm-lighter: #fefcfa;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Force light mode - сайт завжди використовує світлу тему */
 html {
+  color-scheme: light;
   overflow-y: scroll;
   scrollbar-gutter: stable;
-  background: #faf7f2;
+  background: #faf7f2 !important;
+}
+
+/* Override dark mode on Android and other devices */
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: light !important;
+    background: #faf7f2 !important;
+  }
+  
+  body {
+    background: #faf7f2 !important;
+    color: #171717 !important;
+  }
+  
+  :root {
+    --background: #f9f6f0 !important;
+    --foreground: #171717 !important;
+    --warm-beige: #faf7f2 !important;
+    --warm-sand: #f9f6f0 !important;
+    --warm-cream: #fdfbf7 !important;
+    --warm-light: #fcf9f5 !important;
+    --warm-lighter: #fefcfa !important;
+  }
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
-  background: #faf7f2;
+  background: #faf7f2 !important;
+  color: #171717 !important;
   /* Smooth scrolling on mobile */
   -webkit-overflow-scrolling: touch;
+  /* Force light mode on all browsers */
+  color-scheme: light !important;
 }
 
 .font-caramel {
@@ -39,6 +60,13 @@ body {
 @layer utilities {
   .bg-warm {
     background-color: #faf7f2 !important;
+  }
+  
+  /* Force light colors even in dark mode */
+  @media (prefers-color-scheme: dark) {
+    .bg-warm {
+      background-color: #faf7f2 !important;
+    }
   }
 
   .text-balance {
@@ -89,7 +117,7 @@ body {
   text-decoration: underline;
 }
 
-/* Ensure header is always on top */
+/* Ensure header is always on top and light colored */
 header[dir="rtl"] {
   z-index: 9999 !important;
   position: sticky !important;
@@ -99,6 +127,167 @@ header[dir="rtl"] {
 /* Header uses Carmela font */
 header {
   font-family: var(--font-caramel), cursive, sans-serif !important;
+  /* Background контролюється через inline стилі в компоненті - прозорий на початку, білий після скролу */
+}
+
+/* Force light colors for all main elements in dark mode - АГРЕСИВНІ ПРАВИЛА ДЛЯ ANDROID */
+@media (prefers-color-scheme: dark) {
+  /* Root elements - найвищий пріоритет */
+  html,
+  html *,
+  body,
+  body * {
+    color-scheme: light !important;
+  }
+  
+  html {
+    background: #faf7f2 !important;
+  }
+  
+  body {
+    background: #faf7f2 !important;
+    color: #171717 !important;
+  }
+  
+  /* Header - дозволяємо inline стилям працювати, але забезпечуємо правильні кольори тексту */
+  header {
+    /* Background контролюється через inline стилі в компоненті - прозорий на початку, білий після скролу */
+    color: #1c3664 !important;
+  }
+  
+  header * {
+    color: inherit !important;
+  }
+  
+  /* Якщо header має inline style з transparent, залишаємо його прозорим */
+  header[style*="background: transparent"],
+  header[style*="background:transparent"] {
+    background: transparent !important;
+  }
+  
+  /* Якщо header має inline style з білим фоном, залишаємо його білим */
+  header[style*="background: #ffffff"],
+  header[style*="background:#ffffff"],
+  header[style*="background: rgb(255, 255, 255)"] {
+    background: #ffffff !important;
+  }
+  
+  /* Main content area */
+  main,
+  main * {
+    background: #faf7f2 !important;
+    color: #171717 !important;
+  }
+  
+  /* All sections */
+  section {
+    background: inherit !important;
+    color: inherit !important;
+  }
+  
+  /* All containers with warm background */
+  .bg-warm,
+  [class*="bg-warm"],
+  [class*="warm"],
+  div.bg-warm,
+  section.bg-warm {
+    background-color: #faf7f2 !important;
+    color: #171717 !important;
+  }
+  
+  /* Cards and white containers */
+  .bg-white,
+  [class*="bg-white"],
+  div.bg-white,
+  section.bg-white {
+    background-color: #ffffff !important;
+    color: #171717 !important;
+  }
+  
+  /* Gray backgrounds */
+  .bg-gray-50,
+  .bg-gray-100,
+  [class*="bg-gray"] {
+    background-color: #f9fafb !important;
+    color: #171717 !important;
+  }
+  
+  /* All divs inherit light background */
+  div:not(footer):not([class*="dark"]):not([style*="background"]) {
+    background-color: transparent !important;
+  }
+  
+  /* Text colors - ensure readability */
+  h1, h2, h3, h4, h5, h6 {
+    color: #171717 !important;
+  }
+  
+  p, span, div, label {
+    color: #171717 !important;
+  }
+  
+  /* Links */
+  a:not([class*="text-white"]):not([class*="text-gray-400"]) {
+    color: #1c3664 !important;
+  }
+  
+  /* Buttons and interactive elements */
+  button {
+    color-scheme: light !important;
+    background: inherit !important;
+    color: inherit !important;
+  }
+  
+  /* Inputs and forms */
+  input,
+  textarea,
+  select {
+    background: #ffffff !important;
+    color: #171717 !important;
+    border-color: #e5e7eb !important;
+    color-scheme: light !important;
+  }
+  
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important;
+  }
+  
+  /* Override any dark text colors */
+  .text-gray-700,
+  .text-gray-800,
+  .text-gray-900 {
+    color: #171717 !important;
+  }
+  
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600 {
+    color: #6b7280 !important;
+  }
+  
+  /* Footer can stay dark (it's intentional) - використовуємо простий селектор */
+  footer[dir="rtl"] {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+  }
+  
+  footer[dir="rtl"] * {
+    color: inherit !important;
+  }
+  
+  /* Override any inline styles that might force dark colors */
+  [style*="background-color: rgb(0, 0, 0)"],
+  [style*="background-color:#000"],
+  [style*="background-color:black"] {
+    background-color: #faf7f2 !important;
+  }
+  
+  [style*="color: rgb(255, 255, 255)"],
+  [style*="color:#fff"],
+  [style*="color:white"] {
+    color: #171717 !important;
+  }
 }
 
 /* Large screen optimizations (1920px and above) */
@@ -153,5 +342,41 @@ header {
   
   .max-w-7xl {
     max-width: 2200px !important;
+  }
+}
+
+/* ДОДАТКОВИЙ ЗАХИСТ ВІД ТЕМНОГО РЕЖИМУ ANDROID - застосовується завжди */
+* {
+  color-scheme: light;
+}
+
+/* Перевизначення для всіх можливих темних класів Tailwind */
+@media (prefers-color-scheme: dark) {
+  /* Перевизначення всіх темних класів */
+  .dark\:bg-gray-800,
+  .dark\:bg-gray-900,
+  .dark\:bg-black,
+  [class*="dark:bg-"] {
+    background-color: inherit !important;
+  }
+  
+  .dark\:text-white,
+  .dark\:text-gray-100,
+  [class*="dark:text-"] {
+    color: #171717 !important;
+  }
+  
+  /* Забезпечення що всі секції мають правильний фон */
+  section:not(footer):not([class*="dark"]) {
+    background-color: transparent !important;
+  }
+  
+  /* Контейнери завжди світлі */
+  .container,
+  .max-w-7xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl {
+    background-color: transparent !important;
   }
 }

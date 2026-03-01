@@ -10,9 +10,24 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen bg-warm">
+    <div 
+      className="flex flex-col min-h-screen bg-warm"
+      style={{ 
+        colorScheme: 'light',
+        background: '#faf7f2',
+        color: '#171717'
+      } as React.CSSProperties}
+    >
       <Header />
-      <main className="flex-grow bg-warm">{children}</main>
+      <main 
+        className="flex-grow bg-warm"
+        style={{ 
+          background: '#faf7f2',
+          color: '#171717'
+        } as React.CSSProperties}
+      >
+        {children}
+      </main>
       <Footer />
       {/* <SocialSidebar /> */}
       <AccessibilityWidget />

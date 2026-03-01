@@ -83,6 +83,8 @@ export default async function Footer() {
             <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
+              <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors">למכור לבד?</Link></li>
+              <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors">משקיעים זרים</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">מרכז עזרה</Link></li>
               <li><Link href="/links" className="hover:text-white transition-colors">קישורים שימושיים</Link></li>
             </ul>
@@ -93,6 +95,8 @@ export default async function Footer() {
             <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-white transition-colors">מדיניות פרטיות</Link></li>
+              <li><Link href="/accessibility" className="hover:text-white transition-colors">הצהרת נגישות</Link></li>
             </ul>
           </div>
 

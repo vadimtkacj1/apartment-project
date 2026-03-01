@@ -1,14 +1,43 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import AgentCard from './AgentCard';
-// IMPORTANT: Verify this import path matches your project structure
-import { team } from '@/app/(public)/about/aboutData';
+
+type TeamMember = {
+  id: number;
+  name: string;
+  role: string;
+  image: string | null;
+  phone: string | null;
+  mobile: string | null;
+  fax: string | null;
+  email: string | null;
+  description: string | null;
+};
 
 export default function AboutTeam() {
   const teamRef = useRef(null);
   const teamInView = useInView(teamRef, { once: true, amount: 0.1 });
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTeam() {
+      try {
+        const response = await fetch('/api/team');
+        if (response.ok) {
+          const data = await response.json();
+          setTeam(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch team members:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTeam();
+  }, []);
 
   return (
     <motion.section
@@ -43,20 +72,19 @@ export default function AboutTeam() {
 
         {/* Agents List Container */}
         <div className="flex flex-col gap-24 md:gap-32">
-          {/* Check if team data exists before mapping */}
-          {team && team.length > 0 ? (
+          {loading ? (
+            <p className="text-center text-slate-400">טוען נתונים...</p>
+          ) : team && team.length > 0 ? (
             team.map((member, index) => (
               <AgentCard
                 key={member.id}
                 member={member}
                 index={index}
-
-                isEven={index % 2 === 0} 
+                isEven={index % 2 === 0}
               />
             ))
           ) : (
-             // Fallback loading state
-            <p className="text-center text-slate-400">Loading team data...</p>
+            <p className="text-center text-slate-400">אין חברי צוות להצגה</p>
           )}
         </div>
 

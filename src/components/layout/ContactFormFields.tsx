@@ -17,7 +17,7 @@ export interface FormData {
   consent: boolean;
 }
 
-const ContactFormFields: React.FC<ContactFormFieldsProps> = ({ 
+const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
   onSubmitSuccess,
   resetOnSubmit = false,
   idPrefix = ''
@@ -28,29 +28,75 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
     message: '',
     consent: false
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.consent) {
-      alert('יש לאשר את תנאי השימוש והסכמה');
+      setSubmitStatus({
+        type: 'error',
+        message: 'יש לאשר את תנאי השימוש והסכמה'
+      });
       return;
     }
-    
-    // Log submission data (Replace with your API call)
-    console.log('Form submitted:', formData);
-    
-    // Track contact form submission
-    analytics.trackContactForm();
-    
-    // Reset form state if enabled
-    if (resetOnSubmit) {
-      setFormData({ name: '', phone: '', message: '', consent: false });
-    }
-    
-    // Trigger callback on successful submission
-    if (onSubmitSuccess) {
-      onSubmitSuccess();
+
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          phone: formData.phone,
+          message: formData.message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({
+          type: 'success',
+          message: 'הפנייה נשלחה בהצלחה! נחזור אליך בקרוב'
+        });
+
+        // Track contact form submission
+        analytics.trackContactForm();
+
+        // Reset form state if enabled
+        if (resetOnSubmit) {
+          setFormData({ name: '', phone: '', message: '', consent: false });
+        }
+
+        // Trigger callback on successful submission
+        if (onSubmitSuccess) {
+          setTimeout(() => {
+            onSubmitSuccess();
+          }, 1500);
+        }
+      } else {
+        setSubmitStatus({
+          type: 'error',
+          message: data.error || 'אירעה שגיאה בשליחת הטופס'
+        });
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus({
+        type: 'error',
+        message: 'אירעה שגיאה בשליחת הטופס. אנא נסה שוב'
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,18 +181,40 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
         </label>
       </div>
 
+      {/* Status Messages */}
+      {submitStatus.type && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-4 rounded-xl text-center font-bold ${
+            submitStatus.type === 'success'
+              ? 'bg-green-50 text-green-700 border-2 border-green-200'
+              : 'bg-red-50 text-red-700 border-2 border-red-200'
+          }`}
+        >
+          {submitStatus.message}
+        </motion.div>
+      )}
+
       {/* Submit Button */}
       <motion.button
         type="submit"
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        className="w-full px-8 py-5 bg-[#1c3664] text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-lg hover:bg-[#152a4f] transition-all duration-300 flex items-center justify-center gap-3 group mt-4"
+        disabled={isSubmitting}
+        whileHover={!isSubmitting ? { scale: 1.01 } : {}}
+        whileTap={!isSubmitting ? { scale: 0.99 } : {}}
+        className={`w-full px-8 py-5 text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group mt-4 ${
+          isSubmitting
+            ? 'bg-gray-400 cursor-not-allowed'
+            : 'bg-[#1c3664] hover:bg-[#152a4f]'
+        }`}
       >
-        <span>שלח הודעה</span>
-        <Send
-          size={22}
-          className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
-        />
+        <span>{isSubmitting ? 'שולח...' : 'שלח הודעה'}</span>
+        {!isSubmitting && (
+          <Send
+            size={22}
+            className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
+          />
+        )}
       </motion.button>
     </form>
   );
