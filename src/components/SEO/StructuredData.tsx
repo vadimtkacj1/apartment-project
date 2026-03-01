@@ -76,7 +76,7 @@ export default function StructuredData({ type = 'Organization', propertyData }: 
     },
   } : null;
 
-  const schemas = [organizationSchema, websiteSchema];
+  const schemas: Array<Record<string, any>> = [organizationSchema, websiteSchema];
   if (propertySchema) {
     schemas.push(propertySchema);
   }

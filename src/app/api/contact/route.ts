@@ -60,9 +60,9 @@ export async function POST(request: NextRequest) {
 
     // 4. Email template configuration
     const mailOptions = {
-      from: `"Assistant" <${EMAIL_SERVER_USER}>`,
+      from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
       to: EMAIL_TO || "vadim.tkach1378@gmail.com",
-      subject: `New Lead: ${name}`,
+      subject: `פנייה חדשה מהאתר: ${name}`,
       html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee;">
           <div style="background-color: #1c3664; color: white; padding: 20px; text-align: center;">
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
             ${message ? `<p><strong>הודעה:</strong></p><p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">${message}</p>` : ''}
             <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
               <small style="color: #666;">
-                This is an automated message from the contact form at avi-mashkanta.com
+                This is an automated message from the contact form at ram-haim.co.il
               </small>
             </div>
           </div>

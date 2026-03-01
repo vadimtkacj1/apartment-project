@@ -3,7 +3,18 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Phone, Mail, Smartphone } from 'lucide-react';
-import type { TeamMember } from '@/app/(public)/about/aboutData';
+
+type TeamMember = {
+  id: number;
+  name: string;
+  role: string;
+  image: string | null;
+  phone: string | null;
+  mobile: string | null;
+  fax: string | null;
+  email: string | null;
+  description: string | null;
+};
 
 interface AgentCardProps {
   member: TeamMember;
