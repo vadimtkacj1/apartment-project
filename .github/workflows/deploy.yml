@@ -51,18 +51,18 @@ jobs:
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          # Standalone build
-          cp -r .next/standalone/. deploy/
+          # Standalone build (excluding .db files)
+          rsync -av --exclude='*.db' --exclude='*.db-*' .next/standalone/ deploy/
           # Static files
           mkdir -p deploy/.next/static
           cp -r .next/static/. deploy/.next/static/
-          # Public & Prisma
+          # Public & Prisma (schema and migrations only, no .db files)
           [ -d "public" ] && cp -r public deploy/
-          [ -d "prisma" ] && cp -r prisma deploy/
+          [ -d "prisma" ] && rsync -av --exclude='*.db' --exclude='*.db-*' prisma/ deploy/prisma/
           # Package info
           cp package.json deploy/
           [ -f "package-lock.json" ] && cp package-lock.json deploy/
-          
+
           tar -czf deploy.tar.gz deploy/
 
       - name: Deploy to server via SCP
@@ -85,6 +85,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          EMAIL_SERVER_HOST: ${{ secrets.EMAIL_SERVER_HOST }}
+          EMAIL_SERVER_PORT: ${{ secrets.EMAIL_SERVER_PORT }}
+          EMAIL_SERVER_USER: ${{ secrets.EMAIL_SERVER_USER }}
+          EMAIL_SERVER_PASSWORD: ${{ secrets.EMAIL_SERVER_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -92,7 +98,7 @@ jobs:
           port: 22
           timeout: 60s
           command_timeout: 30m
-          envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL
+          envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,EMAIL_SERVER_HOST,EMAIL_SERVER_PORT,EMAIL_SERVER_USER,EMAIL_SERVER_PASSWORD,EMAIL_TO
           script: |
             set -e
             APP_DIR="/opt/apartment-project"
@@ -106,6 +112,12 @@ jobs:
             sudo mkdir -p $APP_DIR $DB_DIR
             sudo chown $USER:$USER $APP_DIR $DB_DIR
 
+            # Backup existing .env and database before deployment
+            if [ -f "$APP_DIR/.env" ]; then
+              echo "💾 Backing up existing .env..."
+              cp $APP_DIR/.env /tmp/.env.backup
+            fi
+
             # Unpack - ensure we have the correct file and permissions
             cd $DEPLOY_TMP
             # Find the actual tar file (SCP action may rename it)
@@ -117,8 +129,17 @@ jobs:
             fi
             echo "📦 Extracting $TAR_FILE to $APP_DIR..."
             cd $APP_DIR
-            tar -xzf "$TAR_FILE" --strip-components=1
+
+            # Extract and exclude any .db files from overwriting
+            tar -xzf "$TAR_FILE" --strip-components=1 --exclude='*.db' --exclude='*.db-*'
             chmod -R u+w $APP_DIR
+
+            # Restore .env if it was backed up
+            if [ -f "/tmp/.env.backup" ]; then
+              echo "♻️ Restoring existing .env..."
+              cp /tmp/.env.backup $APP_DIR/.env
+              rm /tmp/.env.backup
+            fi
             
             # Database Persistence Logic
             if [[ "$DATABASE_URL" == *"file:"* ]]; then
@@ -126,16 +147,27 @@ jobs:
               DATABASE_URL="file:${DB_DIR}/${DB_FILE}"
             fi
 
-            # Create .env
-            echo "📝 Updating .env..."
-            cat <<EOT > .env
+            # Create or update .env (preserves existing database if .env exists)
+            if [ ! -f .env ]; then
+              echo "📝 Creating new .env file..."
+              cat > .env << 'ENVFILE'
             NODE_ENV=production
             PORT=$PORT
             HOSTNAME=0.0.0.0
             DATABASE_URL="$DATABASE_URL"
             NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-$(openssl rand -base64 32)}"
             NEXTAUTH_URL="${NEXTAUTH_URL:-http://localhost:3000}"
-            EOT
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
+            EMAIL_SERVER_HOST="$EMAIL_SERVER_HOST"
+            EMAIL_SERVER_PORT=$EMAIL_SERVER_PORT
+            EMAIL_SERVER_USER="$EMAIL_SERVER_USER"
+            EMAIL_SERVER_PASSWORD="$EMAIL_SERVER_PASSWORD"
+            EMAIL_TO="$EMAIL_TO"
+            ENVFILE
+            else
+              echo "✅ .env file already exists, keeping existing configuration"
+              echo "💡 To update .env, modify GitHub Secrets and delete .env on server, then redeploy"
+            fi
 
             # Database Migrations
             echo "🗄️ Running database migrations..."
