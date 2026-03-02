@@ -54,7 +54,7 @@ const Hero: React.FC<HeroProps> = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden mt-24 md:mt-20"
+      className="relative w-full h-[90vh] md:h-screen overflow-hidden"
     >
       <style>{`
         @keyframes blink {
