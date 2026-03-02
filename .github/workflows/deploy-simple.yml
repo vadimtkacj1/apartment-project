@@ -44,7 +44,6 @@ jobs:
             DB_BACKUP_DIR="/tmp/apartment-project-db-backup"
 
             echo "🚀 Starting deployment via Git Pull..."
-            cd "$APP_DIR"
 
             # Required production secrets/env checks
             if [ -z "$DATABASE_URL" ]; then
@@ -63,6 +62,7 @@ jobs:
             # Create directories
             sudo mkdir -p $APP_DIR $DB_DIR
             sudo chown $USER:$USER $APP_DIR $DB_DIR
+            cd "$APP_DIR"
 
             # Backup existing .env if it exists
             if [ -f "$APP_DIR/.env" ]; then
@@ -88,11 +88,9 @@ jobs:
               echo "📥 Preparing repository in existing directory..."
               cd "$APP_DIR"
               if [ -n "$(ls -A "$APP_DIR")" ]; then
-                # Keep local .env and .db files, remove everything else before checkout.
+                # Keep only .env in place. DB files are already backed up and restored later.
                 find "$APP_DIR" -mindepth 1 \
                   ! -name ".env" \
-                  ! -name "*.db" \
-                  ! -name "*.db-*" \
                   -exec rm -rf {} +
               fi
               git init
