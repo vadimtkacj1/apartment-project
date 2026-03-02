@@ -117,7 +117,7 @@ export default function SellingAloneArticle() {
 
                   <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>סינון פיננסי מקדים</h3>
                   <p>
-                    אנחנו מוודאים שלקונה יש יכולת כלכלית (לעתים קרובות בעזרת שותפנו, <a href="https://avi-mashkanta.com/" className="hyper-link" target="_blank" title="אבי בוקעי | הבית למשכנתאות"><b>אבי בוקעי - "אבי הבית למשכנתאות"</b></a>, שבונה איתם את תקציב הרכישה המדויק לפני הביקור).
+                    אנחנו מוודאים שלקונה יש יכולת כלכלית (לעתים קרובות בעזרת שותפנו, <a href="https://avi-mashkanta.com/" className="hyper-link" target="_blank" title="אבי בוקעי | הבית למשכנתאות"><b>אבי בוקעי — "אבי הבית למשכנתאות"</b></a>, שבונה איתם את תקציב הרכישה המדויק לפני הביקור).
                   </p>
 
                   <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>ניהול מו"מ נטול רגשות</h3>
