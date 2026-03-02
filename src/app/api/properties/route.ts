@@ -39,10 +39,34 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit');
     const category = searchParams.get('category');
     const maxPrice = searchParams.get('maxPrice');
-    const region = searchParams.get('region'); // 'center' for center area
-    const pinned = searchParams.get('pinned'); // 'true' to filter by isPinned
-    const hotProposition = searchParams.get('hotProposition'); // 'true' to filter by isHotProposition
-    const noCommission = searchParams.get('noCommission'); // 'true' to filter by isNoCommission
+    const minPrice = searchParams.get('minPrice');
+    const region = searchParams.get('region');
+    const pinned = searchParams.get('pinned');
+    const hotProposition = searchParams.get('hotProposition');
+    const noCommission = searchParams.get('noCommission');
+
+    // Additional filters
+    const propertyType = searchParams.get('propertyType');
+    const minRooms = searchParams.get('minRooms');
+    const maxRooms = searchParams.get('maxRooms');
+    const minArea = searchParams.get('minArea');
+    const maxArea = searchParams.get('maxArea');
+    const floor = searchParams.get('floor');
+    const parking = searchParams.get('parking');
+    const furniture = searchParams.get('furniture');
+    const kitchen = searchParams.get('kitchen');
+    const position = searchParams.get('position');
+    const neighborhood = searchParams.get('neighborhood');
+    const street = searchParams.get('street');
+    const vacancyDate = searchParams.get('vacancyDate');
+
+    // Feature filters
+    const hasAirConditioning = searchParams.get('hasAirConditioning');
+    const hasElevator = searchParams.get('hasElevator');
+    const hasSunBalcony = searchParams.get('hasSunBalcony');
+    const hasSafeRoom = searchParams.get('hasSafeRoom');
+    const hasStorage = searchParams.get('hasStorage');
+    const hasDisabledAccess = searchParams.get('hasDisabledAccess');
 
     const where: any = {
       isActive: true,
@@ -73,7 +97,6 @@ export async function GET(request: NextRequest) {
 
     // Filter by region (center area)
     if (region === 'center') {
-      // Center area includes: Tel Aviv, Holon, Bat Yam, Rishon LeZion, Ramat Gan, Givatayim, etc.
       where.city = {
         in: ['telaviv', 'holon', 'batyam', 'rishon']
       };
@@ -81,6 +104,87 @@ export async function GET(request: NextRequest) {
 
     if (category && category !== 'all') {
       where.category = category;
+    }
+
+    // Property type filter
+    if (propertyType && propertyType !== 'all') {
+      where.propertyType = propertyType;
+    }
+
+    // Rooms filter
+    if (minRooms) {
+      where.rooms = { ...where.rooms, gte: parseFloat(minRooms) };
+    }
+    if (maxRooms) {
+      where.rooms = { ...where.rooms, lte: parseFloat(maxRooms) };
+    }
+
+    // Area filter
+    if (minArea) {
+      where.area = { ...where.area, gte: parseInt(minArea) };
+    }
+    if (maxArea) {
+      where.area = { ...where.area, lte: parseInt(maxArea) };
+    }
+
+    // Floor filter
+    if (floor) {
+      where.floor = parseInt(floor);
+    }
+
+    // Parking filter
+    if (parking && parking !== 'all') {
+      where.parking = parking;
+    }
+
+    // Furniture filter
+    if (furniture && furniture !== 'all') {
+      where.furniture = furniture;
+    }
+
+    // Kitchen filter
+    if (kitchen && kitchen !== 'all') {
+      where.kitchen = kitchen;
+    }
+
+    // Position filter
+    if (position && position !== 'all') {
+      where.position = position;
+    }
+
+    // Neighborhood filter
+    if (neighborhood) {
+      where.neighborhood = { contains: neighborhood, mode: 'insensitive' };
+    }
+
+    // Street filter
+    if (street) {
+      where.street = { contains: street, mode: 'insensitive' };
+    }
+
+    // Vacancy date filter
+    if (vacancyDate) {
+      where.vacancyDate = { contains: vacancyDate, mode: 'insensitive' };
+    }
+
+    // Feature filters
+    if (hasAirConditioning === 'true') {
+      where.hasAirConditioning = true;
+    }
+    if (hasElevator === 'true') {
+      where.hasElevator = true;
+    }
+    if (hasSunBalcony === 'true') {
+      where.hasSunBalcony = true;
+    }
+    if (hasSafeRoom === 'true') {
+      where.hasSafeRoom = true;
+    }
+    if (hasStorage === 'true') {
+      where.hasStorage = true;
+    }
+    if (hasDisabledAccess === 'true') {
+      where.hasDisabledAccess = true;
     }
 
     let properties = await prisma.property.findMany({
@@ -91,12 +195,16 @@ export async function GET(request: NextRequest) {
       take: limit ? parseInt(limit) : undefined,
     });
 
-    // Filter by max price if provided (client-side filtering since price is stored as string)
-    if (maxPrice) {
-      const maxPriceNum = parseInt(maxPrice);
+    // Filter by price range (client-side filtering since price is stored as string)
+    if (minPrice || maxPrice) {
       properties = properties.filter((prop: any) => {
         const priceNum = extractNumericPrice(prop.price);
-        return priceNum > 0 && priceNum <= maxPriceNum;
+        if (priceNum === 0) return false;
+
+        if (minPrice && priceNum < parseInt(minPrice)) return false;
+        if (maxPrice && priceNum > parseInt(maxPrice)) return false;
+
+        return true;
       });
     }
 

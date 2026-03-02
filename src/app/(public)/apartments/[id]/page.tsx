@@ -15,7 +15,8 @@ import {
   PropertySpecs,
   PropertyMap,
   PriceCard,
-  ContactForm
+  ContactForm,
+  PropertyNavigation
 } from '@/components/apartment-detail';
 
 interface Owner {
@@ -30,6 +31,8 @@ export default function ApartmentDetailPage() {
 
   const { property, loading, error } = usePropertyData(propertyId);
   const [owners, setOwners] = useState<Owner[]>([]);
+  const [previousId, setPreviousId] = useState<number | null>(null);
+  const [nextId, setNextId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch('/api/owners')
@@ -37,6 +40,31 @@ export default function ApartmentDetailPage() {
       .then((data) => setOwners(data))
       .catch((err) => console.error('Error fetching owners:', err));
   }, []);
+
+  // Fetch all property IDs to determine previous/next navigation
+  useEffect(() => {
+    const fetchPropertyIds = async () => {
+      try {
+        const response = await fetch('/api/properties');
+        if (!response.ok) return;
+
+        const properties = await response.json();
+        const propertyIds = properties.map((p: any) => p.id);
+
+        const currentIndex = propertyIds.indexOf(Number(propertyId));
+        if (currentIndex !== -1) {
+          setPreviousId(currentIndex > 0 ? propertyIds[currentIndex - 1] : null);
+          setNextId(currentIndex < propertyIds.length - 1 ? propertyIds[currentIndex + 1] : null);
+        }
+      } catch (err) {
+        console.error('Error fetching property IDs:', err);
+      }
+    };
+
+    if (propertyId) {
+      fetchPropertyIds();
+    }
+  }, [propertyId]);
 
   // Loading state
   if (loading) {
@@ -62,6 +90,11 @@ export default function ApartmentDetailPage() {
             <span>חזרה לנכסים</span>
             <ArrowLeft size={22} className="group-hover:-translate-x-1 transition-transform" />
           </Link>
+        </div>
+
+        {/* Property Navigation */}
+        <div className="w-full px-6 lg:px-12">
+          <PropertyNavigation previousId={previousId} nextId={nextId} isSold={isSold} />
         </div>
 
         <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-6 lg:px-12">

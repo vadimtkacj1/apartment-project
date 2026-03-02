@@ -42,7 +42,7 @@ interface CategoryItem {
   value: string;
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 8;
 
 function ApartmentsPageContent() {
   const router = useRouter();
@@ -72,9 +72,74 @@ function ApartmentsPageContent() {
       try {
         setLoading(true);
         const params = new URLSearchParams();
+
+        // Basic filters
         if (filters.dealType && filters.dealType !== 'all') params.append('dealType', filters.dealType);
         if (filters.city && filters.city !== 'all') params.append('city', filters.city);
         if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
+
+        // Property type filter
+        if (filters.propertyType && filters.propertyType !== 'all') {
+          params.append('propertyType', filters.propertyType);
+        }
+
+        // Rooms filter
+        if (filters.minRooms !== undefined) params.append('minRooms', String(filters.minRooms));
+        if (filters.maxRooms !== undefined) params.append('maxRooms', String(filters.maxRooms));
+
+        // Price filter
+        if (filters.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
+        if (filters.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+
+        // Area filter
+        if (filters.minArea !== undefined) params.append('minArea', String(filters.minArea));
+        if (filters.maxArea !== undefined) params.append('maxArea', String(filters.maxArea));
+
+        // Floor filter
+        if (filters.floor !== undefined) params.append('floor', String(filters.floor));
+
+        // Parking filter
+        if (filters.parking && filters.parking !== 'all') {
+          params.append('parking', filters.parking);
+        }
+
+        // Furniture filter
+        if (filters.furniture && filters.furniture !== 'all') {
+          params.append('furniture', filters.furniture);
+        }
+
+        // Kitchen filter
+        if (filters.kitchen && filters.kitchen !== 'all') {
+          params.append('kitchen', filters.kitchen);
+        }
+
+        // Position filter
+        if (filters.position && filters.position !== 'all') {
+          params.append('position', filters.position);
+        }
+
+        // Neighborhood filter
+        if (filters.neighborhood) {
+          params.append('neighborhood', filters.neighborhood);
+        }
+
+        // Street filter
+        if (filters.street) {
+          params.append('street', filters.street);
+        }
+
+        // Vacancy date filter
+        if (filters.vacancyDate) {
+          params.append('vacancyDate', filters.vacancyDate);
+        }
+
+        // Feature filters
+        if (filters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
+        if (filters.features?.hasElevator) params.append('hasElevator', 'true');
+        if (filters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
+        if (filters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
+        if (filters.features?.hasStorage) params.append('hasStorage', 'true');
+        if (filters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
           next: { revalidate: 60 }
@@ -89,16 +154,10 @@ function ApartmentsPageContent() {
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        // Sort: sold properties at the end
-        const sortedProperties = mappedProperties.sort((a: Property, b: Property) => {
-          const aSold = a.isSold || false;
-          const bSold = b.isSold || false;
-          if (aSold && !bSold) return 1;
-          if (!aSold && bSold) return -1;
-          return 0;
-        });
+        // Filter out sold properties
+        const filteredProperties = mappedProperties.filter((prop: Property) => !prop.isSold);
 
-        setProperties(sortedProperties);
+        setProperties(filteredProperties);
       } catch (error) {
         setProperties([]);
       } finally {
@@ -197,11 +256,64 @@ function ApartmentsPageContent() {
           {loading ? (
             <div className="text-center py-20 font-bold text-gray-400">טוען נכסים...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
-              {currentProperties.map((prop, i) => (
-                <PropertyCard key={prop.id} {...prop} index={i} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
+                {currentProperties.map((prop, i) => (
+                  <PropertyCard key={prop.id} {...prop} index={i} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {properties.length > ITEMS_PER_PAGE && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-center items-center gap-2 mt-12"
+                >
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => updatePage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                      currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
+                    }`}
+                  >
+                    הקודם
+                  </button>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.ceil(properties.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => updatePage(page)}
+                      className={`w-10 h-10 rounded-lg font-bold transition-all ${
+                        currentPage === page
+                          ? 'bg-[#1c3664] text-white shadow-lg scale-110'
+                          : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#1c3664]'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => updatePage(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)}
+                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                      currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
+                    }`}
+                  >
+                    הבא
+                  </button>
+                </motion.div>
+              )}
+            </>
           )}
         </div>
       </div>
