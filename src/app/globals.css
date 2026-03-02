@@ -122,12 +122,6 @@ header {
     color: #171717 !important;
   }
 
-  /* Всі текстові елементи світлі */
-  h1, h2, h3, h4, h5, h6,
-  p, span, div, label, a {
-    color: #171717 !important;
-  }
-
   /* Header */
   header {
     color: #1c3664 !important;
