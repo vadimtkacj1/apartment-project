@@ -8,7 +8,7 @@
     "prebuild": "prisma generate",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint .",
+    "lint": "next lint",
     "seed:admin": "node prisma/seed.mjs",
     "postinstall": "prisma generate"
   },
