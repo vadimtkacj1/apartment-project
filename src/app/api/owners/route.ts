@@ -4,7 +4,17 @@ import { prisma } from '@/lib/prisma'
 export async function GET() {
   try {
     const owners = await prisma.owner.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        phone: {
+          not: null,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+      },
       orderBy: { order: 'asc' },
     })
 
