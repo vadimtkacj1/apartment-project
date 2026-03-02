@@ -108,13 +108,14 @@ function LoginForm() {
             name="password"
             rules={[{ required: true, message: 'אנא הכנס סיסמה!' }]}
           >
-            <Input.Password
-              prefix={<LockOutlined />}
-              placeholder="הכנס סיסמה"
-              disabled={loading}
-              dir="ltr"
-              style={{ textAlign: 'left' }}
-            />
+            <div dir="ltr">
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="הכנס סיסמה"
+                disabled={loading}
+                style={{ textAlign: 'left' }}
+              />
+            </div>
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0 }}>
