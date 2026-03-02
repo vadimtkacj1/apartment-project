@@ -4,12 +4,19 @@ import { Send, Phone, CheckCircle2 } from 'lucide-react';
 import { ContactFormData } from './types';
 import { analytics } from '@/lib/analytics';
 
+interface Owner {
+  id: number;
+  name: string;
+  phone: string;
+}
+
 interface ContactFormProps {
   propertyId: string;
   isSold: boolean;
+  owners?: Owner[];
 }
 
-export function ContactForm({ propertyId, isSold }: ContactFormProps) {
+export function ContactForm({ propertyId, isSold, owners = [] }: ContactFormProps) {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     phone: '',
@@ -97,17 +104,24 @@ export function ContactForm({ propertyId, isSold }: ContactFormProps) {
               <Send size={20} className="transform rotate-180" />
             </motion.button>
           </form>
-          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-            <p className="text-sm font-semibold text-gray-600 mb-2">או התקשר ישירות:</p>
-            <a
-              href="tel:+972123456789"
-              onClick={() => analytics.trackPhoneClick(propertyId)}
-              className="inline-flex items-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
-            >
-              <Phone size={20} />
-              <span>03-123-4567</span>
-            </a>
-          </div>
+          {owners.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+              <p className="text-sm font-semibold text-gray-600 mb-3">או התקשר ישירות:</p>
+              <div className="flex flex-col gap-2">
+                {owners.map((owner) => (
+                  <a
+                    key={owner.id}
+                    href={`tel:${owner.phone.replace(/[^0-9+]/g, '')}`}
+                    onClick={() => analytics.trackPhoneClick(propertyId)}
+                    className="inline-flex items-center justify-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
+                  >
+                    <Phone size={20} />
+                    <span>{owner.phone}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -3,6 +3,7 @@ import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import {
@@ -17,11 +18,25 @@ import {
   ContactForm
 } from '@/components/apartment-detail';
 
+interface Owner {
+  id: number;
+  name: string;
+  phone: string;
+}
+
 export default function ApartmentDetailPage() {
   const params = useParams();
   const propertyId = params.id as string;
 
   const { property, loading, error } = usePropertyData(propertyId);
+  const [owners, setOwners] = useState<Owner[]>([]);
+
+  useEffect(() => {
+    fetch('/api/owners')
+      .then((res) => res.json())
+      .then((data) => setOwners(data))
+      .catch((err) => console.error('Error fetching owners:', err));
+  }, []);
 
   // Loading state
   if (loading) {
@@ -85,7 +100,7 @@ export default function ApartmentDetailPage() {
                 originalPrice={property.originalPrice}
                 isSold={isSold}
               />
-              <ContactForm propertyId={propertyId} isSold={isSold} />
+              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} />
             </motion.div>
           </div>
         </div>
