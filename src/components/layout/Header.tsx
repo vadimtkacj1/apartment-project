@@ -99,12 +99,12 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={50} height={50}
+            <Image src="/images/logo.PNG" alt="Logo" width={60} height={60}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
-          <Image src="/images/second-and.svg" alt="and" width={30} height={30}
+          <Image src="/images/second-and.svg" alt="and" width={36} height={36}
             className="object-contain"
             style={{ transition: "filter 0.35s ease", marginBottom: "8px" }}
           />
@@ -112,7 +112,7 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={50} height={50}
+            <Image src="/images/logo2.svg" alt="Logo 2" width={60} height={60}
               className="object-contain"
               style={{ transition: "filter 0.35s ease" }}
             />
@@ -136,7 +136,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(16px, 1.2vw, 20px)",
+                      fontSize: "clamp(17px, 1.35vw, 22px)",
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",
@@ -146,7 +146,7 @@ export default function Header() {
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                       position: "relative",
-                      letterSpacing: "0.01em",
+                      letterSpacing: "0.04em",
                       opacity: 1,
                       transition: "opacity 0.2s",
                       fontFamily: "var(--font-caramel), cursive, sans-serif",

@@ -98,6 +98,8 @@ function LoginForm() {
               prefix={<UserOutlined />}
               placeholder="הכנס שם משתמש"
               disabled={loading}
+              dir="ltr"
+              style={{ textAlign: 'left' }}
             />
           </Form.Item>
 
@@ -110,6 +112,8 @@ function LoginForm() {
               prefix={<LockOutlined />}
               placeholder="הכנס סיסמה"
               disabled={loading}
+              dir="ltr"
+              style={{ textAlign: 'left' }}
             />
           </Form.Item>
 
