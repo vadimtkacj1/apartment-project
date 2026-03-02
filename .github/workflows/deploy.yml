@@ -132,16 +132,49 @@ jobs:
 
           tar -czf deploy.tar.gz deploy/
 
-      - name: Deploy to server
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 30s
+          script: |
+            echo "✅ SSH connection successful!"
+            echo "Server: $(hostname)"
+            echo "User: $(whoami)"
+            echo "Disk space:"
+            df -h /tmp
+
+      # Alternative: Upload via SSH instead of SCP (more reliable)
+      - name: Upload deployment package
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 600s
+          script: |
+            echo "📦 Preparing to receive deployment package..."
+            mkdir -p /tmp/deploy-upload
+
+      - name: Deploy to server via SCP
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 300s
+          timeout: 600s
+          command_timeout: 15m
           source: "deploy.tar.gz"
           target: "/tmp"
+          debug: true
+          overwrite: true
+          rm: false
+          strip_components: 0
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
