@@ -1,1 +1,5 @@
 2026-03-02 10:37:15 +02:00: ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+2026-03-02 11:23:30 +02:00: ⨯ The requested resource isn't a valid image for /images/portfolio1.svg received null
+2026-03-02 11:23:35 +02:00: ⨯ The requested resource isn't a valid image for /images/portfolio2.svg received null
+2026-03-02 11:23:37 +02:00: ⨯ The requested resource isn't a valid image for /images/portfolio3.svg received null
+2026-03-02 11:25:46 +02:00: ⨯ The requested resource isn't a valid image for /images/portfolio4.svg received null

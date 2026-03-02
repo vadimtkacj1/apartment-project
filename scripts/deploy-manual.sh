@@ -38,8 +38,13 @@ echo "📦 Creating deployment package..."
 rm -rf deploy deploy.tar.gz
 mkdir -p deploy
 
-# Copy standalone build
-cp -r .next/standalone/. deploy/
+# Copy standalone build (excluding database files)
+echo "📦 Copying standalone build (excluding .db files)..."
+rsync -av --exclude='*.db' --exclude='*.db-*' .next/standalone/ deploy/ || {
+    echo "⚠️ rsync not available, using cp with find..."
+    cp -r .next/standalone/. deploy/
+    find deploy -name "*.db" -o -name "*.db-*" | xargs rm -f 2>/dev/null || true
+}
 
 # Copy static files (CRITICAL for Next.js)
 mkdir -p deploy/.next/static
@@ -96,20 +101,42 @@ APP_DIR="/opt/apartment-project"
 APP_NAME="apartment-project"
 
 echo "📦 Extracting deployment..."
-sudo mkdir -p $APP_DIR
-sudo chown $USER:$USER $APP_DIR
+sudo mkdir -p $APP_DIR /var/lib/apartment-project
+sudo chown $USER:$USER $APP_DIR /var/lib/apartment-project
+
+# Backup existing .env if it exists
+if [ -f "$APP_DIR/.env" ]; then
+    echo "💾 Backing up existing .env..."
+    cp $APP_DIR/.env /tmp/.env.backup
+fi
 
 cd $APP_DIR
-tar -xzf /tmp/deploy.tar.gz
+# Extract and exclude database files to prevent overwriting production DB
+tar -xzf /tmp/deploy.tar.gz --exclude='*.db' --exclude='*.db-*'
 cp -r deploy/* .
 rm -rf deploy
 
-# Create .env if it doesn't exist
-if [ ! -f .env ]; then
+# Restore .env if it was backed up, otherwise create new one
+if [ -f "/tmp/.env.backup" ]; then
+    echo "♻️ Restoring existing .env..."
+    cp /tmp/.env.backup $APP_DIR/.env
+    rm /tmp/.env.backup
+elif [ ! -f .env ]; then
+    echo "📝 Creating new .env file..."
+    echo "⚠️  Please update it with production values!"
     cat > .env << EOF
 NODE_ENV=production
-PORT=3000
+PORT=80
 HOSTNAME=0.0.0.0
+DATABASE_URL="file:/var/lib/apartment-project/dev.db"
+NEXTAUTH_SECRET="B3343XqwugRRtMcOtWa9Zh6hGfu2/A1YZS+AdMyd0g4="
+NEXTAUTH_URL="https://ram-haim.co.il"
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="AIzaSyB6oN3zxg47erF-pXJqC1fyvC1fC1IHnsU"
+EMAIL_SERVER_HOST=mail.privateemail.com
+EMAIL_SERVER_PORT=587
+EMAIL_SERVER_USER=info@ram-haim.co.il
+EMAIL_SERVER_PASSWORD=123456789!Qq
+EMAIL_TO=vadim.tkach1378@gmail.com,misha.kaspler@gmail.com
 EOF
 fi
 
