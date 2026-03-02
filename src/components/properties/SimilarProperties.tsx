@@ -45,14 +45,8 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
         const mappedProperties: Property[] = data
           .filter((prop: any) => prop.id !== currentPropertyId)
           .map((prop: any) => ({
-            id: prop.id,
-            title: prop.title,
-            location: prop.location,
-            price: prop.price,
+            ...prop,
             bedrooms: prop.rooms,
-            bathrooms: prop.bathrooms,
-            area: prop.area,
-            status: prop.status,
             category: prop.category || (prop.dealType === 'sale' ? 'sales' : 'rentals'),
             image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
             isSold: prop.isSold || false,

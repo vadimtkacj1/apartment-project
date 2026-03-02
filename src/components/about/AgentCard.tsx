@@ -102,9 +102,9 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                 
                 {/* Email (if exists) */}
                 {member.email && (
-                  <a 
+                  <a
                     href={`mailto:${member.email}`}
-                    className="flex items-center gap-3 px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-full hover:bg-slate-50 transition-all"
+                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all"
                   >
                     <Mail size={18} />
                     <span className="font-medium">Email</span>

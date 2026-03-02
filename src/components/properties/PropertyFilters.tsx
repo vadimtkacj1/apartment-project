@@ -309,6 +309,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                   </label>
                   <input
                     type="text"
+                    value={filters.street || ''}
+                    onChange={(e) => updateFilter('street', e.target.value)}
                     placeholder="שם הרחוב"
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
                   />
@@ -320,6 +322,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                   </label>
                   <input
                     type="date"
+                    value={filters.vacancyDate || ''}
+                    onChange={(e) => updateFilter('vacancyDate', e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
                   />
                 </div>

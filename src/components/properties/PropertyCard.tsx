@@ -196,7 +196,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <img
               src={imageSrc}
               alt={title}
-              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${
+              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 z-0 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
               onError={() => {
@@ -210,31 +210,32 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               loading="lazy"
             />
             {imageError && (
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center z-10">
                 <span className="text-gray-500 text-sm">תמונה לא זמינה</span>
               </div>
             )}
 
-            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
+            {/* Gradient overlay */}
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 ${
               isSold ? 'opacity-40' : 'opacity-60'
             }`} />
 
+            {/* Sold overlays */}
             {isSold && (
-              <div className="absolute inset-0 bg-gray-900/30 z-0" />
-            )}
-
-            {isSold && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center">
-                <Image
-                  src="/images/sold.png"
-                  alt="נמכר"
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  loading="lazy"
-                  quality={90}
-                />
-              </div>
+              <>
+                <div className="absolute inset-0 bg-gray-900/30 z-20" />
+                <div className="absolute inset-0 z-20 flex items-center justify-center">
+                  <Image
+                    src="/images/sold.png"
+                    alt="נמכר"
+                    fill
+                    className="object-contain p-4"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={false}
+                    quality={90}
+                  />
+                </div>
+              </>
             )}
 
             {/* Deal Type Badge — refined, not dollar-green */}
