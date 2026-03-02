@@ -17,6 +17,9 @@ const routeNames: Record<string, string> = {
   'articles': 'מאמרים',
   'foreign-investors': 'משקיעים זרים',
   'selling-alone': 'למכור לבד',
+  'selling-apartment': 'מוכרים דירה',
+  'buying-apartment': 'קונים דירה',
+  'links': 'קישורים שימושיים',
   'privacy-policy': 'מדיניות פרטיות',
   'accessibility': 'נגישות',
 };

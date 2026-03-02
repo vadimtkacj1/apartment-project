@@ -86,7 +86,7 @@ export default function Header() {
           maxWidth: 2400,
           margin: "0 auto",
           /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
-          padding: isMobile ? "0 1rem" : "0 2.5rem",
+          padding: isMobile ? "0 1rem" : "0 3rem",
           height: 70,
           display: "flex",
           alignItems: "center",

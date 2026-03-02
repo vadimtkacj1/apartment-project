@@ -11,9 +11,9 @@ export const metadata: Metadata = {
     'נדל״ן בישראל',
     'רכישת דירה מרחוק',
     'ניהול נכסים',
-    'Property Management',
-    'Foreign Investors',
-    'Israel Real Estate',
+    'השקעות בנדל"ן',
+    'קניית דירה בישראל',
+    'דירות להשקעה',
   ],
   alternates: {
     canonical: `${siteUrl}/articles/foreign-investors`,

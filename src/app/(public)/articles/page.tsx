@@ -26,7 +26,7 @@ const articles: Article[] = [
     date: '2026-01-15',
     category: 'משקיעים זרים',
     readTime: '8 דקות קריאה',
-    tags: ['Israel Real Estate Investment', 'Foreign Investors', 'Property Management', 'תושבי חוץ']
+    tags: ['השקעות נדל"ן בישראל', 'משקיעים זרים', 'ניהול נכסים', 'תושבי חוץ']
   },
   {
     id: 'selling-alone',

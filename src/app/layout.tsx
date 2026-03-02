@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import React from "react";
 import localFont from "next/font/local";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
@@ -110,7 +111,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   themeColor: '#faf7f2',
-  colorScheme: 'light',
+  colorScheme: 'only light',
 };
 
 export default function RootLayout({
@@ -119,18 +120,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="he" dir="rtl" style={{ colorScheme: 'light' }}>
+    <html lang="he" dir="rtl" style={{ colorScheme: 'only light' } as React.CSSProperties}>
       <head>
         <meta name="color-scheme" content="light" />
         <meta name="theme-color" content="#faf7f2" />
         <meta name="supported-color-schemes" content="light" />
         <style dangerouslySetInnerHTML={{ __html: `
-          :root { color-scheme: light !important; }
-          html { color-scheme: light !important; background: #faf7f2 !important; }
-          body { color-scheme: light !important; background: #faf7f2 !important; color: #171717 !important; }
+          :root { color-scheme: only light !important; }
+          html { color-scheme: only light !important; background: #faf7f2 !important; }
+          body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
           @media (prefers-color-scheme: dark) {
-            :root, html, body { color-scheme: light !important; background: #faf7f2 !important; color: #171717 !important; }
-            * { color-scheme: light !important; }
+            :root, html, body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
+            * { color-scheme: only light !important; }
           }
         `}} />
         <link
