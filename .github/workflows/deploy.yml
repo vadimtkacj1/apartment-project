@@ -26,22 +26,11 @@ jobs:
 
       - name: Cache Next.js build cache
         uses: actions/cache@v4
-        id: nextjs-cache
         with:
-          path: |
-            .next/cache
+          path: .next/cache
           key: ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'prisma/**', 'next.config.*', 'tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-
-            ${{ runner.os }}-next-cache-
-
-      - name: Post Cache Next.js build cache
-        if: always()
-        uses: actions/cache@v4
-        with:
-          path: |
-            .next/cache
-          key: ${{ runner.os }}-next-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'prisma/**', 'next.config.*', 'tsconfig.json') }}
 
       - name: Install dependencies
         run: npm ci
@@ -59,106 +48,22 @@ jobs:
           NODE_ENV: production
           DATABASE_URL: "file:./dev.db"
 
-      - name: Copy Prisma files to standalone
-        run: |
-          mkdir -p .next/standalone/node_modules/.prisma
-          mkdir -p .next/standalone/node_modules/@prisma/client/runtime
-          cp -r node_modules/.prisma/. .next/standalone/node_modules/.prisma/ 2>/dev/null || true
-          cp -r node_modules/@prisma/client/runtime/. .next/standalone/node_modules/@prisma/client/runtime/ 2>/dev/null || true
-
       - name: Create deployment package
         run: |
           mkdir -p deploy
-          if [ ! -d ".next/standalone" ]; then
-            echo "❌ Error: .next/standalone not found"
-            exit 1
-          fi
-
-          # Copy standalone build contents
+          # Standalone build
           cp -r .next/standalone/. deploy/
-          
-          # Copy static files to correct location
+          # Static files
           mkdir -p deploy/.next/static
           cp -r .next/static/. deploy/.next/static/
-          
-          # Ensure BUILD_ID is in the right place for standalone mode
-          if [ -f ".next/BUILD_ID" ]; then
-            mkdir -p deploy/.next
-            cp .next/BUILD_ID deploy/.next/BUILD_ID
-          fi
-          
-          # If standalone has .next/server, ensure it's accessible
-          if [ -d ".next/standalone/.next/server" ]; then
-            mkdir -p deploy/.next/server
-            cp -r .next/standalone/.next/server/. deploy/.next/server/
-          fi
-
-          if [ -d "public" ]; then
-            mkdir -p deploy/public
-            cp -r public/. deploy/public/
-          fi
-
-          if [ -d "prisma" ]; then
-            mkdir -p deploy/prisma
-            cp -r prisma/. deploy/prisma/
-          fi
-
-          if [ -d "src" ]; then
-            mkdir -p deploy/src
-            cp -r src/. deploy/src/
-          fi
-
-          # Copy configuration files needed for building
-          if [ -f "tsconfig.json" ]; then
-            cp tsconfig.json deploy/
-          fi
-          
-          if [ -f "middleware.ts" ]; then
-            cp middleware.ts deploy/
-          fi
-          
-          if [ -f "next.config.ts" ]; then
-            cp next.config.ts deploy/
-          fi
-          
-          if [ -f "next.config.js" ]; then
-            cp next.config.js deploy/
-          fi
-
+          # Public & Prisma
+          [ -d "public" ] && cp -r public deploy/
+          [ -d "prisma" ] && cp -r prisma deploy/
+          # Package info
           cp package.json deploy/
-          if [ -f "package-lock.json" ]; then
-            cp package-lock.json deploy/
-          fi
-
+          [ -f "package-lock.json" ] && cp package-lock.json deploy/
+          
           tar -czf deploy.tar.gz deploy/
-
-      - name: Test SSH connection
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          timeout: 30s
-          script: |
-            echo "✅ SSH connection successful!"
-            echo "Server: $(hostname)"
-            echo "User: $(whoami)"
-            echo "Disk space:"
-            df -h /tmp
-
-      # Alternative: Upload via SSH instead of SCP (more reliable)
-      - name: Upload deployment package
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          timeout: 600s
-          script: |
-            echo "📦 Preparing to receive deployment package..."
-            mkdir -p /tmp/deploy-upload
 
       - name: Deploy to server via SCP
         uses: appleboy/scp-action@v0.1.7
@@ -167,14 +72,11 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 600s
-          command_timeout: 15m
+          timeout: 120s
+          command_timeout: 20m
           source: "deploy.tar.gz"
           target: "/tmp"
-          debug: true
           overwrite: true
-          rm: false
-          strip_components: 0
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
@@ -187,7 +89,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 600s
+          timeout: 60s
           command_timeout: 30m
           envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL
           script: |
@@ -195,169 +97,55 @@ jobs:
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
             PORT=3000
+            DB_DIR="/var/lib/apartment-project"
 
             echo "🚀 Starting deployment..."
 
-            sudo mkdir -p $APP_DIR
-            sudo chown $USER:$USER $APP_DIR
+            sudo mkdir -p $APP_DIR $DB_DIR
+            sudo chown $USER:$USER $APP_DIR $DB_DIR
 
+            # Unpack
             cd $APP_DIR
-            tar -xzf /tmp/deploy.tar.gz
-            cp -r deploy/. .
-            rm -rf deploy
-
-            # ==========================================
-            # DATABASE PERSISTENCE FIX
-            # ==========================================
-            # This section ensures the database is NOT deleted on each deployment
-            # For SQLite: Store database file outside deployment directory
-            # For PostgreSQL/MySQL: No changes needed, DATABASE_URL points to external server
-            # ==========================================
-            DB_DIR="/var/lib/apartment-project"
-            sudo mkdir -p $DB_DIR
-            sudo chown $USER:$USER $DB_DIR
-
-            # Update DATABASE_URL to point to persistent location (only for SQLite)
-            if [[ "$DATABASE_URL" == *"file:"* ]]; then
-              # Extract filename from DATABASE_URL (e.g., "file:./dev.db" -> "dev.db")
-              DB_FILE=$(echo "$DATABASE_URL" | sed 's/.*file:\(\.\/\)\?//' | sed 's/?.*//')
-              # Update DATABASE_URL to use persistent path
-              DATABASE_URL="file:${DB_DIR}/${DB_FILE}"
-              echo "📁 Using persistent SQLite database: $DATABASE_URL"
-            else
-              echo "📁 Using external database (PostgreSQL/MySQL/etc.): ${DATABASE_URL:0:30}..."
-            fi
+            tar -xzf /tmp/deploy.tar.gz --strip-components=1
             
-            # Create proper .next directory structure for standalone mode
-            # Standalone build needs .next/server and .next/static directories
-            if [ -d ".next/standalone" ]; then
-              echo "📦 Setting up .next directory structure..."
-              # Create .next directory if it doesn't exist
-              mkdir -p .next
-              
-              # Copy server files from standalone
-              if [ -d ".next/standalone/.next/server" ]; then
-                mkdir -p .next/server
-                cp -r .next/standalone/.next/server/. .next/server/ 2>/dev/null || true
-              fi
-              
-              # Ensure static directory exists (should already be copied)
-              if [ ! -d ".next/static" ]; then
-                echo "⚠️  Warning: .next/static not found, creating..."
-                mkdir -p .next/static
-              fi
-              
-              # Create BUILD_ID file if it doesn't exist
-              if [ ! -f ".next/BUILD_ID" ] && [ -f ".next/standalone/.next/BUILD_ID" ]; then
-                cp .next/standalone/.next/BUILD_ID .next/BUILD_ID 2>/dev/null || true
-              fi
-              
-              echo "✓ .next directory structure created"
+            # Database Persistence Logic
+            if [[ "$DATABASE_URL" == *"file:"* ]]; then
+              DB_FILE=$(echo "$DATABASE_URL" | sed 's/.*file:\(\.\/\)\?//' | sed 's/?.*//')
+              DATABASE_URL="file:${DB_DIR}/${DB_FILE}"
             fi
 
-            # Debug: Check if environment variables are set
-            echo "🔍 Checking environment variables..."
-            if [ -z "$DATABASE_URL" ]; then
-              echo "❌ ERROR: DATABASE_URL is not set!"
-              echo "Please configure the DATABASE_URL secret in GitHub Settings > Secrets > Actions"
-              exit 1
-            else
-              echo "✓ DATABASE_URL is set (length: ${#DATABASE_URL} chars)"
-            fi
-
-            # Generate NEXTAUTH_SECRET if not provided
-            if [ -z "$NEXTAUTH_SECRET" ]; then
-              echo "🔑 Generating NEXTAUTH_SECRET..."
-              NEXTAUTH_SECRET=$(openssl rand -base64 32)
-              echo "✓ NEXTAUTH_SECRET generated"
-            fi
-
-            # Determine NEXTAUTH_URL
-            if [ -z "$NEXTAUTH_URL" ] || [ "$NEXTAUTH_URL" = "" ]; then
-              # Try to get server IP or use default
-              SERVER_IP=$(hostname -I | awk '{print $1}' 2>/dev/null || echo "")
-              if [ -n "$SERVER_IP" ]; then
-                NEXTAUTH_URL="http://${SERVER_IP}"
-              else
-                NEXTAUTH_URL="http://localhost:3000"
-              fi
-              echo "🔗 Using default NEXTAUTH_URL: $NEXTAUTH_URL"
-            else
-              echo "✓ NEXTAUTH_URL is set: $NEXTAUTH_URL"
-            fi
-
-            # Update .env file with current environment variables
+            # Create .env
             echo "📝 Updating .env..."
-            {
-              echo "NODE_ENV=production"
-              echo "PORT=3000"
-              echo "HOSTNAME=0.0.0.0"
-              echo "# Database stored in persistent location: $DB_DIR"
-              echo "DATABASE_URL=\"${DATABASE_URL}\""
-              echo "NEXTAUTH_SECRET=\"${NEXTAUTH_SECRET}\""
-              echo "NEXTAUTH_URL=\"${NEXTAUTH_URL}\""
-            } > .env
+            cat <<EOT > .env
+            NODE_ENV=production
+            PORT=$PORT
+            HOSTNAME=0.0.0.0
+            DATABASE_URL="$DATABASE_URL"
+            NEXTAUTH_SECRET="${NEXTAUTH_SECRET:-$(openssl rand -base64 32)}"
+            NEXTAUTH_URL="${NEXTAUTH_URL:-http://localhost:3000}"
+            EOT
 
-            # Verify .env was created correctly
-            if [ -f ".env" ] && grep -q "DATABASE_URL=" .env; then
-              echo "✓ .env file created successfully"
-            else
-              echo "❌ ERROR: Failed to create .env file"
-              exit 1
-            fi
-
-            # Run database migrations
+            # Database Migrations
             echo "🗄️ Running database migrations..."
             export PRISMA_SCHEMA=$APP_DIR/prisma/schema.prisma
+            npx prisma migrate deploy || echo "⚠️ Migration issue, check logs."
 
-            if ! timeout 120 npx prisma migrate deploy; then
-              echo "⚠️ Migration failed or timed out, attempting to baseline..."
-              # Mark all existing migrations as applied
-              for migration in $APP_DIR/prisma/migrations/*/; do
-                if [ -d "$migration" ]; then
-                  migration_name=$(basename "$migration")
-                  echo "📌 Marking as applied: $migration_name"
-                  timeout 30 npx prisma migrate resolve --applied "$migration_name" || true
-                fi
-              done
-              echo "🔄 Retrying migration deployment..."
-              timeout 120 npx prisma migrate deploy || echo "⚠️ Migration retry failed, continuing anyway..."
-            fi
-
+            # PM2 Setup
             if ! command -v pm2 &> /dev/null; then
-              echo "📦 Installing PM2..."
               npm install -g pm2 --silent
             fi
 
-            # Clean up old PM2 processes
-            echo "🧹 Cleaning up old PM2 processes..."
-            pm2 delete all || true
-            pm2 flush || true
-
-            echo "▶️ Starting application on port $PORT..."
-            # Verify .env file exists and has content
-            if [ ! -f ".env" ] || [ ! -s ".env" ]; then
-              echo "❌ ERROR: .env file is missing or empty"
-              exit 1
-            fi
-
-            # Start PM2 with environment from .env file
+            pm2 delete $APP_NAME || true
             pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
-            # Wait for app to start and check health
-            echo "⏳ Waiting for app to start..."
-            for i in {1..30}; do
-              if curl -f -s --max-time 2 http://localhost:$PORT > /dev/null 2>&1; then
-                echo "✅ Deployment successful!"
-                pm2 list
-                exit 0
-              fi
-              sleep 1
-            done
-
-            echo "⚠️ Warning: Health check failed after 30 seconds"
-            pm2 logs $APP_NAME --lines 20 --nostream
-            exit 1
-
+            # Cleanup and Health check
             rm -f /tmp/deploy.tar.gz
+            sleep 5
+            if curl -f -s http://localhost:$PORT > /dev/null; then
+              echo "✅ Deployment successful!"
+            else
+              echo "❌ Health check failed!"
+              pm2 logs $APP_NAME --lines 20 --nostream
+              exit 1
+            fi
