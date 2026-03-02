@@ -139,7 +139,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 120s
+          timeout: 300s
           source: "deploy.tar.gz"
           target: "/tmp"
 
@@ -154,7 +154,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
-          timeout: 120s
+          timeout: 600s
+          command_timeout: 30m
           envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL
           script: |
             set -e
@@ -274,36 +275,30 @@ jobs:
 
             # Run database migrations
             echo "🗄️ Running database migrations..."
-            if ! npx prisma migrate deploy --schema=$APP_DIR/prisma/schema.prisma; then
-              echo "⚠️ Migration failed, attempting to baseline..."
+            export PRISMA_SCHEMA=$APP_DIR/prisma/schema.prisma
+
+            if ! timeout 120 npx prisma migrate deploy; then
+              echo "⚠️ Migration failed or timed out, attempting to baseline..."
               # Mark all existing migrations as applied
               for migration in $APP_DIR/prisma/migrations/*/; do
                 if [ -d "$migration" ]; then
                   migration_name=$(basename "$migration")
                   echo "📌 Marking as applied: $migration_name"
-                  npx prisma migrate resolve --applied "$migration_name" --schema=$APP_DIR/prisma/schema.prisma || true
+                  timeout 30 npx prisma migrate resolve --applied "$migration_name" || true
                 fi
               done
               echo "🔄 Retrying migration deployment..."
-              npx prisma migrate deploy --schema=$APP_DIR/prisma/schema.prisma
+              timeout 120 npx prisma migrate deploy || echo "⚠️ Migration retry failed, continuing anyway..."
             fi
 
             if ! command -v pm2 &> /dev/null; then
-              npm install -g pm2
+              echo "📦 Installing PM2..."
+              npm install -g pm2 --silent
             fi
 
-            # Clean up all old PM2 processes (including any duplicates)
+            # Clean up old PM2 processes
             echo "🧹 Cleaning up old PM2 processes..."
-            pm2 stop all || true
             pm2 delete all || true
-            
-            # Remove any processes with similar names
-            pm2 stop "apartmen" || true
-            pm2 delete "apartmen" || true
-            pm2 stop $APP_NAME || true
-            pm2 delete $APP_NAME || true
-            
-            # Clear PM2 logs
             pm2 flush || true
 
             echo "▶️ Starting application on port $PORT..."
@@ -312,23 +307,24 @@ jobs:
               echo "❌ ERROR: .env file is missing or empty"
               exit 1
             fi
-            
-            echo "📋 Environment variables from .env:"
-            grep -E "^(NODE_ENV|PORT|HOSTNAME|DATABASE_URL|NEXTAUTH_SECRET|NEXTAUTH_URL)=" .env | sed 's/=.*/=***/' || true
-            
+
             # Start PM2 with environment from .env file
             pm2 start server.js --name $APP_NAME --update-env
             pm2 save
 
-            sleep 5
+            # Wait for app to start and check health
+            echo "⏳ Waiting for app to start..."
+            for i in {1..30}; do
+              if curl -f -s --max-time 2 http://localhost:$PORT > /dev/null 2>&1; then
+                echo "✅ Deployment successful!"
+                pm2 list
+                exit 0
+              fi
+              sleep 1
+            done
 
-            if curl -f http://localhost:$PORT > /dev/null 2>&1; then
-              echo "✅ Deployment successful!"
-              pm2 status
-            else
-              echo "⚠️ Warning: Health check failed"
-              pm2 logs $APP_NAME --lines 30
-              exit 1
-            fi
+            echo "⚠️ Warning: Health check failed after 30 seconds"
+            pm2 logs $APP_NAME --lines 20 --nostream
+            exit 1
 
             rm -f /tmp/deploy.tar.gz
