@@ -74,13 +74,15 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          timeout: 120s
-          command_timeout: 20m
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 300s
+          command_timeout: 30m
           source: "deploy.tar.gz"
           target: "~/deploy-tmp"
           overwrite: true
           rm: false
+          strip_components: 0
+          debug: true
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
@@ -98,9 +100,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          timeout: 60s
+          port: ${{ secrets.SSH_PORT || 22 }}
+          timeout: 120s
           command_timeout: 30m
+          debug: true
           envs: DATABASE_URL,NEXTAUTH_SECRET,NEXTAUTH_URL,NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,EMAIL_SERVER_HOST,EMAIL_SERVER_PORT,EMAIL_SERVER_USER,EMAIL_SERVER_PASSWORD,EMAIL_TO
           script: |
             set -e
