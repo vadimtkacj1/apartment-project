@@ -47,7 +47,7 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
   const center = { lat: validLat, lng: validLng };
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
   });
@@ -76,6 +76,24 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
       }}>
         <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>Google Maps API key is missing</p>
         <p style={{ fontSize: '14px', color: '#666' }}>Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{
+        height: '100%',
+        background: '#e0e0e0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        padding: '20px',
+        textAlign: 'center'
+      }}>
+        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>Google Maps failed to load</p>
+        <p style={{ fontSize: '14px', color: '#666' }}>Check API key, billing, and allowed referrer domains</p>
       </div>
     );
   }
