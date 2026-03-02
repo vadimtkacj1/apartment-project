@@ -114,7 +114,7 @@ const Hero: React.FC<HeroProps> = () => {
           items-center md:items-start
           justify-center md:justify-between
           gap-6 md:gap-0
-          pt-0 md:pt-28 pb-0 md:pb-20
+          pt-0 md:pt-44 pb-0 md:pb-20
         "
         style={{ maxWidth: '2400px', margin: '0 auto' }}
       >

@@ -5,6 +5,7 @@ import AccessibilityWidget from "@/components/AccessibilityWidget";
 import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 import Providers from "@/components/Providers";
 import StructuredData from "@/components/SEO/StructuredData";
+import PageLoader from "@/components/ui/PageLoader";
 import "./globals.css";
 
 const assistant = localFont({
@@ -150,6 +151,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+        <PageLoader />
         <StructuredData />
         <Providers>
           {children}

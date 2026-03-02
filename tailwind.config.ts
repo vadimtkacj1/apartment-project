@@ -6,13 +6,18 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  // darkMode: 'class' означає що темна тема активується ТІЛЬКИ якщо додати клас "dark" до <html>
-  // Оскільки ми ніколи не додаємо цей клас — Tailwind повністю ігнорує dark: класи
-  darkMode: 'class',
+  // Тёмная тема активируется ТОЛЬКО по классу "dark" на <html>
+  // Класс никогда не добавляется — значит dark: классы Tailwind всегда игнорируются
+  darkMode: ['selector', '.dark'] as any,
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    function ({ addVariant }: { addVariant: (name: string, definition: string) => void }) {
+      // Принудительно только светлая тема — игнорируем системные dark-настройки
+      addVariant('light', 'html:not(.dark) &')
+    },
+  ],
 }
 
 export default config

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import dynamic from 'next/dynamic';
 import Hero from '@/components/layout/Hero';
 
@@ -33,6 +33,8 @@ const ContactForm = dynamic(() => import('@/components/layout/ContactForm'), {
 });
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // Handle hash navigation on page load
     if (window.location.hash === '#contact') {
@@ -43,10 +45,26 @@ export default function Home() {
         }
       }, 100);
     }
+
+    // Hide loader when page is fully loaded
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
+      {/* Полноэкранный спиннер */}
+      {isLoading && (
+        <div className="fixed inset-0 z-9999 bg-[#2A4A8A] flex items-center justify-center">
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-[#c5a357]/30 border-t-[#c5a357] rounded-full animate-spin"></div>
+          </div>
+        </div>
+      )}
+
       {/* Hero section - scrolls normally */}
       <div className="w-full -mt-[70px]">
         <Hero
