@@ -3,39 +3,57 @@ import Link from 'next/link';
 import { Facebook, Instagram, MessageCircle } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 
-interface ContactInfo {
-  phone: string;
-  phoneLink: string;
-  email: string;
-  emailLink: string;
-  facebook: string | null;
-  instagram: string | null;
-  linkedin: string | null;
+interface Owner {
+  id: number;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  whatsapp: string | null;
 }
 
-async function getContactInfo(): Promise<ContactInfo | null> {
+interface ContactInfo {
+  facebook: string | null;
+  instagram: string | null;
+}
+
+async function getOwners(): Promise<Owner[]> {
+  try {
+    const owners = await prisma.owner.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        whatsapp: true,
+      },
+      orderBy: { order: 'asc' },
+    });
+    return owners;
+  } catch (error) {
+    console.error('Error fetching owners:', error);
+    return [];
+  }
+}
+
+async function getSocialLinks(): Promise<ContactInfo | null> {
   try {
     const contactInfo = await prisma.contactInfo.findFirst({
       select: {
-        phone: true,
-        phoneLink: true,
-        email: true,
-        emailLink: true,
         facebook: true,
         instagram: true,
-        linkedin: true,
       },
     });
-
     return contactInfo;
   } catch (error) {
-    console.error('Error fetching contact info:', error);
+    console.error('Error fetching social links:', error);
     return null;
   }
 }
 
 export default async function Footer() {
-  const contactInfo = await getContactInfo();
+  const owners = await getOwners();
+  const socialLinks = await getSocialLinks();
 
   return (
     <footer dir="rtl" className="bg-[#1a1a1a] text-white pt-12 pb-10 px-6 lg:px-20 2xl:px-24 relative min-h-70 overflow-hidden flex flex-col items-start justify-start">
@@ -104,31 +122,48 @@ export default async function Footer() {
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
               <h4 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h4>
-              <div className="space-y-1 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
-                {contactInfo?.phone && <p>טלפון: {contactInfo.phone}</p>}
-                {contactInfo?.email && <p>דוא"ל: {contactInfo.email}</p>}
+              <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+                {owners.map((owner) => (
+                  <div key={owner.id} className="space-y-1">
+                    <p className="text-white font-semibold">{owner.name}</p>
+                    {owner.phone && (
+                      <p>
+                        <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors">
+                          {owner.phone}
+                        </a>
+                      </p>
+                    )}
+                    {owner.email && (
+                      <p>
+                        <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors">
+                          {owner.email}
+                        </a>
+                      </p>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
             <div className="flex gap-3">
-              {contactInfo?.phoneLink && (
+              {owners[0]?.whatsapp && (
                 <SocialIcon
                   icon={<MessageCircle className="w-5 h-5 2xl:w-6 2xl:h-6" />}
-                  href={contactInfo.phoneLink}
+                  href={`https://wa.me/${owners[0].whatsapp.replace(/[^0-9]/g, '')}`}
                   hoverClass="hover:bg-[#25D366] hover:text-white"
                 />
               )}
-              {contactInfo?.instagram && (
+              {socialLinks?.instagram && (
                 <SocialIcon
                   icon={<Instagram className="w-5 h-5 2xl:w-6 2xl:h-6" />}
-                  href={contactInfo.instagram}
+                  href={socialLinks.instagram}
                   hoverClass="hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:to-[#ee2a7b] hover:text-white"
                 />
               )}
-              {contactInfo?.facebook && (
+              {socialLinks?.facebook && (
                 <SocialIcon
                   icon={<Facebook className="w-5 h-5 2xl:w-6 2xl:h-6" />}
-                  href={contactInfo.facebook}
+                  href={socialLinks.facebook}
                   hoverClass="hover:bg-[#1877F2] hover:text-white"
                 />
               )}
