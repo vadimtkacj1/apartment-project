@@ -10,26 +10,29 @@
   --warm-lighter: #fefcfa;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Завжди використовуємо світлу тему */
 html {
+  color-scheme: light !important;
   overflow-y: scroll;
   scrollbar-gutter: stable;
-  background: #faf7f2;
+  background: #faf7f2 !important;
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
-  background: #faf7f2;
-  /* Smooth scrolling on mobile */
+  background: #faf7f2 !important;
+  color: #171717 !important;
+  color-scheme: light !important;
   -webkit-overflow-scrolling: touch;
+}
+
+/* Глобальна заборона темної теми */
+*,
+*::before,
+*::after {
+  color-scheme: light !important;
 }
 
 .font-caramel {
@@ -40,6 +43,7 @@ body {
   .bg-warm {
     background-color: #faf7f2 !important;
   }
+  
 
   .text-balance {
     text-wrap: balance;
@@ -89,7 +93,7 @@ body {
   text-decoration: underline;
 }
 
-/* Ensure header is always on top */
+/* Ensure header is always on top and light colored */
 header[dir="rtl"] {
   z-index: 9999 !important;
   position: sticky !important;
@@ -99,6 +103,82 @@ header[dir="rtl"] {
 /* Header uses Carmela font */
 header {
   font-family: var(--font-caramel), cursive, sans-serif !important;
+  /* Background контролюється через inline стилі в компоненті - прозорий на початку, білий після скролу */
+}
+
+/* Повне блокування темного режиму на всіх пристроях */
+@media (prefers-color-scheme: dark) {
+  /* Базові елементи */
+  :root {
+    --background: #f9f6f0 !important;
+    --foreground: #171717 !important;
+    --warm-beige: #faf7f2 !important;
+    --warm-sand: #f9f6f0 !important;
+    --warm-cream: #fdfbf7 !important;
+    --warm-light: #fcf9f5 !important;
+    --warm-lighter: #fefcfa !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    color-scheme: light !important;
+  }
+
+  html,
+  body {
+    background: #faf7f2 !important;
+    color: #171717 !important;
+  }
+
+  /* Всі текстові елементи світлі */
+  h1, h2, h3, h4, h5, h6,
+  p, span, div, label, a {
+    color: #171717 !important;
+  }
+
+  /* Header */
+  header {
+    color: #1c3664 !important;
+  }
+
+  /* Main content */
+  main {
+    background: #faf7f2 !important;
+  }
+
+  /* Tailwind класи */
+  .bg-warm {
+    background-color: #faf7f2 !important;
+  }
+
+  .bg-white {
+    background-color: #ffffff !important;
+  }
+
+  /* Форми */
+  input,
+  textarea,
+  select {
+    background: #ffffff !important;
+    color: #171717 !important;
+    color-scheme: light !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #9ca3af !important;
+  }
+
+  /* Footer залишається темним */
+  footer {
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+  }
+
+  footer * {
+    color: #ffffff !important;
+  }
 }
 
 /* Large screen optimizations (1920px and above) */
@@ -155,3 +235,4 @@ header {
     max-width: 2200px !important;
   }
 }
+

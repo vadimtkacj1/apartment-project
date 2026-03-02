@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -95,7 +95,7 @@ const Hero: React.FC<HeroProps> = () => {
         }
       `}</style>
 
-      {/* ── Відео ── */}
+      {/* ── Video ── */}
       <div className="absolute inset-0 z-0">
         <video
           autoPlay loop muted playsInline preload="auto"
@@ -105,38 +105,43 @@ const Hero: React.FC<HeroProps> = () => {
         </video>
       </div>
 
-      {/* ── Контент ── */}
+      {/* ── Content ── */}
       <div
-        className="relative z-20 h-full w-full px-6 md:px-16 xl:px-20 2xl:px-24 mx-auto flex flex-col justify-between pt-10 pb-20"
-        style={{ maxWidth: "2400px" }} // Удален стиль style={{ y: contentY }}
+        className="
+          relative z-20 h-full w-full
+          px-6 md:px-16 xl:px-20 2xl:px-24
+          flex flex-col
+          items-center md:items-start
+          justify-center md:justify-between
+          gap-6 md:gap-0
+          pt-0 md:pt-28 pb-0 md:pb-20
+        "
+        style={{ maxWidth: '2400px', margin: '0 auto' }}
       >
-        {/* Top */}
-        <div className="flex flex-col items-start text-right w-full mt-10 md:mt-16">
 
-          {/* Heading row */}
-          <div className="flex items-center justify-start gap-x-3 md:gap-x-5 mb-5">
+        {/* TOP: heading + subtitle */}
+        <div className="flex flex-col items-center md:items-start w-full">
 
-            {/* "רם נכסים" */}
+          <div className="flex items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(2rem, 8.5vw, 6rem)',
+                fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif'
+                fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
               {text1}
               {!done1 && <span className="cursor" />}
             </h1>
 
-            {/* Ampersand */}
             <motion.div
               initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
               animate={done1 ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.3, rotate: -20 }}
               transition={{ type: 'spring', stiffness: 120, damping: 12 }}
               className="relative shrink-0"
-              style={{ width: 'clamp(1.8rem, 5.5vw, 4.5rem)', height: 'clamp(1.8rem, 5.5vw, 4.5rem)' }}
+              style={{ width: 'clamp(1.6rem, 5vw, 4.5rem)', height: 'clamp(1.6rem, 5vw, 4.5rem)' }}
             >
               <Image
                 src="/images/and.png"
@@ -148,14 +153,13 @@ const Hero: React.FC<HeroProps> = () => {
               />
             </motion.div>
 
-            {/* "חיים ענבי" */}
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(2rem, 8.5vw, 6rem)',
+                fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
                 textShadow: '0 2px 24px rgba(0,0,0,0.7)',
                 minWidth: '1ch',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif'
+                fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
               {text2}
@@ -163,41 +167,39 @@ const Hero: React.FC<HeroProps> = () => {
             </h1>
           </div>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="text-white/75 font-medium max-w-2xl leading-relaxed"
-            style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.2rem)' }}
+            className="text-white/75 font-medium max-w-2xl leading-relaxed text-center md:text-right"
+            style={{ fontSize: 'clamp(0.82rem, 1.5vw, 1.2rem)' }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </motion.p>
         </div>
 
-        {/* CTA */}
+        {/* BOTTOM: CTA buttons */}
         <motion.div
-          className="flex flex-col gap-3 w-full md:w-auto items-center md:items-start"
+          className="flex flex-col gap-4 items-center md:items-start w-full"
           initial={{ opacity: 0, y: 30 }}
           animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
         >
-          {/* Gold Button */}
           <motion.div
             whileHover={{ scale: 1.02, y: -3 }}
             whileTap={{ scale: 0.97 }}
-            className="w-full md:w-auto"
+            className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
               href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.75rem, 1.6vw, 1.6rem) clamp(1.5rem, 3.8vw, 4rem)',
+                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                 color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
+                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
@@ -208,9 +210,9 @@ const Hero: React.FC<HeroProps> = () => {
                   transform: 'translateX(-200%) skewX(-20deg)',
                 }}
               />
-              <span className="relative z-10 flex items-center justify-center gap-3">
+              <span className="relative z-10 flex items-center justify-center gap-2">
                 נכסים להשכרה
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
                   <path d="M5 12h14M12 5l7 7-7 7" />
@@ -219,17 +221,16 @@ const Hero: React.FC<HeroProps> = () => {
             </Link>
           </motion.div>
 
-          {/* Glass Button */}
           <motion.div
             whileHover={{ scale: 1.02, y: -3 }}
             whileTap={{ scale: 0.97 }}
-            className="w-full md:w-auto"
+            className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
               href="/apartments?dealType=sale"
               className="btn-secondary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
-                padding: 'clamp(0.75rem, 1.6vw, 1.6rem) clamp(1.5rem, 3.8vw, 4rem)',
+                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 borderColor: 'rgba(255,255,255,0.4)',
                 background: 'rgba(255,255,255,0.07)',
                 backdropFilter: 'blur(14px)',
@@ -238,13 +239,13 @@ const Hero: React.FC<HeroProps> = () => {
                 textAlign: 'center',
                 letterSpacing: '0.04em',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-                fontSize: 'clamp(1rem, 1.5vw, 1.3rem)',
+                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
-              <span className="relative z-10 flex items-center justify-center gap-3">
+              <span className="relative z-10 flex items-center justify-center gap-2">
                 נכסים למכירה
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
                   <path d="M5 12h14M12 5l7 7-7 7" />
@@ -253,6 +254,7 @@ const Hero: React.FC<HeroProps> = () => {
             </Link>
           </motion.div>
         </motion.div>
+
       </div>
     </section>
   );

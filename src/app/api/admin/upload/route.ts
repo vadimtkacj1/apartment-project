@@ -15,6 +15,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get folder from query params (default to 'properties')
+    const { searchParams } = new URL(request.url);
+    const folder = searchParams.get('folder') || 'properties';
+
+    // Validate folder (security: only allow specific folders)
+    const allowedFolders = ['properties', 'owners', 'team'];
+    if (!allowedFolders.includes(folder)) {
+      return NextResponse.json(
+        { error: 'Invalid folder specified' },
+        { status: 400 }
+      );
+    }
+
     // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
@@ -43,7 +56,7 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}-${randomString}.${extension}`;
 
     // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'properties');
+    const uploadDir = join(process.cwd(), 'public', 'uploads', folder);
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
@@ -53,7 +66,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filepath, buffer);
 
     // Return public URL
-    const url = `/uploads/properties/${filename}`;
+    const url = `/uploads/${folder}/${filename}`;
 
     return NextResponse.json({ url }, { status: 200 });
   } catch (error: any) {

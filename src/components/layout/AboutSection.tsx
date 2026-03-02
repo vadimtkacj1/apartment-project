@@ -9,6 +9,14 @@ const AboutSection: React.FC = memo(() => {
   const sectionRef = useRef<HTMLElement>(null);
   const logoPattern = "url('/images/about-logo.svg')";
   const [title, setTitle] = useState('אודות');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchTitle = async () => {
@@ -44,44 +52,49 @@ const AboutSection: React.FC = memo(() => {
       className="relative w-full py-16 md:py-20 overflow-hidden"
       style={{ background: 'rgb(42, 74, 138)' }}
     >
-      <motion.div
-        className="absolute z-0"
-        style={{
-          y: patternY,
-          top: '-40%',
-          left: '-30%',
-          right: '-30%',
-          bottom: '-40%',
-          transformOrigin: 'center center',
-        }}
-      >
-        <div
-          className="w-full h-full bg-white"
-          style={{
-            backgroundImage: logoPattern,
-            backgroundSize: '160px',
-            backgroundRepeat: 'repeat',
-            backgroundPosition: 'center',
-          }}
-        />
-      </motion.div>
+      {/* Белая область с логотипами - только на десктопе */}
+      {!isMobile && (
+        <>
+          <motion.div
+            className="absolute z-0"
+            style={{
+              y: patternY,
+              top: '-40%',
+              left: '-10%',
+              right: '-10%',
+              bottom: '-40%',
+              transformOrigin: 'center center',
+            }}
+          >
+            <div
+              className="w-full h-full bg-white"
+              style={{
+                backgroundImage: logoPattern,
+                backgroundSize: '160px',
+                backgroundRepeat: 'repeat',
+                backgroundPosition: 'center',
+              }}
+            />
+          </motion.div>
 
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        {/* Left-side blue */}
-        <div
-          className="absolute inset-0 bg-[#2A4A8A]"
-          style={{
-            clipPath: 'polygon(0 0, 21% 0, 1.5% 100%, 0 100%)'
-          }}
-        />
-        {/* Right-side blue */}
-        <div
-          className="absolute inset-0 bg-[#2A4A8A]"
-          style={{
-            clipPath: 'polygon(35% 0, 100% 0, 100% 100%, 14.5% 100%)'
-          }}
-        />
-      </div>
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            {/* Left-side blue - покрывает левый край полностью */}
+            <div
+              className="absolute inset-0 bg-[#2A4A8A]"
+              style={{
+                clipPath: 'polygon(0 0, 25% 0, 5% 100%, 0 100%)'
+              }}
+            />
+            {/* Right-side blue - покрывает правый край полностью */}
+            <div
+              className="absolute inset-0 bg-[#2A4A8A]"
+              style={{
+                clipPath: 'polygon(30% 0, 100% 0, 100% 100%, 10% 100%)'
+              }}
+            />
+          </div>
+        </>
+      )}
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-20">
@@ -136,8 +149,11 @@ const AboutSection: React.FC = memo(() => {
                 alt="Про застройщика"
                 fill
                 className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 30vw"
+                sizes="(max-width: 1024px) 100vw, 420px"
                 priority
+                quality={100}
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQADAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent pointer-events-none" />
             </div>

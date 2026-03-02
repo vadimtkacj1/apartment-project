@@ -17,6 +17,8 @@ const routeNames: Record<string, string> = {
   'articles': 'מאמרים',
   'foreign-investors': 'משקיעים זרים',
   'selling-alone': 'למכור לבד',
+  'privacy-policy': 'מדיניות פרטיות',
+  'accessibility': 'נגישות',
 };
 
 export default function Breadcrumbs() {

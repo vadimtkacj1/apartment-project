@@ -63,10 +63,12 @@ export default function ArticlesPage() {
 
               <Link href={`/articles/${article.id}`} className="article-image-container">
                 <div className="image-overlay"></div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={article.image}
                   alt={article.title}
                   className="article-image"
+                  loading="lazy"
                 />
                 <span className="category-badge">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="badge-icon">

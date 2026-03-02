@@ -39,6 +39,34 @@ export default function Sidenav({ color, onClose }: SidenavProps) {
       ),
     },
     {
+      key: 'owners',
+      href: '/admin/owners',
+      label: 'בעלים',
+      isActive: pathname.includes('/owners'),
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9Z" />
+          <path d="M3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18H3Z" />
+        </svg>
+      ),
+    },
+    {
+      key: 'team',
+      href: '/admin/team',
+      label: 'צוות',
+      isActive: pathname.includes('/team'),
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M13 6C13 7.65685 11.6569 9 10 9C8.34315 9 7 7.65685 7 6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6Z" />
+          <path d="M18 8C18 9.10457 17.1046 10 16 10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6C17.1046 6 18 6.89543 18 8Z" />
+          <path d="M6 8C6 9.10457 5.10457 10 4 10C2.89543 10 2 9.10457 2 8C2 6.89543 2.89543 6 4 6C5.10457 6 6 6.89543 6 8Z" />
+          <path d="M10 11C7.79086 11 6 12.7909 6 15V17H14V15C14 12.7909 12.2091 11 10 11Z" />
+          <path d="M16 11C15.7348 11 15.4759 11.0314 15.2278 11.0914C15.7123 11.9121 16 12.8752 16 13.9V17H18V15C18 12.7909 17.2091 11 16 11Z" />
+          <path d="M4 11C3.73481 11 3.47586 11.0314 3.22784 11.0914C2.74331 11.9121 2 12.8752 2 13.9V17H4V15C4 12.7909 2.79086 11 4 11Z" />
+        </svg>
+      ),
+    },
+    {
       key: 'homepage',
       href: '/admin/homepage',
       label: 'עמוד הבית',

@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
     // Image optimization settings
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512, 640, 768],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
     // Enable lazy loading by default
     dangerouslyAllowSVG: true,
@@ -44,6 +44,8 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'swiper'],
+    // Enable optimized CSS loading
+    optimizeCss: true,
   },
   
   // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
@@ -104,6 +106,33 @@ const nextConfig: NextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.mp4',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.jpg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000, immutable',
           },
         ],
       },
