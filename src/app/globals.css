@@ -12,7 +12,7 @@
 
 /* Завжди використовуємо світлу тему */
 html {
-  color-scheme: light !important;
+  color-scheme: only light !important;
   overflow-y: scroll;
   scrollbar-gutter: stable;
   background: #faf7f2 !important;
@@ -24,7 +24,7 @@ body {
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
   background: #faf7f2 !important;
   color: #171717 !important;
-  color-scheme: light !important;
+  color-scheme: only light !important;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -32,7 +32,7 @@ body {
 *,
 *::before,
 *::after {
-  color-scheme: light !important;
+  color-scheme: only light !important;
 }
 
 .font-caramel {
@@ -122,7 +122,7 @@ header {
   *,
   *::before,
   *::after {
-    color-scheme: light !important;
+    color-scheme: only light !important;
   }
 
   html,
@@ -162,7 +162,7 @@ header {
   select {
     background: #ffffff !important;
     color: #171717 !important;
-    color-scheme: light !important;
+    color-scheme: only light !important;
   }
 
   input::placeholder,

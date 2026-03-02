@@ -101,6 +101,12 @@ else
     check_warn "Manual deploy script not found"
 fi
 
+if [ -f "scripts/backup-server.sh" ]; then
+    check_pass "Server backup script exists"
+else
+    check_warn "Server backup script not found"
+fi
+
 echo ""
 echo "🔨 Build Check"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━"

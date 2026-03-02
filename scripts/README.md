@@ -75,6 +75,31 @@ chmod +x scripts/check-deployment.sh
 
 ---
 
+### 💾 backup-server.sh
+**Назначение**: Создание серверных резервных копий данных
+
+**Что делает**:
+- Делает архив базы SQLite (`/var/lib/apartment-project/dev.db`)
+- Сохраняет `.env` из приложения
+- Сохраняет пользовательские загрузки (`public/uploads`)
+- Создает SHA256 checksum архива
+- Удаляет старые бэкапы старше 14 дней
+
+**Использование**:
+```bash
+# На сервере
+chmod +x scripts/backup-server.sh
+./scripts/backup-server.sh
+```
+
+**Автоматический запуск**:
+- При `./scripts/deploy-manual.sh` cron-задача устанавливается автоматически
+- Расписание по умолчанию: каждые 6 часов
+- Файлы бэкапа: `/var/backups/apartment-project`
+- Лог: `/var/log/apartment-backup.log`
+
+---
+
 ## 🎯 Типичные сценарии использования
 
 ### Сценарий 1: Первое развертывание

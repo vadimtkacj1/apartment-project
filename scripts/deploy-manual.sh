@@ -80,6 +80,12 @@ if [ -f "middleware.ts" ]; then
     cp middleware.ts deploy/
 fi
 
+# Copy backup script for server-side scheduled backups
+if [ -f "scripts/backup-server.sh" ]; then
+    mkdir -p deploy/scripts
+    cp scripts/backup-server.sh deploy/scripts/
+fi
+
 # Create production package.json
 cat > deploy/package.json << EOF
 {
@@ -179,6 +185,29 @@ pm2 delete $APP_NAME || true
 echo "▶️ Starting application..."
 pm2 start server.js --name $APP_NAME --update-env
 pm2 save
+
+# Setup periodic backups (every 6 hours) to /var/backups/apartment-project
+if [ -f "$APP_DIR/scripts/backup-server.sh" ]; then
+    echo "💾 Installing periodic backup job..."
+    chmod +x "$APP_DIR/scripts/backup-server.sh"
+    sudo cp "$APP_DIR/scripts/backup-server.sh" /usr/local/bin/apartment-backup
+    sudo chmod 750 /usr/local/bin/apartment-backup
+
+    sudo mkdir -p /var/backups/apartment-project
+    sudo touch /var/log/apartment-backup.log
+
+    sudo tee /etc/cron.d/apartment-project-backup > /dev/null << 'EOF'
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Run every 6 hours. flock prevents overlapping runs.
+0 */6 * * * root /usr/bin/flock -n /tmp/apartment-backup.lock /usr/local/bin/apartment-backup >> /var/log/apartment-backup.log 2>&1
+EOF
+    sudo chmod 644 /etc/cron.d/apartment-project-backup
+    sudo systemctl restart cron 2>/dev/null || sudo systemctl restart crond 2>/dev/null || true
+    echo "✅ Backup schedule installed (every 6 hours)"
+else
+    echo "⚠️ backup-server.sh not found, periodic backups were not configured"
+fi
 
 # Wait and check
 sleep 5
