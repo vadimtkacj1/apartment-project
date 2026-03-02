@@ -20,16 +20,19 @@ interface ContactInfo {
   instagramName?: string | null;
   instagram2?: string | null;
   instagramName2?: string | null;
-  whatsapp?: string | null;
-  whatsappName?: string | null;
-  whatsapp2?: string | null;
-  whatsappName2?: string | null;
+}
+
+interface Owner {
+  id: number;
+  name: string;
+  whatsapp: string | null;
 }
 
 type ContactType = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'contact';
 
 const SocialSidebar = () => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [owners, setOwners] = useState<Owner[]>([]);
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -41,6 +44,7 @@ const SocialSidebar = () => {
   useEffect(() => {
     setMounted(true);
     fetchContactInfo();
+    fetchOwners();
   }, []);
 
   const fetchContactInfo = async () => {
@@ -55,6 +59,18 @@ const SocialSidebar = () => {
     }
   };
 
+  const fetchOwners = async () => {
+    try {
+      const response = await fetch('/api/owners');
+      if (response.ok) {
+        const data = await response.json();
+        setOwners(data.slice(0, 2)); // Get first 2 owners
+      }
+    } catch (error) {
+      console.error('Error fetching owners:', error);
+    }
+  };
+
   const handleContactClick = (type: ContactType, e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -65,7 +81,7 @@ const SocialSidebar = () => {
     }
 
     const hasSecondContact =
-      (type === 'whatsapp' && contactInfo?.whatsapp2) ||
+      (type === 'whatsapp' && owners.length > 1 && owners[1].whatsapp) ||
       (type === 'instagram' && contactInfo?.instagram2) ||
       (type === 'facebook' && contactInfo?.facebook2) ||
       (type === 'phone' && contactInfo?.phone2);
@@ -74,9 +90,10 @@ const SocialSidebar = () => {
       setChoiceModal({ type, isOpen: true });
     } else {
       // Open directly if no second contact
-      if (type === 'whatsapp' && contactInfo?.whatsapp) {
+      if (type === 'whatsapp' && owners.length > 0 && owners[0].whatsapp) {
         analytics.trackWhatsAppClick();
-        window.open(`https://wa.me/${contactInfo.whatsapp}?text=${encodeURIComponent('שלום, אני מעוניין בפרטים נוספים')}`, '_blank');
+        const cleanNumber = owners[0].whatsapp.replace(/\D/g, '');
+        window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent('שלום, אני מעוניין בפרטים נוספים')}`, '_blank');
       } else if (type === 'instagram' && contactInfo?.instagram) {
         analytics.trackButtonClick('instagram-sidebar');
         window.open(contactInfo.instagram, '_blank');
@@ -94,10 +111,11 @@ const SocialSidebar = () => {
     setChoiceModal({ type, isOpen: false });
 
     if (type === 'whatsapp') {
-      const number = choice === 1 ? contactInfo?.whatsapp : contactInfo?.whatsapp2;
-      if (number) {
+      const owner = owners[choice - 1];
+      if (owner && owner.whatsapp) {
         analytics.trackWhatsAppClick();
-        window.open(`https://wa.me/${number}?text=${encodeURIComponent('שלום, אני מעוניין בפרטים נוספים')}`, '_blank');
+        const cleanNumber = owner.whatsapp.replace(/\D/g, '');
+        window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent('שלום, אני מעוניין בפרטים נוספים')}`, '_blank');
       }
     } else if (type === 'instagram') {
       const url = choice === 1 ? contactInfo?.instagram : contactInfo?.instagram2;
@@ -212,13 +230,11 @@ const SocialSidebar = () => {
                   onClick={() => handleChoice(choiceModal.type, 1)}
                   className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-xl transition-colors"
                 >
-                  {choiceModal.type === 'whatsapp' && (
+                  {choiceModal.type === 'whatsapp' && owners[0] && (
                     <div className="text-center">
-                      {contactInfo?.whatsappName && (
-                        <div className="text-lg font-bold mb-1">{contactInfo.whatsappName}</div>
-                      )}
-                      {contactInfo?.whatsapp && (
-                        <div className="text-sm opacity-90">{contactInfo.whatsapp}</div>
+                      <div className="text-lg font-bold mb-1">{owners[0].name}</div>
+                      {owners[0].whatsapp && (
+                        <div className="text-sm opacity-90">{owners[0].whatsapp}</div>
                       )}
                     </div>
                   )}
@@ -244,13 +260,11 @@ const SocialSidebar = () => {
                   onClick={() => handleChoice(choiceModal.type, 2)}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl transition-colors"
                 >
-                  {choiceModal.type === 'whatsapp' && (
+                  {choiceModal.type === 'whatsapp' && owners[1] && (
                     <div className="text-center">
-                      {contactInfo?.whatsappName2 && (
-                        <div className="text-lg font-bold mb-1">{contactInfo.whatsappName2}</div>
-                      )}
-                      {contactInfo?.whatsapp2 && (
-                        <div className="text-sm opacity-90">{contactInfo.whatsapp2}</div>
+                      <div className="text-lg font-bold mb-1">{owners[1].name}</div>
+                      {owners[1].whatsapp && (
+                        <div className="text-sm opacity-90">{owners[1].whatsapp}</div>
                       )}
                     </div>
                   )}

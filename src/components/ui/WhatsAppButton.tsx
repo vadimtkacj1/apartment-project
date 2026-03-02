@@ -1,17 +1,37 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { analytics } from '@/lib/analytics';
 
-const WhatsAppButton: React.FC = () => {
-  const phoneNumber = '972501234567'; 
-  const message = 'שלום, אני מעוניין/ת בפרטים נוספים';
+interface Owner {
+  id: number;
+  whatsapp: string | null;
+}
 
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+const WhatsAppButton: React.FC = () => {
+  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+
+  useEffect(() => {
+    // Fetch first owner's WhatsApp
+    fetch('/api/owners')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0 && data[0].whatsapp) {
+          setWhatsappNumber(data[0].whatsapp.replace(/\D/g, ''));
+        }
+      })
+      .catch(err => console.error('Error fetching owner WhatsApp:', err));
+  }, []);
+
+  const message = 'שלום, אני מעוניין/ת בפרטים נוספים';
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   const handleClick = () => {
     analytics.trackWhatsAppClick();
   };
+
+  // Don't render if no WhatsApp number
+  if (!whatsappNumber) return null;
 
   return (
     <motion.a

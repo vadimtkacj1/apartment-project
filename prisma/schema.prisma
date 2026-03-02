@@ -243,6 +243,7 @@ model Owner {
   image       String?  // Path to profile image
   phone       String?
   email       String?
+  whatsapp    String?  // WhatsApp number
   description String?
   order       Int      @default(0) // Display order
   isActive    Boolean  @default(true)

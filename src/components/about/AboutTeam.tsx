@@ -42,7 +42,7 @@ export default function AboutTeam() {
   return (
     <motion.section
       ref={teamRef}
-      className="relative py-24 w-full overflow-hidden"
+      className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={teamInView ? { opacity: 1 } : {}}

@@ -32,6 +32,7 @@ interface Owner {
   image: string | null;
   phone: string | null;
   email: string | null;
+  whatsapp: string | null;
   description: string | null;
   order: number;
   isActive: boolean;
@@ -248,6 +249,13 @@ export default function OwnersPage() {
               key: 'phone',
               width: 120,
               render: (phone: string | null) => phone || '-',
+            },
+            {
+              title: 'WhatsApp',
+              dataIndex: 'whatsapp',
+              key: 'whatsapp',
+              width: 120,
+              render: (whatsapp: string | null) => whatsapp || '-',
             },
             {
               title: 'סדר',

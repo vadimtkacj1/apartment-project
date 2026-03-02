@@ -11,6 +11,7 @@ type Owner = {
   image: string | null;
   phone: string | null;
   email: string | null;
+  whatsapp: string | null;
   description: string | null;
 };
 
@@ -40,7 +41,7 @@ export default function AboutOwners() {
   return (
     <motion.section
       ref={ownersRef}
-      className="relative py-24 w-full overflow-hidden"
+      className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={ownersInView ? { opacity: 1 } : {}}
