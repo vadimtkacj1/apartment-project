@@ -22,11 +22,6 @@ export default function WhatsAppFloatingButton() {
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Don't show on admin pages
-  if (pathname?.startsWith('/admin')) {
-    return null;
-  }
-
   useEffect(() => {
     if (isOpen && owners.length === 0) {
       fetchOwners();
@@ -56,6 +51,11 @@ export default function WhatsAppFloatingButton() {
 
     window.open(whatsappUrl, '_blank');
   };
+
+  // Don't show on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <>
