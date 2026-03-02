@@ -72,9 +72,74 @@ function ApartmentsPageContent() {
       try {
         setLoading(true);
         const params = new URLSearchParams();
+
+        // Basic filters
         if (filters.dealType && filters.dealType !== 'all') params.append('dealType', filters.dealType);
         if (filters.city && filters.city !== 'all') params.append('city', filters.city);
         if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
+
+        // Property type filter
+        if (filters.propertyType && filters.propertyType !== 'all') {
+          params.append('propertyType', filters.propertyType);
+        }
+
+        // Rooms filter
+        if (filters.minRooms !== undefined) params.append('minRooms', String(filters.minRooms));
+        if (filters.maxRooms !== undefined) params.append('maxRooms', String(filters.maxRooms));
+
+        // Price filter
+        if (filters.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
+        if (filters.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+
+        // Area filter
+        if (filters.minArea !== undefined) params.append('minArea', String(filters.minArea));
+        if (filters.maxArea !== undefined) params.append('maxArea', String(filters.maxArea));
+
+        // Floor filter
+        if (filters.floor !== undefined) params.append('floor', String(filters.floor));
+
+        // Parking filter
+        if (filters.parking && filters.parking !== 'all') {
+          params.append('parking', filters.parking);
+        }
+
+        // Furniture filter
+        if (filters.furniture && filters.furniture !== 'all') {
+          params.append('furniture', filters.furniture);
+        }
+
+        // Kitchen filter
+        if (filters.kitchen && filters.kitchen !== 'all') {
+          params.append('kitchen', filters.kitchen);
+        }
+
+        // Position filter
+        if (filters.position && filters.position !== 'all') {
+          params.append('position', filters.position);
+        }
+
+        // Neighborhood filter
+        if (filters.neighborhood) {
+          params.append('neighborhood', filters.neighborhood);
+        }
+
+        // Street filter
+        if (filters.street) {
+          params.append('street', filters.street);
+        }
+
+        // Vacancy date filter
+        if (filters.vacancyDate) {
+          params.append('vacancyDate', filters.vacancyDate);
+        }
+
+        // Feature filters
+        if (filters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
+        if (filters.features?.hasElevator) params.append('hasElevator', 'true');
+        if (filters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
+        if (filters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
+        if (filters.features?.hasStorage) params.append('hasStorage', 'true');
+        if (filters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
           next: { revalidate: 60 }

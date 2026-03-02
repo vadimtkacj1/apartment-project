@@ -8,5 +8,6 @@ export { PropertySpecs } from './PropertySpecs';
 export { PropertyMap } from './PropertyMap';
 export { PriceCard } from './PriceCard';
 export { ContactForm } from './ContactForm';
+export { default as PropertyNavigation } from './PropertyNavigation';
 export * from './types';
 export * from './constants';

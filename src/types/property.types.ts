@@ -107,9 +107,10 @@ export interface FilterState {
   dealType: DealType | 'all';
   city: City;
   neighborhood?: string;
+  street?: string;
   propertyType?: PropertyType | 'all';
-  minRooms?: string;
-  maxRooms?: string;
+  minRooms?: number;
+  maxRooms?: number;
   minArea?: number;
   maxArea?: number;
   minPrice?: number;
@@ -119,6 +120,7 @@ export interface FilterState {
   floor?: number;
   position?: Position | 'all';
   kitchen?: KitchenType | 'all';
+  vacancyDate?: string;
   directions?: Direction[];
   features?: Partial<PropertyFeatures>;
 }

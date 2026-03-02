@@ -6,14 +6,16 @@ export async function GET() {
     const owners = await prisma.owner.findMany({
       where: {
         isActive: true,
-        phone: {
-          not: null,
-        },
       },
       select: {
         id: true,
         name: true,
+        title: true,
+        image: true,
         phone: true,
+        email: true,
+        whatsapp: true,
+        description: true,
       },
       orderBy: { order: 'asc' },
     })
