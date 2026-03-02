@@ -85,20 +85,6 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           </p>
         )}
 
-        {/* Email address displayed as text (above buttons) */}
-        {owner.email && (
-          <p className="text-slate-500 text-sm mb-6 flex items-center justify-center gap-2">
-            <Mail size={14} className="text-[#1c3664]" />
-            <a
-              href={`mailto:${owner.email}`}
-              className="hover:text-[#1c3664] transition-colors underline underline-offset-2"
-              dir="ltr"
-            >
-              {owner.email}
-            </a>
-          </p>
-        )}
-
         {/* Contact Buttons */}
         <div className="flex flex-wrap justify-center gap-4">
           {owner.phone && (
@@ -108,6 +94,16 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
             >
               <Phone size={18} />
               <span dir="ltr" className="font-medium">{owner.phone}</span>
+            </a>
+          )}
+
+          {owner.email && (
+            <a
+              href={`mailto:${owner.email}`}
+              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all hover:shadow-lg hover:-translate-y-1"
+            >
+              <Mail size={18} />
+              <span className="font-medium">Email</span>
             </a>
           )}
 

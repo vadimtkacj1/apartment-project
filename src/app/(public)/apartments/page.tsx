@@ -42,7 +42,7 @@ interface CategoryItem {
   value: string;
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 8;
 
 function ApartmentsPageContent() {
   const router = useRouter();
@@ -262,11 +262,64 @@ function ApartmentsPageContent() {
           {loading ? (
             <div className="text-center py-20 font-bold text-gray-400">טוען נכסים...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
-              {currentProperties.map((prop, i) => (
-                <PropertyCard key={prop.id} {...prop} index={i} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
+                {currentProperties.map((prop, i) => (
+                  <PropertyCard key={prop.id} {...prop} index={i} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {properties.length > ITEMS_PER_PAGE && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-center items-center gap-2 mt-12"
+                >
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => updatePage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                      currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
+                    }`}
+                  >
+                    הקודם
+                  </button>
+
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.ceil(properties.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => updatePage(page)}
+                      className={`w-10 h-10 rounded-lg font-bold transition-all ${
+                        currentPage === page
+                          ? 'bg-[#1c3664] text-white shadow-lg scale-110'
+                          : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#1c3664]'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => updatePage(currentPage + 1)}
+                    disabled={currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)}
+                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
+                      currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
+                    }`}
+                  >
+                    הבא
+                  </button>
+                </motion.div>
+              )}
+            </>
           )}
         </div>
       </div>
