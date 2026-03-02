@@ -59,9 +59,12 @@ export async function POST(request: NextRequest) {
     });
 
     // 4. Email template configuration
+    // EMAIL_TO can be a comma-separated list of emails
+    const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com,info@ram-haim.co.il";
+
     const mailOptions = {
       from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
-      to: EMAIL_TO || "vadim.tkach1378@gmail.com",
+      to: recipients,
       subject: `פנייה חדשה מהאתר: ${name}`,
       html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee;">
