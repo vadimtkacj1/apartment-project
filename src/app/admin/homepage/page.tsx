@@ -291,6 +291,9 @@ export default function HomepagePage() {
   };
 
   const availableProperties = allProperties.filter(p => {
+    // Filter out sold properties
+    if (p.isSold) return false;
+
     const notInOtherSection = modalType === 'hot'
       ? !noCommissionProperties.some(nc => nc.id === p.id) || selectedIds.includes(p.id)
       : !hotProperties.some(h => h.id === p.id) || selectedIds.includes(p.id);
@@ -344,7 +347,7 @@ export default function HomepagePage() {
       key: 'title',
       width: 250,
       ellipsis: { showTitle: true },
-      render: (text: string) => (
+      render: (text: string, record: Property) => (
         <div style={{
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -352,6 +355,7 @@ export default function HomepagePage() {
           maxWidth: '230px'
         }}>
           {text}
+          {record.isSold && <Tag color="red" style={{ marginRight: '8px' }}>נמכר</Tag>}
         </div>
       ),
     },
