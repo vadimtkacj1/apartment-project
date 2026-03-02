@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #f9f6f0;
   --foreground: #171717;
   --warm-beige: #faf7f2;
@@ -12,9 +13,7 @@
 
 /* Завжди використовуємо світлу тему */
 html {
-  color-scheme: only light !important;
   overflow-y: scroll;
-  scrollbar-gutter: stable;
   background: #faf7f2 !important;
 }
 
@@ -24,15 +23,7 @@ body {
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
   background: #faf7f2 !important;
   color: #171717 !important;
-  color-scheme: only light !important;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Глобальна заборона темної теми */
-*,
-*::before,
-*::after {
-  color-scheme: only light !important;
 }
 
 .font-caramel {
