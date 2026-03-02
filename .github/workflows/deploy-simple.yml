@@ -41,6 +41,7 @@ jobs:
             APP_DIR="/opt/apartment-project"
             APP_NAME="apartment-project"
             DB_DIR="/var/lib/apartment-project"
+            DB_BACKUP_DIR="/tmp/apartment-project-db-backup"
 
             echo "🚀 Starting deployment via Git Pull..."
 
@@ -48,22 +49,50 @@ jobs:
             sudo mkdir -p $APP_DIR $DB_DIR
             sudo chown $USER:$USER $APP_DIR $DB_DIR
 
+            # Backup existing .env if it exists
+            if [ -f "$APP_DIR/.env" ]; then
+              echo "💾 Backing up existing .env..."
+              cp "$APP_DIR/.env" /tmp/.env.backup
+            fi
+
+            # Backup local sqlite databases to keep server data unchanged
+            echo "💾 Backing up local database files..."
+            rm -rf "$DB_BACKUP_DIR"
+            mkdir -p "$DB_BACKUP_DIR"
+            if [ -d "$APP_DIR" ]; then
+              find "$APP_DIR" -type f \( -name "*.db" -o -name "*.db-*" \) -exec cp -p --parents {} "$DB_BACKUP_DIR" \; 2>/dev/null || true
+            fi
+
             # Clone or pull repository
-            if [ ! -d "$APP_DIR/.git" ]; then
-              echo "📥 Cloning repository..."
-              git clone https://github.com/${{ github.repository }} $APP_DIR
-              cd $APP_DIR
-            else
+            if [ -d "$APP_DIR/.git" ]; then
               echo "📥 Pulling latest changes..."
-              cd $APP_DIR
+              cd "$APP_DIR"
               git fetch origin
+              git reset --hard origin/${{ github.ref_name }}
+            else
+              echo "📥 Preparing repository in existing directory..."
+              cd "$APP_DIR"
+              if [ -n "$(ls -A "$APP_DIR")" ]; then
+                # Keep local .env and .db files, remove everything else before checkout.
+                find "$APP_DIR" -mindepth 1 \
+                  ! -name ".env" \
+                  ! -name "*.db" \
+                  ! -name "*.db-*" \
+                  -exec rm -rf {} +
+              fi
+              git init
+              git remote remove origin 2>/dev/null || true
+              git remote add origin https://github.com/${{ github.repository }}
+              git fetch origin
+              git checkout -B ${{ github.ref_name }} origin/${{ github.ref_name }}
               git reset --hard origin/${{ github.ref_name }}
             fi
 
-            # Backup existing .env if it exists
-            if [ -f ".env" ]; then
-              echo "💾 Backing up existing .env..."
-              cp .env /tmp/.env.backup
+            # Restore local sqlite databases after git update
+            echo "♻️ Restoring local database files..."
+            if [ -d "$DB_BACKUP_DIR" ]; then
+              cp -a "$DB_BACKUP_DIR"/. / 2>/dev/null || true
+              rm -rf "$DB_BACKUP_DIR"
             fi
 
             # Create or restore .env
@@ -101,9 +130,8 @@ jobs:
             export NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="$NEXT_PUBLIC_GOOGLE_MAPS_API_KEY"
             npm run build
 
-            # Database migrations
-            echo "🗄️ Running database migrations..."
-            npx prisma migrate deploy || echo "⚠️ Migration warning (may be expected)"
+            # Keep server database untouched during deployment
+            echo "⏭️ Skipping database migrations (server DB is preserved)"
 
             # Install PM2 if not available
             if ! command -v pm2 &> /dev/null; then
