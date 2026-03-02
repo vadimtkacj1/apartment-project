@@ -59,7 +59,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
   });
@@ -230,6 +230,25 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   }
 
   const center = markerPosition || position || defaultCenter;
+
+  if (loadError) {
+    return (
+      <div style={{
+        width: '100%',
+        padding: '40px',
+        background: '#f5f5f5',
+        borderRadius: '12px',
+        textAlign: 'center'
+      }}>
+        <p style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '16px' }}>
+          Google Maps failed to load
+        </p>
+        <p style={{ fontSize: '14px', color: '#666' }}>
+          Check API key, billing, and allowed referrer domains
+        </p>
+      </div>
+    );
+  }
 
   if (!isLoaded) {
     return (

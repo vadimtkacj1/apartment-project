@@ -46,6 +46,13 @@ rsync -av --exclude='*.db' --exclude='*.db-*' .next/standalone/ deploy/ || {
     find deploy -name "*.db" -o -name "*.db-*" | xargs rm -f 2>/dev/null || true
 }
 
+# Include a bootstrap DB for first-time deployments (never force-overwrite existing prod DB)
+if [ -f "dev.db" ]; then
+    echo "📦 Including bootstrap database for first deploy..."
+    mkdir -p deploy/bootstrap
+    cp dev.db deploy/bootstrap/dev.db
+fi
+
 # Copy static files (CRITICAL for Next.js)
 mkdir -p deploy/.next/static
 cp -r .next/static/. deploy/.next/static/
@@ -129,15 +136,39 @@ NODE_ENV=production
 PORT=80
 HOSTNAME=0.0.0.0
 DATABASE_URL="file:/var/lib/apartment-project/dev.db"
-NEXTAUTH_SECRET="B3343XqwugRRtMcOtWa9Zh6hGfu2/A1YZS+AdMyd0g4="
-NEXTAUTH_URL="https://ram-haim.co.il"
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="AIzaSyB6oN3zxg47erF-pXJqC1fyvC1fC1IHnsU"
-EMAIL_SERVER_HOST=mail.privateemail.com
+NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+NEXTAUTH_URL="https://your-domain.example"
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="replace-with-your-google-maps-key"
+EMAIL_SERVER_HOST=
 EMAIL_SERVER_PORT=587
-EMAIL_SERVER_USER=info@ram-haim.co.il
-EMAIL_SERVER_PASSWORD=123456789!Qq
-EMAIL_TO=vadim.tkach1378@gmail.com,misha.kaspler@gmail.com
+EMAIL_SERVER_USER=
+EMAIL_SERVER_PASSWORD=
+EMAIL_TO=
 EOF
+fi
+
+# Load environment variables for deployment-time checks
+set -a
+source .env
+set +a
+
+# Initialize SQLite DB on first deploy to avoid API 500 from missing tables.
+# If DATABASE_URL points to a file and it does not exist yet, bootstrap from packaged dev.db.
+DB_URL_CLEAN="${DATABASE_URL%\"}"
+DB_URL_CLEAN="${DB_URL_CLEAN#\"}"
+if [[ "$DB_URL_CLEAN" == file:* ]]; then
+    DB_PATH="${DB_URL_CLEAN#file:}"
+    if [ ! -f "$DB_PATH" ]; then
+        echo "🗄️ Database not found at $DB_PATH"
+        if [ -f "$APP_DIR/bootstrap/dev.db" ]; then
+            echo "🛠️ Bootstrapping initial SQLite database..."
+            mkdir -p "$(dirname "$DB_PATH")"
+            cp "$APP_DIR/bootstrap/dev.db" "$DB_PATH"
+            chmod 640 "$DB_PATH" || true
+        else
+            echo "⚠️ Bootstrap DB not found. API routes may fail until DB is initialized."
+        fi
+    fi
 fi
 
 # Stop existing process

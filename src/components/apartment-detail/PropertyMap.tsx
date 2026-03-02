@@ -46,7 +46,7 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
   });
@@ -68,6 +68,29 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
           <div className="text-center p-8">
             <p className="text-gray-600 mb-2">Google Maps API key is missing</p>
             <p className="text-sm text-gray-500">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className={`rounded-2xl p-8 shadow-lg border ${
+          isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
+        }`}
+      >
+        <h2 className={`text-3xl font-black mb-6 uppercase ${
+          isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+        }`}>מיקום</h2>
+        <div className="rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center" style={{ height: '450px' }}>
+          <div className="text-center p-8">
+            <p className="text-gray-600 mb-2">Google Maps failed to load</p>
+            <p className="text-sm text-gray-500">Check API key, billing, and allowed referrer domains</p>
           </div>
         </div>
       </motion.div>
