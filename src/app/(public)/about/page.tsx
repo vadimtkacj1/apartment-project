@@ -11,7 +11,7 @@ import AboutTeam from '@/components/about/AboutTeam';
 
 export default function AboutPage() {
   return (
-    <div className="about-page" dir="rtl">
+    <div className="about-page bg-[#faf7f2]" dir="rtl">
       {/* Hero with Background Image */}
       <SecondaryHero
         img="/7.jpg"

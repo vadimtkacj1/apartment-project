@@ -14,7 +14,7 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
       style={{ isolation: 'isolate' }}
     >
       <div
-        className="relative w-full overflow-hidden flex items-center min-h-[30vh] md:min-h-[40vh] pt-[90px]"
+        className="relative w-full overflow-hidden flex items-center min-h-[30vh] md:min-h-[40vh] pt-[70px]"
       >
         {/* Background Image */}
         <div

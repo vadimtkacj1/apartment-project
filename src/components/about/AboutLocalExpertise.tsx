@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function AboutLocalExpertise() {
   return (
-    <section className="relative py-20 w-full overflow-hidden" dir="rtl">
+    <section className="relative py-20 w-full overflow-hidden bg-[#faf7f2]" dir="rtl">
       <div className="relative z-10 max-w-[1200px] 2xl:max-w-[1800px] mx-auto px-6 2xl:px-16">
 
         {/* H2 Title */}

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Phone, Mail } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 
 type Owner = {
   id: number;
@@ -11,6 +12,7 @@ type Owner = {
   image: string | null;
   phone: string | null;
   email: string | null;
+  whatsapp: string | null;
   description: string | null;
 };
 
@@ -70,6 +72,18 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
             >
               <Phone size={18} />
               <span dir="ltr" className="font-medium">{owner.phone}</span>
+            </a>
+          )}
+
+          {owner.whatsapp && (
+            <a
+              href={`https://wa.me/${owner.whatsapp.replace(/[^0-9]/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-all hover:shadow-lg hover:-translate-y-1"
+            >
+              <FaWhatsapp size={20} />
+              <span className="font-medium">WhatsApp</span>
             </a>
           )}
 

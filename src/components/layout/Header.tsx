@@ -87,7 +87,7 @@ export default function Header() {
           margin: "0 auto",
           /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
           padding: isMobile ? "0 1rem" : "0 2.5rem",
-          height: 90,
+          height: 70,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -99,20 +99,20 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={60} height={60}
+            <Image src="/images/logo.PNG" alt="Logo" width={50} height={50}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
-          <Image src="/images/second-and.svg" alt="and" width={36} height={36}
+          <Image src="/images/second-and.svg" alt="and" width={30} height={30}
             className="object-contain"
-            style={{ transition: "filter 0.35s ease", marginBottom: "10px" }}
+            style={{ transition: "filter 0.35s ease", marginBottom: "8px" }}
           />
           <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={60} height={60}
+            <Image src="/images/logo2.svg" alt="Logo 2" width={50} height={50}
               className="object-contain"
               style={{ transition: "filter 0.35s ease" }}
             />
@@ -121,7 +121,7 @@ export default function Header() {
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -136,13 +136,13 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(19px, 1.4vw, 26px)",
+                      fontSize: "clamp(16px, 1.2vw, 20px)",
                       fontWeight: 700,
                       color: textColor,
                       display: "flex",
                       alignItems: "center",
                       gap: 5,
-                      padding: "8px 0",
+                      padding: "6px 0",
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                       position: "relative",

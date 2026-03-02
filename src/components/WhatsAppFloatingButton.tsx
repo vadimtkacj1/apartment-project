@@ -13,6 +13,7 @@ interface Owner {
   image: string | null;
   phone: string | null;
   email: string | null;
+  whatsapp: string | null;
   description: string | null;
 }
 
@@ -41,13 +42,13 @@ export default function WhatsAppFloatingButton() {
     }
   };
 
-  const handleWhatsAppClick = (phone: string | null, name: string) => {
-    if (!phone) return;
+  const handleWhatsAppClick = (whatsapp: string | null, name: string) => {
+    if (!whatsapp) return;
 
-    // Remove any non-digit characters from phone
-    const cleanPhone = phone.replace(/\D/g, '');
+    // Remove any non-digit characters from whatsapp
+    const cleanWhatsapp = whatsapp.replace(/\D/g, '');
     const message = encodeURIComponent(`שלום, אני מעוניין/ת לקבל מידע נוסף`);
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${message}`;
+    const whatsappUrl = `https://wa.me/${cleanWhatsapp}?text=${message}`;
 
     window.open(whatsappUrl, '_blank');
   };
@@ -155,10 +156,10 @@ export default function WhatsAppFloatingButton() {
 
                       {/* WhatsApp Button */}
                       <button
-                        onClick={() => handleWhatsAppClick(owner.phone, owner.name)}
-                        disabled={!owner.phone}
+                        onClick={() => handleWhatsAppClick(owner.whatsapp, owner.name)}
+                        disabled={!owner.whatsapp}
                         className={`bg-[#25D366] text-white p-3 rounded-full hover:bg-[#20BA5A] transition-colors duration-300 shrink-0 ${
-                          !owner.phone ? 'opacity-50 cursor-not-allowed' : ''
+                          !owner.whatsapp ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
                         aria-label={`WhatsApp ${owner.name}`}
                       >

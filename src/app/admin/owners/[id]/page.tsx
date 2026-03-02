@@ -14,6 +14,7 @@ interface OwnerForm {
   image: string | null;
   phone: string;
   email: string;
+  whatsapp: string;
   description: string;
   order: number;
   isActive: boolean;
@@ -25,6 +26,7 @@ const INITIAL_FORM: OwnerForm = {
   image: null,
   phone: '',
   email: '',
+  whatsapp: '',
   description: '',
   order: 0,
   isActive: true,
@@ -204,6 +206,17 @@ export default function OwnerEditPage() {
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="example@example.com"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              WhatsApp
+            </label>
+            <Input
+              value={formData.whatsapp}
+              onChange={(e) => handleChange('whatsapp', e.target.value)}
+              placeholder="050-123-4567"
               size="large"
             />
           </div>
