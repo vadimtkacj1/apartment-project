@@ -75,8 +75,9 @@ jobs:
           timeout: 120s
           command_timeout: 20m
           source: "deploy.tar.gz"
-          target: "/tmp"
+          target: "~/deploy-tmp"
           overwrite: true
+          rm: false
 
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
@@ -98,15 +99,26 @@ jobs:
             APP_NAME="apartment-project"
             PORT=3000
             DB_DIR="/var/lib/apartment-project"
+            DEPLOY_TMP="$HOME/deploy-tmp"
 
             echo "🚀 Starting deployment..."
 
             sudo mkdir -p $APP_DIR $DB_DIR
             sudo chown $USER:$USER $APP_DIR $DB_DIR
 
-            # Unpack
+            # Unpack - ensure we have the correct file and permissions
+            cd $DEPLOY_TMP
+            # Find the actual tar file (SCP action may rename it)
+            TAR_FILE=$(ls -t $DEPLOY_TMP/*.tar.gz 2>/dev/null | head -1 || echo "$DEPLOY_TMP/deploy.tar.gz")
+            if [ ! -f "$TAR_FILE" ]; then
+              echo "❌ Error: Tar file not found in $DEPLOY_TMP"
+              ls -la $DEPLOY_TMP/*.tar.gz || true
+              exit 1
+            fi
+            echo "📦 Extracting $TAR_FILE to $APP_DIR..."
             cd $APP_DIR
-            tar -xzf /tmp/deploy.tar.gz --strip-components=1
+            tar -xzf "$TAR_FILE" --strip-components=1
+            chmod -R u+w $APP_DIR
             
             # Database Persistence Logic
             if [[ "$DATABASE_URL" == *"file:"* ]]; then
@@ -140,7 +152,7 @@ jobs:
             pm2 save
 
             # Cleanup and Health check
-            rm -f /tmp/deploy.tar.gz
+            rm -f $DEPLOY_TMP/*.tar.gz
             sleep 5
             if curl -f -s http://localhost:$PORT > /dev/null; then
               echo "✅ Deployment successful!"
