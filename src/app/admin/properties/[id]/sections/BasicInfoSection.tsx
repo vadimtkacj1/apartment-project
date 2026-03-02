@@ -156,7 +156,14 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             <Switch
               checkedChildren="נמכר"
               unCheckedChildren="לא נמכר"
-              onChange={(checked) => handleChange('isSold', checked)}
+              onChange={(checked) => {
+                handleChange('isSold', checked);
+                // Auto-clear hot proposition and no commission when marking as sold
+                if (checked) {
+                  handleChange('isHotProposition', false);
+                  handleChange('isNoCommission', false);
+                }
+              }}
             />
             <span style={{ marginRight: '8px' }}>נכס נמכר</span>
           </Form.Item>
@@ -180,8 +187,10 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               checkedChildren="כן"
               unCheckedChildren="לא"
               onChange={(checked) => handleChange('isHotProposition', checked)}
+              disabled={formData.isSold}
             />
             <span style={{ marginRight: '8px' }}>הצעה חמה</span>
+            {formData.isSold && <span style={{ marginRight: '8px', color: '#999', fontSize: '12px' }}>(לא זמין לנכסים שנמכרו)</span>}
           </Form.Item>
         </Col>
         <Col xs={24} sm={12}>
@@ -190,8 +199,10 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               checkedChildren="כן"
               unCheckedChildren="לא"
               onChange={(checked) => handleChange('isNoCommission', checked)}
+              disabled={formData.isSold}
             />
             <span style={{ marginRight: '8px' }}>ללא עמלה</span>
+            {formData.isSold && <span style={{ marginRight: '8px', color: '#999', fontSize: '12px' }}>(לא זמין לנכסים שנמכרו)</span>}
           </Form.Item>
         </Col>
       </Row>

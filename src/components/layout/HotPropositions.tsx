@@ -137,8 +137,8 @@ function HotPropositions() {
           isSold: prop.isSold || false,
           floor: prop.floor,
           dealType: prop.dealType || 'sale',
-          propertyType: (prop.propertyType && ['apartment', 'garden-apartment', 'cottage', 'house', 'duplex', 'penthouse', 'roof-apartment', 'housing-unit', 'studio', 'basement-apartment', 'villa'].includes(prop.propertyType)) 
-            ? prop.propertyType as PropertyType 
+          propertyType: (prop.propertyType && ['apartment', 'garden-apartment', 'cottage', 'house', 'duplex', 'penthouse', 'roof-apartment', 'housing-unit', 'studio', 'basement-apartment', 'villa'].includes(prop.propertyType))
+            ? prop.propertyType as PropertyType
             : undefined,
           totalFloors: prop.totalFloors,
           neighborhood: prop.neighborhood,
@@ -152,7 +152,10 @@ function HotPropositions() {
           features: prop.features,
         }));
 
-        setProperties(mappedProperties);
+        // Filter out sold properties
+        const filteredProperties = mappedProperties.filter((prop: Property) => !prop.isSold);
+
+        setProperties(filteredProperties);
       } catch (error) {
         console.error('Error fetching hot properties:', error);
         setProperties([]);

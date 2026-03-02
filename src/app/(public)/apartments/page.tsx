@@ -154,16 +154,10 @@ function ApartmentsPageContent() {
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        // Sort: sold properties at the end
-        const sortedProperties = mappedProperties.sort((a: Property, b: Property) => {
-          const aSold = a.isSold || false;
-          const bSold = b.isSold || false;
-          if (aSold && !bSold) return 1;
-          if (!aSold && bSold) return -1;
-          return 0;
-        });
+        // Filter out sold properties
+        const filteredProperties = mappedProperties.filter((prop: Property) => !prop.isSold);
 
-        setProperties(sortedProperties);
+        setProperties(filteredProperties);
       } catch (error) {
         setProperties([]);
       } finally {
