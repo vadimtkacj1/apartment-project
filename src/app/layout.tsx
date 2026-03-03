@@ -141,6 +141,7 @@ export default function RootLayout({
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
+          media="(min-width: 768px)"
         />
         <link
           rel="preload"
@@ -148,6 +149,7 @@ export default function RootLayout({
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
+          media="(min-width: 768px)"
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>

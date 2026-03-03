@@ -141,7 +141,7 @@ const ContactForm: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate-400 font-semibold mb-1">טלפון</p>
-                  <a href={phoneLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors">
+                  <a href={phoneLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2">
                     {phone}
                   </a>
                 </div>
@@ -154,7 +154,7 @@ const ContactForm: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate-400 font-semibold mb-1">דוא״ל</p>
-                  <a href={emailLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all">
+                  <a href={emailLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2">
                     {email}
                   </a>
                 </div>

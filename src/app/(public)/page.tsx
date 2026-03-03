@@ -46,10 +46,11 @@ export default function Home() {
       }, 100);
     }
 
-    // Hide loader when page is fully loaded
+    // Hide loader when page is fully loaded - faster on mobile
+    const isMobile = window.innerWidth < 768;
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, isMobile ? 500 : 1000);
 
     return () => clearTimeout(timer);
   }, []);

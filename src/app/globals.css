@@ -72,16 +72,61 @@ body {
   html {
     scroll-behavior: smooth;
   }
+  
+  /* Enable hardware acceleration for smoother scrolling */
+  body {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Optimize video rendering on mobile */
+  video {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Optimize font rendering */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Reduce layout shifts */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Optimize animations for mobile */
+  @media (prefers-reduced-motion: no-preference) {
+    * {
+      animation-duration: 0.3s !important;
+      transition-duration: 0.3s !important;
+    }
+  }
+  
+  /* Force composited animations */
+  [class*="animate-"], [style*="animation"] {
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
 }
 
 .hyper-link {
   color: rgb(38, 38, 186);
   cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .hyper-link:hover {
   color: rgb(2, 2, 2);
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 /* Ensure header is always on top and light colored */

@@ -15,17 +15,9 @@ export default function robots(): MetadataRoute.Robots {
           '/uploads/temp/',
         ],
       },
-      {
-        userAgent: 'Googlebot',
-        allow: '/',
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/_next/',
-        ],
-      },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl.replace(/^https?:\/\//, ''),
   };
 }
 

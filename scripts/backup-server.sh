@@ -53,3 +53,4 @@ find "${BACKUP_DIR}" -type f -name "apartment-backup-*.tar.gz.sha256" -mtime +"$
 echo "Backup created: ${ARCHIVE_PATH}"
 echo "Checksum file: ${CHECKSUM_PATH}"
 
+

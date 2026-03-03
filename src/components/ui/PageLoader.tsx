@@ -9,15 +9,28 @@ export default function PageLoader() {
   useEffect(() => {
     const hide = () => {
       setFadeOut(true);
-      setTimeout(() => setVisible(false), 500);
+      // Faster fade out on mobile
+      const isMobile = window.innerWidth < 768;
+      setTimeout(() => setVisible(false), isMobile ? 200 : 500);
     };
 
-    if (document.readyState === 'complete') {
-      // Страница уже загружена (например, кэш)
-      hide();
+    // On mobile, hide faster to improve perceived performance
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) {
+      // Hide after DOM is ready, don't wait for all resources
+      if (document.readyState === 'interactive' || document.readyState === 'complete') {
+        setTimeout(hide, 300);
+      } else {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(hide, 300));
+      }
     } else {
-      window.addEventListener('load', hide);
-      return () => window.removeEventListener('load', hide);
+      if (document.readyState === 'complete') {
+        // Страница уже загружена (например, кэш)
+        hide();
+      } else {
+        window.addEventListener('load', hide);
+        return () => window.removeEventListener('load', hide);
+      }
     }
   }, []);
 
