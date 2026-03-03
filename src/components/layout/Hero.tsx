@@ -55,7 +55,7 @@ const Hero: React.FC<HeroProps> = () => {
     <section
       dir="rtl"
       className="relative w-full h-screen overflow-hidden"
-      style={{ height: '100dvh' }}
+      style={{ height: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
         .cursor {

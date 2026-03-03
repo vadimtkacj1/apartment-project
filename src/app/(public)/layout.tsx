@@ -10,12 +10,14 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div 
+    <div
       className="flex flex-col min-h-screen bg-warm"
-      style={{ 
+      style={{
         colorScheme: 'light',
         background: '#faf7f2',
-        color: '#171717'
+        color: '#171717',
+        overflowX: 'hidden',
+        width: '100%'
       } as React.CSSProperties}
     >
       <Header />
