@@ -13,7 +13,7 @@
 
 /* Завжди використовуємо світлу тему */
 html {
-  overflow-y: scroll;
+  overflow-y: auto;
   background: #faf7f2 !important;
 }
 
