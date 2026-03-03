@@ -13,7 +13,10 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
   useEffect(() => {
     if (formData.vacancyDate === 'מיד' || formData.vacancyDate === 'immediately') {
       setVacancyType('immediately');
-    } else if (formData.vacancyDate && formData.vacancyDate.trim() !== '') {
+    } else if (formData.vacancyDate && typeof formData.vacancyDate === 'string' && formData.vacancyDate.trim() !== '') {
+      setVacancyType('date');
+    } else if (formData.vacancyDate && typeof formData.vacancyDate === 'object') {
+      // It's a dayjs object from DatePicker
       setVacancyType('date');
     }
   }, [formData.vacancyDate]);

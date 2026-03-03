@@ -69,8 +69,11 @@ export function usePropertyForm(
           vacancyDate: vacancyDateValue,
         };
 
-        // Update both formData and form fields with the same values
-        setFormData(formValues);
+        // Keep vacancyDate as string in formData for API submission
+        setFormData({
+          ...data,
+          vacancyDate: data.vacancyDate || null
+        });
         form.setFieldsValue(formValues);
       }
     } catch (err) {
@@ -106,11 +109,11 @@ export function usePropertyForm(
 
       const method = isNew ? 'POST' : 'PUT';
 
-      // Merge form data with values, but exclude homepage section flags
-      // These should only be managed through Homepage settings page
+      // Convert vacancyDate to string if it's a dayjs object
       const submitData = { ...formData, ...values };
-      delete submitData.isHotProposition;
-      delete submitData.isNoCommission;
+      if (submitData.vacancyDate && typeof submitData.vacancyDate === 'object' && dayjs.isDayjs(submitData.vacancyDate)) {
+        submitData.vacancyDate = submitData.vacancyDate.format('DD/MM/YYYY');
+      }
 
       const response = await fetch(url, {
         method,
