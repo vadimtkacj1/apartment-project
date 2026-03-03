@@ -29,7 +29,6 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512, 640, 768],
     minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year for better caching
-    quality: 85, // Optimize quality vs size
     // Enable lazy loading by default
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -37,10 +36,7 @@ const nextConfig: NextConfig = {
   
   // Compression
   compress: true,
-  
-  // Optimize production builds
-  swcMinify: true,
-  
+
   // Reduce bundle size
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
@@ -57,8 +53,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'swiper', '@ant-design/icons', 'react-icons'],
     // Enable optimized CSS loading
     optimizeCss: true,
-    // Optimize server components
-    serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
   
   // Webpack optimizations
