@@ -33,6 +33,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9, // Main content page - very high priority
     },
     {
+      url: `${baseUrl}/apartments?dealType=sale`,
+      lastModified: new Date(),
+      changeFrequency: 'daily', // Sale properties list updates frequently
+      priority: 0.85, // High priority - important filtered view
+    },
+    {
+      url: `${baseUrl}/apartments?dealType=rent`,
+      lastModified: new Date(),
+      changeFrequency: 'daily', // Rent properties list updates frequently
+      priority: 0.85, // High priority - important filtered view
+    },
+    {
       url: `${baseUrl}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly', // About page changes less frequently
@@ -96,6 +108,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Fetch all active properties from database
+    // Note: The size of the sitemap depends on the number of active properties in the database
+    // Each property will generate a separate URL in the sitemap
     const properties = await prisma.property.findMany({
       where: {
         isActive: true,
@@ -111,6 +125,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Dynamic property routes - only include active properties
     // Each property page is important for SEO and may be updated when status changes
+    // This is where the sitemap gets its size - one URL per active property
     const propertyRoutes: MetadataRoute.Sitemap = properties.map((property) => ({
       url: `${baseUrl}/apartments/${property.id}`,
       lastModified: property.updatedAt,
@@ -118,6 +133,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8, // High priority - these are the main content pages
     }));
 
+    // Combine static routes with dynamic property routes
+    // Total sitemap size = static routes (15) + number of active properties
     return [...staticRoutes, ...propertyRoutes];
   } catch (error) {
     console.error('Error generating sitemap:', error);
