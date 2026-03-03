@@ -64,7 +64,11 @@ export function usePropertyForm(
           vacancyDate: vacancyDateValue,
         };
 
-        setFormData(data);
+        // Keep vacancyDate as string in formData for API submission
+        setFormData({
+          ...data,
+          vacancyDate: data.vacancyDate || null
+        });
         form.setFieldsValue(formValues);
       }
     } catch (err) {
@@ -96,10 +100,16 @@ export function usePropertyForm(
 
       const method = isNew ? 'POST' : 'PUT';
 
+      // Convert vacancyDate to string if it's a dayjs object
+      const submitData = { ...formData, ...values };
+      if (submitData.vacancyDate && typeof submitData.vacancyDate === 'object' && dayjs.isDayjs(submitData.vacancyDate)) {
+        submitData.vacancyDate = submitData.vacancyDate.format('DD/MM/YYYY');
+      }
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, ...values }),
+        body: JSON.stringify(submitData),
       });
 
       const responseData = await response.json().catch(() => ({}));

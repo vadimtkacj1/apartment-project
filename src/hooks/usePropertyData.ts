@@ -205,7 +205,7 @@ export function usePropertyData(propertyId: string) {
         }
 
         // Always show vacancy date if it exists (even if empty string, check for null/undefined)
-        if (data.vacancyDate !== null && data.vacancyDate !== undefined && data.vacancyDate.trim() !== '') {
+        if (data.vacancyDate !== null && data.vacancyDate !== undefined && typeof data.vacancyDate === 'string' && data.vacancyDate.trim() !== '') {
           const trimmedDate = data.vacancyDate.trim();
           
           // Check if it's "מיד" (immediately)
