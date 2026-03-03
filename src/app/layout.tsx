@@ -130,10 +130,6 @@ export default function RootLayout({
           :root { color-scheme: only light !important; }
           html { color-scheme: only light !important; background: #faf7f2 !important; }
           body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
-          @media (prefers-color-scheme: dark) {
-            :root, html, body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
-            * { color-scheme: only light !important; }
-          }
         `}} />
         <link
           rel="preload"

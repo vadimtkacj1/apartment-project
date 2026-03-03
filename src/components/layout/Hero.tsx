@@ -160,8 +160,8 @@ const Hero: React.FC<HeroProps> = () => {
         {/* TOP: heading + subtitle */}
         <div className="flex flex-col items-center md:items-start w-full">
 
-          <div className="flex items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
-            <h1
+          <h1 className="flex items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
+            <span
               className="font-black text-white leading-none"
               style={{
                 fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
@@ -172,7 +172,7 @@ const Hero: React.FC<HeroProps> = () => {
             >
               {text1}
               {!done1 && <span className="cursor" />}
-            </h1>
+            </span>
 
             <motion.div
               initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
@@ -183,7 +183,7 @@ const Hero: React.FC<HeroProps> = () => {
             >
               <Image
                 src="/images/and.png"
-                alt="&"
+                alt="וסימן"
                 fill
                 className="object-contain"
                 style={{ filter: 'brightness(0) invert(1)' }}
@@ -191,7 +191,7 @@ const Hero: React.FC<HeroProps> = () => {
               />
             </motion.div>
 
-            <h1
+            <span
               className="font-black text-white leading-none"
               style={{
                 fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
@@ -202,8 +202,8 @@ const Hero: React.FC<HeroProps> = () => {
             >
               {text2}
               {!done2 && text2.length > 0 && <span className="cursor" />}
-            </h1>
-          </div>
+            </span>
+          </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 12 }}

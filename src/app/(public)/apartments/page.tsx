@@ -70,6 +70,36 @@ function ApartmentsPageContent() {
     }
   }, [searchParams]);
 
+  const handleCategoryChange = (category: Category) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
+    
+    // Sync dealType filter
+    if (category === 'sales') {
+      setFilters(prev => ({ ...prev, dealType: 'sale' }));
+    } else if (category === 'rentals') {
+      setFilters(prev => ({ ...prev, dealType: 'rent' }));
+    } else if (category === 'all') {
+      setFilters(prev => ({ ...prev, dealType: 'all' }));
+    }
+  };
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+  // Sync category when dealType changes
+  useEffect(() => {
+    if (filters.dealType === 'sale' && selectedCategory === 'rentals') {
+      setSelectedCategory('sales');
+    } else if (filters.dealType === 'rent' && selectedCategory === 'sales') {
+      setSelectedCategory('rentals');
+    } else if (filters.dealType === 'all' && (selectedCategory === 'sales' || selectedCategory === 'rentals')) {
+      setSelectedCategory('all');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.dealType]);
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -208,7 +238,7 @@ function ApartmentsPageContent() {
             {CATEGORIES.filter(cat => ['all', 'sales', 'rentals'].includes(cat.value)).map((cat: any) => (
               <button
                 key={cat.id}
-                onClick={() => { setSelectedCategory(cat.value); updatePage(1); }}
+                onClick={() => handleCategoryChange(cat.value)}
                 className={`px-8 py-3 rounded-2xl font-bold transition-all ${selectedCategory === cat.value ? 'bg-[#1c3664] text-white shadow-lg scale-105' : 'bg-white text-gray-600 border border-gray-200'}`}
               >
                 {cat.label}

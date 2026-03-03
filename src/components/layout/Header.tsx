@@ -235,6 +235,9 @@ export default function Header() {
         {isMobile && (
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
             style={{
               background: "rgba(255,255,255,0.15)",
               border: "none",
@@ -255,6 +258,7 @@ export default function Header() {
       {/* ✅ Mobile menu — fullscreen, zIndex above header, X button inside */}
       {isMobile && isMobileMenuOpen && (
         <div
+          id="mobile-menu"
           dir="rtl"
           style={{
             position: "fixed",
@@ -275,6 +279,7 @@ export default function Header() {
           <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "1rem" }}>
             <button
               onClick={() => setIsMobileMenuOpen(false)}
+              aria-label="סגור תפריט"
               style={{
                 background: "none",
                 border: "none",
@@ -304,6 +309,8 @@ export default function Header() {
                   {link.submenu && (
                     <button
                       onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
+                      aria-label={openSubmenu === link.label ? `סגור ${link.label}` : `פתח ${link.label}`}
+                      aria-expanded={openSubmenu === link.label}
                       style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#1c3664" }}
                     >
                       <ChevronDown size={22} style={{
