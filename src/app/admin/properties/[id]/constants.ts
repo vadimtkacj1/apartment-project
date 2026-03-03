@@ -42,8 +42,6 @@ export const INITIAL_FORM: PropertyForm = {
   isActive: true,
   isSold: false,
   isPinned: false,
-  isHotProposition: false,
-  isNoCommission: false,
 };
 
 export const DEAL_TYPE_OPTIONS = [

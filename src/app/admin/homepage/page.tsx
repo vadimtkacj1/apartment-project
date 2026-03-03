@@ -324,7 +324,7 @@ export default function HomepagePage() {
           height: '80px'
         }}>
           <Image
-            src={images[0] || '/placeholder.png'}
+            src={images[0] || '/images/hero/sales.jpg'}
             alt="נכס"
             width={80}
             height={80}
@@ -336,7 +336,7 @@ export default function HomepagePage() {
               width: '80px',
               height: '80px'
             }}
-            fallback="/placeholder.png"
+            fallback="/images/hero/sales.jpg"
           />
         </div>
       ),

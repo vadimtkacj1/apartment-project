@@ -144,6 +144,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
         <Col xs={24} sm={8}>
           <Form.Item name="isActive" valuePropName="checked">
             <Switch
+              checked={formData.isActive}
               checkedChildren="פעיל"
               unCheckedChildren="לא פעיל"
               onChange={(checked) => handleChange('isActive', checked)}
@@ -154,16 +155,10 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
         <Col xs={24} sm={8}>
           <Form.Item name="isSold" valuePropName="checked">
             <Switch
+              checked={formData.isSold}
               checkedChildren="נמכר"
               unCheckedChildren="לא נמכר"
-              onChange={(checked) => {
-                handleChange('isSold', checked);
-                // Auto-clear hot proposition and no commission when marking as sold
-                if (checked) {
-                  handleChange('isHotProposition', false);
-                  handleChange('isNoCommission', false);
-                }
-              }}
+              onChange={(checked) => handleChange('isSold', checked)}
             />
             <span style={{ marginRight: '8px' }}>נכס נמכר</span>
           </Form.Item>
@@ -171,38 +166,12 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
         <Col xs={24} sm={8}>
           <Form.Item name="isPinned" valuePropName="checked">
             <Switch
+              checked={formData.isPinned}
               checkedChildren="נצמד"
               unCheckedChildren="לא נצמד"
               onChange={(checked) => handleChange('isPinned', checked)}
             />
             <span style={{ marginRight: '8px' }}>הצמד לעמוד הבית</span>
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row gutter={16}>
-        <Col xs={24} sm={12}>
-          <Form.Item name="isHotProposition" valuePropName="checked">
-            <Switch
-              checkedChildren="כן"
-              unCheckedChildren="לא"
-              onChange={(checked) => handleChange('isHotProposition', checked)}
-              disabled={formData.isSold}
-            />
-            <span style={{ marginRight: '8px' }}>הצעה חמה</span>
-            {formData.isSold && <span style={{ marginRight: '8px', color: '#999', fontSize: '12px' }}>(לא זמין לנכסים שנמכרו)</span>}
-          </Form.Item>
-        </Col>
-        <Col xs={24} sm={12}>
-          <Form.Item name="isNoCommission" valuePropName="checked">
-            <Switch
-              checkedChildren="כן"
-              unCheckedChildren="לא"
-              onChange={(checked) => handleChange('isNoCommission', checked)}
-              disabled={formData.isSold}
-            />
-            <span style={{ marginRight: '8px' }}>ללא עמלה</span>
-            {formData.isSold && <span style={{ marginRight: '8px', color: '#999', fontSize: '12px' }}>(לא זמין לנכסים שנמכרו)</span>}
           </Form.Item>
         </Col>
       </Row>
