@@ -127,7 +127,6 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" style={{ colorScheme: 'only light' } as React.CSSProperties}>
       <head>
-        <meta name="google-site-verification" content="GYtO0YiBqAWl4aXqjeIfk0RTqKMJfsMDH9spvgqafAA" />
         <meta name="color-scheme" content="light only" />
         <meta name="theme-color" content="#faf7f2" />
         <meta name="supported-color-schemes" content="light" />
