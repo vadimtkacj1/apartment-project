@@ -96,7 +96,7 @@ const Hero: React.FC<HeroProps> = () => {
         <video
           autoPlay loop muted playsInline preload="auto"
           className="absolute top-0 left-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center center', minWidth: '100%', minHeight: '100%' }}
+          style={{ objectPosition: 'center center' }}
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
