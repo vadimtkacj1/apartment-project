@@ -9,6 +9,23 @@ interface HeroProps {
   img?: string;
 }
 
+// Hook to detect mobile devices
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
@@ -39,6 +56,7 @@ function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
 }
 
 const Hero: React.FC<HeroProps> = () => {
+  const isMobile = useIsMobile();
   const line1 = 'רם נכסים';
   const line2 = 'חיים ענבי';
 
@@ -72,8 +90,14 @@ const Hero: React.FC<HeroProps> = () => {
           border-radius: 1px;
         }
         @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4); }
-          50%       { box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4); }
+          0%, 100% { 
+            box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4);
+            transform: translateZ(0);
+          }
+          50% { 
+            box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4);
+            transform: translateZ(0);
+          }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
@@ -84,9 +108,13 @@ const Hero: React.FC<HeroProps> = () => {
         }
         .btn-primary {
           animation: goldGlow 2.5s ease-in-out infinite;
+          will-change: box-shadow;
+          transform: translateZ(0);
         }
         .btn-secondary {
           transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+          will-change: background, border-color, box-shadow;
+          transform: translateZ(0);
         }
         .btn-secondary:hover {
           background: rgba(255,255,255,0.13) !important;
@@ -98,10 +126,20 @@ const Hero: React.FC<HeroProps> = () => {
       {/* ── Video ── */}
       <div className="absolute inset-0 z-0">
         <video
-          autoPlay loop muted playsInline preload="auto"
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          preload={isMobile ? "metadata" : "auto"}
           className="absolute inset-0 w-full h-full object-cover"
+          poster="/hero-poster.jpg"
         >
-          <source src="/hero.mp4" type="video/mp4" />
+          {isMobile ? (
+            <source src="/hero-mobile.mp4" type="video/mp4" />
+          ) : (
+            <source src="/hero.mp4" type="video/mp4" />
+          )}
+          <track kind="captions" srcLang="he" label="Hebrew" />
         </video>
       </div>
 

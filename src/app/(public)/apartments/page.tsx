@@ -287,7 +287,7 @@ function ApartmentsPageContent() {
                       updatePage(1);
                     }}
                     onReset={() => {
-                      const resetFilters = { dealType: 'all', city: 'all' };
+                      const resetFilters: FilterState = { dealType: 'all', city: 'all' };
                       setFilters(resetFilters);
                       setAppliedFilters(resetFilters);
                       updatePage(1);

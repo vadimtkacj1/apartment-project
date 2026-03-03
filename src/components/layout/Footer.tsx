@@ -79,25 +79,49 @@ export default async function Footer() {
 
           {/* For Renters Section */}
           <div>
+<<<<<<< HEAD
+            <h4 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h4>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/apartments" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">דירות להשכרה</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">שאלות ותשובות</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
+=======
             <h2 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/apartments" className="hover:text-white transition-colors">דירות להשכרה</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">שאלות ותשובות</Link></li>
               <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
+>>>>>>> 833b245a4de2e817c1068684a4c142cbaab9fbec
             </ul>
           </div>
 
           {/* For Owners Section */}
           <div>
+<<<<<<< HEAD
+            <h4 className="text-xl font-bold mb-4 text-white">עבור משכירים</h4>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
+              <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
+=======
             <h2 className="text-xl font-bold mb-4 text-white">עבור משכירים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors">רכישת נכס</Link></li>
+>>>>>>> 833b245a4de2e817c1068684a4c142cbaab9fbec
             </ul>
           </div>
 
           {/* Resources Section */}
           <div>
+<<<<<<< HEAD
+            <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/articles" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מאמרים</Link></li>
+              <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">למכור לבד?</Link></li>
+              <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">משקיעים זרים</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מרכז עזרה</Link></li>
+              <li><Link href="/links" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">קישורים שימושיים</Link></li>
+=======
             <h2 className="text-xl font-bold mb-4 text-white">משאבים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
@@ -105,16 +129,25 @@ export default async function Footer() {
               <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors">משקיעים זרים</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">מרכז עזרה</Link></li>
               <li><Link href="/links" className="hover:text-white transition-colors">קישורים שימושיים</Link></li>
+>>>>>>> 833b245a4de2e817c1068684a4c142cbaab9fbec
             </ul>
           </div>
 
           {/* Company Section */}
           <div>
+<<<<<<< HEAD
+            <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מדיניות פרטיות</Link></li>
+              <li><Link href="/accessibility" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">הצהרת נגישות</Link></li>
+=======
             <h2 className="text-xl font-bold mb-4 text-white">החברה</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-white transition-colors">מדיניות פרטיות</Link></li>
               <li><Link href="/accessibility" className="hover:text-white transition-colors">הצהרת נגישות</Link></li>
+>>>>>>> 833b245a4de2e817c1068684a4c142cbaab9fbec
             </ul>
           </div>
 
@@ -128,14 +161,14 @@ export default async function Footer() {
                     <p className="text-white font-semibold">{owner.name}</p>
                     {owner.phone && (
                       <p>
-                        <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors">
+                        <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
                           {owner.phone}
                         </a>
                       </p>
                     )}
                     {owner.email && (
                       <p>
-                        <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors">
+                        <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
                           {owner.email}
                         </a>
                       </p>

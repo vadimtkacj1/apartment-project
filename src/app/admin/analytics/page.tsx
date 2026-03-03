@@ -100,6 +100,7 @@ export default function AnalyticsPage() {
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
   const [selectedIP, setSelectedIP] = useState<string>('all');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [ipToVisitorMap, setIpToVisitorMap] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     fetchAnalytics();
@@ -157,6 +158,18 @@ export default function AnalyticsPage() {
 
       // 5. Process Charts (using the local variables, fixing the scope error)
       processChartData(loadedViews, loadedClicks);
+
+      // 6. Create IP to Visitor Number mapping
+      const allIPs = new Set<string>();
+      loadedViews.forEach(v => allIPs.add(v.ipAddress));
+      loadedClicks.forEach(c => allIPs.add(c.ipAddress));
+
+      const ipMap = new Map<string, number>();
+      const sortedIPs = Array.from(allIPs).sort();
+      sortedIPs.forEach((ip, index) => {
+        ipMap.set(ip, index + 1);
+      });
+      setIpToVisitorMap(ipMap);
 
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -235,6 +248,11 @@ export default function AnalyticsPage() {
     }
   };
 
+  const getVisitorNumber = (ipAddress: string): string => {
+    const visitorNum = ipToVisitorMap.get(ipAddress);
+    return visitorNum ? `מבקר #${visitorNum}` : 'מבקר #?';
+  };
+
   const getEventTypeLabel = (eventType: string) => {
     const labels: Record<string, string> = {
       'property_view': 'צפייה בנכס',
@@ -281,13 +299,13 @@ export default function AnalyticsPage() {
       ) : <span style={{color: '#ccc'}}>לא זמין</span>,
     },
     {
-      title: 'כתובת IP',
+      title: 'מזהה מבקר',
       dataIndex: 'ipAddress',
       key: 'ipAddress',
       width: '20%',
       render: (ip) => (
-        <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
-          {ip}
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1890ff' }}>
+          {getVisitorNumber(ip)}
         </span>
       ),
     },
@@ -344,13 +362,13 @@ export default function AnalyticsPage() {
       ),
     },
     {
-      title: 'כתובת IP',
+      title: 'מזהה מבקר',
       dataIndex: 'ipAddress',
       key: 'ipAddress',
       width: '18%',
       render: (ip) => (
-        <span style={{ fontFamily: 'monospace', fontSize: '0.9em', color: '#1890ff' }}>
-          {ip}
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1890ff' }}>
+          {getVisitorNumber(ip)}
         </span>
       ),
     },
@@ -470,12 +488,12 @@ export default function AnalyticsPage() {
             </Select>
           </Col>
           <Col xs={24} md={12} lg={8}>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי משתמש (IP):</div>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי מבקר:</div>
             <Select
               style={{ width: '100%' }}
               value={selectedIP}
               onChange={setSelectedIP}
-              placeholder="בחר כתובת IP"
+              placeholder="בחר מבקר"
               showSearch
               filterOption={(input, option) =>
                 (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -484,7 +502,7 @@ export default function AnalyticsPage() {
               <Select.Option value="all">הצג הכל</Select.Option>
               {(summary?.topUsersByClicks || []).map((user) => (
                 <Select.Option key={user.ipAddress} value={user.ipAddress}>
-                  {user.ipAddress} ({user.clicks} לחיצות)
+                  {getVisitorNumber(user.ipAddress)} ({user.clicks} לחיצות)
                 </Select.Option>
               ))}
             </Select>
@@ -508,7 +526,7 @@ export default function AnalyticsPage() {
             </Col>
             <Col flex="auto">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                פעילות משתמש: <span style={{ fontFamily: 'monospace', color: '#1890ff' }}>{selectedIP}</span>
+                פעילות משתמש: <span style={{ fontWeight: 700, color: '#1890ff' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
               <div style={{ color: '#666' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
@@ -694,7 +712,7 @@ export default function AnalyticsPage() {
         {summary?.topUsersByClicks && summary.topUsersByClicks.length > 0 && (
           <Col xs={24} lg={barChartData.length > 0 ? 12 : 24}>
             <Card
-              title={<span style={{ fontWeight: 600 }}>משתמשים פעילים (לפי כתובת IP)</span>}
+              title={<span style={{ fontWeight: 600 }}>מבקרים פעילים</span>}
               style={{ borderRadius: '8px', height: '100%' }}
             >
               <div style={{ maxHeight: 300, overflowY: 'auto' }}>
@@ -735,8 +753,8 @@ export default function AnalyticsPage() {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                           <Tag color={selectedIP === user.ipAddress ? 'blue' : (index < 3 ? 'blue' : 'default')}>#{index + 1}</Tag>
-                          <span style={{ fontFamily: 'monospace', fontSize: '0.95em', fontWeight: 600, color: '#1890ff' }}>
-                            {user.ipAddress}
+                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#1890ff' }}>
+                            {getVisitorNumber(user.ipAddress)}
                           </span>
                           {selectedIP === user.ipAddress && (
                             <Tag color="processing">מסונן</Tag>
