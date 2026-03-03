@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, Check } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useState } from 'react';
 
@@ -25,6 +25,19 @@ interface OwnerCardProps {
 
 export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
   const [imgError, setImgError] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    if (!owner.email) return;
+
+    try {
+      await navigator.clipboard.writeText(owner.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
+  };
 
   // Get initials for the fallback avatar
   const initials = owner.name
@@ -98,13 +111,23 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           )}
 
           {owner.email && (
-            <a
-              href={`mailto:${owner.email}`}
+            <button
+              onClick={handleCopyEmail}
               className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all hover:shadow-lg hover:-translate-y-1"
+              title="Click to copy email"
             >
-              <Mail size={18} />
-              <span className="font-medium">Email</span>
-            </a>
+              {copied ? (
+                <>
+                  <Check size={18} className="text-green-600" />
+                  <span className="font-medium text-green-600">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Mail size={18} />
+                  <span className="font-medium" dir="ltr">{owner.email}</span>
+                </>
+              )}
+            </button>
           )}
 
           {owner.whatsapp && (

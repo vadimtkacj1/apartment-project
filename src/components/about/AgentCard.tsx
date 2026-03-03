@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, Check } from 'lucide-react';
+import { useState } from 'react';
 
 type TeamMember = {
   id: number;
@@ -25,6 +26,20 @@ interface AgentCardProps {
 export default function AgentCard({ member, index, isEven }: AgentCardProps) {
   // SAFETY CHECK: If member data is missing, do not render anything to prevent crashes.
   if (!member) return null;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    if (!member.email) return;
+
+    try {
+      await navigator.clipboard.writeText(member.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
+  };
 
   return (
     <motion.div
@@ -91,13 +106,23 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
 
                 {/* Email (if exists) */}
                 {member.email && (
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all"
+                  <button
+                    onClick={handleCopyEmail}
+                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all relative group"
+                    title="Click to copy email"
                   >
-                    <Mail size={18} />
-                    <span className="font-medium">Email</span>
-                  </a>
+                    {copied ? (
+                      <>
+                        <Check size={18} className="text-green-600" />
+                        <span className="font-medium text-green-600">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={18} />
+                        <span className="font-medium" dir="ltr">{member.email}</span>
+                      </>
+                    )}
+                  </button>
                 )}
             </div>
         </div>
