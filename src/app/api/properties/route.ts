@@ -111,13 +111,7 @@ export async function GET(request: NextRequest) {
       where.propertyType = propertyType;
     }
 
-    // Rooms filter
-    if (minRooms) {
-      where.rooms = { ...where.rooms, gte: parseFloat(minRooms) };
-    }
-    if (maxRooms) {
-      where.rooms = { ...where.rooms, lte: parseFloat(maxRooms) };
-    }
+    // Rooms filter - will be applied client-side since rooms is stored as string
 
     // Area filter
     if (minArea) {
@@ -203,6 +197,19 @@ export async function GET(request: NextRequest) {
 
         if (minPrice && priceNum < parseInt(minPrice)) return false;
         if (maxPrice && priceNum > parseInt(maxPrice)) return false;
+
+        return true;
+      });
+    }
+
+    // Filter by rooms range (client-side filtering since rooms is stored as string)
+    if (minRooms || maxRooms) {
+      properties = properties.filter((prop: any) => {
+        const roomsNum = parseFloat(prop.rooms);
+        if (isNaN(roomsNum)) return false;
+
+        if (minRooms && roomsNum < parseFloat(minRooms)) return false;
+        if (maxRooms && roomsNum > parseFloat(maxRooms)) return false;
 
         return true;
       });

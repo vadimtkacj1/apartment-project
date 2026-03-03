@@ -54,16 +54,19 @@ function ApartmentsPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({ dealType: 'all', city: 'all' });
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>({ dealType: 'all', city: 'all' });
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const pageFromUrl = searchParams.get('page');
     if (pageFromUrl) setCurrentPage(parseInt(pageFromUrl, 10));
-    
+
     const dealTypeFromUrl = searchParams.get('dealType');
     if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
-      setFilters(prev => ({ ...prev, dealType: dealTypeFromUrl as DealType }));
+      const newFilters = { ...filters, dealType: dealTypeFromUrl as DealType };
+      setFilters(newFilters);
+      setAppliedFilters(newFilters);
     }
   }, [searchParams]);
 
@@ -74,72 +77,76 @@ function ApartmentsPageContent() {
         const params = new URLSearchParams();
 
         // Basic filters
-        if (filters.dealType && filters.dealType !== 'all') params.append('dealType', filters.dealType);
-        if (filters.city && filters.city !== 'all') params.append('city', filters.city);
+        if (appliedFilters.dealType && appliedFilters.dealType !== 'all') params.append('dealType', appliedFilters.dealType);
+        if (appliedFilters.city && appliedFilters.city !== 'all') params.append('city', appliedFilters.city);
         if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
 
         // Property type filter
-        if (filters.propertyType && filters.propertyType !== 'all') {
-          params.append('propertyType', filters.propertyType);
+        if (appliedFilters.propertyType && appliedFilters.propertyType !== 'all') {
+          params.append('propertyType', appliedFilters.propertyType);
         }
 
         // Rooms filter
-        if (filters.minRooms !== undefined) params.append('minRooms', String(filters.minRooms));
-        if (filters.maxRooms !== undefined) params.append('maxRooms', String(filters.maxRooms));
+        if (appliedFilters.minRooms !== undefined && appliedFilters.minRooms !== null) {
+          params.append('minRooms', String(appliedFilters.minRooms));
+        }
+        if (appliedFilters.maxRooms !== undefined && appliedFilters.maxRooms !== null) {
+          params.append('maxRooms', String(appliedFilters.maxRooms));
+        }
 
         // Price filter
-        if (filters.minPrice !== undefined) params.append('minPrice', String(filters.minPrice));
-        if (filters.maxPrice !== undefined) params.append('maxPrice', String(filters.maxPrice));
+        if (appliedFilters.minPrice !== undefined) params.append('minPrice', String(appliedFilters.minPrice));
+        if (appliedFilters.maxPrice !== undefined) params.append('maxPrice', String(appliedFilters.maxPrice));
 
         // Area filter
-        if (filters.minArea !== undefined) params.append('minArea', String(filters.minArea));
-        if (filters.maxArea !== undefined) params.append('maxArea', String(filters.maxArea));
+        if (appliedFilters.minArea !== undefined) params.append('minArea', String(appliedFilters.minArea));
+        if (appliedFilters.maxArea !== undefined) params.append('maxArea', String(appliedFilters.maxArea));
 
         // Floor filter
-        if (filters.floor !== undefined) params.append('floor', String(filters.floor));
+        if (appliedFilters.floor !== undefined) params.append('floor', String(appliedFilters.floor));
 
         // Parking filter
-        if (filters.parking && filters.parking !== 'all') {
-          params.append('parking', filters.parking);
+        if (appliedFilters.parking && appliedFilters.parking !== 'all') {
+          params.append('parking', appliedFilters.parking);
         }
 
         // Furniture filter
-        if (filters.furniture && filters.furniture !== 'all') {
-          params.append('furniture', filters.furniture);
+        if (appliedFilters.furniture && appliedFilters.furniture !== 'all') {
+          params.append('furniture', appliedFilters.furniture);
         }
 
         // Kitchen filter
-        if (filters.kitchen && filters.kitchen !== 'all') {
-          params.append('kitchen', filters.kitchen);
+        if (appliedFilters.kitchen && appliedFilters.kitchen !== 'all') {
+          params.append('kitchen', appliedFilters.kitchen);
         }
 
         // Position filter
-        if (filters.position && filters.position !== 'all') {
-          params.append('position', filters.position);
+        if (appliedFilters.position && appliedFilters.position !== 'all') {
+          params.append('position', appliedFilters.position);
         }
 
         // Neighborhood filter
-        if (filters.neighborhood) {
-          params.append('neighborhood', filters.neighborhood);
+        if (appliedFilters.neighborhood) {
+          params.append('neighborhood', appliedFilters.neighborhood);
         }
 
         // Street filter
-        if (filters.street) {
-          params.append('street', filters.street);
+        if (appliedFilters.street) {
+          params.append('street', appliedFilters.street);
         }
 
         // Vacancy date filter
-        if (filters.vacancyDate) {
-          params.append('vacancyDate', filters.vacancyDate);
+        if (appliedFilters.vacancyDate) {
+          params.append('vacancyDate', appliedFilters.vacancyDate);
         }
 
         // Feature filters
-        if (filters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
-        if (filters.features?.hasElevator) params.append('hasElevator', 'true');
-        if (filters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
-        if (filters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
-        if (filters.features?.hasStorage) params.append('hasStorage', 'true');
-        if (filters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
+        if (appliedFilters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
+        if (appliedFilters.features?.hasElevator) params.append('hasElevator', 'true');
+        if (appliedFilters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
+        if (appliedFilters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
+        if (appliedFilters.features?.hasStorage) params.append('hasStorage', 'true');
+        if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
           next: { revalidate: 60 }
@@ -165,7 +172,7 @@ function ApartmentsPageContent() {
       }
     };
     fetchProperties();
-  }, [filters, selectedCategory]);
+  }, [appliedFilters, selectedCategory]);
 
   const currentProperties = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -245,8 +252,16 @@ function ApartmentsPageContent() {
                   <PropertyFilters
                     filters={filters}
                     onFiltersChange={setFilters}
-                    onApply={() => updatePage(1)}
-                    onReset={() => { setFilters({ dealType: 'all', city: 'all' }); updatePage(1); }}
+                    onApply={() => {
+                      setAppliedFilters(filters);
+                      updatePage(1);
+                    }}
+                    onReset={() => {
+                      const resetFilters = { dealType: 'all', city: 'all' };
+                      setFilters(resetFilters);
+                      setAppliedFilters(resetFilters);
+                      updatePage(1);
+                    }}
                   />
                 {/* </div> */}
               </motion.div>
