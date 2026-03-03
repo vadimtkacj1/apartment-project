@@ -115,6 +115,7 @@ export default async function Footer() {
               <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מדיניות פרטיות</Link></li>
               <li><Link href="/accessibility" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">הצהרת נגישות</Link></li>
+              <li><Link href="/sitemap.xml" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מפת האתר</Link></li>
             </ul>
           </div>
 
