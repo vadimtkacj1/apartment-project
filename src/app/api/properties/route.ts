@@ -17,6 +17,20 @@ function formatProperty(property: any) {
     ...property,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
+    // Explicitly convert boolean fields from SQLite (0/1) to true booleans
+    isActive: Boolean(property.isActive),
+    isSold: Boolean(property.isSold),
+    isPinned: Boolean(property.isPinned),
+    hasAirConditioning: Boolean(property.hasAirConditioning),
+    hasDisabledAccess: Boolean(property.hasDisabledAccess),
+    hasSunBalcony: Boolean(property.hasSunBalcony),
+    hasStorage: Boolean(property.hasStorage),
+    hasSunroom: Boolean(property.hasSunroom),
+    hasBoiler: Boolean(property.hasBoiler),
+    hasSafeRoom: Boolean(property.hasSafeRoom),
+    hasElevator: Boolean(property.hasElevator),
+    isHotProposition: Boolean(property.isHotProposition),
+    isNoCommission: Boolean(property.isNoCommission),
   };
 }
 
@@ -114,11 +128,14 @@ export async function GET(request: NextRequest) {
     // Rooms filter - will be applied client-side since rooms is stored as string
 
     // Area filter
-    if (minArea) {
-      where.area = { ...where.area, gte: parseInt(minArea) };
-    }
-    if (maxArea) {
-      where.area = { ...where.area, lte: parseInt(maxArea) };
+    if (minArea || maxArea) {
+      where.area = {};
+      if (minArea) {
+        where.area.gte = parseInt(minArea);
+      }
+      if (maxArea) {
+        where.area.lte = parseInt(maxArea);
+      }
     }
 
     // Floor filter

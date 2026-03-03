@@ -132,19 +132,6 @@ input, textarea, select {
     }
   }
 
-  // Dark mode support
-  &[data-coreui-theme="dark"] {
-    background-color: var(--cui-dark-bg-subtle);
-
-    .footer {
-      --cui-footer-bg: var(--cui-body-bg);
-    }
-
-    .header {
-      background: var(--cui-dark-bg-subtle);
-      border-bottom-color: var(--cui-border-color);
-    }
-  }
 
   // Improved card styling
   .card {
@@ -326,21 +313,6 @@ input, textarea, select {
   }
 }
 
-// Media query for system dark mode preference
-@media (prefers-color-scheme: dark) {
-  .admin-wrapper {
-    background-color: var(--cui-dark-bg-subtle);
-
-    .footer {
-      --cui-footer-bg: var(--cui-body-bg);
-    }
-
-    .header {
-      background: var(--cui-dark-bg-subtle);
-      border-bottom-color: var(--cui-border-color);
-    }
-  }
-}
 
 // Force font styles with maximum specificity - must be at the end
 .admin-wrapper {
