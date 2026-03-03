@@ -97,74 +97,6 @@ header {
   /* Background контролюється через inline стилі в компоненті - прозорий на початку, білий після скролу */
 }
 
-/* Повне блокування темного режиму на всіх пристроях */
-@media (prefers-color-scheme: dark) {
-  /* Базові елементи */
-  :root {
-    --background: #f9f6f0 !important;
-    --foreground: #171717 !important;
-    --warm-beige: #faf7f2 !important;
-    --warm-sand: #f9f6f0 !important;
-    --warm-cream: #fdfbf7 !important;
-    --warm-light: #fcf9f5 !important;
-    --warm-lighter: #fefcfa !important;
-  }
-
-  *,
-  *::before,
-  *::after {
-    color-scheme: only light !important;
-  }
-
-  html,
-  body {
-    background: #faf7f2 !important;
-    color: #171717 !important;
-  }
-
-  /* Header */
-  header {
-    color: #1c3664 !important;
-  }
-
-  /* Main content */
-  main {
-    background: #faf7f2 !important;
-  }
-
-  /* Tailwind класи */
-  .bg-warm {
-    background-color: #faf7f2 !important;
-  }
-
-  .bg-white {
-    background-color: #ffffff !important;
-  }
-
-  /* Форми */
-  input,
-  textarea,
-  select {
-    background: #ffffff !important;
-    color: #171717 !important;
-    color-scheme: only light !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: #9ca3af !important;
-  }
-
-  /* Footer залишається темним */
-  footer {
-    background: #1a1a1a !important;
-    color: #ffffff !important;
-  }
-
-  footer * {
-    color: #ffffff !important;
-  }
-}
 
 /* Large screen optimizations (1920px and above) */
 @media (min-width: 1920px) {
@@ -215,9 +147,20 @@ header {
   .container {
     max-width: 2400px !important;
   }
-  
+
   .max-w-7xl {
     max-width: 2200px !important;
   }
+}
+
+/* Admin panel - sold properties styling */
+.sold-property-row {
+  background-color: #fff1f0 !important;
+  opacity: 0.7;
+}
+
+.sold-property-row:hover {
+  background-color: #ffe7e6 !important;
+  opacity: 0.8;
 }
 

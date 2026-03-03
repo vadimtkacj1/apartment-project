@@ -179,6 +179,9 @@ export default async function Footer() {
           <p className="text-gray-500 font-medium" style={{ fontSize: 'clamp(12px, 0.9vw, 16px)' }}>
             © {new Date().getFullYear()} H&R נדל"ן בע"מ
           </p>
+          <p className="text-gray-600 font-medium mt-2" style={{ fontSize: 'clamp(11px, 0.85vw, 14px)' }}>
+            Built by <a href="https://aiterra.agency/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">Aiterra</a>
+          </p>
         </div>
       </div>
     </footer>

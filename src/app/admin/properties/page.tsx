@@ -151,18 +151,27 @@ export default function PropertiesPage() {
     value: boolean
   ) => {
     try {
-      const property = properties.find((p) => p.id === propertyId);
-      if (!property) return;
+      // First, fetch the current property data from the server to ensure we have the latest version
+      const getResponse = await fetch(`/api/admin/properties/${propertyId}`);
+      if (!getResponse.ok) {
+        throw new Error('Failed to fetch property');
+      }
+      const currentProperty = await getResponse.json();
+
+      // Update the property with the new value
       const response = await fetch(`/api/admin/properties/${propertyId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...property, [field]: value }),
+        body: JSON.stringify({ ...currentProperty, [field]: value }),
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
-      fetchProperties();
+
+      // Refresh the properties list
+      await fetchProperties();
+
       const msgs: Record<string, string> = {
         isSold: value ? 'הנכס סומן כנמכר' : 'הנכס בוטל מסומן כנמכר',
         isPinned: value ? 'הנכס נצמד לעמוד הבית' : 'הנכס בוטל מהצמדה',
@@ -172,6 +181,8 @@ export default function PropertiesPage() {
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
       message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
+      // Refresh properties to revert the optimistic update
+      await fetchProperties();
     }
   };
 
@@ -273,7 +284,7 @@ export default function PropertiesPage() {
                   height: '80px'
                 }}>
                   <Image
-                    src={images[0] || '/placeholder.png'}
+                    src={images[0] || '/images/hero/sales.jpg'}
                     alt="Property"
                     width={80}
                     height={80}
@@ -285,7 +296,7 @@ export default function PropertiesPage() {
                       width: '80px',
                       height: '80px'
                     }}
-                    fallback="/placeholder.png"
+                    fallback="/images/hero/sales.jpg"
                   />
                 </div>
               ),

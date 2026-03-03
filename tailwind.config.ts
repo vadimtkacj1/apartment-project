@@ -6,9 +6,8 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  // Тёмная тема активируется ТОЛЬКО по классу "dark" на <html>
-  // Класс никогда не добавляется — значит dark: классы Tailwind всегда игнорируются
-  darkMode: ['selector', '.dark'] as any,
+  // Тёмная тема отключена
+  darkMode: 'class' as any,
   theme: {
     extend: {},
   },

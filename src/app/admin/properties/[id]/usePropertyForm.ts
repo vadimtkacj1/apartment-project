@@ -25,7 +25,12 @@ export function usePropertyForm(
 
   const fetchProperty = async () => {
     try {
-      const response = await fetch(`/api/admin/properties/${propertyId}`);
+      const response = await fetch(`/api/admin/properties/${propertyId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
 
@@ -58,7 +63,7 @@ export function usePropertyForm(
             }
           }
         }
-        
+
         const formValues = {
           ...data,
           vacancyDate: vacancyDateValue,
@@ -85,7 +90,11 @@ export function usePropertyForm(
         const cityLabel = CITY_OPTIONS.find((c) => c.value === updated.city)?.label || updated.city;
         const parts = [cityLabel, updated.neighborhood].filter(Boolean);
         updated.location = parts.join(', ');
+        // Update location in form as well
+        form.setFieldValue('location', updated.location);
       }
+      // Update form value to keep it in sync
+      form.setFieldValue(field, value);
       return updated;
     });
   };

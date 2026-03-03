@@ -17,6 +17,20 @@ function formatProperty(property: any) {
     ...property,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
+    // Explicitly convert boolean fields from SQLite (0/1) to true booleans
+    isActive: Boolean(property.isActive),
+    isSold: Boolean(property.isSold),
+    isPinned: Boolean(property.isPinned),
+    hasAirConditioning: Boolean(property.hasAirConditioning),
+    hasDisabledAccess: Boolean(property.hasDisabledAccess),
+    hasSunBalcony: Boolean(property.hasSunBalcony),
+    hasStorage: Boolean(property.hasStorage),
+    hasSunroom: Boolean(property.hasSunroom),
+    hasBoiler: Boolean(property.hasBoiler),
+    hasSafeRoom: Boolean(property.hasSafeRoom),
+    hasElevator: Boolean(property.hasElevator),
+    isHotProposition: Boolean(property.isHotProposition),
+    isNoCommission: Boolean(property.isNoCommission),
   };
 }
 
@@ -58,6 +72,11 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    // If property is being marked as sold, clear hot proposition and no commission flags
+    const isSold = body.isSold !== undefined ? body.isSold : false;
+    const isHotProposition = isSold ? false : (body.isHotProposition !== undefined ? body.isHotProposition : false);
+    const isNoCommission = isSold ? false : (body.isNoCommission !== undefined ? body.isNoCommission : false);
 
     const property = await prisma.property.update({
       where: {
@@ -123,14 +142,14 @@ export async function PUT(
         isActive: body.isActive !== undefined ? body.isActive : true,
 
         // Sold status
-        isSold: body.isSold !== undefined ? body.isSold : false,
+        isSold: isSold,
 
         // Pin status
         isPinned: body.isPinned !== undefined ? body.isPinned : false,
 
-        // Homepage section flags
-        isHotProposition: body.isHotProposition !== undefined ? body.isHotProposition : false,
-        isNoCommission: body.isNoCommission !== undefined ? body.isNoCommission : false,
+        // Homepage section flags - automatically clear if sold
+        isHotProposition: isHotProposition,
+        isNoCommission: isNoCommission,
       },
     });
 
