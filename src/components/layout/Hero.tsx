@@ -54,13 +54,10 @@ const Hero: React.FC<HeroProps> = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden"
+      className="relative w-full h-screen overflow-hidden"
+      style={{ height: '100dvh' }}
     >
       <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0; }
-        }
         .cursor {
           display: inline-block;
           width: 3px;
@@ -68,12 +65,7 @@ const Hero: React.FC<HeroProps> = () => {
           background: #ffffff;
           margin-right: 4px;
           vertical-align: middle;
-          animation: blink 750ms steps(1) infinite;
           border-radius: 1px;
-        }
-        @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4); }
-          50%       { box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4); }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
@@ -83,7 +75,11 @@ const Hero: React.FC<HeroProps> = () => {
           animation: shineSwipe 0.5s ease forwards;
         }
         .btn-primary {
-          animation: goldGlow 2.5s ease-in-out infinite;
+          box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4);
+          transition: box-shadow 0.3s ease;
+        }
+        .btn-primary:hover {
+          box-shadow: 0 0 30px 4px rgba(212,168,67,0.5), 0 4px 20px rgba(0,0,0,0.4);
         }
         .btn-secondary {
           transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -99,7 +95,8 @@ const Hero: React.FC<HeroProps> = () => {
       <div className="absolute inset-0 z-0">
         <video
           autoPlay loop muted playsInline preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute top-0 left-0 w-full h-full object-cover"
+          style={{ objectPosition: 'center center', minWidth: '100%', minHeight: '100%' }}
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
@@ -114,7 +111,7 @@ const Hero: React.FC<HeroProps> = () => {
           items-center md:items-start
           justify-center md:justify-between
           gap-6 md:gap-0
-          pt-0 md:pt-44 pb-0 md:pb-20
+          py-8 md:pt-44 md:pb-20
         "
         style={{ maxWidth: '2400px', margin: '0 auto' }}
       >

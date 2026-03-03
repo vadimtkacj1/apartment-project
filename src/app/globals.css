@@ -73,21 +73,6 @@ body {
     scroll-behavior: smooth;
   }
   
-  /* Enable hardware acceleration for smoother scrolling */
-  body {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-  
-  /* Optimize video rendering on mobile */
-  video {
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: transform;
-  }
-  
   /* Optimize font rendering */
   body {
     -webkit-font-smoothing: antialiased;
@@ -96,24 +81,9 @@ body {
   }
   
   /* Reduce layout shifts */
-  img, video {
+  img {
     max-width: 100%;
     height: auto;
-  }
-  
-  /* Optimize animations for mobile */
-  @media (prefers-reduced-motion: no-preference) {
-    * {
-      animation-duration: 0.3s !important;
-      transition-duration: 0.3s !important;
-    }
-  }
-  
-  /* Force composited animations */
-  [class*="animate-"], [style*="animation"] {
-    will-change: transform, opacity;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
   }
 }
 
