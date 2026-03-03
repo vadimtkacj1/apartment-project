@@ -13,10 +13,21 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
+    const resolvedParams = await params;
+    const propertyId = parseInt(resolvedParams.id);
+
+    // Validate that id is a valid number
+    if (!resolvedParams.id || isNaN(propertyId)) {
+      return {
+        title: 'נכס לא נמצא',
+        description: 'מזהה נכס לא תקין',
+      };
+    }
+
     const property = await prisma.property.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: propertyId },
     });
 
     if (!property || !property.isActive) {
@@ -48,7 +59,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     const propertyDescription = property.description || 
       `דירה ${dealTypeName} ב${cityName}. ${property.rooms} חדרים, ${property.area} מ״ר${property.builtArea ? `, ${property.builtArea} מ״ר בנוי` : ''}. ${property.floor ? `קומה ${property.floor}` : ''}${property.totalFloors ? ` מתוך ${property.totalFloors}` : ''}. מחיר: ${property.price}`;
 
-    const url = `${siteUrl}/apartments/${params.id}`;
+    const url = `${siteUrl}/apartments/${resolvedParams.id}`;
 
     return {
       title: propertyTitle,
