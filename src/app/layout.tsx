@@ -51,7 +51,7 @@ const caramel = localFont({
   adjustFontFallback: false,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ramnekasim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

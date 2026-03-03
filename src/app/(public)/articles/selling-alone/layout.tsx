@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ramnekasim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
   title: 'למכור לבד? כשה"חיסכון" בתיווך עולה לכם עשרות אלפי שקלים - רם נכסים חיים ענבי',
