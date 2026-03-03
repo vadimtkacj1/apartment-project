@@ -79,7 +79,7 @@ export default async function Footer() {
 
           {/* For Renters Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h4>
+            <h2 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/apartments" className="hover:text-white transition-colors">דירות להשכרה</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">שאלות ותשובות</Link></li>
@@ -89,7 +89,7 @@ export default async function Footer() {
 
           {/* For Owners Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">עבור משכירים</h4>
+            <h2 className="text-xl font-bold mb-4 text-white">עבור משכירים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors">רכישת נכס</Link></li>
@@ -98,7 +98,7 @@ export default async function Footer() {
 
           {/* Resources Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
+            <h2 className="text-xl font-bold mb-4 text-white">משאבים</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
               <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors">למכור לבד?</Link></li>
@@ -110,7 +110,7 @@ export default async function Footer() {
 
           {/* Company Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
+            <h2 className="text-xl font-bold mb-4 text-white">החברה</h2>
             <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
               <li><Link href="/privacy-policy" className="hover:text-white transition-colors">מדיניות פרטיות</Link></li>
@@ -121,7 +121,7 @@ export default async function Footer() {
           {/* Contact Section */}
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
-              <h4 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h4>
+              <h2 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h2>
               <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
                 {owners.map((owner) => (
                   <div key={owner.id} className="space-y-1">
@@ -151,6 +151,7 @@ export default async function Footer() {
                   icon={<MessageCircle className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={`https://wa.me/${owners[0].whatsapp.replace(/[^0-9]/g, '')}`}
                   hoverClass="hover:bg-[#25D366] hover:text-white"
+                  label="WhatsApp"
                 />
               )}
               {socialLinks?.instagram && (
@@ -158,6 +159,7 @@ export default async function Footer() {
                   icon={<Instagram className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={socialLinks.instagram}
                   hoverClass="hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:to-[#ee2a7b] hover:text-white"
+                  label="Instagram"
                 />
               )}
               {socialLinks?.facebook && (
@@ -165,6 +167,7 @@ export default async function Footer() {
                   icon={<Facebook className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={socialLinks.facebook}
                   hoverClass="hover:bg-[#1877F2] hover:text-white"
+                  label="Facebook"
                 />
               )}
             </div>
@@ -183,12 +186,13 @@ export default async function Footer() {
 }
 
 {/* Reusable Social Icon Component */}
-function SocialIcon({ icon, href, hoverClass }: { icon: React.ReactNode, href: string, hoverClass: string }) {
+function SocialIcon({ icon, href, hoverClass, label }: { icon: React.ReactNode, href: string, hoverClass: string, label?: string }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={label}
       className={`w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-[#2a2a2a] flex items-center justify-center text-gray-300 transition-all border border-white/5 shadow-lg ${hoverClass}`}
     >
       {icon}
