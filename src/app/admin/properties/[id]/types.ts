@@ -40,8 +40,10 @@ export interface PropertyForm {
   isActive: boolean;
   isSold: boolean;
   isPinned: boolean;
-  isHotProposition: boolean;
-  isNoCommission: boolean;
+  // Note: isHotProposition and isNoCommission are managed only through Homepage settings
+  // They are not editable in the property form
+  isHotProposition?: boolean;
+  isNoCommission?: boolean;
 }
 
 export interface PropertyFormSectionProps {
