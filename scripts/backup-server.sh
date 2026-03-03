@@ -54,3 +54,4 @@ echo "Backup created: ${ARCHIVE_PATH}"
 echo "Checksum file: ${CHECKSUM_PATH}"
 
 
+
