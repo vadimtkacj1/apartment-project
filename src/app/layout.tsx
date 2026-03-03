@@ -6,6 +6,7 @@ import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 import Providers from "@/components/Providers";
 import StructuredData from "@/components/SEO/StructuredData";
 import PageLoader from "@/components/ui/PageLoader";
+import AlternatingFavicon from "@/components/AlternatingFavicon";
 import "./globals.css";
 
 const assistant = localFont({
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
   creator: "רם נכסים חיים ענבי",
   publisher: "רם נכסים חיים ענבי",
   icons: {
-    icon: '/favicon.gif',
+    icon: '/favicon-ha.png',
   },
   alternates: {
     canonical: siteUrl,
@@ -153,6 +154,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+        <AlternatingFavicon />
         <PageLoader />
         <StructuredData />
         <Providers>
