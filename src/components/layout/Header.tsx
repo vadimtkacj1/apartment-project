@@ -70,11 +70,12 @@ export default function Header() {
   };
 
   return (
+    <>
     <header
       style={{
         position: "fixed",
         top: 0, left: 0, right: 0,
-        zIndex: 100,
+        zIndex: 1000,
         transition: "all 0.35s ease",
         background: shouldBeTransparent
           ? "transparent"
@@ -261,108 +262,110 @@ export default function Header() {
               transition: "all 0.3s ease",
               WebkitTapHighlightColor: "transparent",
               touchAction: "manipulation",
-              zIndex: 150,
+              zIndex: 1050,
+              position: "relative",
             }}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         )}
       </nav>
+    </header>
 
-      {/* ✅ Mobile menu — fullscreen, zIndex above header, X button inside */}
-      {isMobile && isMobileMenuOpen && (
-        <div
-          id="mobile-menu"
-          dir="rtl"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "#ffffff",
-            zIndex: 200, /* ✅ выше хедера (100) */
-            overflowY: "auto",
-            paddingTop: "1.5rem",
-            paddingLeft: "1.5rem",
-            paddingRight: "1.5rem",
-            paddingBottom: "1.5rem",
-          }}
-        >
-          {/* ✅ Крестик закрытия внутри меню */}
-          <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "1rem" }}>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              aria-label="סגור תפריט"
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: "#1c3664",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 8,
-                borderRadius: 10,
-              }}
-            >
-              <X size={32} />
-            </button>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            {navLinks.map((link) => (
-              <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
-                  <Link
-                    href={link.href}
-                    onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                    style={{ fontSize: 20, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
+    {/* Mobile menu — fullscreen, rendered OUTSIDE header to avoid stacking context issues on iOS Safari */}
+    {isMobile && isMobileMenuOpen && (
+      <div
+        id="mobile-menu"
+        dir="rtl"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "#ffffff",
+          zIndex: 2000,
+          overflowY: "auto",
+          paddingTop: "1.5rem",
+          paddingLeft: "1.5rem",
+          paddingRight: "1.5rem",
+          paddingBottom: "1.5rem",
+        }}
+      >
+        {/* Close button */}
+        <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "1rem" }}>
+          <button
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-label="סגור תפריט"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#1c3664",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 8,
+              borderRadius: 10,
+            }}
+          >
+            <X size={32} />
+          </button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {navLinks.map((link) => (
+            <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
+                <Link
+                  href={link.href}
+                  onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
+                  style={{ fontSize: 20, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
+                >
+                  {link.label}
+                </Link>
+                {link.submenu && (
+                  <button
+                    onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
+                    aria-label={openSubmenu === link.label ? `סגור ${link.label}` : `פתח ${link.label}`}
+                    aria-expanded={openSubmenu === link.label}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#1c3664" }}
                   >
-                    {link.label}
-                  </Link>
-                  {link.submenu && (
-                    <button
-                      onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
-                      aria-label={openSubmenu === link.label ? `סגור ${link.label}` : `פתח ${link.label}`}
-                      aria-expanded={openSubmenu === link.label}
-                      style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#1c3664" }}
-                    >
-                      <ChevronDown size={22} style={{
-                        transform: openSubmenu === link.label ? "rotate(180deg)" : "rotate(0)",
-                        transition: "transform 0.25s",
-                      }} />
-                    </button>
-                  )}
-                </div>
-
-                {link.submenu && openSubmenu === link.label && (
-                  <div style={{ background: "#f7f9ff", borderRadius: 10, marginBottom: 12, overflow: "hidden" }}>
-                    {link.submenu.map((sub) => (
-                      <Link
-                        key={sub.label}
-                        href={sub.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        style={{
-                          display: "block",
-                          padding: "14px 20px",
-                          fontSize: 18,
-                          fontWeight: 600,
-                          color: "#1c3664",
-                          textDecoration: "none",
-                          borderRight: "3px solid #1c3664",
-                          fontFamily: "var(--font-caramel), cursive, sans-serif",
-                        }}
-                      >
-                        {sub.label}
-                      </Link>
-                    ))}
-                  </div>
+                    <ChevronDown size={22} style={{
+                      transform: openSubmenu === link.label ? "rotate(180deg)" : "rotate(0)",
+                      transition: "transform 0.25s",
+                    }} />
+                  </button>
                 )}
               </div>
-            ))}
-          </div>
+
+              {link.submenu && openSubmenu === link.label && (
+                <div style={{ background: "#f7f9ff", borderRadius: 10, marginBottom: 12, overflow: "hidden" }}>
+                  {link.submenu.map((sub) => (
+                    <Link
+                      key={sub.label}
+                      href={sub.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      style={{
+                        display: "block",
+                        padding: "14px 20px",
+                        fontSize: 18,
+                        fontWeight: 600,
+                        color: "#1c3664",
+                        textDecoration: "none",
+                        borderRight: "3px solid #1c3664",
+                        fontFamily: "var(--font-caramel), cursive, sans-serif",
+                      }}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
-    </header>
+      </div>
+    )}
+    </>
   );
 }
