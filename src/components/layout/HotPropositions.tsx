@@ -54,7 +54,7 @@ const MarqueeRow = ({
     [items, isMobile]
   );
 
-  const animationDuration = isMobile ? duration * 1.5 : duration;
+  const animationDuration = isMobile ? duration * 0.8 : duration;
 
   const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
   const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
