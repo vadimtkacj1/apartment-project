@@ -213,10 +213,10 @@ function NoCommissionSection() {
         {/* Card */}
         <Link href={`/apartments/${property.id}`}>
           <div className="no-commission-card transition-all duration-300 max-w-2xl mx-auto">
-            <div className="grid md:grid-cols-5 gap-0 md:min-h-48">
+            <div className="grid md:grid-cols-5 gap-0 md:min-h-96">
 
               {/* Image — 3/5 width */}
-              <div className="md:col-span-3 relative h-36 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+              <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
                 <img
                   src={property.image}
                   alt={property.title}
