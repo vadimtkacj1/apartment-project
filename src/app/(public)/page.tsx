@@ -67,7 +67,7 @@ export default function Home() {
       )}
 
       {/* Hero section - scrolls normally */}
-      <div className="w-full -mt-[70px]">
+      <div className="w-full">
         <Hero
           img="/images/hero/main-hero.jpg"
         />

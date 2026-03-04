@@ -101,7 +101,13 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                   className="flex items-center gap-3 px-6 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg group"
                 >
                   <Phone size={18} className="group-hover:rotate-12 transition-transform" />
-                  <span dir="ltr" className="font-medium">{member.phone}</span>
+                  <span
+                    dir="ltr"
+                    className="font-medium"
+                    style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                  >
+                    {member.phone}
+                  </span>
                 </a>
 
                 {/* Email (if exists) */}
@@ -119,7 +125,13 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                     ) : (
                       <>
                         <Mail size={18} />
-                        <span className="font-medium" dir="ltr">{member.email}</span>
+                        <span
+                          className="font-medium"
+                          dir="ltr"
+                          style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                        >
+                          {member.email}
+                        </span>
                       </>
                     )}
                   </button>

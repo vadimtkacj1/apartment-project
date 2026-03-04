@@ -33,16 +33,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9, // Main content page - very high priority
     },
     {
-      url: `${baseUrl}/apartments?dealType=sale`,
+      url: `${baseUrl}/apartments/sale`,
       lastModified: new Date(),
-      changeFrequency: 'daily', // Sale properties list updates frequently
-      priority: 0.85, // High priority - important filtered view
+      changeFrequency: 'daily',
+      priority: 0.85,
     },
     {
-      url: `${baseUrl}/apartments?dealType=rent`,
+      url: `${baseUrl}/apartments/rent`,
       lastModified: new Date(),
-      changeFrequency: 'daily', // Rent properties list updates frequently
-      priority: 0.85, // High priority - important filtered view
+      changeFrequency: 'daily',
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/about`,
