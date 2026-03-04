@@ -245,15 +245,23 @@ export default function Header() {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
             style={{
-              background: "rgba(255,255,255,0.15)",
-              border: "none",
+              background: shouldBeTransparent
+                ? "rgba(28, 54, 100, 0.85)"
+                : "rgba(28, 54, 100, 0.1)",
+              border: shouldBeTransparent
+                ? "1px solid rgba(255, 255, 255, 0.3)"
+                : "1px solid rgba(28, 54, 100, 0.2)",
               borderRadius: 10,
               padding: 8,
               cursor: "pointer",
-              color: textColor,
+              color: shouldBeTransparent ? "#ffffff" : "#1c3664",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "all 0.3s ease",
+              WebkitTapHighlightColor: "transparent",
+              touchAction: "manipulation",
+              zIndex: 150,
             }}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
