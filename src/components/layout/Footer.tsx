@@ -89,7 +89,7 @@ export default async function Footer() {
 
           {/* For Owners Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">עבור משכירים</h4>
+            <h4 className="text-xl font-bold mb-4 text-white">קונים ומוכרים</h4>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
@@ -113,9 +113,6 @@ export default async function Footer() {
             <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מדיניות פרטיות</Link></li>
-              <li><Link href="/accessibility" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">הצהרת נגישות</Link></li>
-              <li><Link href="/sitemap.xml" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מפת האתר</Link></li>
             </ul>
           </div>
 
@@ -175,13 +172,32 @@ export default async function Footer() {
           </div>
         </div>
 
-        {/* Footer Bottom / Copyright */}
-        <div className="mt-10 pt-6 border-t border-white/10 text-center">
-          <p className="text-gray-500 font-medium" style={{ fontSize: 'clamp(12px, 0.9vw, 16px)' }}>
-            © {new Date().getFullYear()} H&R נדל"ן בע"מ
+        {/* Legal Content Section */}
+        <div className="mt-12 pt-8 border-t-2 border-[#c5a357]/30 text-center">
+          <h5 className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
+            תוכן משפטי
+          </h5>
+
+          <p className="text-gray-500 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
+            © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.
           </p>
-          <p className="text-gray-600 font-medium mt-2" style={{ fontSize: 'clamp(11px, 0.85vw, 14px)' }}>
-            Built by <a href="https://aiterra.agency/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors">Aiterra</a>
+
+          <div className="flex items-center justify-center gap-3 text-gray-400 flex-wrap" style={{ fontSize: 'clamp(12px, 0.85vw, 14px)' }}>
+            <Link href="/privacy-policy" className="hover:text-[#c5a357] transition-colors font-medium">
+              מדיניות פרטיות
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link href="/accessibility" className="hover:text-[#c5a357] transition-colors font-medium">
+              נגישות
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link href="/sitemap.xml" className="hover:text-[#c5a357] transition-colors font-medium">
+              מפת האתר
+            </Link>
+          </div>
+
+          <p className="text-gray-600 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+            Built by <a href="https://aiterra.agency/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>

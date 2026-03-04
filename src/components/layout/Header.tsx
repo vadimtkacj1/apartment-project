@@ -75,9 +75,15 @@ export default function Header() {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 100,
-        transition: "background 0.35s ease, box-shadow 0.35s ease",
-        background: shouldBeTransparent ? "transparent" : "#ffffff",
-        boxShadow: shouldBeTransparent ? "none" : "0 4px 40px rgba(0,0,0,0.18)",
+        transition: "all 0.35s ease",
+        background: shouldBeTransparent
+          ? "transparent"
+          : "rgba(255, 255, 255, 0.95)",
+        backdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
+        WebkitBackdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
+        boxShadow: shouldBeTransparent
+          ? "none"
+          : "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.15)",
       }}
     >
       <nav
@@ -99,7 +105,7 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo.PNG" alt="Logo" width={60} height={60}
+            <Image src="/favicon-rm.png" alt="Logo" width={60} height={60}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
@@ -112,7 +118,7 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/images/logo2.svg" alt="Logo 2" width={60} height={60}
+            <Image src="/favicon-ha.png" alt="Logo 2" width={60} height={60}
               className="object-contain"
               style={{ transition: "filter 0.35s ease" }}
             />

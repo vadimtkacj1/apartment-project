@@ -43,7 +43,8 @@ function extractNumericPrice(priceStr: string): number {
 }
 
 // GET all active properties (public endpoint)
-export const revalidate = 60; // Revalidate every 60 seconds
+// This endpoint depends on query params and request URL, so it must be dynamic.
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {

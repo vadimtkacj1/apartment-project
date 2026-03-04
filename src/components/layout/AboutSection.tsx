@@ -44,8 +44,9 @@ const AboutSection: React.FC = memo(() => {
       className="relative w-full py-16 md:py-20 overflow-hidden"
       style={{ background: 'rgb(42, 74, 138)' }}
     >
+      {/* Скрываем белый фон с паттерном на мобильных (hidden md:block) */}
       <motion.div
-        className="absolute z-0"
+        className="absolute z-0 hidden md:block"
         style={{
           y: patternY,
           top: '-40%',
@@ -66,7 +67,8 @@ const AboutSection: React.FC = memo(() => {
         />
       </motion.div>
 
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* Скрываем синие блоки с clip-path на мобильных (hidden md:block) */}
+      <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
         {/* Left-side blue */}
         <div
           className="absolute inset-0 bg-[#2A4A8A]"
@@ -110,7 +112,7 @@ const AboutSection: React.FC = memo(() => {
  
               </p>
               <p className="text-lg sm:text-xl text-gray-200 leading-relaxed">
-                צוות המשרד כולל ארבעה סוכנים, ומציע גישה אישית ומקצועית לכל לקוח. אנו מלווים את בעלי הנכסים משלב
+               צוות המשרד כולל ארבעה סוכנים, ומציע גישה אישית ומקצועית לכל לקוח. אנו מלווים את בעלי הנכסים משלב
 האפיון, דרך תמחור נכון, צילום ושיווק ממוקד, ניהול משא ומתן ועד לסגירת העסקה בתנאים הטובים ביותר.
 המשרד מתמחה בהשכרת דירות, מכירת דירות, נכסים להשקעה ופתרונות נדל״ן בהתאמה אישית, תוך היכרות
 עמוקה עם השוק המקומי והקונים הפוטנציאליים.

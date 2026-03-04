@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -39,6 +39,9 @@ function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
 }
 
 const Hero: React.FC<HeroProps> = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
   const line1 = 'רם נכסים';
   const line2 = 'חיים ענבי';
 
@@ -51,13 +54,51 @@ const Hero: React.FC<HeroProps> = () => {
 
   const showRest = done2;
 
+  // Force video play on iOS
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const tryPlay = () => {
+      video.muted = true;
+      video.play().catch(() => {});
+    };
+
+    tryPlay();
+
+    const handleVisibility = () => {
+      if (!document.hidden) tryPlay();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
+
   return (
     <section
+      ref={sectionRef}
       dir="rtl"
-      className="relative w-full h-screen overflow-hidden"
+      className="relative w-full overflow-hidden"
       style={{ height: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
+        .hero-video-wrap {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          z-index: 0;
+          background: #000;
+        }
+        .hero-video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center center;
+        }
         .cursor {
           display: inline-block;
           width: 3px;
@@ -92,11 +133,16 @@ const Hero: React.FC<HeroProps> = () => {
       `}</style>
 
       {/* ── Video ── */}
-      <div className="absolute inset-0 z-0">
+      <div className="hero-video-wrap">
         <video
-          autoPlay loop muted playsInline preload="auto"
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          style={{ objectPosition: 'center center' }}
+          ref={videoRef}
+          className="hero-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          poster="/images/hero-poster.jpg"
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
@@ -188,8 +234,8 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold"
+              href="/apartments/rent"
+              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
@@ -224,8 +270,8 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments?dealType=sale"
-              className="btn-secondary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold border-2"
+              href="/apartments/sale"
+              className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 borderColor: 'rgba(255,255,255,0.4)',
