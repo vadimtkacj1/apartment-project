@@ -41,12 +41,11 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
             <div className="relative w-full h-full">
               <Image src={image} alt="Property" fill className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="100vw" />
               {/* Logo overlay - top left */}
-              <div className="absolute top-4 left-4 z-10 pointer-events-none">
+              <div className="absolute top-2 md:top-4 left-2 md:left-4 z-10 pointer-events-none w-32 h-16 md:w-36 md:h-[72px]">
                 <Image
                   src="/images/logos.png"
                   alt="Logo"
-                  width={180}
-                  height={90}
+                  fill
                   className="object-contain drop-shadow-lg"
                   loading="lazy"
                 />
