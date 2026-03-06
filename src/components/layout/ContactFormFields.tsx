@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { Send, Phone } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
 
 interface ContactFormFieldsProps {
@@ -100,12 +100,36 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
     }
   };
 
+  const formatPhoneNumber = (value: string) => {
+    // Удаляем все нецифровые символы
+    const phoneNumber = value.replace(/[^\d]/g, '');
+
+    // Не форматируем если пусто
+    if (!phoneNumber) return '';
+
+    // Форматируем для израильских номеров
+    // 05X-XXX-XXXX или 0X-XXX-XXXX
+    if (phoneNumber.length <= 3) {
+      return phoneNumber;
+    } else if (phoneNumber.length <= 6) {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+    } else {
+      return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
+    } else if (name === 'phone') {
+      // Разрешаем только цифры
+      const digitsOnly = value.replace(/[^\d]/g, '');
+      // Автоформатирование телефона
+      const formattedPhone = formatPhoneNumber(digitsOnly);
+      setFormData(prev => ({ ...prev, [name]: formattedPhone }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
@@ -135,32 +159,40 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
         <label htmlFor={`${idPrefix}phone`} className="block text-lg font-bold text-gray-900 mb-3">
           טלפון <span className="text-[#1c3664]">*</span>
         </label>
-        <input
-          type="tel"
-          id={`${idPrefix}phone`}
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          required
-          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
-          placeholder="050-123-4567"
-        />
+        <div className="relative">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Phone size={20} className="text-gray-400" />
+          </div>
+          <input
+            type="tel"
+            id={`${idPrefix}phone`}
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            maxLength={12}
+            inputMode="numeric"
+            pattern="[0-9-]*"
+            className="w-full pr-12 pl-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
+            placeholder="050-123-4567"
+            dir="ltr"
+          />
+        </div>
       </div>
 
       {/* Message/Interest Field */}
       <div>
         <label htmlFor={`${idPrefix}message`} className="block text-lg font-bold text-gray-900 mb-3">
-          במה אתה מעוניין? <span className="text-[#1c3664]">*</span>
+          במה אתה מעוניין?
         </label>
         <textarea
           id={`${idPrefix}message`}
           name="message"
           value={formData.message}
           onChange={handleChange}
-          required
           rows={5}
           className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300 resize-none"
-          placeholder="ספר לנו במה אתה מעוניין - מכירה, קניה, השכרה..."
+          placeholder="ספר לנו במה אתה מעוניין - מכירה, קניה, השכרה... (אופציונלי)"
         />
       </div>
 
