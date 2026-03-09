@@ -232,7 +232,7 @@ const Hero: React.FC<HeroProps> = () => {
             display: 'block',
           }}
         >
-          <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
+          <source src={isMobile ? "/hero-mobile.mp4?v=2" : "/hero.mp4?v=2"} type="video/mp4" />
         </video>
       </div>
 
