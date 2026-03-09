@@ -9,6 +9,7 @@ import { useState } from 'react';
 type Owner = {
   id: number;
   name: string;
+  licenceNumber: string;
   title: string;
   image: string | null;
   phone: string | null;
@@ -72,6 +73,10 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
         <h3 className="text-4xl font-extrabold text-[#1c3664] mb-2">
           {owner.name}
         </h3>
+
+       <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
+          {owner.licenceNumber}
+        </p> 
 
         {/* Title / Position */}
         <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">

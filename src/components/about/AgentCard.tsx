@@ -7,6 +7,7 @@ import { Phone, Mail } from 'lucide-react';
 type TeamMember = {
   id: number;
   name: string;
+  licenceNumber: string;
   role: string;
   image: string | null;
   phone: string | null;
@@ -69,6 +70,9 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             <h3 className="text-3xl md:text-4xl font-extrabold text-[#1c3664] mb-3">
               {member.name}
             </h3>
+              <p className="text-xl text-blue-600 font-semibold mb-6">
+              {member.licenceNumber ? member.licenceNumber : ""}
+            </p>
             <p className="text-xl text-blue-600 font-semibold mb-6">
               {member.role}
             </p>

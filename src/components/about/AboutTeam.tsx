@@ -7,6 +7,7 @@ import AgentCard from './AgentCard';
 type TeamMember = {
   id: number;
   name: string;
+  licenceNumber: string;
   role: string;
   image: string | null;
   phone: string | null;
@@ -38,7 +39,7 @@ export default function AboutTeam() {
     }
     fetchTeam();
   }, []);
-
+console.log(team);
   return (
     <motion.section
       ref={teamRef}
