@@ -54,6 +54,19 @@ const Hero: React.FC<HeroProps> = () => {
 
   const showRest = done2;
 
+  // Определяем размер экрана для адаптивного видео
+  const [isMobile, setIsMobile] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Force video play on iOS
   useEffect(() => {
     const video = videoRef.current;
@@ -61,10 +74,24 @@ const Hero: React.FC<HeroProps> = () => {
 
     const tryPlay = () => {
       video.muted = true;
-      video.play().catch(() => {});
+      video.play().catch((err) => {
+        console.warn('Video playback failed:', err);
+        setVideoError(true);
+      });
     };
 
-    tryPlay();
+    // Ждем загрузки метаданных
+    const handleLoadedMetadata = () => {
+      tryPlay();
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('error', () => setVideoError(true));
+
+    // Пробуем запустить сразу на случай если уже загружено
+    if (video.readyState >= 2) {
+      tryPlay();
+    }
 
     const handleVisibility = () => {
       if (!document.hidden) tryPlay();
@@ -72,9 +99,10 @@ const Hero: React.FC<HeroProps> = () => {
     document.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section
@@ -134,18 +162,29 @@ const Hero: React.FC<HeroProps> = () => {
 
       {/* ── Video ── */}
       <div className="hero-video-wrap">
-        <video
-          ref={videoRef}
-          className="hero-video"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          poster="/images/hero-poster.jpg"
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
+        {!videoError ? (
+          <video
+            ref={videoRef}
+            className="hero-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            poster="/hero-poster.jpg"
+            key={isMobile ? 'mobile' : 'desktop'}
+          >
+            <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
+          </video>
+        ) : (
+          <Image
+            src="/hero-poster.jpg"
+            alt="Hero background"
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
       </div>
 
       {/* ── Content ── */}
