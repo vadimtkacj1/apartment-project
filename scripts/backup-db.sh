@@ -3,8 +3,16 @@
 # Database backup script
 # Creates automatic backups of the SQLite database
 
+# Read DATABASE_URL from .env and extract the file path
+if [ -f .env ]; then
+    DB_URL=$(grep "^DATABASE_URL=" .env | cut -d'=' -f2 | tr -d '"')
+    DB_PATH=$(echo "$DB_URL" | sed 's|file:||')
+else
+    echo "Error: .env file not found"
+    exit 1
+fi
+
 # Configuration
-DB_PATH="prisma/dev.db"
 BACKUP_DIR="backups"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 BACKUP_FILE="$BACKUP_DIR/dev.db.backup-$TIMESTAMP"
