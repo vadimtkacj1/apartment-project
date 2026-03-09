@@ -3,13 +3,23 @@
 # Database restore script
 # Restores database from a backup file
 
+# Read DATABASE_URL from .env and extract the file path
+if [ -f .env ]; then
+    DB_URL=$(grep "^DATABASE_URL=" .env | cut -d'=' -f2 | tr -d '"')
+    DB_PATH=$(echo "$DB_URL" | sed 's|file:||')
+else
+    echo "Error: .env file not found"
+    exit 1
+fi
+
 # Configuration
-DB_PATH="prisma/dev.db"
 BACKUP_DIR="backups"
 
 # Check if backup file is provided
 if [ -z "$1" ]; then
     echo "Usage: $0 <backup-file>"
+    echo ""
+    echo "Database path: $DB_PATH"
     echo ""
     echo "Available backups:"
     ls -lh $BACKUP_DIR/dev.db.backup-* 2>/dev/null || echo "  No backups found"
