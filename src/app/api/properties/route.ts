@@ -17,6 +17,20 @@ function formatProperty(property: any) {
     ...property,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
+    // Explicitly convert boolean fields from SQLite (0/1) to true booleans
+    isActive: Boolean(property.isActive),
+    isSold: Boolean(property.isSold),
+    isPinned: Boolean(property.isPinned),
+    hasAirConditioning: Boolean(property.hasAirConditioning),
+    hasDisabledAccess: Boolean(property.hasDisabledAccess),
+    hasSunBalcony: Boolean(property.hasSunBalcony),
+    hasStorage: Boolean(property.hasStorage),
+    hasSunroom: Boolean(property.hasSunroom),
+    hasBoiler: Boolean(property.hasBoiler),
+    hasSafeRoom: Boolean(property.hasSafeRoom),
+    hasElevator: Boolean(property.hasElevator),
+    isHotProposition: Boolean(property.isHotProposition),
+    isNoCommission: Boolean(property.isNoCommission),
   };
 }
 
@@ -29,7 +43,8 @@ function extractNumericPrice(priceStr: string): number {
 }
 
 // GET all active properties (public endpoint)
-export const revalidate = 60; // Revalidate every 60 seconds
+// This endpoint depends on query params and request URL, so it must be dynamic.
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -111,20 +126,17 @@ export async function GET(request: NextRequest) {
       where.propertyType = propertyType;
     }
 
-    // Rooms filter
-    if (minRooms) {
-      where.rooms = { ...where.rooms, gte: parseFloat(minRooms) };
-    }
-    if (maxRooms) {
-      where.rooms = { ...where.rooms, lte: parseFloat(maxRooms) };
-    }
+    // Rooms filter - will be applied client-side since rooms is stored as string
 
     // Area filter
-    if (minArea) {
-      where.area = { ...where.area, gte: parseInt(minArea) };
-    }
-    if (maxArea) {
-      where.area = { ...where.area, lte: parseInt(maxArea) };
+    if (minArea || maxArea) {
+      where.area = {};
+      if (minArea) {
+        where.area.gte = parseInt(minArea);
+      }
+      if (maxArea) {
+        where.area.lte = parseInt(maxArea);
+      }
     }
 
     // Floor filter
@@ -203,6 +215,19 @@ export async function GET(request: NextRequest) {
 
         if (minPrice && priceNum < parseInt(minPrice)) return false;
         if (maxPrice && priceNum > parseInt(maxPrice)) return false;
+
+        return true;
+      });
+    }
+
+    // Filter by rooms range (client-side filtering since rooms is stored as string)
+    if (minRooms || maxRooms) {
+      properties = properties.filter((prop: any) => {
+        const roomsNum = parseFloat(prop.rooms);
+        if (isNaN(roomsNum)) return false;
+
+        if (minRooms && roomsNum < parseFloat(minRooms)) return false;
+        if (maxRooms && roomsNum > parseFloat(maxRooms)) return false;
 
         return true;
       });

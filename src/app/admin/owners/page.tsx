@@ -204,7 +204,7 @@ export default function OwnersPage() {
                         borderRadius: '50%',
                         border: '2px solid #d9d9d9',
                       }}
-                      fallback="/placeholder.png"
+                      fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23e5e7eb'/%3E%3C/svg%3E"
                     />
                   ) : (
                     <div

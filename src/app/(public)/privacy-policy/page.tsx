@@ -218,9 +218,9 @@ export default function PrivacyPolicyPage() {
               </p>
               <div className="contact-details">
                 <p><strong>שם בית העסק:</strong> רם שיווק נכסים & חיים ענבי</p>
-                <p><strong>דוא"ל:</strong> info@ram-haim.co.il</p>
-                <p><strong>טלפון:</strong> 03-5021722</p>
-                <p><strong>כתובת:</strong> חולון, ישראל</p>
+                <p><strong>דוא"ל:</strong> rammiz800@gmail.com</p>
+                <p><strong>טלפון:</strong> 050-549-6626</p>
+                <p><strong>כתובת:</strong> חנקין 83 חולון, ישראל</p>
               </div>
             </section>
 

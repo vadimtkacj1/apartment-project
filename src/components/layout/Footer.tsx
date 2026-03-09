@@ -80,62 +80,60 @@ export default async function Footer() {
           {/* For Renters Section */}
           <div>
             <h4 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h4>
-            <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
-              <li><Link href="/apartments" className="hover:text-white transition-colors">דירות להשכרה</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">שאלות ותשובות</Link></li>
-              <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/apartments" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">דירות להשכרה</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">שאלות ותשובות</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
             </ul>
           </div>
 
           {/* For Owners Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">עבור משכירים</h4>
-            <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
-              <li><Link href="/selling-apartment" className="hover:text-white transition-colors">מכירת נכס</Link></li>
-              <li><Link href="/buying-apartment" className="hover:text-white transition-colors">רכישת נכס</Link></li>
+            <h4 className="text-xl font-bold mb-4 text-white">קונים ומוכרים</h4>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
+              <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
             </ul>
           </div>
 
           {/* Resources Section */}
           <div>
             <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
-            <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
-              <li><Link href="/articles" className="hover:text-white transition-colors">מאמרים</Link></li>
-              <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors">למכור לבד?</Link></li>
-              <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors">משקיעים זרים</Link></li>
-              <li><Link href="/faq" className="hover:text-white transition-colors">מרכז עזרה</Link></li>
-              <li><Link href="/links" className="hover:text-white transition-colors">קישורים שימושיים</Link></li>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/articles" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מאמרים</Link></li>
+              <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">למכור לבד?</Link></li>
+              <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">משקיעים זרים</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מרכז עזרה</Link></li>
+              <li><Link href="/links" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">קישורים שימושיים</Link></li>
             </ul>
           </div>
 
           {/* Company Section */}
           <div>
             <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
-            <ul className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
-              <li><Link href="/about" className="hover:text-white transition-colors">אודותינו</Link></li>
-              <li><Link href="/privacy-policy" className="hover:text-white transition-colors">מדיניות פרטיות</Link></li>
-              <li><Link href="/accessibility" className="hover:text-white transition-colors">הצהרת נגישות</Link></li>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
             </ul>
           </div>
 
           {/* Contact Section */}
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
-              <h4 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h4>
+              <h2 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h2>
               <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
                 {owners.map((owner) => (
                   <div key={owner.id} className="space-y-1">
                     <p className="text-white font-semibold">{owner.name}</p>
                     {owner.phone && (
                       <p>
-                        <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors">
+                        <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
                           {owner.phone}
                         </a>
                       </p>
                     )}
                     {owner.email && (
                       <p>
-                        <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors">
+                        <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
                           {owner.email}
                         </a>
                       </p>
@@ -151,6 +149,7 @@ export default async function Footer() {
                   icon={<MessageCircle className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={`https://wa.me/${owners[0].whatsapp.replace(/[^0-9]/g, '')}`}
                   hoverClass="hover:bg-[#25D366] hover:text-white"
+                  label="WhatsApp"
                 />
               )}
               {socialLinks?.instagram && (
@@ -158,6 +157,7 @@ export default async function Footer() {
                   icon={<Instagram className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={socialLinks.instagram}
                   hoverClass="hover:bg-gradient-to-tr hover:from-[#f9ce34] hover:to-[#ee2a7b] hover:text-white"
+                  label="Instagram"
                 />
               )}
               {socialLinks?.facebook && (
@@ -165,16 +165,39 @@ export default async function Footer() {
                   icon={<Facebook className="w-5 h-5 2xl:w-6 2xl:h-6" />}
                   href={socialLinks.facebook}
                   hoverClass="hover:bg-[#1877F2] hover:text-white"
+                  label="Facebook"
                 />
               )}
             </div>
           </div>
         </div>
 
-        {/* Footer Bottom / Copyright */}
-        <div className="mt-10 pt-6 border-t border-white/10 text-center">
-          <p className="text-gray-500 font-medium" style={{ fontSize: 'clamp(12px, 0.9vw, 16px)' }}>
-            © {new Date().getFullYear()} H&R נדל"ן בע"מ
+        {/* Legal Content Section */}
+        <div className="mt-12 pt-8 border-t-2 border-[#c5a357]/30 text-center">
+          <h5 className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
+            תוכן משפטי
+          </h5>
+
+          <p className="text-gray-500 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
+            © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.
+          </p>
+
+          <div className="flex items-center justify-center gap-3 text-gray-400 flex-wrap" style={{ fontSize: 'clamp(12px, 0.85vw, 14px)' }}>
+            <Link href="/privacy-policy" className="hover:text-[#c5a357] transition-colors font-medium">
+              מדיניות פרטיות
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link href="/accessibility" className="hover:text-[#c5a357] transition-colors font-medium">
+              נגישות
+            </Link>
+            <span className="text-gray-600">|</span>
+            <Link href="/sitemap.xml" className="hover:text-[#c5a357] transition-colors font-medium">
+              מפת האתר
+            </Link>
+          </div>
+
+          <p className="text-gray-600 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+            Built by <a href="https://aiterra.agency/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>
@@ -183,12 +206,13 @@ export default async function Footer() {
 }
 
 {/* Reusable Social Icon Component */}
-function SocialIcon({ icon, href, hoverClass }: { icon: React.ReactNode, href: string, hoverClass: string }) {
+function SocialIcon({ icon, href, hoverClass, label }: { icon: React.ReactNode, href: string, hoverClass: string, label?: string }) {
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={label}
       className={`w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-[#2a2a2a] flex items-center justify-center text-gray-300 transition-all border border-white/5 shadow-lg ${hoverClass}`}
     >
       {icon}

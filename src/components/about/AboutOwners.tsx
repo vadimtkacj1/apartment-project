@@ -7,12 +7,12 @@ import OwnerCard from './OwnerCard';
 type Owner = {
   id: number;
   name: string;
-  licenceNumber: string;
   title: string;
   image: string | null;
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 

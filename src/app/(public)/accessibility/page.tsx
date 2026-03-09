@@ -97,9 +97,11 @@ export default function AccessibilityPage() {
             <section className="accessibility-section contact-section">
               <h2>פרטי רכז הנגישות בארגון</h2>
               <div className="coordinator-details">
-                <p><strong>שם רכז הנגישות:</strong> רם & חיים</p>
-                <p><strong>טלפון:</strong> 03-5021722</p>
-                <p><strong>דואר אלקטרוני:</strong> info@ram-haim.co.il</p>
+                <p><strong>שם בית העסק:</strong> רם שיווק נכסים & חיים ענבי</p>
+                <p><strong>שם רכז הנגישות:</strong> רם מזרחי</p>
+                <p><strong>דוא"ל:</strong> rammiz800@gmail.com</p>
+                <p><strong>טלפון:</strong> 050-549-6626</p>
+                <p><strong>כתובת:</strong> חנקין 83 חולון, ישראל</p>
               </div>
               <p className="contact-note">
                 אנו זמינים לכל פנייה ונשתדל לתת מענה מתאים ומהיר ככל האפשר.

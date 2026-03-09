@@ -15,6 +15,7 @@ interface OwnerForm {
   phone: string;
   email: string;
   whatsapp: string;
+  licenceNumber: string;
   description: string;
   order: number;
   isActive: boolean;
@@ -27,6 +28,7 @@ const INITIAL_FORM: OwnerForm = {
   phone: '',
   email: '',
   whatsapp: '',
+  licenceNumber: '',
   description: '',
   order: 0,
   isActive: true,
@@ -156,6 +158,17 @@ export default function OwnerEditPage() {
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder='לדוגמה: מייסד ומתווך נדל"ן'
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              מספר רישיון
+            </label>
+            <Input
+              value={formData.licenceNumber}
+              onChange={(e) => handleChange('licenceNumber', e.target.value)}
+              placeholder="הכנס מספר רישיון"
               size="large"
             />
           </div>

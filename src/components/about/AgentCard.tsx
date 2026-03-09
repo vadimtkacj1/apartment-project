@@ -2,18 +2,19 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Phone, Mail } from 'lucide-react';
+import { Phone, Mail, Check } from 'lucide-react';
+import { useState } from 'react';
 
 type TeamMember = {
   id: number;
   name: string;
-  licenceNumber: string;
   role: string;
   image: string | null;
   phone: string | null;
   mobile: string | null;
   fax: string | null;
   email: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 
@@ -26,6 +27,20 @@ interface AgentCardProps {
 export default function AgentCard({ member, index, isEven }: AgentCardProps) {
   // SAFETY CHECK: If member data is missing, do not render anything to prevent crashes.
   if (!member) return null;
+
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyEmail = async () => {
+    if (!member.email) return;
+
+    try {
+      await navigator.clipboard.writeText(member.email);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy email:', err);
+    }
+  };
 
   return (
     <motion.div
@@ -70,13 +85,18 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             <h3 className="text-3xl md:text-4xl font-extrabold text-[#1c3664] mb-3">
               {member.name}
             </h3>
+
+            {/* License Number */}
+            {member.licenceNumber && (
               <p className="text-xl text-blue-600 font-semibold mb-6">
-              {member.licenceNumber ? member.licenceNumber : ""}
-            </p>
+                {member.licenceNumber}
+              </p>
+            )}
+
             <p className="text-xl text-blue-600 font-semibold mb-6">
               {member.role}
             </p>
-            
+
             {/* Description */}
             <p className="text-slate-600 leading-relaxed text-lg mb-8 max-w-lg mx-auto md:mx-0">
               {member.description || "סוכן נדלן מקצועי עם ניסיון עשיר בשוק המקומי בחולון. מתמחה בליווי אישי ומקצועי לכל אורך הדרך."}
@@ -90,18 +110,40 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                   className="flex items-center gap-3 px-6 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg group"
                 >
                   <Phone size={18} className="group-hover:rotate-12 transition-transform" />
-                  <span dir="ltr" className="font-medium">{member.phone}</span>
+                  <span
+                    dir="ltr"
+                    className="font-medium"
+                    style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                  >
+                    {member.phone}
+                  </span>
                 </a>
 
                 {/* Email (if exists) */}
                 {member.email && (
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all"
+                  <button
+                    onClick={handleCopyEmail}
+                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all relative group"
+                    title="Click to copy email"
                   >
-                    <Mail size={18} />
-                    <span className="font-medium">Email</span>
-                  </a>
+                    {copied ? (
+                      <>
+                        <Check size={18} className="text-green-600" />
+                        <span className="font-medium text-green-600">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mail size={18} />
+                        <span
+                          className="font-medium"
+                          dir="ltr"
+                          style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                        >
+                          {member.email}
+                        </span>
+                      </>
+                    )}
+                  </button>
                 )}
             </div>
         </div>

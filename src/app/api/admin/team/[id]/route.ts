@@ -52,6 +52,7 @@ export async function PUT(
         mobile: body.mobile || null,
         fax: body.fax || null,
         email: body.email || null,
+        licenceNumber: body.licenceNumber || null,
         description: body.description || null,
         order: body.order !== undefined ? body.order : 0,
         isActive: body.isActive !== undefined ? body.isActive : true,

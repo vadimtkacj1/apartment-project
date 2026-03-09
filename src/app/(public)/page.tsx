@@ -46,12 +46,24 @@ export default function Home() {
       }, 100);
     }
 
-    // Hide loader when page is fully loaded
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const hideLoader = () => setIsLoading(false);
 
-    return () => clearTimeout(timer);
+    // If all resources (images, video poster, etc.) are already loaded
+    if (document.readyState === 'complete') {
+      hideLoader();
+      return;
+    }
+
+    // Hide loader only when ALL images/resources have finished loading
+    window.addEventListener('load', hideLoader);
+
+    // Safety fallback: hide after 6s maximum so spinner never stays forever
+    const fallback = setTimeout(hideLoader, 6000);
+
+    return () => {
+      window.removeEventListener('load', hideLoader);
+      clearTimeout(fallback);
+    };
   }, []);
 
   return (
@@ -66,7 +78,7 @@ export default function Home() {
       )}
 
       {/* Hero section - scrolls normally */}
-      <div className="w-full -mt-[70px]">
+      <div className="w-full">
         <Hero
           img="/images/hero/main-hero.jpg"
         />

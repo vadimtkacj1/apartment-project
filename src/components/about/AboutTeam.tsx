@@ -7,13 +7,13 @@ import AgentCard from './AgentCard';
 type TeamMember = {
   id: number;
   name: string;
-  licenceNumber: string;
   role: string;
   image: string | null;
   phone: string | null;
   mobile: string | null;
   fax: string | null;
   email: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 

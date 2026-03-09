@@ -15,6 +15,15 @@ const ContactMap = dynamic(() => import('./ContactMap'), {
   )
 });
 
+interface Owner {
+  id: number;
+  name: string;
+  title: string;
+  phone: string | null;
+  email: string | null;
+  whatsapp: string | null;
+}
+
 interface ContactInfo {
   phone: string;
   phoneLink: string;
@@ -34,10 +43,12 @@ interface ContactInfo {
 
 const ContactForm: React.FC = () => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
+  const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchContactInfo();
+    fetchOwners();
   }, []);
 
   const fetchContactInfo = async () => {
@@ -56,10 +67,20 @@ const ContactForm: React.FC = () => {
     }
   };
 
-  const phone = contactInfo?.phone || '03-123-4567';
-  const phoneLink = contactInfo?.phoneLink || 'tel:+97231234567';
-  const email = contactInfo?.email || 'info@zamir-realestate.co.il';
-  const emailLink = contactInfo?.emailLink || 'mailto:info@zamir-realestate.co.il';
+  const fetchOwners = async () => {
+    try {
+      const response = await fetch('/api/owners', {
+        cache: 'no-store',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setOwners(data);
+      }
+    } catch (error) {
+      console.error('Error fetching owners:', error);
+    }
+  };
+
   const address = contactInfo?.address || 'חולון';
   const city = contactInfo?.city || 'בת ים, ישראל';
   const latitude = contactInfo?.latitude ?? null;
@@ -128,40 +149,65 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200 space-y-4 md:space-y-6"
+              className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200 space-y-6"
             >
               <h3 className="text-2xl font-black text-[#1c3664] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                 פרטי התקשרות
               </h3>
 
-              {/* Phone */}
-              <div className="flex items-start gap-4 group">
-                <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
-                  <Phone size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-slate-400 font-semibold mb-1">טלפון</p>
-                  <a href={phoneLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors">
-                    {phone}
-                  </a>
-                </div>
-              </div>
+              {/* Display all owners */}
+              {owners.length > 0 ? (
+                owners.map((owner, index) => (
+                  <div key={owner.id} className={`space-y-4 ${index > 0 ? 'pt-6 border-t border-slate-200' : ''}`}>
+                    {/* Owner Name */}
+                    <div className="mb-2">
+                      <p className="text-lg font-bold text-[#1c3664]">{owner.name}</p>
+                      {owner.title && <p className="text-sm text-slate-500">{owner.title}</p>}
+                    </div>
 
-              {/* Email */}
-              <div className="flex items-start gap-4 group">
-                <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
-                  <Mail size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-slate-400 font-semibold mb-1">דוא״ל</p>
-                  <a href={emailLink} className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all">
-                    {email}
-                  </a>
-                </div>
-              </div>
+                    {/* Phone */}
+                    {owner.phone && (
+                      <div className="flex items-start gap-4 group">
+                        <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
+                          <Phone size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-slate-400 font-semibold mb-1">טלפון</p>
+                          <a
+                            href={`tel:${owner.phone.replace(/[^0-9+]/g, '')}`}
+                            className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
+                          >
+                            {owner.phone}
+                          </a>
+                        </div>
+                      </div>
+                    )}
 
-              {/* Address */}
-              <div className="flex items-start gap-4 group">
+                    {/* Email */}
+                    {owner.email && (
+                      <div className="flex items-start gap-4 group">
+                        <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
+                          <Mail size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-slate-400 font-semibold mb-1">דוא״ל</p>
+                          <a
+                            href={`mailto:${owner.email}`}
+                            className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
+                          >
+                            {owner.email}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p className="text-slate-400">טוען פרטי התקשרות...</p>
+              )}
+
+              {/* Address - Same for all */}
+              <div className="flex items-start gap-4 group pt-6 border-t border-slate-200">
                 <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
                   <MapPin size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
                 </div>

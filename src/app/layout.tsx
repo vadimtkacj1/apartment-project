@@ -6,6 +6,7 @@ import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 import Providers from "@/components/Providers";
 import StructuredData from "@/components/SEO/StructuredData";
 import PageLoader from "@/components/ui/PageLoader";
+import AlternatingFavicon from "@/components/AlternatingFavicon";
 import "./globals.css";
 
 const assistant = localFont({
@@ -50,7 +51,7 @@ const caramel = localFont({
   adjustFontFallback: false,
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ramnekasim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -63,6 +64,9 @@ export const metadata: Metadata = {
   authors: [{ name: "רם נכסים חיים ענבי" }],
   creator: "רם נכסים חיים ענבי",
   publisher: "רם נכסים חיים ענבי",
+  icons: {
+    icon: '/favicon-ha.png',
+  },
   alternates: {
     canonical: siteUrl,
   },
@@ -130,10 +134,6 @@ export default function RootLayout({
           :root { color-scheme: only light !important; }
           html { color-scheme: only light !important; background: #faf7f2 !important; }
           body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
-          @media (prefers-color-scheme: dark) {
-            :root, html, body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
-            * { color-scheme: only light !important; }
-          }
         `}} />
         <link
           rel="preload"
@@ -141,6 +141,7 @@ export default function RootLayout({
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
+          media="(min-width: 768px)"
         />
         <link
           rel="preload"
@@ -148,9 +149,11 @@ export default function RootLayout({
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
+          media="(min-width: 768px)"
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+        <AlternatingFavicon />
         <PageLoader />
         <StructuredData />
         <Providers>

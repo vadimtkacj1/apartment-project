@@ -42,8 +42,6 @@ export const INITIAL_FORM: PropertyForm = {
   isActive: true,
   isSold: false,
   isPinned: false,
-  isHotProposition: false,
-  isNoCommission: false,
 };
 
 export const DEAL_TYPE_OPTIONS = [
@@ -72,7 +70,11 @@ export const PROPERTY_TYPE_OPTIONS = [
   { value: 'house', label: 'בית' },
   { value: 'duplex', label: 'דופלקס' },
   { value: 'penthouse', label: 'פנטהאוס' },
+<<<<<<< HEAD
   { value: 'mini-penthouse', label: 'מיני פנטהאוס' },
+=======
+  { value: 'mini-penthouse', label: 'מי פנטהאוז' },
+>>>>>>> main
   { value: 'roof-apartment', label: 'דירת גג' },
   { value: 'housing-unit', label: 'יחידת דיור' },
   { value: 'studio', label: 'סטודיו' },
@@ -103,6 +105,7 @@ export const PARKING_OPTIONS = [
   { value: 'yes', label: 'יש' },
   { value: 'none', label: 'אין' },
   { value: 'double', label: 'כפולה' },
+  { value: 'two-separate', label: 'שניים נפרדות' },
   { value: 'shared', label: 'משותפת' },
   { value: 'two-seperate', label: 'שניים נפרדות' },
   { value: 'covered', label: 'מקורה' },

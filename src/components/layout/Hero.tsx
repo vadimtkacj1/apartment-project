@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -39,6 +39,9 @@ function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
 }
 
 const Hero: React.FC<HeroProps> = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+
   const line1 = 'רם נכסים';
   const line2 = 'חיים ענבי';
 
@@ -51,15 +54,130 @@ const Hero: React.FC<HeroProps> = () => {
 
   const showRest = done2;
 
+  // Определяем размер экрана для адаптивного видео
+  const [isMobile, setIsMobile] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Force video play
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const tryPlay = async () => {
+      try {
+        video.muted = true;
+        video.playsInline = true;
+        await video.play();
+        setVideoLoaded(true);
+        console.log('✅ Video playing successfully');
+      } catch (err) {
+        attempts++;
+        console.warn(`❌ Video play attempt ${attempts} failed:`, err);
+
+        if (attempts < maxAttempts) {
+          setTimeout(tryPlay, 500 * attempts);
+        } else {
+          setVideoError(true);
+        }
+      }
+    };
+
+    const handleCanPlay = () => {
+      console.log('🎬 Video can play');
+      tryPlay();
+    };
+
+    const handleLoadedData = () => {
+      console.log('📊 Video data loaded');
+      tryPlay();
+    };
+
+    const handlePlaying = () => {
+      console.log('▶️ Video is actually playing now!');
+      setVideoLoaded(true);
+    };
+
+    const handleError = (e: Event) => {
+      console.error('❌ Video error:', e);
+      setVideoError(true);
+    };
+
+    const handleVisibility = () => {
+      if (!document.hidden && video.paused) {
+        tryPlay();
+      }
+    };
+
+    // Добавляем обработчики событий
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('error', handleError);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Пробуем запустить сразу если уже загружено
+    if (video.readyState >= 3) {
+      tryPlay();
+    }
+
+    // Дополнительная попытка через секунду на всякий случай
+    const timeoutId = setTimeout(() => {
+      if (!videoLoaded && !videoError) {
+        console.log('⏰ Timeout fallback - trying to play video');
+        tryPlay();
+      }
+    }, 1000);
+
+    return () => {
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('error', handleError);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearTimeout(timeoutId);
+    };
+  }, [videoLoaded, videoError]);
+
   return (
     <section
+      ref={sectionRef}
       dir="rtl"
-      className="relative w-full h-[90vh] md:h-screen overflow-hidden"
+      className="relative w-full overflow-hidden"
+      style={{ height: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0; }
+        .hero-video-wrap {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          z-index: 0;
+          background: #000;
+        }
+        .hero-video {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center center;
+          display: block;
+          opacity: 1;
+        }
+        .hero-video[poster] {
+          background: transparent;
         }
         .cursor {
           display: inline-block;
@@ -68,12 +186,7 @@ const Hero: React.FC<HeroProps> = () => {
           background: #ffffff;
           margin-right: 4px;
           vertical-align: middle;
-          animation: blink 750ms steps(1) infinite;
           border-radius: 1px;
-        }
-        @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4); }
-          50%       { box-shadow: 0 0 40px 8px rgba(212,168,67,0.65), 0 4px 24px rgba(0,0,0,0.4); }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
@@ -83,7 +196,11 @@ const Hero: React.FC<HeroProps> = () => {
           animation: shineSwipe 0.5s ease forwards;
         }
         .btn-primary {
-          animation: goldGlow 2.5s ease-in-out infinite;
+          box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4);
+          transition: box-shadow 0.3s ease;
+        }
+        .btn-primary:hover {
+          box-shadow: 0 0 30px 4px rgba(212,168,67,0.5), 0 4px 20px rgba(0,0,0,0.4);
         }
         .btn-secondary {
           transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
@@ -96,12 +213,26 @@ const Hero: React.FC<HeroProps> = () => {
       `}</style>
 
       {/* ── Video ── */}
-      <div className="absolute inset-0 z-0">
+      <div className="hero-video-wrap">
         <video
-          autoPlay loop muted playsInline preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
+          ref={videoRef}
+          className="hero-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          x-webkit-airplay="allow"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
         >
-          <source src="/hero.mp4" type="video/mp4" />
+          <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
         </video>
       </div>
 
@@ -114,7 +245,7 @@ const Hero: React.FC<HeroProps> = () => {
           items-center md:items-start
           justify-center md:justify-between
           gap-6 md:gap-0
-          pt-0 md:pt-44 pb-0 md:pb-20
+          py-8 md:pt-44 md:pb-20
         "
         style={{ maxWidth: '2400px', margin: '0 auto' }}
       >
@@ -191,8 +322,8 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold"
+              href="/apartments/rent"
+              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
@@ -227,8 +358,8 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments?dealType=sale"
-              className="btn-secondary group relative block overflow-hidden w-full md:min-w-[340px] xl:min-w-105 rounded-2xl font-bold border-2"
+              href="/apartments/sale"
+              className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
                 borderColor: 'rgba(255,255,255,0.4)',
