@@ -105,6 +105,11 @@ const Hero: React.FC<HeroProps> = () => {
       tryPlay();
     };
 
+    const handlePlaying = () => {
+      console.log('▶️ Video is actually playing now!');
+      setVideoLoaded(true);
+    };
+
     const handleError = (e: Event) => {
       console.error('❌ Video error:', e);
       setVideoError(true);
@@ -119,6 +124,7 @@ const Hero: React.FC<HeroProps> = () => {
     // Добавляем обработчики событий
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('playing', handlePlaying);
     video.addEventListener('error', handleError);
     document.addEventListener('visibilitychange', handleVisibility);
 
@@ -138,6 +144,7 @@ const Hero: React.FC<HeroProps> = () => {
     return () => {
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('playing', handlePlaying);
       video.removeEventListener('error', handleError);
       document.removeEventListener('visibilitychange', handleVisibility);
       clearTimeout(timeoutId);
@@ -166,6 +173,11 @@ const Hero: React.FC<HeroProps> = () => {
           height: 100%;
           object-fit: cover;
           object-position: center center;
+          display: block;
+          opacity: 1;
+        }
+        .hero-video[poster] {
+          background: transparent;
         }
         .cursor {
           display: inline-block;
@@ -202,34 +214,26 @@ const Hero: React.FC<HeroProps> = () => {
 
       {/* ── Video ── */}
       <div className="hero-video-wrap">
-        {!videoError ? (
-          <video
-            ref={videoRef}
-            className="hero-video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            poster="/hero-poster.jpg"
-            webkit-playsinline="true"
-            x5-playsinline="true"
-            x-webkit-airplay="allow"
-            controlsList="nodownload nofullscreen noremoteplayback"
-            disablePictureInPicture
-          >
-            <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
-            Ваш браузер не поддерживает видео.
-          </video>
-        ) : (
-          <Image
-            src="/hero-poster.jpg"
-            alt="Hero background"
-            fill
-            className="object-cover"
-            priority
-          />
-        )}
+        <video
+          ref={videoRef}
+          className="hero-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          x-webkit-airplay="allow"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        >
+          <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
+        </video>
       </div>
 
       {/* ── Content ── */}
