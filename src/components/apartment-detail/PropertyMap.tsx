@@ -49,6 +49,8 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
+    language: 'he',
+    region: 'IL',
   });
 
   if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
