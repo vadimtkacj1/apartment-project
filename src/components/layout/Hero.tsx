@@ -57,6 +57,7 @@ const Hero: React.FC<HeroProps> = () => {
   // Определяем размер экрана для адаптивного видео
   const [isMobile, setIsMobile] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -67,42 +68,81 @@ const Hero: React.FC<HeroProps> = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Force video play on iOS
+  // Force video play
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const tryPlay = () => {
-      video.muted = true;
-      video.play().catch((err) => {
-        console.warn('Video playback failed:', err);
-        setVideoError(true);
-      });
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    const tryPlay = async () => {
+      try {
+        video.muted = true;
+        video.playsInline = true;
+        await video.play();
+        setVideoLoaded(true);
+        console.log('✅ Video playing successfully');
+      } catch (err) {
+        attempts++;
+        console.warn(`❌ Video play attempt ${attempts} failed:`, err);
+
+        if (attempts < maxAttempts) {
+          setTimeout(tryPlay, 500 * attempts);
+        } else {
+          setVideoError(true);
+        }
+      }
     };
 
-    // Ждем загрузки метаданных
-    const handleLoadedMetadata = () => {
+    const handleCanPlay = () => {
+      console.log('🎬 Video can play');
       tryPlay();
     };
 
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    video.addEventListener('error', () => setVideoError(true));
+    const handleLoadedData = () => {
+      console.log('📊 Video data loaded');
+      tryPlay();
+    };
 
-    // Пробуем запустить сразу на случай если уже загружено
-    if (video.readyState >= 2) {
+    const handleError = (e: Event) => {
+      console.error('❌ Video error:', e);
+      setVideoError(true);
+    };
+
+    const handleVisibility = () => {
+      if (!document.hidden && video.paused) {
+        tryPlay();
+      }
+    };
+
+    // Добавляем обработчики событий
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('error', handleError);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Пробуем запустить сразу если уже загружено
+    if (video.readyState >= 3) {
       tryPlay();
     }
 
-    const handleVisibility = () => {
-      if (!document.hidden) tryPlay();
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
+    // Дополнительная попытка через секунду на всякий случай
+    const timeoutId = setTimeout(() => {
+      if (!videoLoaded && !videoError) {
+        console.log('⏰ Timeout fallback - trying to play video');
+        tryPlay();
+      }
+    }, 1000);
 
     return () => {
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('error', handleError);
       document.removeEventListener('visibilitychange', handleVisibility);
+      clearTimeout(timeoutId);
     };
-  }, [isMobile]);
+  }, [videoLoaded, videoError]);
 
   return (
     <section
@@ -170,11 +210,16 @@ const Hero: React.FC<HeroProps> = () => {
             loop
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             poster="/hero-poster.jpg"
-            key={isMobile ? 'mobile' : 'desktop'}
+            webkit-playsinline="true"
+            x5-playsinline="true"
+            x-webkit-airplay="allow"
+            controlsList="nodownload nofullscreen noremoteplayback"
+            disablePictureInPicture
           >
             <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
+            Ваш браузер не поддерживает видео.
           </video>
         ) : (
           <Image
