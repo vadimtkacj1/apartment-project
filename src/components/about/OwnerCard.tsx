@@ -14,7 +14,7 @@ type Owner = {
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
-  license: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 
@@ -87,17 +87,17 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.name}
         </h3>
 
+        {/* License Number */}
+        {owner.licenceNumber && (
+          <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
+            {owner.licenceNumber}
+          </p>
+        )}
+
         {/* Title / Position */}
         <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
           {owner.title}
         </p>
-
-        {/* License Number */}
-        {owner.license && (
-          <p className="text-base text-slate-500 mb-4">
-            רישיון מס׳ {owner.license}
-          </p>
-        )}
 
         {/* Description */}
         {owner.description && (
