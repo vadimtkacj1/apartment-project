@@ -13,6 +13,7 @@ type TeamMember = {
   mobile: string | null;
   fax: string | null;
   email: string | null;
+  license: string | null;
   description: string | null;
 };
 

@@ -14,6 +14,7 @@ type TeamMember = {
   mobile: string | null;
   fax: string | null;
   email: string | null;
+  license: string | null;
   description: string | null;
 };
 
@@ -87,7 +88,14 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             <p className="text-xl text-blue-600 font-semibold mb-6">
               {member.role}
             </p>
-            
+
+            {/* License Number */}
+            {member.license && (
+              <p className="text-base text-slate-500 mb-6">
+                רישיון מס׳ {member.license}
+              </p>
+            )}
+
             {/* Description */}
             <p className="text-slate-600 leading-relaxed text-lg mb-8 max-w-lg mx-auto md:mx-0">
               {member.description || "סוכן נדלן מקצועי עם ניסיון עשיר בשוק המקומי בחולון. מתמחה בליווי אישי ומקצועי לכל אורך הדרך."}

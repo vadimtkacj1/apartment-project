@@ -12,6 +12,7 @@ type Owner = {
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
+  license: string | null;
   description: string | null;
 };
 
