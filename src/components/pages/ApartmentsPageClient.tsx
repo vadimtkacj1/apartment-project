@@ -180,7 +180,10 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
-          next: { revalidate: 60 },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
         if (!response.ok) throw new Error('Failed');
         const data = await response.json();

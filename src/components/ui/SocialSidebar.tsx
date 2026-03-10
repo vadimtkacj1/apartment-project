@@ -49,7 +49,9 @@ const SocialSidebar = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('/api/contact-info');
+      const response = await fetch('/api/contact-info', {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         setContactInfo(data);
@@ -61,7 +63,9 @@ const SocialSidebar = () => {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch('/api/owners');
+      const response = await fetch('/api/owners', {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         setOwners(data.slice(0, 2)); // Get first 2 owners
