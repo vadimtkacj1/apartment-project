@@ -1,5 +1,17 @@
 const { PrismaClient } = require('@prisma/client');
-require('dotenv').config();
+const path = require('path');
+
+// Load .env from project root
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
+// Verify DATABASE_URL is loaded
+if (!process.env.DATABASE_URL) {
+  console.error('ERROR: DATABASE_URL not found in environment variables!');
+  console.error('Make sure .env file exists at:', path.join(__dirname, '..', '.env'));
+  process.exit(1);
+}
+
+console.log('✓ Database URL loaded:', process.env.DATABASE_URL.substring(0, 20) + '...');
 
 const prisma = new PrismaClient();
 
