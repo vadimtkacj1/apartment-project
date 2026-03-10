@@ -93,6 +93,10 @@ const Hero: React.FC<HeroProps> = () => {
       try {
         video.muted = true;
         video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x-webkit-airplay', 'allow');
+        video.setAttribute('x5-playsinline', 'true');
         video.load(); // Force reload video
         await video.play();
         setVideoLoaded(true);
@@ -244,7 +248,7 @@ const Hero: React.FC<HeroProps> = () => {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           poster="/hero-poster.jpg"
           webkit-playsinline="true"
           x5-playsinline="true"
@@ -259,8 +263,7 @@ const Hero: React.FC<HeroProps> = () => {
           }}
           key={isMobile ? 'mobile-video' : 'desktop-video'}
         >
-          <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
-          Your browser does not support the video tag.
+          <source src="/hero.mp4" type="video/mp4" />
         </video>
       </div>
 
