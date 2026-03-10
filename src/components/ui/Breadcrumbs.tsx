@@ -12,7 +12,7 @@ const routeNames: Record<string, string> = {
   'about': 'אודות',
   'faq': 'שאלות נפוצות',
   'admin': 'ניהול',
-  'settings': 'הגдерות',
+  'settings': 'הגדרות',
   'users': 'משתמשים',
   'articles': 'מאמרים',
   'foreign-investors': 'משקיעים זרים',

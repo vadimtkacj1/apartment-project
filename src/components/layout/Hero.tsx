@@ -73,6 +73,10 @@ const Hero: React.FC<HeroProps> = () => {
     const video = videoRef.current;
     if (!video) return;
 
+    // Reset states when video source changes
+    setVideoLoaded(false);
+    setVideoError(false);
+
     let attempts = 0;
     const maxAttempts = 5;
 
@@ -80,6 +84,7 @@ const Hero: React.FC<HeroProps> = () => {
       try {
         video.muted = true;
         video.playsInline = true;
+        video.load(); // Force reload video
         await video.play();
         setVideoLoaded(true);
         console.log('✅ Video playing successfully');
@@ -121,19 +126,19 @@ const Hero: React.FC<HeroProps> = () => {
       }
     };
 
-    // Добавляем обработчики событий
+    // Add event listeners
     video.addEventListener('canplay', handleCanPlay);
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('error', handleError);
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // Пробуем запустить сразу если уже загружено
+    // Try to play immediately if already loaded
     if (video.readyState >= 3) {
       tryPlay();
     }
 
-    // Дополнительная попытка через секунду на всякий случай
+    // Fallback attempt after 1 second
     const timeoutId = setTimeout(() => {
       if (!videoLoaded && !videoError) {
         console.log('⏰ Timeout fallback - trying to play video');
@@ -149,7 +154,7 @@ const Hero: React.FC<HeroProps> = () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       clearTimeout(timeoutId);
     };
-  }, [videoLoaded, videoError]);
+  }, [isMobile]);
 
   return (
     <section
@@ -210,10 +215,35 @@ const Hero: React.FC<HeroProps> = () => {
           border-color: rgba(255,255,255,0.7) !important;
           box-shadow: 0 0 24px rgba(255,255,255,0.12);
         }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
       `}</style>
 
       {/* ── Video ── */}
       <div className="hero-video-wrap">
+        {!videoLoaded && !videoError && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: `url('/hero-poster.jpg') center/cover`,
+              zIndex: 1,
+            }}
+          >
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid rgba(255,255,255,0.3)',
+              borderTopColor: 'white',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+          </div>
+        )}
         <video
           ref={videoRef}
           className="hero-video"
@@ -222,6 +252,7 @@ const Hero: React.FC<HeroProps> = () => {
           muted
           playsInline
           preload="auto"
+          poster="/hero-poster.jpg"
           webkit-playsinline="true"
           x5-playsinline="true"
           x-webkit-airplay="allow"
@@ -230,9 +261,13 @@ const Hero: React.FC<HeroProps> = () => {
             height: '100%',
             objectFit: 'cover',
             display: 'block',
+            opacity: videoLoaded ? 1 : 0,
+            transition: 'opacity 0.5s ease',
           }}
+          key={isMobile ? 'mobile-video' : 'desktop-video'}
         >
           <source src={isMobile ? "/hero-mobile.mp4" : "/hero.mp4"} type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
       </div>
 
