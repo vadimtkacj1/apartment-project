@@ -25,7 +25,7 @@ export default function PageLoader() {
       }
     } else {
       if (document.readyState === 'complete') {
-        // Страница уже загружена (например, кэш)
+        // Page already loaded (e.g., from cache)
         hide();
       } else {
         window.addEventListener('load', hide);
@@ -52,7 +52,7 @@ export default function PageLoader() {
         pointerEvents: fadeOut ? 'none' : 'all',
       }}
     >
-      {/* Логотип / название */}
+      {/* Logo / Title */}
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
         <div
           style={{
@@ -66,9 +66,9 @@ export default function PageLoader() {
         </div>
       </div>
 
-      {/* Спиннер */}
+      {/* Spinner */}
       <div style={{ position: 'relative', width: '56px', height: '56px' }}>
-        {/* Внешнее кольцо */}
+        {/* Outer ring */}
         <div
           style={{
             position: 'absolute',
@@ -79,7 +79,7 @@ export default function PageLoader() {
             animation: 'page-spin 0.9s linear infinite',
           }}
         />
-        {/* Внутреннее кольцо */}
+        {/* Inner ring */}
         <div
           style={{
             position: 'absolute',
