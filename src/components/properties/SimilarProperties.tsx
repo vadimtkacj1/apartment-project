@@ -34,7 +34,12 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
     const fetchSimilarProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/properties');
+        const response = await fetch('/api/properties', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch properties');

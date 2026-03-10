@@ -32,7 +32,9 @@ export default function WhatsAppFloatingButton() {
   const fetchOwners = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/owners');
+      const response = await fetch('/api/owners', {
+        cache: 'no-store'
+      });
       const data = await response.json();
       setOwners(data.slice(0, 2)); // Get only first 2 owners
     } catch (error) {

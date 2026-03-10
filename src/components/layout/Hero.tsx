@@ -79,20 +79,32 @@ const Hero: React.FC<HeroProps> = () => {
 
     let attempts = 0;
     const maxAttempts = 5;
+    let isPlaying = false;
+    let isTryingToPlay = false;
 
     const tryPlay = async () => {
+      // Prevent multiple simultaneous play attempts
+      if (isTryingToPlay || isPlaying) {
+        return;
+      }
+
+      isTryingToPlay = true;
+
       try {
         video.muted = true;
         video.playsInline = true;
         video.load(); // Force reload video
         await video.play();
         setVideoLoaded(true);
+        isPlaying = true;
+        isTryingToPlay = false;
         console.log('✅ Video playing successfully');
       } catch (err) {
         attempts++;
+        isTryingToPlay = false;
         console.warn(`❌ Video play attempt ${attempts} failed:`, err);
 
-        if (attempts < maxAttempts) {
+        if (attempts < maxAttempts && !isPlaying) {
           setTimeout(tryPlay, 500 * attempts);
         } else {
           setVideoError(true);
@@ -100,19 +112,10 @@ const Hero: React.FC<HeroProps> = () => {
       }
     };
 
-    const handleCanPlay = () => {
-      console.log('🎬 Video can play');
-      tryPlay();
-    };
-
-    const handleLoadedData = () => {
-      console.log('📊 Video data loaded');
-      tryPlay();
-    };
-
     const handlePlaying = () => {
       console.log('▶️ Video is actually playing now!');
       setVideoLoaded(true);
+      isPlaying = true;
     };
 
     const handleError = (e: Event) => {
@@ -121,34 +124,24 @@ const Hero: React.FC<HeroProps> = () => {
     };
 
     const handleVisibility = () => {
-      if (!document.hidden && video.paused) {
+      if (!document.hidden && video.paused && !isTryingToPlay) {
         tryPlay();
       }
     };
 
     // Add event listeners
-    video.addEventListener('canplay', handleCanPlay);
-    video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('error', handleError);
     document.addEventListener('visibilitychange', handleVisibility);
 
-    // Try to play immediately if already loaded
-    if (video.readyState >= 3) {
-      tryPlay();
-    }
-
-    // Fallback attempt after 1 second
+    // Single play attempt
     const timeoutId = setTimeout(() => {
-      if (!videoLoaded && !videoError) {
-        console.log('⏰ Timeout fallback - trying to play video');
+      if (!videoLoaded && !videoError && !isPlaying) {
         tryPlay();
       }
-    }, 1000);
+    }, 500);
 
     return () => {
-      video.removeEventListener('canplay', handleCanPlay);
-      video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('playing', handlePlaying);
       video.removeEventListener('error', handleError);
       document.removeEventListener('visibilitychange', handleVisibility);
