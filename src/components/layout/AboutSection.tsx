@@ -144,7 +144,8 @@ const AboutSection: React.FC = memo(() => {
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 30vw"
-                priority
+                quality={85}
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent pointer-events-none" />
             </div>
