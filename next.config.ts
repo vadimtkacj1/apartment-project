@@ -68,6 +68,22 @@ const nextConfig: NextConfig = {
     return config;
   },
   
+  // Redirect old routes to new ones with query parameters
+  async redirects() {
+    return [
+      {
+        source: '/apartments/rent',
+        destination: '/apartments?dealType=rent',
+        permanent: true,
+      },
+      {
+        source: '/apartments/sale',
+        destination: '/apartments?dealType=sale',
+        permanent: true,
+      },
+    ];
+  },
+
   // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
   async rewrites() {
     return [

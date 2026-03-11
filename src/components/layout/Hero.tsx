@@ -353,7 +353,7 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments/rent"
+              href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
@@ -389,7 +389,7 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments/sale"
+              href="/apartments?dealType=sale"
               className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',

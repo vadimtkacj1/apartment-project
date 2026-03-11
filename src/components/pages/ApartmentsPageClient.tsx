@@ -79,14 +79,17 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     setSelectedCategory(category);
     setCurrentPage(1);
 
-    // Sync dealType filter
+    // Sync dealType filter and apply immediately
+    let newDealType: DealType | 'all' = 'all';
     if (category === 'sales') {
-      setFilters((prev) => ({ ...prev, dealType: 'sale' }));
+      newDealType = 'sale';
     } else if (category === 'rentals') {
-      setFilters((prev) => ({ ...prev, dealType: 'rent' }));
-    } else if (category === 'all') {
-      setFilters((prev) => ({ ...prev, dealType: 'all' }));
+      newDealType = 'rent';
     }
+
+    const updatedFilters = { ...filters, dealType: newDealType };
+    setFilters(updatedFilters);
+    setAppliedFilters(updatedFilters);
   };
 
   // Sync category when dealType changes
