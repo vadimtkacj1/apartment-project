@@ -198,10 +198,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        // Filter out sold properties
-        const filteredProperties = mappedProperties.filter((prop: Property) => !prop.isSold);
-
-        setProperties(filteredProperties);
+        setProperties(mappedProperties);
       } catch (error) {
         setProperties([]);
       } finally {
