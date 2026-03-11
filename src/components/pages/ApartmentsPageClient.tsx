@@ -113,7 +113,6 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         // Basic filters
         if (appliedFilters.dealType && appliedFilters.dealType !== 'all') params.append('dealType', appliedFilters.dealType);
         if (appliedFilters.city && appliedFilters.city !== 'all') params.append('city', appliedFilters.city);
-        if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
 
         // Property type filter
         if (appliedFilters.propertyType && appliedFilters.propertyType !== 'all') {
