@@ -13,14 +13,25 @@ export async function GET(
     // The rewrite already strips '/uploads' prefix, so path is relative to uploads directory
     const relativePath = path.join('/');
 
-    // Always use public/uploads - must match upload route
-    const baseDir = join(process.cwd(), 'public', 'uploads');
+    // Production: UPLOADS_DIR must match nginx (e.g. /opt/apartment-project/public/uploads)
+    // Fallbacks for different deployment layouts
+    const candidates = [
+      process.env.UPLOADS_DIR,
+      join(process.cwd(), 'public', 'uploads'),
+      join(process.cwd(), 'uploads'),
+      join(process.cwd(), '..', '..', 'public', 'uploads'), // when cwd is .next/standalone
+    ].filter(Boolean) as string[];
 
-    // Construct full file path (path is relative to uploads directory)
-    const fullPath = join(baseDir, relativePath);
+    let fullPath: string | null = null;
+    for (const baseDir of candidates) {
+      const candidatePath = join(baseDir, relativePath);
+      if (existsSync(candidatePath)) {
+        fullPath = candidatePath;
+        break;
+      }
+    }
 
-    // Check if file exists
-    if (!existsSync(fullPath)) {
+    if (!fullPath) {
       return NextResponse.json(
         { error: 'File not found' },
         { status: 404 }

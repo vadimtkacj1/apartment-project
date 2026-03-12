@@ -55,9 +55,11 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop() || 'jpg';
     const filename = `${timestamp}-${randomString}.${extension}`;
 
-    // Always use public/uploads - consistent path for dev and production
-    // So photos land in public/uploads/properties where they're expected
-    const baseDir = join(process.cwd(), 'public', 'uploads');
+    // Production: UPLOADS_DIR must match nginx alias (e.g. /opt/apartment-project/public/uploads)
+    // Dev: use public/uploads
+    const baseDir = process.env.UPLOADS_DIR
+      ? process.env.UPLOADS_DIR
+      : join(process.cwd(), 'public', 'uploads');
 
     const uploadDir = join(baseDir, folder);
     if (!existsSync(uploadDir)) {
