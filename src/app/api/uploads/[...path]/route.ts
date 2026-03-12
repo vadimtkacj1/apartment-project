@@ -12,9 +12,17 @@ export async function GET(
     // Join path segments (e.g., ['properties', 'file.webp'] -> 'properties/file.webp')
     // The rewrite already strips '/uploads' prefix, so path is relative to uploads directory
     const relativePath = path.join('/');
-    
+
+    // Determine upload directory based on environment
+    // In production (standalone), use a data directory outside .next
+    // In development, use public/uploads for easy access
+    const isDev = process.env.NODE_ENV === 'development';
+    const baseDir = isDev
+      ? join(process.cwd(), 'public', 'uploads')
+      : join(process.cwd(), 'uploads');
+
     // Construct full file path (path is relative to uploads directory)
-    const fullPath = join(process.cwd(), 'public', 'uploads', relativePath);
+    const fullPath = join(baseDir, relativePath);
 
     // Check if file exists
     if (!existsSync(fullPath)) {
@@ -32,12 +40,11 @@ export async function GET(
     const contentType = getContentType(extension || '');
 
     // Return file with appropriate headers
-    // Don't include cookies/auth headers for public images
+    // Use shorter cache for fresh uploads to avoid serving stale cached images
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-        // Ensure no authentication cookies are sent with image responses
+        'Cache-Control': 'public, max-age=3600, must-revalidate', // 1 hour cache, must revalidate
         'Access-Control-Allow-Origin': '*',
       },
     });

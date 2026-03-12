@@ -55,15 +55,24 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop() || 'jpg';
     const filename = `${timestamp}-${randomString}.${extension}`;
 
-    // Ensure upload directory exists
-    const uploadDir = join(process.cwd(), 'public', 'uploads', folder);
+    // Determine upload directory based on environment
+    // In production (standalone), use a data directory outside .next
+    // In development, use public/uploads for easy access
+    const isDev = process.env.NODE_ENV === 'development';
+    const baseDir = isDev
+      ? join(process.cwd(), 'public', 'uploads')
+      : join(process.cwd(), 'uploads');
+
+    const uploadDir = join(baseDir, folder);
     if (!existsSync(uploadDir)) {
       await mkdir(uploadDir, { recursive: true });
     }
 
-    // Write file
+    // Write file directly to folder (no cache)
     const filepath = join(uploadDir, filename);
     await writeFile(filepath, buffer);
+
+    console.log(`✅ File saved to: ${filepath}`);
 
     // Return public URL
     const url = `/uploads/${folder}/${filename}`;
