@@ -94,9 +94,9 @@ async function cleanMissingImages() {
     console.log(`   Total images removed: ${totalRemoved}`);
 
     if (totalRemoved > 0) {
-      console.log('\n⚠️  ВНИМАНИЕ: Ссылки на несуществующие файлы были удалены из базы данных.');
-      console.log('   Если у вас есть резервная копия этих файлов, восстановите их в папку public/uploads/');
-      console.log('   и НЕ запускайте этот скрипт повторно.');
+      console.log('\n⚠️  WARNING: References to missing files were removed from the database.');
+      console.log('   If you have a backup of these files, restore them to public/uploads/');
+      console.log('   and DO NOT run this script again.');
     }
 
   } catch (error) {
@@ -108,7 +108,7 @@ async function cleanMissingImages() {
 }
 
 async function showMissingOnly() {
-  console.log('🔍 Поиск отсутствующих изображений...\n');
+  console.log('🔍 Searching for missing images...\n');
 
   try {
     const properties = await prisma.property.findMany();
@@ -140,17 +140,17 @@ async function showMissingOnly() {
     }
 
     if (missingFiles.length === 0) {
-      console.log('✅ Все изображения на месте!\n');
+      console.log('✅ All images are present!\n');
     } else {
-      console.log(`❌ Найдено ${missingFiles.length} отсутствующих файлов:\n`);
+      console.log(`❌ Found ${missingFiles.length} missing file(s):\n`);
       missingFiles.forEach((file) => {
         console.log(`   - ${file}`);
       });
 
-      console.log('\n💡 Что делать:');
-      console.log('   1. Если файлы есть в резервной копии - восстановите их в public/uploads/');
-      console.log('   2. Если файлов нет - запустите скрипт с флагом --clean для очистки БД');
-      console.log('      npm run clean:images -- --clean');
+      console.log('\n💡 What to do:');
+      console.log('   1. If files exist in backup - restore them to public/uploads/');
+      console.log('   2. If files are lost - run script with --clean flag to clean DB');
+      console.log('      npm run clean:images');
     }
 
   } catch (error) {
