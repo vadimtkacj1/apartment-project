@@ -14,7 +14,8 @@
     "postinstall": "prisma generate",
     "diagnose:images": "npx tsx scripts/diagnose-images.ts",
     "check:images": "npx tsx scripts/clean-missing-images.ts",
-    "clean:images": "npx tsx scripts/clean-missing-images.ts --clean"
+    "clean:images": "npx tsx scripts/clean-missing-images.ts --clean",
+    "fix:images": "npx tsx scripts/fix-images-random.ts"
   },
   "keywords": [],
   "author": "",
