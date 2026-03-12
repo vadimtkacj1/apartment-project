@@ -55,14 +55,21 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop() || 'jpg';
     const filename = `${timestamp}-${randomString}.${extension}`;
 
-    // Production: UPLOADS_DIR must match nginx alias (e.g. /opt/apartment-project/public/uploads)
-    // Dev: use public/uploads
-    const baseDir = process.env.UPLOADS_DIR
-      ? process.env.UPLOADS_DIR
+    // SIMPLIFIED: On production always use absolute path
+    const baseDir = process.env.NODE_ENV === 'production'
+      ? '/opt/apartment-project/public/uploads'
       : join(process.cwd(), 'public', 'uploads');
 
+    console.log('🔍 DEBUG upload:');
+    console.log('  - NODE_ENV:', process.env.NODE_ENV);
+    console.log('  - baseDir:', baseDir);
+    console.log('  - folder:', folder);
+
     const uploadDir = join(baseDir, folder);
+    console.log('  - uploadDir:', uploadDir);
+
     if (!existsSync(uploadDir)) {
+      console.log('  - Creating directory...');
       await mkdir(uploadDir, { recursive: true });
     }
 
