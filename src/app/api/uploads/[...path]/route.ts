@@ -42,11 +42,11 @@ export async function GET(
     const contentType = getContentType(extension || '');
 
     // Return file with appropriate headers
-    // Use shorter cache for fresh uploads to avoid serving stale cached images
+    // Для загруженных файлов отключаем агрессивный кеш – всегда можно получить свежую версию
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=3600, must-revalidate', // 1 hour cache, must revalidate
+        'Cache-Control': 'public, max-age=0, must-revalidate',
         'Access-Control-Allow-Origin': '*',
       },
     });
