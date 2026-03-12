@@ -77,6 +77,8 @@ export async function POST(request: NextRequest) {
     const uploadDir = join(baseDir, folder);
     console.log(`   - baseDir: ${baseDir}`);
     console.log(`   - uploadDir: ${uploadDir}`);
+
+    if (!existsSync(uploadDir)) {
       console.log('📁 [UPLOAD] Directory does not exist, creating...');
       await mkdir(uploadDir, { recursive: true });
       console.log('✅ [UPLOAD] Directory created');

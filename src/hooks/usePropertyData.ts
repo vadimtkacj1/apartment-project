@@ -208,11 +208,17 @@ export function usePropertyData(propertyId: string) {
         if (data.vacancyDate !== null && data.vacancyDate !== undefined && typeof data.vacancyDate === 'string' && data.vacancyDate.trim() !== '') {
           const trimmedDate = data.vacancyDate.trim();
           
-          // Check if it's "מיד" (immediately)
+          // Check if it's "מיד" (immediately) or "גמיש" (flexible)
           if (trimmedDate === 'מיד' || trimmedDate === 'immediately') {
             specs.push({
               label: "תאריך פינוי",
               value: 'מיד',
+              icon: Calendar
+            });
+          } else if (trimmedDate === 'גמיש' || trimmedDate === 'flexible') {
+            specs.push({
+              label: "תאריך פינוי",
+              value: 'גמיש',
               icon: Calendar
             });
           } else {
