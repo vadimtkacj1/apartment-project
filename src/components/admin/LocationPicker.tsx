@@ -62,6 +62,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
+    language: 'he',
+    region: 'IL',
+    version: 'weekly', // Актуальная версия (3.55 retired)
   });
 
   // Load address when position is provided initially

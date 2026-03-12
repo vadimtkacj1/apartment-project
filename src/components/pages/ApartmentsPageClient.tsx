@@ -79,14 +79,17 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     setSelectedCategory(category);
     setCurrentPage(1);
 
-    // Sync dealType filter
+    // Sync dealType filter and apply immediately
+    let newDealType: DealType | 'all' = 'all';
     if (category === 'sales') {
-      setFilters((prev) => ({ ...prev, dealType: 'sale' }));
+      newDealType = 'sale';
     } else if (category === 'rentals') {
-      setFilters((prev) => ({ ...prev, dealType: 'rent' }));
-    } else if (category === 'all') {
-      setFilters((prev) => ({ ...prev, dealType: 'all' }));
+      newDealType = 'rent';
     }
+
+    const updatedFilters = { ...filters, dealType: newDealType };
+    setFilters(updatedFilters);
+    setAppliedFilters(updatedFilters);
   };
 
   // Sync category when dealType changes
@@ -110,7 +113,6 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         // Basic filters
         if (appliedFilters.dealType && appliedFilters.dealType !== 'all') params.append('dealType', appliedFilters.dealType);
         if (appliedFilters.city && appliedFilters.city !== 'all') params.append('city', appliedFilters.city);
-        if (selectedCategory && selectedCategory !== 'all') params.append('category', selectedCategory);
 
         // Property type filter
         if (appliedFilters.propertyType && appliedFilters.propertyType !== 'all') {
@@ -180,7 +182,10 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
-          next: { revalidate: 60 },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
         if (!response.ok) throw new Error('Failed');
         const data = await response.json();
@@ -192,10 +197,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        // Filter out sold properties
-        const filteredProperties = mappedProperties.filter((prop: Property) => !prop.isSold);
-
-        setProperties(filteredProperties);
+        setProperties(mappedProperties);
       } catch (error) {
         setProperties([]);
       } finally {

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
   if (!value) return [];

@@ -140,11 +140,12 @@ const AboutSection: React.FC = memo(() => {
             <div className="relative w-full max-w-[420px] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
               <Image
                 src="/6.png"
-                alt="Про застройщика"
+                alt="אודות המשרד"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 30vw"
-                priority
+                quality={85}
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent pointer-events-none" />
             </div>

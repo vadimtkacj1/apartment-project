@@ -50,6 +50,9 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey || '',
+    language: 'he',
+    region: 'IL',
+    version: 'weekly', // Актуальная версия (3.55 retired)
   });
 
   // Debug logging

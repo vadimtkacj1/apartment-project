@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
         phone: body.phone || null,
         email: body.email || null,
         whatsapp: body.whatsapp || null,
+        licenceNumber: body.licenceNumber || null,
         description: body.description || null,
         order: body.order !== undefined ? body.order : 0,
         isActive: body.isActive !== undefined ? body.isActive : true,

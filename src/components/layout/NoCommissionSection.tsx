@@ -62,7 +62,10 @@ function NoCommissionSection() {
         }
 
         const response = await fetch('/api/properties?noCommission=true&limit=1', {
-          next: { revalidate: 300 }
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
 
         if (!response.ok) {

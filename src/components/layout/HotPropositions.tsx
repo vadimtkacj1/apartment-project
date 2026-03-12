@@ -114,7 +114,10 @@ function HotPropositions() {
         }
         
         const response = await fetch('/api/properties?dealType=sale&hotProposition=true&limit=12', {
-          next: { revalidate: 300 }
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
 
         if (!response.ok) {
