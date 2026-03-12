@@ -32,12 +32,45 @@ export default function ImageUploader({
     });
 
     if (!response.ok) {
+<<<<<<< Updated upstream
       const error = await response.json();
       throw new Error(error.error || 'Failed to upload image');
     }
 
     const data = await response.json();
     return data.url;
+=======
+      let errorMessage = 'Failed to upload image';
+
+      try {
+        const error = await response.json();
+        console.error('❌ [FRONTEND] Error from server (JSON):', error);
+        errorMessage = error.error || errorMessage;
+      } catch (jsonError) {
+        console.error('❌ [FRONTEND] Error parsing JSON error response:', jsonError);
+
+        if (response.status === 413) {
+          // Payload Too Large – сервер отверг файл ещё до обработки нашим бэкендом
+          errorMessage = 'התמונה גדולה מדי עבור השרת. נסה להקטין את התמונה ולהעלות שוב.';
+        } else {
+          const text = await response.text().catch(() => null);
+          console.error('❌ [FRONTEND] Non-JSON error response body:', text);
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    try {
+      const data = await response.json();
+      console.log('✅ [FRONTEND] File uploaded successfully!');
+      console.log('   URL:', data.url);
+      return data.url;
+    } catch (parseError) {
+      console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
+      throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
+    }
+>>>>>>> Stashed changes
   };
 
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
@@ -63,9 +96,9 @@ export default function ImageUploader({
       return false;
     }
 
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      message.error('התמונה חייבת להיות קטנה מ-5MB');
+    const isLt50M = file.size / 1024 / 1024 < 50;
+    if (!isLt50M) {
+      message.error('התמונה חייבת להיות קטנה מ-50MB');
       return false;
     }
 
@@ -116,7 +149,7 @@ export default function ImageUploader({
           גרור תמונות לכאן או לחץ להעלאה
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 5MB לכל תמונה
+          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 50MB לכל תמונה
         </p>
         {uploading && (
           <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
