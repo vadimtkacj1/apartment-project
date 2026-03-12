@@ -133,7 +133,9 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // Для загруженных картинок не кешируем агрессивно:
+            // браузер и прокси всегда могут проверить наличие обновления.
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },
