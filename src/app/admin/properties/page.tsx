@@ -172,8 +172,12 @@ export default function PropertiesPage() {
       // Refresh the properties list
       await fetchProperties();
 
+      // Get the property to check dealType for proper messaging
+      const property = properties.find(p => p.id === propertyId);
+      const soldText = property?.dealType === 'rent' ? 'מושכר' : 'נמכר';
+
       const msgs: Record<string, string> = {
-        isSold: value ? 'הנכס סומן כנמכר' : 'הנכס בוטל מסומן כנמכר',
+        isSold: value ? `הנכס סומן כ${soldText}` : `הנכס בוטל מסומן כ${soldText}`,
         isPinned: value ? 'הנכס נצמד לעמוד הבית' : 'הנכס בוטל מהצמדה',
         isActive: value ? 'הנכס הופעל' : 'הנכס הושבת',
       };
@@ -405,7 +409,7 @@ export default function PropertiesPage() {
                     size="small"
                     checked={record.isSold}
                     onChange={(v) => handleStatusChange(record.id, 'isSold', v)}
-                    checkedChildren="נמכר"
+                    checkedChildren={record.dealType === 'rent' ? 'מושכר' : 'נמכר'}
                     unCheckedChildren="פנוי"
                   />
                   <Switch

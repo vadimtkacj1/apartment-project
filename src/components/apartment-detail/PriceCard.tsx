@@ -5,9 +5,10 @@ interface PriceCardProps {
   price: string;
   originalPrice?: string;
   isSold: boolean;
+  dealType?: string;
 }
 
-export function PriceCard({ price, originalPrice, isSold }: PriceCardProps) {
+export function PriceCard({ price, originalPrice, isSold, dealType }: PriceCardProps) {
   return (
     <div className={`rounded-2xl p-8 mb-6 shadow-2xl ${
       isSold
@@ -26,7 +27,7 @@ export function PriceCard({ price, originalPrice, isSold }: PriceCardProps) {
       {isSold && (
         <div className="mt-4 flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-bold">
           <CheckCircle2 size={20} />
-          <span>נמכר</span>
+          <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
         </div>
       )}
     </div>

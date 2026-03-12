@@ -303,6 +303,7 @@ export function usePropertyData(propertyId: string) {
           images: data.images && data.images.length > 0 ? data.images : ["/images/hero/sales.jpg"],
           description: data.description || 'אין תיאור זמין',
           isSold: data.isSold || false,
+          dealType: data.dealType,
           amenities: {
             ac: data.hasAirConditioning || false,
             handicap: data.hasDisabledAccess || false,

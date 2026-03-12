@@ -159,11 +159,11 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           <Form.Item name="isSold" valuePropName="checked">
             <Switch
               checked={formData.isSold}
-              checkedChildren="נמכר"
-              unCheckedChildren="לא נמכר"
+              checkedChildren={formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}
+              unCheckedChildren={formData.dealType === 'rent' ? 'לא מושכר' : 'לא נמכר'}
               onChange={(checked) => handleChange('isSold', checked)}
             />
-            <span style={{ marginRight: '8px' }}>נכס נמכר</span>
+            <span style={{ marginRight: '8px' }}>נכס {formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
           </Form.Item>
         </Col>
         <Col xs={24} sm={8}>
