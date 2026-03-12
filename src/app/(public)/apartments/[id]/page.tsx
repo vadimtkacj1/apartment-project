@@ -100,7 +100,7 @@ export default function ApartmentDetailPage() {
         <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-6 lg:px-12">
           {/* Right Side - Gallery & Description */}
           <div className="lg:col-span-2">
-            <PropertyGallery images={property.images} isSold={isSold} />
+            <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
             <PropertyDescription
               description={property.description}
               bedrooms={property.bedrooms}
@@ -132,8 +132,9 @@ export default function ApartmentDetailPage() {
                 price={property.price}
                 originalPrice={property.originalPrice}
                 isSold={isSold}
+                dealType={property.dealType}
               />
-              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} />
+              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} dealType={property.dealType} />
             </motion.div>
           </div>
         </div>

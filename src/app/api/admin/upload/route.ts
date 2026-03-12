@@ -69,20 +69,14 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}-${randomString}.${extension}`;
     console.log(`🏷️  [UPLOAD] Generated filename: ${filename}`);
 
-    // SIMPLIFIED: On production always use absolute path
-    const baseDir = process.env.NODE_ENV === 'production'
-      ? '/opt/apartment-project/public/uploads'
+    // One source of truth: UPLOADS_DIR or cwd/public/uploads (same as API that serves files)
+    const baseDir = process.env.UPLOADS_DIR
+      ? process.env.UPLOADS_DIR
       : join(process.cwd(), 'public', 'uploads');
 
-    console.log('🔍 [UPLOAD] Determining save path:');
-    console.log(`   - NODE_ENV: ${process.env.NODE_ENV}`);
-    console.log(`   - baseDir: ${baseDir}`);
-    console.log(`   - folder: ${folder}`);
-
     const uploadDir = join(baseDir, folder);
+    console.log(`   - baseDir: ${baseDir}`);
     console.log(`   - uploadDir: ${uploadDir}`);
-
-    if (!existsSync(uploadDir)) {
       console.log('📁 [UPLOAD] Directory does not exist, creating...');
       await mkdir(uploadDir, { recursive: true });
       console.log('✅ [UPLOAD] Directory created');

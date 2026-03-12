@@ -13,13 +13,13 @@ export async function GET(
     // The rewrite already strips '/uploads' prefix, so path is relative to uploads directory
     const relativePath = path.join('/');
 
-    // Production: UPLOADS_DIR must match nginx (e.g. /opt/apartment-project/public/uploads)
-    // Fallbacks for different deployment layouts
+    // Same logic as upload: UPLOADS_DIR first, then cwd paths. In production add common server path.
     const candidates = [
       process.env.UPLOADS_DIR,
       join(process.cwd(), 'public', 'uploads'),
       join(process.cwd(), 'uploads'),
-      join(process.cwd(), '..', '..', 'public', 'uploads'), // when cwd is .next/standalone
+      join(process.cwd(), '..', '..', 'public', 'uploads'),
+      ...(process.env.NODE_ENV === 'production' ? ['/opt/apartment-project/public/uploads'] : []),
     ].filter(Boolean) as string[];
 
     let fullPath: string | null = null;
