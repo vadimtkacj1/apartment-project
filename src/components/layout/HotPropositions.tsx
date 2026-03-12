@@ -49,10 +49,14 @@ const MarqueeRow = ({
   duration?: number,
   isMobile?: boolean
 }) => {
-  const duplicatedItems = useMemo(
-    () => isMobile ? [...items, ...items] : [...items, ...items, ...items],
-    [items, isMobile]
-  );
+  const duplicatedItems = useMemo(() => {
+    // Avoid showing the same 1–2 cards 3 times in a row
+    if (items.length <= 2) {
+      return [...items, ...items];
+    }
+
+    return isMobile ? [...items, ...items] : [...items, ...items, ...items];
+  }, [items, isMobile]);
 
   const animationDuration = isMobile ? duration * 0.8 : duration;
 

@@ -63,8 +63,11 @@ const FeaturedProperties: React.FC = () => {
 
         const data = await response.json();
 
+        // Filter out sold / rented properties – only show available ones
+        const available = (data as any[]).filter((prop) => !prop.isSold);
+
         // Map properties to the format expected by PropertyCard
-        const mappedProperties: Property[] = data.map((prop: any) => ({
+        const mappedProperties: Property[] = available.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
           location: prop.location,
