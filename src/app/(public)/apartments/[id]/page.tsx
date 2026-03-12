@@ -97,31 +97,35 @@ export default function ApartmentDetailPage() {
           <PropertyNavigation previousId={previousId} nextId={nextId} isSold={isSold} />
         </div>
 
-        <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 px-6 lg:px-12">
+        <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 lg:px-12">
           {/* Right Side - Gallery & Description */}
           <div className="lg:col-span-2">
-            <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
-            <PropertyDescription
-              description={property.description}
-              bedrooms={property.bedrooms}
-              floor={property.floor}
-              totalFloors={property.totalFloors}
-              area={property.area}
-              builtArea={property.builtArea}
-              isSold={isSold}
-            />
-            <PropertyAmenities amenities={property.amenities} isSold={isSold} />
-            <PropertySpecs specs={property.specs} isSold={isSold} />
-            <PropertyMap
-              isSold={isSold}
-              latitude={property.latitude}
-              longitude={property.longitude}
-              location={property.location}
-            />
+            <div className="-mx-6 lg:mx-0">
+              <PropertyGallery images={property.images} isSold={isSold} />
+            </div>
+            <div className="px-6">
+              <PropertyDescription
+                description={property.description}
+                bedrooms={property.bedrooms}
+                floor={property.floor}
+                totalFloors={property.totalFloors}
+                area={property.area}
+                builtArea={property.builtArea}
+                isSold={isSold}
+              />
+              <PropertyAmenities amenities={property.amenities} isSold={isSold} />
+              <PropertySpecs specs={property.specs} isSold={isSold} />
+              <PropertyMap
+                isSold={isSold}
+                latitude={property.latitude}
+                longitude={property.longitude}
+                location={property.location}
+              />
+            </div>
           </div>
 
           {/* Left Side - Contact Form */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 px-6">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}

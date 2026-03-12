@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
     }
     console.log('✅ [UPLOAD] File type validation passed');
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
       console.log(`❌ [UPLOAD] Error: File too large (${file.size} bytes)`);
       return NextResponse.json(
