@@ -39,17 +39,6 @@ export default function ImageUploader({
     console.log('📥 [FRONTEND] Received response, status:', response.status);
 
     if (!response.ok) {
-<<<<<<< Updated upstream
-      const error = await response.json();
-      console.error('❌ [FRONTEND] Error from server:', error);
-      throw new Error(error.error || 'Failed to upload image');
-    }
-
-    const data = await response.json();
-    console.log('✅ [FRONTEND] File uploaded successfully!');
-    console.log('   URL:', data.url);
-    return data.url;
-=======
       let errorMessage = 'Failed to upload image';
 
       try {
@@ -80,7 +69,6 @@ export default function ImageUploader({
       console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
       throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
     }
->>>>>>> Stashed changes
   };
 
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
