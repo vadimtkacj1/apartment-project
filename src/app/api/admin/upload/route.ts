@@ -69,10 +69,9 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}-${randomString}.${extension}`;
     console.log(`🏷️  [UPLOAD] Generated filename: ${filename}`);
 
-    // One source of truth: UPLOADS_DIR or cwd/public/uploads (same as API that serves files)
-    const baseDir = process.env.UPLOADS_DIR
-      ? process.env.UPLOADS_DIR
-      : join(process.cwd(), 'public', 'uploads');
+    // One source of truth: only UPLOADS_DIR (or fixed absolute path on server)
+    // Никаких временных/.next папок – всегда одна постоянная директория
+    const baseDir = process.env.UPLOADS_DIR || '/opt/apartment-project/public/uploads';
 
     const uploadDir = join(baseDir, folder);
     console.log(`   - baseDir: ${baseDir}`);

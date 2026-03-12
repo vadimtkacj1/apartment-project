@@ -13,14 +13,10 @@ export async function GET(
     // The rewrite already strips '/uploads' prefix, so path is relative to uploads directory
     const relativePath = path.join('/');
 
-    // Same logic as upload: UPLOADS_DIR first, then cwd paths. In production add common server path.
-    const candidates = [
-      process.env.UPLOADS_DIR,
-      join(process.cwd(), 'public', 'uploads'),
-      join(process.cwd(), 'uploads'),
-      join(process.cwd(), '..', '..', 'public', 'uploads'),
-      ...(process.env.NODE_ENV === 'production' ? ['/opt/apartment-project/public/uploads'] : []),
-    ].filter(Boolean) as string[];
+    // Only look in UPLOADS_DIR (or fixed absolute path on server).
+    // Без fallback-ов на cwd/.next – все файлы хранятся в одной постоянной папке.
+    const baseDir = process.env.UPLOADS_DIR || '/opt/apartment-project/public/uploads';
+    const candidates = [baseDir];
 
     let fullPath: string | null = null;
     for (const baseDir of candidates) {
