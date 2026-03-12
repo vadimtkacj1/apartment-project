@@ -63,8 +63,12 @@ const FeaturedProperties: React.FC = () => {
 
         const data = await response.json();
 
-        // Map properties to the format expected by PropertyCard
-        const mappedProperties: Property[] = data.map((prop: any) => ({
+        // Filter out sold / rented properties – only show available ones
+        const available = (data as any[]).filter((prop) => !prop.isSold);
+
+        // Map properties to the format expected by PropertyCard.
+        // Force isSold = false so "נמכר/מושכר" не показується в цьому блоці.
+        const mappedProperties: Property[] = available.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
           location: prop.location,
@@ -75,7 +79,7 @@ const FeaturedProperties: React.FC = () => {
           area: prop.area,
           status: prop.status,
           image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
-          isSold: prop.isSold || false,
+          isSold: false,
         }));
 
         setProperties(mappedProperties);
