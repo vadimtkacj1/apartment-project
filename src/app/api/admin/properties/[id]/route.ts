@@ -71,12 +71,27 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
+    console.log('🔄 [DB UPDATE] Обновление property ID:', id);
+
     const body = await request.json();
+    console.log('📝 [DB UPDATE] Данные для обновления:');
+    console.log('   - Title:', body.title);
+    console.log('   - Images array:', body.images);
+    console.log('   - Images count:', body.images?.length || 0);
+    if (body.images && body.images.length > 0) {
+      console.log('   - Images:');
+      body.images.forEach((img: string, idx: number) => {
+        console.log(`     ${idx + 1}. ${img}`);
+      });
+    }
 
     // If property is being marked as sold, clear hot proposition and no commission flags
     const isSold = body.isSold !== undefined ? body.isSold : false;
     const isHotProposition = isSold ? false : (body.isHotProposition !== undefined ? body.isHotProposition : false);
     const isNoCommission = isSold ? false : (body.isNoCommission !== undefined ? body.isNoCommission : false);
+
+    const imagesJson = JSON.stringify(body.images || []);
+    console.log('🔄 [DB UPDATE] Images преобразованы в JSON:', imagesJson);
 
     const property = await prisma.property.update({
       where: {
@@ -129,7 +144,7 @@ export async function PUT(
         description: body.description,
         price: body.price,
         originalPrice: body.originalPrice || null,
-        images: JSON.stringify(body.images || []),
+        images: imagesJson,
         status: body.status || null,
         location: body.location,
 
@@ -153,9 +168,17 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(formatProperty(property));
+    console.log('✅ [DB UPDATE] Property обновлён успешно! ID:', property.id);
+    console.log('   - Изображений в БД:', property.images);
+
+    const formatted = formatProperty(property);
+    console.log('🎉 [DB UPDATE] Property форматирован для ответа');
+    console.log('   - Images count:', formatted.images?.length || 0);
+    console.log('   - Images:', formatted.images);
+
+    return NextResponse.json(formatted);
   } catch (error) {
-    console.error('Error updating property:', error);
+    console.error('❌ [DB UPDATE] Ошибка обновления property:', error);
     return NextResponse.json(
       { error: 'Failed to update property' },
       { status: 500 }

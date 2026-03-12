@@ -23,36 +23,51 @@ export default function ImageUploader({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const uploadImage = async (file: File): Promise<string> => {
+    console.log('🚀 [FRONTEND] Starting file upload:', file.name);
+    console.log('   Size:', file.size, 'bytes');
+    console.log('   Type:', file.type);
+
     const formData = new FormData();
     formData.append('file', file);
 
+    console.log('📡 [FRONTEND] Sending request to /api/admin/upload...');
     const response = await fetch('/api/admin/upload', {
       method: 'POST',
       body: formData,
     });
 
+    console.log('📥 [FRONTEND] Received response, status:', response.status);
+
     if (!response.ok) {
       const error = await response.json();
+      console.error('❌ [FRONTEND] Error from server:', error);
       throw new Error(error.error || 'Failed to upload image');
     }
 
     const data = await response.json();
+    console.log('✅ [FRONTEND] File uploaded successfully!');
+    console.log('   URL:', data.url);
     return data.url;
   };
 
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
+    console.log('📤 [FRONTEND] handleUpload called');
     setUploading(true);
 
     try {
       const url = await uploadImage(file as File);
+      console.log('💾 [FRONTEND] Adding URL to images list:', url);
       onImagesChange([...images, url]);
+      console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
       message.success('התמונה הועלתה בהצלחה');
       onSuccess?.(url);
     } catch (err: any) {
+      console.error('❌ [FRONTEND] Upload error:', err);
       message.error(err.message || 'שגיאה בהעלאת התמונה');
       onError?.(err);
     } finally {
       setUploading(false);
+      console.log('🏁 [FRONTEND] Upload completed\n');
     }
   };
 
