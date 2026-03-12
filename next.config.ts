@@ -84,15 +84,16 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
-  async rewrites() {
-    return [
-      {
-        source: '/uploads/:path*',
-        destination: '/api/uploads/:path*',
-      },
-    ];
-  },
+  // Rewrites removed - static files from public/uploads/ are served directly by Next.js
+  // This prevents conflicts with Next.js Image Optimization API
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/uploads/:path*',
+  //       destination: '/api/uploads/:path*',
+  //     },
+  //   ];
+  // },
   
   // Headers for caching and security
   async headers() {

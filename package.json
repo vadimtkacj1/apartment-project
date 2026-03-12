@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "seed:admin": "node prisma/seed.mjs",
     "seed": "node prisma/seed-properties.mjs",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "clean:images": "tsx scripts/clean-missing-images.ts"
   },
   "keywords": [],
   "author": "",
