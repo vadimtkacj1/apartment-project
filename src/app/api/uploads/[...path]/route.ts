@@ -13,13 +13,8 @@ export async function GET(
     // The rewrite already strips '/uploads' prefix, so path is relative to uploads directory
     const relativePath = path.join('/');
 
-    // Determine upload directory based on environment
-    // In production (standalone), use a data directory outside .next
-    // In development, use public/uploads for easy access
-    const isDev = process.env.NODE_ENV === 'development';
-    const baseDir = isDev
-      ? join(process.cwd(), 'public', 'uploads')
-      : join(process.cwd(), 'uploads');
+    // Always use public/uploads - must match upload route
+    const baseDir = join(process.cwd(), 'public', 'uploads');
 
     // Construct full file path (path is relative to uploads directory)
     const fullPath = join(baseDir, relativePath);

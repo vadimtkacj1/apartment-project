@@ -22,14 +22,33 @@ fi
 echo "✅ Build complete!"
 echo ""
 
-# Copy public folder to standalone
+# Copy public folder to standalone (excluding uploads - they go to separate data directory)
 echo "📁 Copying public folder to standalone..."
 if [ -d "public" ]; then
   mkdir -p .next/standalone/public
-  cp -r public/* .next/standalone/public/
-  echo "✅ Public folder copied!"
+  if command -v rsync &> /dev/null; then
+    rsync -av --exclude 'uploads' public/ .next/standalone/public/
+  else
+    # Use find to copy all files except uploads directory
+    (cd public && find . -type f ! -path './uploads/*' -exec sh -c 'mkdir -p "../.next/standalone/public/$(dirname "{}")" && cp "{}" "../.next/standalone/public/{}"' \;)
+  fi
+  echo "✅ Public folder copied (excluding uploads)!"
 else
   echo "⚠️  Warning: public folder not found"
+fi
+
+# Create uploads directory in standalone root (for production data)
+echo "📁 Creating uploads directory for production..."
+mkdir -p .next/standalone/uploads
+if [ -d "public/uploads" ]; then
+  # Copy existing uploads structure
+  cp -r public/uploads/* .next/standalone/uploads/ 2>/dev/null || true
+  echo "✅ Uploads directory created and populated!"
+else
+  mkdir -p .next/standalone/uploads/properties
+  mkdir -p .next/standalone/uploads/owners
+  mkdir -p .next/standalone/uploads/team
+  echo "✅ Uploads directory structure created!"
 fi
 echo ""
 
