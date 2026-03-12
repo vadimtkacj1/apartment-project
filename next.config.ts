@@ -84,16 +84,15 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Uploads are served directly by nginx from public/uploads
-  // No rewrite needed - nginx handles /uploads/ location
-  // async rewrites() {
-  //   return [
-  //     {
-  //       source: '/uploads/:path*',
-  //       destination: '/api/uploads/:path*',
-  //     },
-  //   ];
-  // },
+  // Rewrite /uploads/* to API route — сервер сохраняет в UPLOADS_DIR и API отдаёт оттуда же
+  async rewrites() {
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: '/api/uploads/:path*',
+      },
+    ];
+  },
   
   // Headers for caching and security
   async headers() {

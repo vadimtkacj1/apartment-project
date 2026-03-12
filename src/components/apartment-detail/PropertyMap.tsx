@@ -51,7 +51,7 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
     googleMapsApiKey: apiKey || '',
     language: 'he',
     region: 'IL',
-    version: '3.55', // Без deprecation warning для Marker (v3.56+ deprecated)
+    version: 'weekly', // Актуальная версия (3.55 retired)
   });
 
   if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
