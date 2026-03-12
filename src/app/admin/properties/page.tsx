@@ -150,30 +150,27 @@ export default function PropertiesPage() {
     field: 'isActive' | 'isSold' | 'isPinned',
     value: boolean
   ) => {
-    try {
-      // First, fetch the current property data from the server to ensure we have the latest version
-      const getResponse = await fetch(`/api/admin/properties/${propertyId}`);
-      if (!getResponse.ok) {
-        throw new Error('Failed to fetch property');
-      }
-      const currentProperty = await getResponse.json();
+    // Optimistic UI update for snappier toggles
+    setProperties((prev) =>
+      prev.map((property) =>
+        property.id === propertyId ? { ...property, [field]: value } : property
+      )
+    );
 
-      // Update the property with the new value
+    try {
       const response = await fetch(`/api/admin/properties/${propertyId}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...currentProperty, [field]: value }),
+        body: JSON.stringify({ [field]: value }),
       });
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      // Refresh the properties list
-      await fetchProperties();
-
       // Get the property to check dealType for proper messaging
-      const property = properties.find(p => p.id === propertyId);
+      const property = properties.find((p) => p.id === propertyId);
       const soldText = property?.dealType === 'rent' ? 'מושכר' : 'נמכר';
 
       const msgs: Record<string, string> = {
@@ -185,8 +182,12 @@ export default function PropertiesPage() {
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
       message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
-      // Refresh properties to revert the optimistic update
-      await fetchProperties();
+      // Revert optimistic update on error
+      setProperties((prev) =>
+        prev.map((property) =>
+          property.id === propertyId ? { ...property, [field]: !value } : property
+        )
+      );
     }
   };
 

@@ -64,7 +64,7 @@ export async function GET(
   }
 }
 
-// PUT - Update property
+// PUT - Update property (full update)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -181,6 +181,65 @@ export async function PUT(
     console.error('❌ [DB UPDATE] Ошибка обновления property:', error);
     return NextResponse.json(
       { error: 'Failed to update property' },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Partial update (lightweight status toggles etc.)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+
+    console.log('🔧 [DB PATCH] Partial update property ID:', id);
+    console.log('   - Incoming body:', body);
+
+    const updateData: any = {};
+
+    if (typeof body.isActive === 'boolean') {
+      updateData.isActive = body.isActive;
+    }
+
+    if (typeof body.isPinned === 'boolean') {
+      updateData.isPinned = body.isPinned;
+    }
+
+    if (typeof body.isSold === 'boolean') {
+      const isSold = body.isSold;
+      updateData.isSold = isSold;
+      // When marking as sold, automatically clear homepage flags
+      if (isSold) {
+        updateData.isHotProposition = false;
+        updateData.isNoCommission = false;
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: 'No valid fields provided for update' },
+        { status: 400 }
+      );
+    }
+
+    const property = await prisma.property.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: updateData,
+    });
+
+    const formatted = formatProperty(property);
+    console.log('✅ [DB PATCH] Property partially updated. Fields:', Object.keys(updateData));
+
+    return NextResponse.json(formatted);
+  } catch (error) {
+    console.error('❌ [DB PATCH] Error partially updating property:', error);
+    return NextResponse.json(
+      { error: 'Failed to partially update property' },
       { status: 500 }
     );
   }
