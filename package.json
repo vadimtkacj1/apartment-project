@@ -12,6 +12,7 @@
     "seed:admin": "node prisma/seed.mjs",
     "seed": "node prisma/seed-properties.mjs",
     "postinstall": "prisma generate",
+    "diagnose:images": "npx tsx scripts/diagnose-images.ts",
     "check:images": "npx tsx scripts/clean-missing-images.ts",
     "clean:images": "npx tsx scripts/clean-missing-images.ts --clean"
   },
