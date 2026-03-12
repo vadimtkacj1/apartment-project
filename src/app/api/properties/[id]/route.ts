@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -11,12 +13,33 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
+// Helper to validate that image files exist on disk
+function validateImages(images: string[]): string[] {
+  return images.filter((imagePath) => {
+    // Remove leading slash if present
+    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+    const fullPath = join(process.cwd(), 'public', cleanPath);
+    const exists = existsSync(fullPath);
+
+    // Log missing images in development
+    if (!exists && process.env.NODE_ENV === 'development') {
+      console.warn(`⚠️  Image not found: ${imagePath}`);
+    }
+
+    return exists;
+  });
+}
+
 // Helper to convert property from DB format to API format
 function formatProperty(property: any) {
+  const allImages = parseJsonArray(property.images);
+  // Filter out images that don't exist on disk
+  const validImages = validateImages(allImages);
+
   return {
     ...property,
     directions: parseJsonArray(property.directions),
-    images: parseJsonArray(property.images),
+    images: validImages,
     // Explicitly convert boolean fields from SQLite (0/1) to true booleans
     isActive: Boolean(property.isActive),
     isSold: Boolean(property.isSold),
