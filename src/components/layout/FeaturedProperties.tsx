@@ -49,8 +49,9 @@ const FeaturedProperties: React.FC = () => {
           });
         }
         
-        // Fetch pinned properties from center area for sale, limit to 3
-        const response = await fetch('/api/properties?region=center&dealType=sale&pinned=true&limit=3', {
+        // Fetch properties from center area for sale (not only pinned),
+        // then on client we will pick up to 3 best ones.
+        const response = await fetch('/api/properties?region=center&dealType=sale&limit=20', {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache'
@@ -66,9 +67,19 @@ const FeaturedProperties: React.FC = () => {
         // Filter out sold / rented properties – only show available ones
         const available = (data as any[]).filter((prop) => !prop.isSold);
 
+        // Sort: pinned first, then by newest
+        const sorted = available.sort((a: any, b: any) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+        // Take up to 3 properties
+        const topThree = sorted.slice(0, 3);
+
         // Map properties to the format expected by PropertyCard.
         // Force isSold = false so "נמכר/מושכר" не показується в цьому блоці.
-        const mappedProperties: Property[] = available.map((prop: any) => ({
+        const mappedProperties: Property[] = topThree.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
           location: prop.location,
