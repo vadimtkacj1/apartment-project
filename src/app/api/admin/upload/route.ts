@@ -55,13 +55,9 @@ export async function POST(request: NextRequest) {
     const extension = file.name.split('.').pop() || 'jpg';
     const filename = `${timestamp}-${randomString}.${extension}`;
 
-    // Determine upload directory based on environment
-    // In production (standalone), use a data directory outside .next
-    // In development, use public/uploads for easy access
-    const isDev = process.env.NODE_ENV === 'development';
-    const baseDir = isDev
-      ? join(process.cwd(), 'public', 'uploads')
-      : join(process.cwd(), 'uploads');
+    // Always use public/uploads - consistent path for dev and production
+    // So photos land in public/uploads/properties where they're expected
+    const baseDir = join(process.cwd(), 'public', 'uploads');
 
     const uploadDir = join(baseDir, folder);
     if (!existsSync(uploadDir)) {

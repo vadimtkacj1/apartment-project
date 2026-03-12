@@ -10,20 +10,15 @@ fi
 
 echo "📦 Copying files to standalone output..."
 
-# Copy public folder (excluding uploads - they go to separate data directory)
+# Copy public folder INCLUDING uploads - API uses public/uploads for consistency
 if [ -d "public" ]; then
   mkdir -p .next/standalone/public
-  # Copy all public files except uploads
-  rsync -av --exclude 'uploads' public/ .next/standalone/public/ 2>/dev/null || cp -r public/* .next/standalone/public/ 2>/dev/null || true
-  echo "✅ Public files copied"
-fi
-
-# Create uploads directory in standalone root (for production data)
-mkdir -p .next/standalone/uploads
-# Copy existing uploads if they exist
-if [ -d "public/uploads" ]; then
-  cp -r public/uploads/* .next/standalone/uploads/ 2>/dev/null || true
-  echo "✅ Uploads directory created and populated"
+  if command -v rsync &> /dev/null; then
+    rsync -av public/ .next/standalone/public/
+  else
+    cp -r public/* .next/standalone/public/ 2>/dev/null || true
+  fi
+  echo "✅ Public files copied (including uploads)"
 fi
 
 # Copy .next/static
