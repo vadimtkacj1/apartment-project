@@ -10,8 +10,8 @@ export type PropertyType =
   | 'cottage'          // קוטג
   | 'house'            // בית
   | 'duplex'           // דופלקס
-  | 'penthouse'        // פנטהאוס
-  | 'mini-penthouse'   // מי פנטהאוז
+  | 'penthouse'        // פנטהאוז
+  | 'mini-penthouse'   // מיני פנטהאוז
   | 'roof-apartment'   // דירת גג
   | 'housing-unit'     // יחידת דיור
   | 'studio'           // סטודיו
