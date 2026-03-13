@@ -49,9 +49,9 @@ const FeaturedProperties: React.FC = () => {
           });
         }
         
-        // Fetch properties from center area for sale (not only pinned),
-        // then on client we will pick up to 3 best ones.
-        const response = await fetch('/api/properties?region=center&dealType=sale&limit=20', {
+        // Fetch properties for sale (excluding sold/rented),
+        // then pick up to 3 ones.
+        const response = await fetch('/api/properties?dealType=sale&limit=20', {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache'

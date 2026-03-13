@@ -197,7 +197,14 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        setProperties(mappedProperties);
+        // Sort: available properties first, sold/rented last
+        const sortedProperties = mappedProperties.sort((a: Property, b: Property) => {
+          if (a.isSold && !b.isSold) return 1;  // a is sold, b is not -> a goes after b
+          if (!a.isSold && b.isSold) return -1; // a is not sold, b is sold -> a goes before b
+          return 0; // both sold or both available -> keep original order
+        });
+
+        setProperties(sortedProperties);
       } catch (error) {
         setProperties([]);
       } finally {
