@@ -69,8 +69,8 @@ export const sampleProperties: Property[] = [
       hasSafeRoom: true,
       hasElevator: true
     },
-    title: 'פנטהאוס יוקרתי 5 חדרים עם מרפסת ענקית',
-    description: 'פנטהאוס מרהיב עם נוף פנורמי',
+    title: 'פנטהאוז יוקרתי 5 חדרים עם מרפסת ענקית',
+    description: 'פנטהאוז מרהיב עם נוף פנורמי',
     price: '12,500',
     images: ['/images/hero/sales.jpg'],
     status: 'דירוג מעולה',
