@@ -67,10 +67,7 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
-  
-<<<<<<< Updated upstream
-  // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
-=======
+
   // Redirect old routes to new ones with query parameters
   async redirects() {
     return [
@@ -99,7 +96,6 @@ const nextConfig: NextConfig = {
   },
 
   // Rewrite /uploads/* to API route — сервер сохраняет в UPLOADS_DIR и API отдаёт оттуда же
->>>>>>> Stashed changes
   async rewrites() {
     return [
       {
