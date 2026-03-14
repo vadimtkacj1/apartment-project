@@ -67,8 +67,12 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+<<<<<<< HEAD
+
+=======
   
   // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
+>>>>>>> 4a375a6e93e6b6e190c9ef0a9d836e6868bac87c
   // Redirect old routes to new ones with query parameters
   async redirects() {
     return [
@@ -95,6 +99,11 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+<<<<<<< HEAD
+
+  // Rewrite /uploads/* to API route — сервер сохраняет в UPLOADS_DIR и API отдаёт оттуда же
+=======
+>>>>>>> 4a375a6e93e6b6e190c9ef0a9d836e6868bac87c
   async rewrites() {
     return [
       {
