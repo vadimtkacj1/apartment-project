@@ -59,7 +59,20 @@ export async function GET(request: NextRequest) {
 // POST - Create new property
 export async function POST(request: NextRequest) {
   try {
+    console.log('💾 [DB] Received request to create property');
     const body = await request.json();
+
+    console.log('📝 [DB] Data to save:');
+    console.log('   - Title:', body.title);
+    console.log('   - Images array:', body.images);
+    console.log('   - Images count:', body.images?.length || 0);
+    if (body.images && body.images.length > 0) {
+      console.log('   - First image:', body.images[0]);
+      console.log('   - Last image:', body.images[body.images.length - 1]);
+    }
+
+    const imagesJson = JSON.stringify(body.images || []);
+    console.log('🔄 [DB] Images converted to JSON:', imagesJson);
 
     const property = await prisma.property.create({
       data: {
@@ -109,7 +122,7 @@ export async function POST(request: NextRequest) {
         description: body.description,
         price: body.price,
         originalPrice: body.originalPrice || null,
-        images: JSON.stringify(body.images || []),
+        images: imagesJson,
         status: body.status || null,
         location: body.location,
 
@@ -133,9 +146,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(formatProperty(property), { status: 201 });
+    console.log('✅ [DB] Property created successfully! ID:', property.id);
+    console.log('   - Saved images count:', parseJsonArray(property.images).length);
+    console.log('   - Images in DB:', property.images);
+
+    const formatted = formatProperty(property);
+    console.log('🎉 [DB] Property formatted and ready to send');
+    console.log('   - Images in response:', formatted.images);
+
+    return NextResponse.json(formatted, { status: 201 });
   } catch (error) {
-    console.error('Error creating property:', error);
+    console.error('❌ [DB] Error creating property:', error);
     return NextResponse.json(
       { error: 'Failed to create property' },
       { status: 500 }

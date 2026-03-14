@@ -15,6 +15,7 @@ export async function GET() {
         phone: true,
         email: true,
         whatsapp: true,
+        licenceNumber: true,
         description: true,
       },
       orderBy: { order: 'asc' },
