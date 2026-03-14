@@ -68,7 +68,38 @@ const nextConfig: NextConfig = {
     return config;
   },
   
+<<<<<<< Updated upstream
   // Rewrite /uploads/* to API route to ensure uploaded images are served correctly
+=======
+  // Redirect old routes to new ones with query parameters
+  async redirects() {
+    return [
+      {
+        source: '/apartments/rent',
+        destination: '/apartments?dealType=rent',
+        permanent: true,
+      },
+      {
+        source: '/apartments/sale',
+        destination: '/apartments?dealType=sale',
+        permanent: true,
+      },
+      // Redirect deleted properties to apartments list
+      {
+        source: '/apartments/60',
+        destination: '/apartments',
+        permanent: true,
+      },
+      {
+        source: '/apartments/61',
+        destination: '/apartments',
+        permanent: true,
+      },
+    ];
+  },
+
+  // Rewrite /uploads/* to API route — сервер сохраняет в UPLOADS_DIR и API отдаёт оттуда же
+>>>>>>> Stashed changes
   async rewrites() {
     return [
       {

@@ -1,16 +1,6 @@
 import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 
-// Helper to parse JSON arrays stored as strings in SQLite
-function parseJsonArray(value: string | null): string[] {
-  if (!value) return [];
-  try {
-    return JSON.parse(value);
-  } catch {
-    return [];
-  }
-}
-
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -86,24 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly', // FAQ may be updated occasionally
       priority: 0.5, // Support page - medium priority
     },
-    {
-      url: `${baseUrl}/links`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly', // Links page may be updated occasionally
-      priority: 0.5, // Resource page - medium priority
-    },
-    {
-      url: `${baseUrl}/accessibility`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly', // Legal/static page - rarely changes
-      priority: 0.3, // Legal page - low priority (static content)
-    },
-    {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly', // Legal/static page - rarely changes
-      priority: 0.3, // Legal page - low priority (static content)
-    },
   ];
 
   try {
@@ -134,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Combine static routes with dynamic property routes
-    // Total sitemap size = static routes (15) + number of active properties
+    // Total sitemap size = static routes (9) + number of active properties
     return [...staticRoutes, ...propertyRoutes];
   } catch (error) {
     console.error('Error generating sitemap:', error);
