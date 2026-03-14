@@ -355,7 +355,7 @@ export default function HomepagePage() {
           maxWidth: '230px'
         }}>
           {text}
-          {record.isSold && <Tag color="red" style={{ marginRight: '8px' }}>נמכר</Tag>}
+          {record.isSold && <Tag color="red" style={{ marginRight: '8px' }}>{record.dealType === 'rent' ? 'מושכר' : 'נמכר'}</Tag>}
         </div>
       ),
     },

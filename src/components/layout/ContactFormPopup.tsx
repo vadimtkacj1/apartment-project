@@ -82,9 +82,9 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
               </div>
 
               {/* Scrollable Content Area - Scrollbar starts here */}
-              <div className="flex-1 overflow-y-auto form-scroll-area p-8">
-                <ContactFormFields 
-                  idPrefix="popup-" 
+              <div className="overflow-y-auto form-scroll-area px-8 pt-8 pb-8">
+                <ContactFormFields
+                  idPrefix="popup-"
                   resetOnSubmit={true}
                   onSubmitSuccess={onClose}
                 />

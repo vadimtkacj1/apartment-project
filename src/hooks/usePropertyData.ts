@@ -11,7 +11,8 @@ const getPropertyTypeLabel = (type?: string) => {
     'cottage': 'קוטג׳',
     'house': 'בית',
     'duplex': 'דופלקס',
-    'penthouse': 'נטהאוס',
+    'penthouse': 'פנטהאוז',
+    'mini-penthouse': 'מיני פנטהאוז',
     'rooftop': 'דירת גג',
     'unit': 'יחידת דיור',
     'studio': 'סטודיו',
@@ -208,11 +209,17 @@ export function usePropertyData(propertyId: string) {
         if (data.vacancyDate !== null && data.vacancyDate !== undefined && typeof data.vacancyDate === 'string' && data.vacancyDate.trim() !== '') {
           const trimmedDate = data.vacancyDate.trim();
           
-          // Check if it's "מיד" (immediately)
+          // Check if it's "מיד" (immediately) or "גמיש" (flexible)
           if (trimmedDate === 'מיד' || trimmedDate === 'immediately') {
             specs.push({
               label: "תאריך פינוי",
               value: 'מיד',
+              icon: Calendar
+            });
+          } else if (trimmedDate === 'גמיש' || trimmedDate === 'flexible') {
+            specs.push({
+              label: "תאריך פינוי",
+              value: 'גמיש',
               icon: Calendar
             });
           } else {
@@ -303,6 +310,7 @@ export function usePropertyData(propertyId: string) {
           images: data.images && data.images.length > 0 ? data.images : ["/images/hero/sales.jpg"],
           description: data.description || 'אין תיאור זמין',
           isSold: data.isSold || false,
+          dealType: data.dealType,
           amenities: {
             ac: data.hasAirConditioning || false,
             handicap: data.hasDisabledAccess || false,

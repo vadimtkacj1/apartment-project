@@ -54,27 +54,104 @@ const Hero: React.FC<HeroProps> = () => {
 
   const showRest = done2;
 
-  // Force video play on iOS
+  // Определяем размер экрана для адаптивного видео
+  const [isMobile, setIsMobile] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Force video play
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const tryPlay = () => {
-      video.muted = true;
-      video.play().catch(() => {});
+    // Reset states when video source changes
+    setVideoLoaded(false);
+    setVideoError(false);
+
+    let attempts = 0;
+    const maxAttempts = 5;
+    let isPlaying = false;
+    let isTryingToPlay = false;
+
+    const tryPlay = async () => {
+      // Prevent multiple simultaneous play attempts
+      if (isTryingToPlay || isPlaying) {
+        return;
+      }
+
+      isTryingToPlay = true;
+
+      try {
+        video.muted = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', 'true');
+        video.setAttribute('webkit-playsinline', 'true');
+        video.setAttribute('x-webkit-airplay', 'allow');
+        video.setAttribute('x5-playsinline', 'true');
+        video.load(); // Force reload video
+        await video.play();
+        setVideoLoaded(true);
+        isPlaying = true;
+        isTryingToPlay = false;
+        console.log('✅ Video playing successfully');
+      } catch (err) {
+        attempts++;
+        isTryingToPlay = false;
+        console.warn(`❌ Video play attempt ${attempts} failed:`, err);
+
+        if (attempts < maxAttempts && !isPlaying) {
+          setTimeout(tryPlay, 500 * attempts);
+        } else {
+          setVideoError(true);
+        }
+      }
     };
 
-    tryPlay();
+    const handlePlaying = () => {
+      console.log('▶️ Video is actually playing now!');
+      setVideoLoaded(true);
+      isPlaying = true;
+    };
+
+    const handleError = (e: Event) => {
+      console.error('❌ Video error:', e);
+      setVideoError(true);
+    };
 
     const handleVisibility = () => {
-      if (!document.hidden) tryPlay();
+      if (!document.hidden && video.paused && !isTryingToPlay) {
+        tryPlay();
+      }
     };
+
+    // Add event listeners
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('error', handleError);
     document.addEventListener('visibilitychange', handleVisibility);
 
+    // Single play attempt
+    const timeoutId = setTimeout(() => {
+      if (!videoLoaded && !videoError && !isPlaying) {
+        tryPlay();
+      }
+    }, 500);
+
     return () => {
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('error', handleError);
       document.removeEventListener('visibilitychange', handleVisibility);
+      clearTimeout(timeoutId);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <section
@@ -98,6 +175,11 @@ const Hero: React.FC<HeroProps> = () => {
           height: 100%;
           object-fit: cover;
           object-position: center center;
+          display: block;
+          opacity: 1;
+        }
+        .hero-video[poster] {
+          background: transparent;
         }
         .cursor {
           display: inline-block;
@@ -130,10 +212,35 @@ const Hero: React.FC<HeroProps> = () => {
           border-color: rgba(255,255,255,0.7) !important;
           box-shadow: 0 0 24px rgba(255,255,255,0.12);
         }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
       `}</style>
 
       {/* ── Video ── */}
       <div className="hero-video-wrap">
+        {!videoLoaded && !videoError && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: `url('/hero-poster.jpg') center/cover`,
+              zIndex: 1,
+            }}
+          >
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid rgba(255,255,255,0.3)',
+              borderTopColor: 'white',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+          </div>
+        )}
         <video
           ref={videoRef}
           className="hero-video"
@@ -141,8 +248,20 @@ const Hero: React.FC<HeroProps> = () => {
           loop
           muted
           playsInline
-          preload="auto"
-          poster="/images/hero-poster.jpg"
+          preload="metadata"
+          poster="/hero-poster.jpg"
+          webkit-playsinline="true"
+          x5-playsinline="true"
+          x-webkit-airplay="allow"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            opacity: videoLoaded ? 1 : 0,
+            transition: 'opacity 0.5s ease',
+          }}
+          key={isMobile ? 'mobile-video' : 'desktop-video'}
         >
           <source src="/hero.mp4" type="video/mp4" />
         </video>
@@ -234,7 +353,7 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments/rent"
+              href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
@@ -270,7 +389,7 @@ const Hero: React.FC<HeroProps> = () => {
             className="w-[70%] sm:w-[55%] md:w-auto"
           >
             <Link
-              href="/apartments/sale"
+              href="/apartments?dealType=sale"
               className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',

@@ -64,19 +64,34 @@ export async function GET(
   }
 }
 
-// PUT - Update property
+// PUT - Update property (full update)
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
+    console.log('🔄 [DB UPDATE] Обновление property ID:', id);
+
     const body = await request.json();
+    console.log('📝 [DB UPDATE] Данные для обновления:');
+    console.log('   - Title:', body.title);
+    console.log('   - Images array:', body.images);
+    console.log('   - Images count:', body.images?.length || 0);
+    if (body.images && body.images.length > 0) {
+      console.log('   - Images:');
+      body.images.forEach((img: string, idx: number) => {
+        console.log(`     ${idx + 1}. ${img}`);
+      });
+    }
 
     // If property is being marked as sold, clear hot proposition and no commission flags
     const isSold = body.isSold !== undefined ? body.isSold : false;
     const isHotProposition = isSold ? false : (body.isHotProposition !== undefined ? body.isHotProposition : false);
     const isNoCommission = isSold ? false : (body.isNoCommission !== undefined ? body.isNoCommission : false);
+
+    const imagesJson = JSON.stringify(body.images || []);
+    console.log('🔄 [DB UPDATE] Images преобразованы в JSON:', imagesJson);
 
     const property = await prisma.property.update({
       where: {
@@ -129,7 +144,7 @@ export async function PUT(
         description: body.description,
         price: body.price,
         originalPrice: body.originalPrice || null,
-        images: JSON.stringify(body.images || []),
+        images: imagesJson,
         status: body.status || null,
         location: body.location,
 
@@ -153,11 +168,78 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(formatProperty(property));
+    console.log('✅ [DB UPDATE] Property обновлён успешно! ID:', property.id);
+    console.log('   - Изображений в БД:', property.images);
+
+    const formatted = formatProperty(property);
+    console.log('🎉 [DB UPDATE] Property форматирован для ответа');
+    console.log('   - Images count:', formatted.images?.length || 0);
+    console.log('   - Images:', formatted.images);
+
+    return NextResponse.json(formatted);
   } catch (error) {
-    console.error('Error updating property:', error);
+    console.error('❌ [DB UPDATE] Ошибка обновления property:', error);
     return NextResponse.json(
       { error: 'Failed to update property' },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH - Partial update (lightweight status toggles etc.)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+
+    console.log('🔧 [DB PATCH] Partial update property ID:', id);
+    console.log('   - Incoming body:', body);
+
+    const updateData: any = {};
+
+    if (typeof body.isActive === 'boolean') {
+      updateData.isActive = body.isActive;
+    }
+
+    if (typeof body.isPinned === 'boolean') {
+      updateData.isPinned = body.isPinned;
+    }
+
+    if (typeof body.isSold === 'boolean') {
+      const isSold = body.isSold;
+      updateData.isSold = isSold;
+      // When marking as sold, automatically clear homepage flags
+      if (isSold) {
+        updateData.isHotProposition = false;
+        updateData.isNoCommission = false;
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: 'No valid fields provided for update' },
+        { status: 400 }
+      );
+    }
+
+    const property = await prisma.property.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: updateData,
+    });
+
+    const formatted = formatProperty(property);
+    console.log('✅ [DB PATCH] Property partially updated. Fields:', Object.keys(updateData));
+
+    return NextResponse.json(formatted);
+  } catch (error) {
+    console.error('❌ [DB PATCH] Error partially updating property:', error);
+    return NextResponse.json(
+      { error: 'Failed to partially update property' },
       { status: 500 }
     );
   }

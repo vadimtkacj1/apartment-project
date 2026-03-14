@@ -49,7 +49,9 @@ const SocialSidebar = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const response = await fetch('/api/contact-info');
+      const response = await fetch('/api/contact-info', {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         setContactInfo(data);
@@ -61,7 +63,9 @@ const SocialSidebar = () => {
 
   const fetchOwners = async () => {
     try {
-      const response = await fetch('/api/owners');
+      const response = await fetch('/api/owners', {
+        cache: 'no-store'
+      });
       if (response.ok) {
         const data = await response.json();
         setOwners(data.slice(0, 2)); // Get first 2 owners
@@ -202,7 +206,7 @@ const SocialSidebar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/50 z-[900] flex items-center justify-center p-4"
             onClick={() => setChoiceModal({ ...choiceModal, isOpen: false })}
           >
             <motion.div
@@ -291,8 +295,8 @@ const SocialSidebar = () => {
         )}
       </AnimatePresence>
 
-      <motion.div 
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-[100] flex items-center"
+      <motion.div
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-[50] flex items-center"
         initial={false}
         animate={{
           /* On mobile (width < 768), if menu is closed, shift the container left 

@@ -40,6 +40,8 @@ export function usePropertyForm(
         if (data.vacancyDate) {
           if (data.vacancyDate === 'מיד' || data.vacancyDate === 'immediately') {
             vacancyDateValue = 'מיד';
+          } else if (data.vacancyDate === 'גמיש' || data.vacancyDate === 'flexible') {
+            vacancyDateValue = 'גמיש';
           } else {
             // Try different date formats
             try {

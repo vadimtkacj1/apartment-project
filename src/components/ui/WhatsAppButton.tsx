@@ -13,7 +13,7 @@ const WhatsAppButton: React.FC = () => {
 
   useEffect(() => {
     // Fetch first owner's WhatsApp
-    fetch('/api/owners')
+    fetch('/api/owners', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0 && data[0].whatsapp) {

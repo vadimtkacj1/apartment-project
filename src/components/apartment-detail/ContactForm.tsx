@@ -14,9 +14,10 @@ interface ContactFormProps {
   propertyId: string;
   isSold: boolean;
   owners?: Owner[];
+  dealType?: string;
 }
 
-export function ContactForm({ propertyId, isSold, owners = [] }: ContactFormProps) {
+export function ContactForm({ propertyId, isSold, owners = [], dealType }: ContactFormProps) {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     phone: '',
@@ -52,7 +53,7 @@ export function ContactForm({ propertyId, isSold, owners = [] }: ContactFormProp
         <div className="text-center py-8">
           <div className="flex items-center justify-center gap-2 bg-red-100 text-red-700 px-6 py-4 rounded-lg font-bold mb-4">
             <CheckCircle2 size={24} />
-            <span>הנכס נמכר</span>
+            <span>הנכס {dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
           </div>
           <p className="text-gray-500">לא ניתן ליצור קשר לגבי נכס זה</p>
         </div>

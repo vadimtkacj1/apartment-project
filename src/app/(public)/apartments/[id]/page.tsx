@@ -136,8 +136,9 @@ export default function ApartmentDetailPage() {
                 price={property.price}
                 originalPrice={property.originalPrice}
                 isSold={isSold}
+                dealType={property.dealType}
               />
-              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} />
+              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} dealType={property.dealType} />
             </motion.div>
           </div>
         </div>

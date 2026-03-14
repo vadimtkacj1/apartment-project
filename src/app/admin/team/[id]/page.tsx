@@ -16,6 +16,7 @@ interface TeamMemberForm {
   mobile: string;
   fax: string;
   email: string;
+  licenceNumber: string;
   description: string;
   order: number;
   isActive: boolean;
@@ -29,6 +30,7 @@ const INITIAL_FORM: TeamMemberForm = {
   mobile: '',
   fax: '',
   email: '',
+  licenceNumber: '',
   description: '',
   order: 0,
   isActive: true,
@@ -158,6 +160,17 @@ export default function TeamMemberEditPage() {
               value={formData.role}
               onChange={(e) => handleChange('role', e.target.value)}
               placeholder='לדוגמה: סוכן נדל"ן'
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              מספר רישיון
+            </label>
+            <Input
+              value={formData.licenceNumber}
+              onChange={(e) => handleChange('licenceNumber', e.target.value)}
+              placeholder="הכנס מספר רישיון"
               size="large"
             />
           </div>

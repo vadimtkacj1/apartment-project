@@ -64,6 +64,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly', // FAQ may be updated occasionally
       priority: 0.5, // Support page - medium priority
     },
+    {
+      url: `${baseUrl}/links`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly', // Links page may be updated occasionally
+      priority: 0.4, // Resource page - lower priority
+    },
   ];
 
   try {
@@ -94,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Combine static routes with dynamic property routes
-    // Total sitemap size = static routes (9) + number of active properties
+    // Total sitemap size = static routes (10) + number of active properties
     return [...staticRoutes, ...propertyRoutes];
   } catch (error) {
     console.error('Error generating sitemap:', error);

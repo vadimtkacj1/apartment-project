@@ -10,7 +10,8 @@ export type PropertyType =
   | 'cottage'          // קוטג
   | 'house'            // בית
   | 'duplex'           // דופלקס
-  | 'penthouse'        // פנטהאוס
+  | 'penthouse'        // פנטהאוז
+  | 'mini-penthouse'   // מיני פנטהאוז
   | 'roof-apartment'   // דירת גג
   | 'housing-unit'     // יחידת דיור
   | 'studio'           // סטודיו
@@ -18,14 +19,15 @@ export type PropertyType =
   | 'villa';           // וילה
 
 export type ParkingType =
-  | 'yes'        // יש
-  | 'none'       // אין
-  | 'double'     // כפולה
-  | 'shared'     // משותפת
-  | 'covered'    // מקורה
-  | 'three'      // שלוש
-  | 'robotic'    // רובוטית
-  | 'multiplier'; // מכפיל
+  | 'yes'          // יש
+  | 'none'         // אין
+  | 'double'       // כפולה
+  | 'two-separate' // שניים נפרדות
+  | 'shared'       // משותפת
+  | 'covered'      // מקורה
+  | 'three'        // שלוש
+  | 'robotic'      // רובוטית
+  | 'multiplier';  // מכפיל
 
 export type Position = 
   | 'front'        // חזית

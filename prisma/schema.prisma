@@ -237,18 +237,19 @@ model HomepageSettings {
 
 // Owner model - company owners/founders
 model Owner {
-  id          Int      @id @default(autoincrement())
-  name        String
-  title       String   // "מייסד ומתווך נדל״ן"
-  image       String?  // Path to profile image
-  phone       String?
-  email       String?
-  whatsapp    String?  // WhatsApp number
-  description String?
-  order       Int      @default(0) // Display order
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  name          String
+  title         String   // "מייסד ומתווך נדל״ן"
+  image         String?  // Path to profile image
+  phone         String?
+  email         String?
+  whatsapp      String?  // WhatsApp number
+  licenceNumber String?  // License number
+  description   String?
+  order         Int      @default(0) // Display order
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([order])
   @@index([isActive])
@@ -256,19 +257,20 @@ model Owner {
 
 // Team member model - agents/employees
 model TeamMember {
-  id          Int      @id @default(autoincrement())
-  name        String
-  role        String   // "סוכן נדל״ן", "סוכנת נדל״ן"
-  image       String?  // Path to profile image
-  phone       String?
-  mobile      String?
-  fax         String?
-  email       String?
-  description String?
-  order       Int      @default(0) // Display order
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  name          String
+  role          String   // "סוכן נדל״ן", "סוכנת נדל״ן"
+  image         String?  // Path to profile image
+  phone         String?
+  mobile        String?
+  fax           String?
+  email         String?
+  licenceNumber String?  // License number
+  description   String?
+  order         Int      @default(0) // Display order
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([order])
   @@index([isActive])

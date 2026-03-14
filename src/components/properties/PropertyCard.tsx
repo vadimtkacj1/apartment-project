@@ -68,7 +68,8 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
       'cottage': 'קוטג׳',
       'house': 'בית',
       'duplex': 'דופלקס',
-      'penthouse': 'פנטהאוס',
+      'penthouse': 'פנטהאוז',
+      'mini-penthouse': 'מיני פנטהאוז',
       'rooftop': 'דירת גג',
       'unit': 'יחידת דיור',
       'studio': 'סטודיו',
@@ -197,7 +198,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               src={imageSrc}
               alt={title}
               className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 z-0 ${
-                isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
+                isSold ? '' : 'group-hover:scale-105'
               }`}
               onError={() => {
                 // Fallback to local image if external image fails to load
@@ -222,20 +223,17 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
             {/* Sold overlays */}
             {isSold && (
-              <>
-                <div className="absolute inset-0 bg-gray-900/30 z-20" />
-                <div className="absolute inset-0 z-20 flex items-center justify-center">
-                  <Image
-                    src="/images/sold.png"
-                    alt="נמכר"
-                    fill
-                    className="object-contain p-4"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={false}
-                    quality={90}
-                  />
-                </div>
-              </>
+              <div className="absolute inset-0 z-20 flex items-center justify-center">
+                <Image
+                  src={dealType === 'rent' ? '/Rented.svg' : '/Sold.svg'}
+                  alt={dealType === 'rent' ? 'מושכר' : 'נמכר'}
+                  fill
+                  className="object-contain p-4"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={false}
+                  quality={90}
+                />
+              </div>
             )}
 
             {/* Deal Type Badge — refined, not dollar-green */}
@@ -280,7 +278,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               {isSold && (
                 <div className="bg-red-600 text-white px-3 py-1.5 text-sm font-bold rounded-lg shadow flex items-center gap-1.5">
                   <CheckCircle2 size={16} />
-                  <span>נמכר</span>
+                  <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
                 </div>
               )}
 
@@ -321,7 +319,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             {isSold && (
               <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
                 <CheckCircle2 size={10} />
-                <span>נמכר</span>
+                <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
               </div>
             )}
           </div>
@@ -415,7 +413,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
             {isSold ? (
               <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-400 text-white font-bold text-sm sm:text-base rounded-xl opacity-60 w-full sm:w-auto justify-center">
-                נמכר
+                {dealType === 'rent' ? 'מושכר' : 'נמכר'}
                 <CheckCircle2 size={18} />
               </div>
             ) : (
