@@ -10,12 +10,23 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
+function parseAgentIds(value: string | null): number[] {
+  if (!value) return [];
+  try {
+    const arr = JSON.parse(value);
+    return Array.isArray(arr) ? arr.map((x: any) => parseInt(String(x), 10)).filter((n) => !isNaN(n)) : [];
+  } catch {
+    return [];
+  }
+}
+
 // Helper to convert property from DB format to API format
 function formatProperty(property: any) {
   return {
     ...property,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
+    agentIds: parseAgentIds(property.agentIds),
     // Explicitly convert boolean fields from SQLite (0/1) to true booleans
     isActive: Boolean(property.isActive),
     isSold: Boolean(property.isSold),
@@ -54,7 +65,24 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(formatProperty(property));
+    const formatted = formatProperty(property);
+
+    // Fetch agents (owners) for this property
+    let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
+    if (formatted.agentIds.length > 0) {
+      const owners = await prisma.owner.findMany({
+        where: { id: { in: formatted.agentIds }, isActive: true },
+        select: { id: true, name: true, phone: true, whatsapp: true },
+      });
+      agents = owners.map((o) => ({
+        id: o.id,
+        name: o.name,
+        phone: o.phone || '',
+        whatsapp: o.whatsapp || undefined,
+      }));
+    }
+
+    return NextResponse.json({ ...formatted, agents });
   } catch (error) {
     console.error('Error fetching property:', error);
     return NextResponse.json(

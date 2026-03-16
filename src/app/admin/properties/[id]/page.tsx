@@ -6,6 +6,7 @@ import { SaveOutlined, ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons
 import { usePropertyForm } from './usePropertyForm';
 import {
   BasicInfoSection,
+  AgentSection,
   LocationSection,
   PropertyDetailsSection,
   FeaturesSection,
@@ -63,6 +64,7 @@ export default function PropertyEditPage() {
         initialValues={formData}
       >
         <BasicInfoSection formData={formData} handleChange={handleChange} />
+        <AgentSection formData={formData} handleChange={handleChange} />
         <LocationSection formData={formData} handleChange={handleChange} />
         <PropertyDetailsSection formData={formData} handleChange={handleChange} />
         <FeaturesSection formData={formData} handleChange={handleChange} />

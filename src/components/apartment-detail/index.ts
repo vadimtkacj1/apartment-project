@@ -2,6 +2,7 @@ export { LoadingState } from './LoadingState';
 export { ErrorState } from './ErrorState';
 export { SoldBadge } from './SoldBadge';
 export { PropertyGallery } from './PropertyGallery';
+export { PropertyAgentBlock } from './PropertyAgentBlock';
 export { PropertyDescription } from './PropertyDescription';
 export { PropertyAmenities } from './PropertyAmenities';
 export { PropertySpecs } from './PropertySpecs';

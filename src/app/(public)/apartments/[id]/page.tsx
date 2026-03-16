@@ -10,6 +10,7 @@ import {
   LoadingState,
   ErrorState,
   PropertyGallery,
+  PropertyAgentBlock,
   PropertyDescription,
   PropertyAmenities,
   PropertySpecs,
@@ -23,6 +24,11 @@ interface Owner {
   id: number;
   name: string;
   phone: string;
+}
+
+// Type guard to check if an agent/owner has a phone
+function hasPhone(contact: { id: number; name: string; phone?: string }): contact is Owner {
+  return typeof contact.phone === 'string' && contact.phone.length > 0;
 }
 
 export default function ApartmentDetailPage() {
@@ -82,7 +88,7 @@ export default function ApartmentDetailPage() {
     <div className={`min-h-screen bg-warm pt-32 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
       <div className={`w-full ${isSold ? 'pointer-events-none' : ''}`}>
         {/* Back to apartments link */}
-        <div className="w-full px-6 flex justify-end mb-8 px-6 lg:px-12">
+        <div className="w-full px-6 flex justify-end mb-4 lg:px-12">
           <Link
             href="/apartments"
             className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#1c3664] transition-colors duration-300 font-bold text-lg"
@@ -97,12 +103,26 @@ export default function ApartmentDetailPage() {
           <PropertyNavigation previousId={previousId} nextId={nextId} isSold={isSold} />
         </div>
 
+        {/* Property Title - always show at top */}
+        <h1 className="w-full px-6 lg:px-12 text-2xl md:text-3xl font-bold text-[#1c3664] mb-6 text-center md:text-right" dir="rtl">
+          {property.title?.trim() || property.location || `דירה ${property.dealType === 'rent' ? 'להשכרה' : 'למכירה'}`}
+        </h1>
+
         <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 lg:px-12">
           {/* Right Side - Gallery & Description */}
           <div className="lg:col-span-2">
             <div className="-mx-6 lg:mx-0">
               <PropertyGallery images={property.images} isSold={isSold} />
             </div>
+            {property.agents && property.agents.length > 0 && (
+              <div className="px-6 mb-6">
+                <PropertyAgentBlock
+                  agents={property.agents}
+                  isSold={isSold}
+                  propertyId={propertyId}
+                />
+              </div>
+            )}
             <div className="px-6">
               <PropertyDescription
                 description={property.description}
@@ -138,7 +158,15 @@ export default function ApartmentDetailPage() {
                 isSold={isSold}
                 dealType={property.dealType}
               />
-              <ContactForm propertyId={propertyId} isSold={isSold} owners={owners} dealType={property.dealType} />
+              <ContactForm
+                propertyId={propertyId}
+                isSold={isSold}
+                owners={property.agents && property.agents.length > 0
+                  ? property.agents.filter(hasPhone)
+                  : owners.filter(hasPhone)
+                }
+                dealType={property.dealType}
+              />
             </motion.div>
           </div>
         </div>

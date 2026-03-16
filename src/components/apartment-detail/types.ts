@@ -40,6 +40,7 @@ export interface PropertyData {
   directions?: string[];
   isSold?: boolean;
   dealType?: string;
+  agents?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
 }
 
 export interface ContactFormData {

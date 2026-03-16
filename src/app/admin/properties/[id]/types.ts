@@ -44,6 +44,7 @@ export interface PropertyForm {
   // They are not editable in the property form
   isHotProposition?: boolean;
   isNoCommission?: boolean;
+  agentIds?: number[];
 }
 
 export interface PropertyFormSectionProps {

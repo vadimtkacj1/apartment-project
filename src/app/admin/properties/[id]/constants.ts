@@ -42,6 +42,7 @@ export const INITIAL_FORM: PropertyForm = {
   isActive: true,
   isSold: false,
   isPinned: false,
+  agentIds: [],
 };
 
 export const DEAL_TYPE_OPTIONS = [

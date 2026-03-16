@@ -1,4 +1,5 @@
 export { BasicInfoSection } from './BasicInfoSection';
+export { AgentSection } from './AgentSection';
 export { LocationSection } from './LocationSection';
 export { PropertyDetailsSection } from './PropertyDetailsSection';
 export { FeaturesSection } from './FeaturesSection';

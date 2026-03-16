@@ -132,6 +132,9 @@ model Property {
   isHotProposition Boolean @default(false) // Show in Hot Propositions section
   isNoCommission   Boolean @default(false) // Show in No Commission section
 
+  // Agent(s) for this property - JSON array of Owner IDs, e.g. "[1,2]"
+  agentIds String @default("[]")
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

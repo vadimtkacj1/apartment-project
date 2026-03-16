@@ -11,12 +11,23 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
+function parseAgentIds(value: string | null): number[] {
+  if (!value) return [];
+  try {
+    const arr = JSON.parse(value);
+    return Array.isArray(arr) ? arr.map((x: any) => parseInt(String(x), 10)).filter((n) => !isNaN(n)) : [];
+  } catch {
+    return [];
+  }
+}
+
 // Helper to convert property from DB format (JSON strings) to API format (arrays)
 function formatProperty(property: any) {
   return {
     ...property,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
+    agentIds: parseAgentIds(property.agentIds),
     // Explicitly convert boolean fields from SQLite (0/1) to true booleans
     isActive: Boolean(property.isActive),
     isSold: Boolean(property.isSold),
@@ -73,6 +84,15 @@ export async function POST(request: NextRequest) {
 
     const imagesJson = JSON.stringify(body.images || []);
     console.log('🔄 [DB] Images converted to JSON:', imagesJson);
+
+    const agentIds = Array.isArray(body.agentIds) ? body.agentIds : [];
+    if (agentIds.length < 1) {
+      return NextResponse.json(
+        { error: 'יש לבחור לפחות סוכן אחד' },
+        { status: 400 }
+      );
+    }
+    const agentIdsJson = JSON.stringify(agentIds);
 
     const property = await prisma.property.create({
       data: {
@@ -143,6 +163,9 @@ export async function POST(request: NextRequest) {
         // Homepage section flags
         isHotProposition: body.isHotProposition !== undefined ? body.isHotProposition : false,
         isNoCommission: body.isNoCommission !== undefined ? body.isNoCommission : false,
+
+        // Agents
+        agentIds: agentIdsJson,
       },
     });
 
