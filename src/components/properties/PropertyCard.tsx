@@ -3,7 +3,7 @@ import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Bed, Maximize, MapPin, Car, Home, Compass,
   Wind, Warehouse, Sun, Droplet, Shield, ArrowUpDown,
@@ -60,6 +60,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   isSold,
   showImage = true
 }) => {
+  const router = useRouter();
 
   const getPropertyTypeLabel = (type?: string) => {
     const labels: Record<string, string> = {
@@ -166,16 +167,17 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const displayRooms = rooms || bedrooms || 0;
   const dealTypeLabel = dealType === 'sale' ? 'למכירה' : dealType === 'rent' ? 'להשכרה' : 'למכירה';
 
+  const handleClick = () => {
+    if (!isSold) {
+      analytics.trackPropertyClick(id, 'card');
+    }
+    router.push(`/apartments/${id}`);
+  };
+
   return (
-    <Link
-      href={`/apartments/${id}`}
-      onClick={() => {
-        if (!isSold) {
-          analytics.trackPropertyClick(id, 'card');
-        }
-      }}
-      className="block h-full"
-      style={{ cursor: 'pointer' }}
+    <div
+      onClick={handleClick}
+      className="block h-full cursor-pointer"
     >
       <motion.div
         whileHover={isSold ? {} : { y: -5 }}
@@ -219,11 +221,11 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             {/* Gradient overlay */}
             <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10 ${
               isSold ? 'opacity-40' : 'opacity-60'
-            }`} />
+            }`} style={{ pointerEvents: 'none' }} />
 
             {/* Sold overlays */}
             {isSold && (
-              <div className="absolute inset-0 z-20 flex items-center justify-center">
+              <div className="absolute inset-0 z-20 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
                 <Image
                   src={dealType === 'rent' ? '/Rented.svg' : '/Sold.svg'}
                   alt={dealType === 'rent' ? 'מושכר' : 'נמכר'}
@@ -242,7 +244,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
                 dealType === 'sale'
                   ? 'bg-[#1c3664]/90 text-white border border-white/20'
                   : 'bg-[#1c3664]/90 text-white border border-white/20'
-              }`}>
+              }`} style={{ pointerEvents: 'none' }}>
                 <Tag size={13} className="shrink-0" />
                 <span>{dealTypeLabel}</span>
               </div>
@@ -250,14 +252,14 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
             {/* Status Badge — distinct color per status, never dark-on-dark */}
             {status && !isSold && (
-              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md tracking-wide uppercase ${getStatusStyle(status)}`}>
+              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md tracking-wide uppercase ${getStatusStyle(status)}`} style={{ pointerEvents: 'none' }}>
                 {getStatusLabel(status)}
               </div>
             )}
 
             {/* Property Type Badge */}
             {propertyType && (
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30" style={{ pointerEvents: 'none' }}>
                 {getPropertyTypeLabel(propertyType)}
               </div>
             )}
@@ -426,7 +428,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
           </div>
         </div>
       </motion.div>
-    </Link>
+    </div>
   );
 });
 
