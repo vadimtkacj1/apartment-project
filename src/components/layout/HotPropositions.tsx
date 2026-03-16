@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useMemo, memo, useEffect, useState } from "react";
+import { useMemo, memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import PropertyCard from "@/components/properties/PropertyCard";
+import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
 // Type for apartment data
@@ -68,7 +70,7 @@ const MarqueeRow = ({
 
   const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
   const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
-  console.log(items)
+
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
       <motion.div
@@ -87,12 +89,22 @@ const MarqueeRow = ({
           const cardProps = {
             ...item,
             propertyType: item.propertyType as PropertyType | undefined,
-            index: i
+            index: i,
+            disableClick: true
           };
           return (
-            <div key={`hot-proposition-card-${direction}-${i}`} className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0">
+            <Link
+              key={`hot-proposition-card-${direction}-${i}`}
+              href={`/apartments/${item.id}`}
+              onClick={() => {
+                if (!item.isSold) {
+                  analytics.trackPropertyClick(item.id, 'hot-proposition');
+                }
+              }}
+              className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block"
+            >
               <PropertyCard {...cardProps} />
-            </div>
+            </Link>
           );
         })}
       </motion.div>

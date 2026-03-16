@@ -29,6 +29,7 @@ interface PropertyCardProps extends Partial<Property> {
   isSold?: boolean;
   showImage?: boolean;
   totalFloors?: number;
+  disableClick?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = memo(({
@@ -58,7 +59,8 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   vacancyDate,
   features,
   isSold,
-  showImage = true
+  showImage = true,
+  disableClick = false
 }) => {
   const router = useRouter();
 
@@ -176,8 +178,8 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
   return (
     <div
-      onClick={handleClick}
-      className="block h-full cursor-pointer"
+      onClick={disableClick ? undefined : handleClick}
+      className={`block h-full ${disableClick ? '' : 'cursor-pointer'}`}
     >
       <motion.div
         whileHover={isSold ? {} : { y: -5 }}
