@@ -11,6 +11,7 @@ export const owners = [
   {
     id: 1,
     name: 'רם מזרחי',
+    licenceNumber: '3019640',
     title: 'מייסד ומתווך נדל"ן',
     image: '/images/owner1.jpg',
     phone: '050-549-6626',
@@ -21,6 +22,7 @@ export const owners = [
   {
     id: 2,
     name: 'חיים ענבי',
+    licenceNumber: '3164492',
     title: 'מייסד ומתווך נדל"ן',
     image: '/images/owner2.jpg',
     phone: '050-675-9999',
@@ -34,6 +36,7 @@ export const team = [
   {
     id: 1,
     name: 'תומר גל',
+    licenceNumber: '30829716',
     role: 'סוכן נדל״ן',
     image: '/agent-second.jpg',
     phone: '050-901-7800',

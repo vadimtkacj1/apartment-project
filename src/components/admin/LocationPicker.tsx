@@ -64,6 +64,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     googleMapsApiKey: apiKey || '',
     language: 'he',
     region: 'IL',
+    version: 'weekly', // Актуальная версия (3.55 retired)
   });
 
   // Load address when position is provided initially

@@ -39,6 +39,7 @@ export interface PropertyData {
   description: string;
   directions?: string[];
   isSold?: boolean;
+  dealType?: string;
 }
 
 export interface ContactFormData {

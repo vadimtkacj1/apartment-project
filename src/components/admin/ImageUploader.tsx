@@ -23,36 +23,72 @@ export default function ImageUploader({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const uploadImage = async (file: File): Promise<string> => {
+    console.log('🚀 [FRONTEND] Starting file upload:', file.name);
+    console.log('   Size:', file.size, 'bytes');
+    console.log('   Type:', file.type);
+
     const formData = new FormData();
     formData.append('file', file);
 
+    console.log('📡 [FRONTEND] Sending request to /api/admin/upload...');
     const response = await fetch('/api/admin/upload', {
       method: 'POST',
       body: formData,
     });
 
+    console.log('📥 [FRONTEND] Received response, status:', response.status);
+
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to upload image');
+      let errorMessage = 'Failed to upload image';
+
+      try {
+        const error = await response.json();
+        console.error('❌ [FRONTEND] Error from server (JSON):', error);
+        errorMessage = error.error || errorMessage;
+      } catch (jsonError) {
+        console.error('❌ [FRONTEND] Error parsing JSON error response:', jsonError);
+
+        if (response.status === 413) {
+          // Payload Too Large – сервер отверг файл ещё до обработки нашим бэкендом
+          errorMessage = 'התמונה גדולה מדי עבור השרת. נסה להקטין את התמונה ולהעלות שוב.';
+        } else {
+          const text = await response.text().catch(() => null);
+          console.error('❌ [FRONTEND] Non-JSON error response body:', text);
+        }
+      }
+
+      throw new Error(errorMessage);
     }
 
-    const data = await response.json();
-    return data.url;
+    try {
+      const data = await response.json();
+      console.log('✅ [FRONTEND] File uploaded successfully!');
+      console.log('   URL:', data.url);
+      return data.url;
+    } catch (parseError) {
+      console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
+      throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
+    }
   };
 
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
+    console.log('📤 [FRONTEND] handleUpload called');
     setUploading(true);
 
     try {
       const url = await uploadImage(file as File);
+      console.log('💾 [FRONTEND] Adding URL to images list:', url);
       onImagesChange([...images, url]);
+      console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
       message.success('התמונה הועלתה בהצלחה');
       onSuccess?.(url);
     } catch (err: any) {
+      console.error('❌ [FRONTEND] Upload error:', err);
       message.error(err.message || 'שגיאה בהעלאת התמונה');
       onError?.(err);
     } finally {
       setUploading(false);
+      console.log('🏁 [FRONTEND] Upload completed\n');
     }
   };
 
@@ -63,9 +99,9 @@ export default function ImageUploader({
       return false;
     }
 
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      message.error('התמונה חייבת להיות קטנה מ-5MB');
+    const isLt50M = file.size / 1024 / 1024 < 50;
+    if (!isLt50M) {
+      message.error('התמונה חייבת להיות קטנה מ-50MB');
       return false;
     }
 
@@ -116,7 +152,7 @@ export default function ImageUploader({
           גרור תמונות לכאן או לחץ להעלאה
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 5MB לכל תמונה
+          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 50MB לכל תמונה
         </p>
         {uploading && (
           <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>

@@ -16,7 +16,7 @@ const FEATURES = [
   { key: 'hasDisabledAccess', label: 'גישה לנכים', icon: Accessibility },
   { key: 'hasSunBalcony', label: 'מרפסת שמש', icon: Waves },
   { key: 'hasStorage', label: 'מחסן', icon: Box },
-  { key: 'hasSunroom', label: 'חדר שמש', icon: Sun },
+  { key: 'hasSunroom', label: 'חימום גז', icon: Sun },
   { key: 'hasBoiler', label: 'דוד שמש', icon: Flame },
   { key: 'hasSafeRoom', label: 'ממ״ד', icon: Shield },
   { key: 'hasElevator', label: 'מעלית', icon: ArrowUpDown },

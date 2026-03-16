@@ -49,8 +49,14 @@ const FeaturedProperties: React.FC = () => {
           });
         }
         
-        // Fetch pinned properties from center area for sale, limit to 3
-        const response = await fetch('/api/properties?region=center&dealType=sale&pinned=true&limit=3');
+        // Fetch properties for sale (excluding sold/rented),
+        // then pick up to 3 ones.
+        const response = await fetch('/api/properties?dealType=sale&limit=20', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch properties');
@@ -58,8 +64,22 @@ const FeaturedProperties: React.FC = () => {
 
         const data = await response.json();
 
-        // Map properties to the format expected by PropertyCard
-        const mappedProperties: Property[] = data.map((prop: any) => ({
+        // Filter out sold / rented properties – only show available ones
+        const available = (data as any[]).filter((prop) => !prop.isSold);
+
+        // Sort: pinned first, then by newest
+        const sorted = available.sort((a: any, b: any) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+        // Take up to 3 properties
+        const topThree = sorted.slice(0, 3);
+
+        // Map properties to the format expected by PropertyCard.
+        // Force isSold = false so "נמכר/מושכר" не показується в цьому блоці.
+        const mappedProperties: Property[] = topThree.map((prop: any) => ({
           id: prop.id,
           title: prop.title,
           location: prop.location,
@@ -70,7 +90,7 @@ const FeaturedProperties: React.FC = () => {
           area: prop.area,
           status: prop.status,
           image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
-          isSold: prop.isSold || false,
+          isSold: false,
         }));
 
         setProperties(mappedProperties);

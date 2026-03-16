@@ -12,7 +12,7 @@ type Owner = {
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
-  license: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 
@@ -25,7 +25,9 @@ export default function AboutOwners() {
   useEffect(() => {
     async function fetchOwners() {
       try {
-        const response = await fetch('/api/owners');
+        const response = await fetch('/api/owners', {
+          cache: 'no-store'
+        });
         if (response.ok) {
           const data = await response.json();
           setOwners(data);

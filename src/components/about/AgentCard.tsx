@@ -14,7 +14,7 @@ type TeamMember = {
   mobile: string | null;
   fax: string | null;
   email: string | null;
-  license: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 
@@ -85,16 +85,17 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             <h3 className="text-3xl md:text-4xl font-extrabold text-[#1c3664] mb-3">
               {member.name}
             </h3>
+
+            {/* License Number */}
+            {member.licenceNumber && (
+              <p className="text-xl text-blue-600 font-semibold mb-6">
+                {member.licenceNumber}
+              </p>
+            )}
+
             <p className="text-xl text-blue-600 font-semibold mb-6">
               {member.role}
             </p>
-
-            {/* License Number */}
-            {member.license && (
-              <p className="text-base text-slate-500 mb-6">
-                רישיון מס׳ {member.license}
-              </p>
-            )}
 
             {/* Description */}
             <p className="text-slate-600 leading-relaxed text-lg mb-8 max-w-lg mx-auto md:mx-0">

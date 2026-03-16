@@ -5,12 +5,12 @@ async function testSMTP() {
   console.log('\n🔍 Testing SMTP Configuration...\n');
 
   const config = {
-    host: 'smtp.titan.email',
-    port: 587,
+    host: process.env.EMAIL_SERVER_HOST || 'smtp.titan.email',
+    port: parseInt(process.env.EMAIL_SERVER_PORT || '587'),
     secure: false, // STARTTLS
     auth: {
-      user: 'info@ram-haim.co.il',
-      pass: 'A123456789!Qq'
+      user: process.env.EMAIL_SERVER_USER,
+      pass: process.env.EMAIL_SERVER_PASSWORD
     },
     requireTLS: true,
     tls: {
@@ -19,6 +19,13 @@ async function testSMTP() {
     debug: true,
     logger: true
   };
+
+  // Validate required environment variables
+  if (!config.auth.user || !config.auth.pass) {
+    console.error('❌ Error: EMAIL_SERVER_USER and EMAIL_SERVER_PASSWORD environment variables are required');
+    console.error('\nMake sure your .env file contains the SMTP credentials.\n');
+    process.exit(1);
+  }
 
   console.log('Configuration:');
   console.log(`  Host: ${config.host}`);

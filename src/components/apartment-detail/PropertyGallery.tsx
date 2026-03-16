@@ -12,9 +12,10 @@ import 'swiper/css/thumbs';
 interface PropertyGalleryProps {
   images: string[];
   isSold: boolean;
+  dealType?: string;
 }
 
-export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
+export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   return (
@@ -69,8 +70,8 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
         {isSold && (
           <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
             <Image
-              src="/images/sold.png"
-              alt="נמכר"
+              src={dealType === 'rent' ? '/Rented.svg' : '/Sold.svg'}
+              alt={dealType === 'rent' ? 'מושכר' : 'נמכר'}
               fill
               className="object-contain"
               sizes="100vw"

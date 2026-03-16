@@ -49,16 +49,26 @@ const MarqueeRow = ({
   duration?: number,
   isMobile?: boolean
 }) => {
-  const duplicatedItems = useMemo(
-    () => isMobile ? [...items, ...items] : [...items, ...items, ...items],
-    [items, isMobile]
-  );
+  const duplicatedItems = useMemo(() => {
+    // Guarantee smooth infinite carousel even when there are few items
+    if (items.length === 1) {
+      // One item – duplicate more times to avoid big empty gaps
+      return [...items, ...items, ...items, ...items];
+    }
+    if (items.length === 2) {
+      // Two items – 3 cycles give good density
+      return [...items, ...items, ...items];
+    }
+
+    // 3+ items – standard behavior
+    return isMobile ? [...items, ...items] : [...items, ...items, ...items];
+  }, [items, isMobile]);
 
   const animationDuration = isMobile ? duration * 0.8 : duration;
 
   const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
   const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
-
+  console.log(items)
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
       <motion.div
@@ -113,8 +123,12 @@ function HotPropositions() {
           setTitle(titlesData.hotPropositionsTitle || 'הצעות חמות');
         }
         
-        const response = await fetch('/api/properties?dealType=sale&hotProposition=true&limit=12', {
-          next: { revalidate: 300 }
+        // Fetch all hot propositions (for sale and for rent)
+        const response = await fetch('/api/properties?hotProposition=true&limit=12', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
         });
 
         if (!response.ok) {

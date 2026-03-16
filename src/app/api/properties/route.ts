@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
   if (!value) return [];
@@ -235,8 +234,14 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.json(properties.map(formatProperty));
     
-    // Add caching headers for better performance
-    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    // Add caching headers for better performance.
+    // For dynamic homepage sections (pinned / hot / no-commission) disable cache
+    // so changes from the admin panel appear immediately.
+    if (pinned === 'true' || hotProposition === 'true' || noCommission === 'true') {
+      response.headers.set('Cache-Control', 'no-store');
+    } else {
+      response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    }
     
     return response;
   } catch (error) {

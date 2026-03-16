@@ -13,7 +13,7 @@ type TeamMember = {
   mobile: string | null;
   fax: string | null;
   email: string | null;
-  license: string | null;
+  licenceNumber: string | null;
   description: string | null;
 };
 
@@ -26,7 +26,9 @@ export default function AboutTeam() {
   useEffect(() => {
     async function fetchTeam() {
       try {
-        const response = await fetch('/api/team');
+        const response = await fetch('/api/team', {
+          cache: 'no-store'
+        });
         if (response.ok) {
           const data = await response.json();
           setTeam(data);
@@ -39,7 +41,7 @@ export default function AboutTeam() {
     }
     fetchTeam();
   }, []);
-
+console.log(team);
   return (
     <motion.section
       ref={teamRef}

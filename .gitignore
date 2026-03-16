@@ -56,3 +56,6 @@ deploy.tar.gz
 
 /src/generated/prisma
 nul/data
+
+# uploaded files (stored in data directory in production)
+/uploads

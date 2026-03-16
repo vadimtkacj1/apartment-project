@@ -16,6 +16,7 @@ interface HotPropositionCardProps {
   index?: number;
   image?: string;
   images?: string[];
+  dealType?: string;
 }
 
 const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
@@ -27,7 +28,8 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
   isSold,
   index,
   image,
-  images
+  images,
+  dealType
 }) => {
   const getStatusLabel = (status?: string) => {
     const labels: Record<string, string> = {
@@ -115,7 +117,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               {isSold && (
                 <div className="flex items-center gap-1.5 bg-red-600 px-3 py-1 text-xs font-bold rounded-md">
                   <CheckCircle2 size={14} />
-                  <span>נמכר</span>
+                  <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
                 </div>
               )}
             </div>
@@ -127,8 +129,8 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               <div className="absolute inset-0 bg-gray-900/40 z-10"></div>
               <div className="absolute inset-0 z-15 flex items-center justify-center">
                 <Image
-                  src="/images/sold.png"
-                  alt="נמכר"
+                  src={dealType === 'rent' ? '/Rented.svg' : '/Sold.svg'}
+                  alt={dealType === 'rent' ? 'מושכר' : 'נמכר'}
                   fill
                   className="object-contain p-8"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -165,7 +167,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             {isSold ? (
               <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gray-300 text-white font-bold rounded-2xl text-base opacity-60 cursor-not-allowed">
                 <CheckCircle2 size={18} />
-                <span>נמכר</span>
+                <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
               </div>
             ) : (
               <button className="w-full group/btn">

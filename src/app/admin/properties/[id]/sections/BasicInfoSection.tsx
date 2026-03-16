@@ -7,16 +7,17 @@ import { useState, useEffect } from 'react';
 const { TextArea } = Input;
 
 export function BasicInfoSection({ formData, handleChange }: PropertyFormSectionProps) {
-  const [vacancyType, setVacancyType] = useState<'date' | 'immediately'>('date');
+  const [vacancyType, setVacancyType] = useState<'date' | 'immediately' | 'flexible'>('date');
 
   // Sync vacancyType with formData
   useEffect(() => {
     if (formData.vacancyDate === 'מיד' || formData.vacancyDate === 'immediately') {
       setVacancyType('immediately');
+    } else if (formData.vacancyDate === 'גמיש' || formData.vacancyDate === 'flexible') {
+      setVacancyType('flexible');
     } else if (formData.vacancyDate && typeof formData.vacancyDate === 'string' && formData.vacancyDate.trim() !== '') {
       setVacancyType('date');
     } else if (formData.vacancyDate && typeof formData.vacancyDate === 'object') {
-      // It's a dayjs object from DatePicker
       setVacancyType('date');
     }
   }, [formData.vacancyDate]);
@@ -103,6 +104,8 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
                   setVacancyType(newType);
                   if (newType === 'immediately') {
                     handleChange('vacancyDate', 'מיד');
+                  } else if (newType === 'flexible') {
+                    handleChange('vacancyDate', 'גמיש');
                   } else {
                     handleChange('vacancyDate', '');
                   }
@@ -111,16 +114,17 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               >
                 <Radio value="date">בחר תאריך</Radio>
                 <Radio value="immediately">מיד</Radio>
+                <Radio value="flexible">גמיש</Radio>
               </Radio.Group>
               {vacancyType === 'date' && (
                 <DatePicker
                   placeholder="בחר תאריך פינוי"
                   format="DD/MM/YYYY"
                   style={{ width: '100%' }}
-                  value={formData.vacancyDate && formData.vacancyDate !== 'מיד' && formData.vacancyDate !== 'immediately' 
-                    ? (typeof formData.vacancyDate === 'string' 
-                        ? (dayjs(formData.vacancyDate, 'DD/MM/YYYY', true).isValid() 
-                            ? dayjs(formData.vacancyDate, 'DD/MM/YYYY') 
+                  value={formData.vacancyDate && formData.vacancyDate !== 'מיד' && formData.vacancyDate !== 'immediately' && formData.vacancyDate !== 'גמיש' && formData.vacancyDate !== 'flexible'
+                    ? (typeof formData.vacancyDate === 'string'
+                        ? (dayjs(formData.vacancyDate, 'DD/MM/YYYY', true).isValid()
+                            ? dayjs(formData.vacancyDate, 'DD/MM/YYYY')
                             : null)
                         : (formData.vacancyDate && dayjs.isDayjs(formData.vacancyDate) ? formData.vacancyDate : null))
                     : null}
@@ -136,6 +140,11 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               {vacancyType === 'immediately' && (
                 <div style={{ padding: '8px 12px', background: '#f0f0f0', borderRadius: '6px', color: '#666' }}>
                   מיד
+                </div>
+              )}
+              {vacancyType === 'flexible' && (
+                <div style={{ padding: '8px 12px', background: '#f0f0f0', borderRadius: '6px', color: '#666' }}>
+                  גמיש
                 </div>
               )}
             </div>
@@ -159,11 +168,11 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           <Form.Item name="isSold" valuePropName="checked">
             <Switch
               checked={formData.isSold}
-              checkedChildren="נמכר"
-              unCheckedChildren="לא נמכר"
+              checkedChildren={formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}
+              unCheckedChildren={formData.dealType === 'rent' ? 'לא מושכר' : 'לא נמכר'}
               onChange={(checked) => handleChange('isSold', checked)}
             />
-            <span style={{ marginRight: '8px' }}>נכס נמכר</span>
+            <span style={{ marginRight: '8px' }}>נכס {formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
           </Form.Item>
         </Col>
         <Col xs={24} sm={8}>
