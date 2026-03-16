@@ -2,7 +2,6 @@
 
 import { useMemo, memo, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
@@ -76,13 +75,23 @@ const MarqueeRow = ({
       <motion.div
         key={`hot-propositions-marquee-${direction}-${animationDuration}`}
         className="flex gap-4 md:gap-6 py-4 md:py-6"
-        style={{ willChange: 'transform' }}
+        style={{
+          willChange: 'transform',
+          pointerEvents: 'auto'
+        }}
         initial={{ x: xInitial }}
         animate={{ x: xAnimate }}
         transition={{
           duration: animationDuration,
           ease: "linear",
           repeat: Infinity,
+        }}
+        onMouseDown={(e) => {
+          // Allow clicks to pass through to links
+          const target = e.target as HTMLElement;
+          if (target.closest('a')) {
+            e.stopPropagation();
+          }
         }}
       >
         {duplicatedItems.map((item: Property, i: number) => {
@@ -93,18 +102,20 @@ const MarqueeRow = ({
             disableClick: true
           };
           return (
-            <Link
+            <a
               key={`hot-proposition-card-${direction}-${i}`}
               href={`/apartments/${item.id}`}
-              onClick={() => {
+              onClick={(e) => {
                 if (!item.isSold) {
                   analytics.trackPropertyClick(item.id, 'hot-proposition');
                 }
               }}
-              className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block"
+              draggable={false}
+              className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block select-none"
+              style={{ pointerEvents: 'auto', cursor: 'pointer' }}
             >
               <PropertyCard {...cardProps} />
-            </Link>
+            </a>
           );
         })}
       </motion.div>

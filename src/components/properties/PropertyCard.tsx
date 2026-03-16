@@ -170,6 +170,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const dealTypeLabel = dealType === 'sale' ? 'למכירה' : dealType === 'rent' ? 'להשכרה' : 'למכירה';
 
   const handleClick = () => {
+    console.log('PropertyCard clicked!', { id, isSold, disableClick });
     if (!isSold) {
       analytics.trackPropertyClick(id, 'card');
     }
@@ -180,6 +181,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     <div
       onClick={disableClick ? undefined : handleClick}
       className={`block h-full ${disableClick ? '' : 'cursor-pointer'}`}
+      style={disableClick ? undefined : { pointerEvents: 'auto' }}
     >
       <motion.div
         whileHover={isSold ? {} : { y: -5 }}
@@ -191,7 +193,8 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
         style={{
           boxShadow: isSold
             ? '0 2px 10px rgba(0, 0, 0, 0.1)'
-            : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)'
+            : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)',
+          pointerEvents: 'auto'
         }}
         dir="rtl"
       >
