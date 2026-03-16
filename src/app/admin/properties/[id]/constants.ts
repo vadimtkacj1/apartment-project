@@ -56,13 +56,6 @@ export const STATUS_OPTIONS = [
   { value: 'Opportunity', label: 'הזדמנות' },
 ];
 
-export const CITY_OPTIONS = [
-  { value: 'holon', label: 'חולון' },
-  { value: 'batyam', label: 'בת ים' },
-  { value: 'rishon', label: 'ראשון לציון' },
-  { value: 'telaviv', label: 'תל אביב' },
-];
-
 export const PROPERTY_TYPE_OPTIONS = [
   { value: 'apartment', label: 'דירה' },
   { value: 'garden-apartment', label: 'דירת גן' },

@@ -81,12 +81,6 @@ const nextConfig: NextConfig = {
         destination: '/apartments?dealType=sale',
         permanent: true,
       },
-      // Redirect deleted properties to apartments list
-      {
-        source: '/apartments/60',
-        destination: '/apartments',
-        permanent: true,
-      },
     ];
   },
 

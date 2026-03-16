@@ -3,7 +3,7 @@
 import { Card, Row, Col, Form, Input, Select } from 'antd';
 import { EnvironmentOutlined } from '@ant-design/icons';
 import { PropertyFormSectionProps } from '../types';
-import { CITY_OPTIONS } from '../constants';
+import { ISRAELI_CITIES } from '@/data/cities';
 
 export function LocationSection({ formData, handleChange }: PropertyFormSectionProps) {
 
@@ -17,8 +17,15 @@ export function LocationSection({ formData, handleChange }: PropertyFormSectionP
             rules={[{ required: true, message: 'עיר היא שדה חובה' }]}
           >
             <Select
+              showSearch
+              optionFilterProp="label"
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
               onChange={(value) => handleChange('city', value)}
-              options={CITY_OPTIONS}
+              options={ISRAELI_CITIES}
+              notFoundContent="לא נמצא"
+              placeholder="בחר עיר"
             />
           </Form.Item>
         </Col>

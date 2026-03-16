@@ -2,7 +2,8 @@
 
 export type DealType = 'sale' | 'rent';
 
-export type City = 'holon' | 'batyam' | 'rishon' | 'telaviv' | 'all';
+// City slug (e.g. 'telaviv', 'jerusalem'). Use ISRAELI_CITIES from @/data/cities for options.
+export type City = string;
 
 export type PropertyType =
   | 'apartment'        // דירה

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { message } from 'antd';
 import { FormInstance } from 'antd';
 import { PropertyForm } from './types';
-import { INITIAL_FORM, CITY_OPTIONS } from './constants';
+import { INITIAL_FORM } from './constants';
+import { getCityLabel, getCitySlug } from '@/data/cities';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 
@@ -89,7 +90,7 @@ export function usePropertyForm(
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
       if (field === 'city' || field === 'neighborhood') {
-        const cityLabel = CITY_OPTIONS.find((c) => c.value === updated.city)?.label || updated.city;
+        const cityLabel = getCityLabel(updated.city) || updated.city;
         const parts = [cityLabel, updated.neighborhood].filter(Boolean);
         updated.location = parts.join(', ');
         // Update location in form as well
@@ -145,27 +146,10 @@ export function usePropertyForm(
     }
   };
 
-  // Map city names from OpenStreetMap to our format
-  const mapCityName = (cityName: string): string => {
-    const cityMap: { [key: string]: string } = {
-      'חולון': 'holon',
-      'Holon': 'holon',
-      'בת ים': 'batyam',
-      'Bat Yam': 'batyam',
-      'ראשון לציון': 'rishon',
-      'Rishon LeZion': 'rishon',
-      'תל אביב': 'telaviv',
-      'Tel Aviv': 'telaviv',
-      'Tel Aviv-Yafo': 'telaviv',
-    };
-
-    return cityMap[cityName] || cityName.toLowerCase();
-  };
-
   const handleAddressFromMap = (address: any) => {
     // Auto-fill address fields from map geocoding
     if (address.city) {
-      const mappedCity = mapCityName(address.city);
+      const mappedCity = getCitySlug(address.city);
       handleChange('city', mappedCity);
       form.setFieldValue('city', mappedCity);
     }

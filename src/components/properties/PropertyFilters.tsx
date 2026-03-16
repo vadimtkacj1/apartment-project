@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { FilterState } from '@/types/property.types';
+import { ISRAELI_CITIES } from '@/data/cities';
 
 interface PropertyFiltersProps {
   filters: FilterState;
@@ -70,10 +71,9 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
             className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
           >
             <option value="all">הכל</option>
-            <option value="holon">חולון</option>
-            <option value="batyam">בת ים</option>
-            <option value="rishon">ראשון לציון</option>
-            <option value="telaviv">תל אביב</option>
+            {ISRAELI_CITIES.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
           </select>
         </div>
 

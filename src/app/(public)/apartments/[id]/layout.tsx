@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
+import { getCityLabel } from '@/data/cities';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -41,19 +42,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const mainImage = images[0] || '/images/hero/main-hero.jpg';
     const fullImageUrl = mainImage.startsWith('http') ? mainImage : `${siteUrl}${mainImage}`;
 
-    const cityNames: Record<string, string> = {
-      holon: 'חולון',
-      batyam: 'בת ים',
-      rishon: 'ראשון לציון',
-      telaviv: 'תל אביב',
-    };
-
     const dealTypeNames: Record<string, string> = {
       sale: 'למכירה',
       rent: 'להשכרה',
     };
 
-    const cityName = cityNames[property.city] || property.city;
+    const cityName = getCityLabel(property.city) || property.city;
     const dealTypeName = dealTypeNames[property.dealType] || '';
     const propertyTitle = `דירה ${dealTypeName} ב${cityName} - ${property.rooms} חדרים, ${property.area} מ״ר`;
     const propertyDescription = property.description || 

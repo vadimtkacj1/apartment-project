@@ -1,4 +1,5 @@
 import { FilterState } from '@/types/property.types';
+import { getCityLabel } from '@/data/cities';
 
 /** * Type definitions for categorized navigation and sorting 
  */
@@ -58,15 +59,10 @@ export const filterProperties = (properties: typeof PROPERTIES, selectedCategory
     // Top-level navigation category check
     if (selectedCategory !== 'all' && property.category !== selectedCategory) return false;
     
-    // City selection mapping
+    // City selection mapping (uses central cities)
     if (filters.city !== 'all') {
-      const cityMap: Record<string, string> = {
-        'holon': 'חולון',
-        'batyam': 'בת ים',
-        'rishon': 'ראשון לציון',
-        'telaviv': 'תל אביב'
-      };
-      if (property.location !== cityMap[filters.city]) return false;
+      const cityLabel = getCityLabel(filters.city);
+      if (property.location !== cityLabel) return false;
     }
     
     // Deal Type grouping (Sale vs Rent)

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { CENTER_REGION_CITY_SLUGS } from '@/data/cities';
+
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
   if (!value) return [];
@@ -109,11 +111,9 @@ export async function GET(request: NextRequest) {
       where.city = city;
     }
 
-    // Filter by region (center area)
+    // Filter by region (center area - Gush Dan)
     if (region === 'center') {
-      where.city = {
-        in: ['telaviv', 'holon', 'batyam', 'rishon']
-      };
+      where.city = { in: CENTER_REGION_CITY_SLUGS };
     }
 
     if (category && category !== 'all') {

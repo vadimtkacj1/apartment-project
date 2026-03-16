@@ -15,6 +15,7 @@ import ContactFormPopup from '@/components/layout/ContactFormPopup';
 import { FilterState, DealType, City } from '@/types/property.types';
 
 import { CATEGORIES, Category, SortOption } from '@/data/properties.data';
+import { ISRAELI_CITIES } from '@/data/cities';
 
 interface Property {
   id: number;
@@ -67,11 +68,32 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     if (pageFromUrl) setCurrentPage(parseInt(pageFromUrl, 10));
 
     const dealTypeFromUrl = searchParams.get('dealType');
+    const cityFromUrl = searchParams.get('city');
+
+    setFilters((prev) => {
+      let next = { ...prev };
+      if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
+        next.dealType = dealTypeFromUrl as DealType;
+      }
+      if (cityFromUrl) {
+        const validCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
+        next.city = validCity;
+      }
+      return next;
+    });
+    setAppliedFilters((prev) => {
+      let next = { ...prev };
+      if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
+        next.dealType = dealTypeFromUrl as DealType;
+      }
+      if (cityFromUrl) {
+        const validCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
+        next.city = validCity;
+      }
+      return next;
+    });
     if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
-      const dt = dealTypeFromUrl as DealType;
-      setFilters((prev) => ({ ...prev, dealType: dt }));
-      setAppliedFilters((prev) => ({ ...prev, dealType: dt }));
-      setSelectedCategory(getInitialCategory(dt));
+      setSelectedCategory(getInitialCategory(dealTypeFromUrl as DealType));
     }
   }, [searchParams]);
 
@@ -219,11 +241,39 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     return properties.slice(start, start + ITEMS_PER_PAGE);
   }, [properties, currentPage]);
 
-  const updatePage = (page: number) => {
-    setCurrentPage(page);
-    const params = new URLSearchParams(searchParams.toString());
+  /** Sync URL with applied filters (call when applying or resetting). */
+  const syncUrlFromFilters = (f: FilterState, page: number = 1) => {
+    const params = new URLSearchParams();
+    if (f.dealType && f.dealType !== 'all') params.set('dealType', f.dealType);
+    if (f.city && f.city !== 'all') params.set('city', f.city);
+    if (f.propertyType && f.propertyType !== 'all') params.set('propertyType', f.propertyType);
+    if (f.minRooms != null) params.set('minRooms', String(f.minRooms));
+    if (f.maxRooms != null) params.set('maxRooms', String(f.maxRooms));
+    if (f.minPrice != null) params.set('minPrice', String(f.minPrice));
+    if (f.maxPrice != null) params.set('maxPrice', String(f.maxPrice));
+    if (f.minArea != null) params.set('minArea', String(f.minArea));
+    if (f.maxArea != null) params.set('maxArea', String(f.maxArea));
+    if (f.floor != null) params.set('floor', String(f.floor));
+    if (f.parking && f.parking !== 'all') params.set('parking', f.parking);
+    if (f.furniture && f.furniture !== 'all') params.set('furniture', f.furniture);
+    if (f.kitchen && f.kitchen !== 'all') params.set('kitchen', f.kitchen);
+    if (f.position && f.position !== 'all') params.set('position', f.position);
+    if (f.neighborhood) params.set('neighborhood', f.neighborhood);
+    if (f.street) params.set('street', f.street);
+    if (f.vacancyDate) params.set('vacancyDate', f.vacancyDate);
+    if (f.features?.hasAirConditioning) params.set('hasAirConditioning', 'true');
+    if (f.features?.hasElevator) params.set('hasElevator', 'true');
+    if (f.features?.hasSunBalcony) params.set('hasSunBalcony', 'true');
+    if (f.features?.hasSafeRoom) params.set('hasSafeRoom', 'true');
+    if (f.features?.hasStorage) params.set('hasStorage', 'true');
+    if (f.features?.hasDisabledAccess) params.set('hasDisabledAccess', 'true');
     params.set('page', page.toString());
     router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  const updatePage = (page: number) => {
+    setCurrentPage(page);
+    syncUrlFromFilters(appliedFilters, page);
   };
 
   return (
@@ -293,13 +343,15 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
                   onFiltersChange={setFilters}
                   onApply={() => {
                     setAppliedFilters(filters);
-                    updatePage(1);
+                    setCurrentPage(1);
+                    syncUrlFromFilters(filters, 1);
                   }}
                   onReset={() => {
                     const resetFilters: FilterState = { dealType: initialDealType ?? 'all', city: 'all' };
                     setFilters(resetFilters);
                     setAppliedFilters(resetFilters);
-                    updatePage(1);
+                    setCurrentPage(1);
+                    syncUrlFromFilters(resetFilters, 1);
                   }}
                 />
               </motion.div>

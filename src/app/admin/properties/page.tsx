@@ -28,6 +28,7 @@ import {
 import Link from 'next/link';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 import type { ColumnsType } from 'antd/es/table';
+import { getCityLabel } from '@/data/cities';
 
 interface Property {
   id: number;
@@ -337,18 +338,7 @@ export default function PropertiesPage() {
               dataIndex: 'city',
               key: 'city',
               width: 100,
-              render: (city: string) => {
-                const cityLabels: Record<string, string> = {
-                  'telaviv': 'תל אביב',
-                  'batyam': 'בת ים',
-                  'holon': 'חולון',
-                  'rishon': 'ראשון לציון',
-                  'ramatgan': 'רמת גן',
-                  'givatayim': 'גבעתיים',
-                  'azor': 'אזור',
-                };
-                return cityLabels[city] || city;
-              },
+              render: (city: string) => getCityLabel(city) || city,
             },
             {
               title: 'סוג עסקה',
