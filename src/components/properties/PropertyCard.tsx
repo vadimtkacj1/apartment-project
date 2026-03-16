@@ -169,13 +169,13 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   return (
     <Link
       href={`/apartments/${id}`}
-      onClick={(e) => {
-        e.stopPropagation();
+      onClick={() => {
         if (!isSold) {
           analytics.trackPropertyClick(id, 'card');
         }
       }}
       className="block h-full"
+      style={{ cursor: 'pointer' }}
     >
       <motion.div
         whileHover={isSold ? {} : { y: -5 }}
