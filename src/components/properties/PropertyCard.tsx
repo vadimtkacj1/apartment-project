@@ -196,7 +196,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <img
               src={imageSrc}
               alt={title}
-              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 z-0 ${
+              className={`absolute inset-0 w-full h-full object-contain transition-transform duration-700 z-0 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
               onError={() => {
@@ -403,13 +403,13 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <div className="w-full sm:w-auto">
               {originalPrice && (
                 <p className="text-xs text-gray-400 line-through mb-0.5">
-                  {originalPrice}
+                  {originalPrice} ₪
                 </p>
               )}
               <p className={`text-lg sm:text-xl font-black ${
                 isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
               }`}>
-                {price}
+                {price} ₪
               </p>
             </div>
 

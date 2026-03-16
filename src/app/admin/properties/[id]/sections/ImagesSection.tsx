@@ -13,7 +13,7 @@ export function ImagesSection({ formData, handleChange }: ImagesSectionProps) {
       <ImageUploader
         images={formData.images}
         onImagesChange={(images) => handleChange('images', images)}
-        maxImages={10}
+        maxImages={25}
       />
     </Card>
   );

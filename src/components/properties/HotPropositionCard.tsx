@@ -72,7 +72,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             src={displayImage}
             alt={title}
             fill
-            className={`object-cover transition-all duration-500 ${
+            className={`object-contain transition-all duration-500 ${
               isSold ? 'grayscale opacity-50' : 'group-hover:scale-105'
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -110,7 +110,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
                 : 'bg-[#1c3664]/90 text-white'
             }`}>
               <p className={`text-2xl sm:text-3xl font-black ${isSold ? 'line-through' : ''}`}>
-                {price}
+                {price} ₪
               </p>
               {isSold && (
                 <div className="flex items-center gap-1.5 bg-red-600 px-3 py-1 text-xs font-bold rounded-md">

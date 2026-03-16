@@ -16,11 +16,11 @@ export function PriceCard({ price, originalPrice, isSold }: PriceCardProps) {
     }`}>
       <div className="text-sm font-bold mb-2 opacity-90">מחיר:</div>
       <div className={`text-4xl font-black mb-4 ${isSold ? 'line-through' : ''}`}>
-        {price}
+        {price} ₪
       </div>
       {originalPrice && (
         <div className="text-lg font-semibold opacity-75">
-          מחיר מקורי: {originalPrice}
+          מחיר מקורי: {originalPrice} ₪
         </div>
       )}
       {isSold && (

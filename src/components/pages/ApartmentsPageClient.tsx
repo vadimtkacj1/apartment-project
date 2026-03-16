@@ -227,7 +227,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
       {/* Breadcrumbs */}
       <Breadcrumbs />
 
-      <div className="min-h-screen bg-warm pt-16 pb-16" dir="rtl">
+      <div className="min-h-screen bg-warm pt-16 pb-32" dir="rtl">
         <div className="mx-auto px-6">
           {/* Categories */}
           <div className="flex justify-center gap-3 mb-10">

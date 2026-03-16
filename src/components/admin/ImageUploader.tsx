@@ -17,7 +17,7 @@ interface ImageUploaderProps {
 export default function ImageUploader({
   images,
   onImagesChange,
-  maxImages = 10,
+  maxImages = 25,
 }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);

@@ -28,30 +28,41 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
         modules={[Navigation, Pagination, Thumbs, Autoplay]}
         navigation
         pagination={{ clickable: true }}
-        autoplay={isSold ? false : { delay: 3000, disableOnInteraction: false, pauseOnMouseEnter: false }}
+        autoplay={isSold ? false : { delay: 3000, disableOnInteraction: false }}
         loop={true}
         speed={800}
         thumbs={{ swiper: thumbsSwiper && !(thumbsSwiper as any).destroyed ? thumbsSwiper : null }}
-        className={`rounded-2xl overflow-hidden mb-4 shadow-2xl property-slider ${isSold ? 'grayscale opacity-60' : ''}`}
+        className={`overflow-hidden mb-4 property-slider ${isSold ? 'grayscale opacity-60' : ''}`}
         style={{ height: '85vh' }}
         dir="ltr"
       >
         {images.map((image: string, index: number) => (
           <SwiperSlide key={index}>
-            <div className="relative w-full h-full">
-              <Image src={image} alt="Property" fill className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="100vw" />
-              {/* Logo overlay - top left */}
-              <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                <Image
-                  src="/images/logos.png"
-                  alt="Logo"
-                  width={180}
-                  height={90}
-                  className="object-contain drop-shadow-lg"
-                  loading="lazy"
+            <div className="relative w-full h-full flex items-center justify-center bg-black/5">
+              <div className="relative max-h-full max-w-full flex items-center justify-center">
+                <img
+                  src={image}
+                  alt="Property"
+                  className={`object-contain max-h-[85vh] w-auto h-auto ${isSold ? 'grayscale opacity-60' : ''}`}
                 />
+                
+                <div 
+                  className="absolute z-10 pointer-events-none" 
+                  style={{ 
+                    top: '20px', 
+                    left: '20px',
+                    width: 'clamp(100px, 12vw, 180px)' 
+                  }}
+                >
+                  <img
+                    src="/images/logos.png"
+                    alt="Logo"
+                    className="w-full h-auto drop-shadow-2xl"
+                  />
+                </div>
+
+                {isSold && <div className="absolute inset-0 bg-gray-900/30"></div>}
               </div>
-              {isSold && <div className="absolute inset-0 bg-gray-900/30"></div>}
             </div>
           </SwiperSlide>
         ))}
@@ -70,10 +81,8 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
 
       <style jsx global>{`
         .property-slider { position: relative; }
-
-        /* Стили кнопок слайдера - уменьшены */
         .property-slider .swiper-button-prev, .property-slider .swiper-button-next {
-          width: 30px; /* Было 32/48 */
+          width: 30px;
           height: 30px;
           background-color: rgba(0, 0, 0, 0.4);
           color: white;
@@ -85,22 +94,17 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
           justify-content: center;
           border: 1px solid rgba(255,255,255,0.1);
         }
-
         .property-slider .swiper-button-prev:hover, .property-slider .swiper-button-next:hover {
           background-color: #1c3664;
           border-color: #1c3664;
           transform: scale(1.1);
         }
-
-        /* Размер самой иконки стрелки - уменьшен */
         .property-slider .swiper-button-prev:after, .property-slider .swiper-button-next:after {
-          font-size: 10px !important; /* Было 12/20 - очень маленькая аккуратная стрелка */
+          font-size: 10px !important;
           font-weight: bold;
         }
-
         .property-slider .swiper-button-prev { left: 20px; }
         .property-slider .swiper-button-next { right: 20px; }
-
         .property-slider .swiper-pagination-bullet { background: white; opacity: 0.7; width: 8px; height: 8px; }
         .property-slider .swiper-pagination-bullet-active { background: #1c3664; opacity: 1; width: 24px; border-radius: 4px; }
       `}</style>
@@ -114,10 +118,10 @@ export function PropertyGallery({ images, isSold }: PropertyGalleryProps) {
       >
         {images.map((image: string, index: number) => (
           <SwiperSlide key={index} className={isSold ? 'cursor-not-allowed' : 'cursor-pointer'}>
-            <div className={`relative aspect-video rounded-lg overflow-hidden border-2 transition-colors ${
-              isSold ? 'border-gray-300 opacity-60' : 'border-gray-200 hover:border-[#1c3664]'
+            <div className={`relative aspect-video rounded-lg overflow-hidden transition-colors ${
+              isSold ? 'opacity-60' : ''
             }`}>
-              <Image src={image} alt="Thumb" fill className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
+              <Image src={image} alt="Thumb" fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
             </div>
           </SwiperSlide>
         ))}
