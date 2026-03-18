@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 
 interface Property {
   id: number;
@@ -18,9 +19,9 @@ interface Property {
   isSold?: boolean;
   floor?: number;
   description?: string;
-  propertyType?: string;
-  parking?: string;
-  furniture?: string;
+  propertyType?: PropertyType;
+  parking?: ParkingType;
+  furniture?: FurnitureLevel;
   directions?: string[];
   hasAirConditioning?: boolean;
   hasElevator?: boolean;

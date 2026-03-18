@@ -1,3 +1,5 @@
+import { PropertyType, ParkingType, Position, FurnitureLevel, KitchenType, DealType } from '@/types/property.types';
+
 export interface PropertyData {
   id: number;
   title: string;
@@ -18,11 +20,11 @@ export interface PropertyData {
   totalFloors?: number;
   buildingType?: string;
   availableFrom?: string;
-  propertyType?: string;
-  parking?: string;
-  position?: string;
-  furniture?: string;
-  kitchen?: string;
+  propertyType?: PropertyType;
+  parking?: ParkingType;
+  position?: Position;
+  furniture?: FurnitureLevel;
+  kitchen?: KitchenType;
   vacancyDate?: string | null;
   images: string[];
   amenities: {
@@ -44,7 +46,7 @@ export interface PropertyData {
   description: string;
   directions?: string[];
   isSold?: boolean;
-  dealType?: string;
+  dealType?: DealType;
   agents?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
   owners?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
 }

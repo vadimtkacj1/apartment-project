@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
+import { DealType } from '@/types/property.types';
 
 interface HotPropositionCardProps {
   id: number;
@@ -16,7 +17,7 @@ interface HotPropositionCardProps {
   index?: number;
   image?: string;
   images?: string[];
-  dealType?: string;
+  dealType?: DealType;
 }
 
 const HotPropositionCard: React.FC<HotPropositionCardProps> = ({

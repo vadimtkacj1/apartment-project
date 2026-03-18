@@ -28,7 +28,12 @@ export const sampleProperties: Property[] = [
       hasSunroom: false,
       hasBoiler: true,
       hasSafeRoom: true,
-      hasElevator: true
+      hasElevator: true,
+      hasMamak: false,
+      hasBars: true,
+      hasPets: false,
+      hasHousingUnit: false,
+      hasShelter: true
     },
     title: 'דירת 3.5 חדרים מרווחת בפלורנטין',
     description: 'דירה מדהימה במיקום מעולה',
@@ -67,7 +72,12 @@ export const sampleProperties: Property[] = [
       hasSunroom: true,
       hasBoiler: true,
       hasSafeRoom: true,
-      hasElevator: true
+      hasElevator: true,
+      hasMamak: true,
+      hasBars: true,
+      hasPets: false,
+      hasHousingUnit: false,
+      hasShelter: true
     },
     title: 'פנטהאוז יוקרתי 5 חדרים עם מרפסת ענקית',
     description: 'פנטהאוז מרהיב עם נוף פנורמי',
@@ -104,7 +114,12 @@ export const sampleProperties: Property[] = [
       hasSunroom: false,
       hasBoiler: true,
       hasSafeRoom: true,
-      hasElevator: false
+      hasElevator: false,
+      hasMamak: false,
+      hasBars: true,
+      hasPets: true,
+      hasHousingUnit: false,
+      hasShelter: false
     },
     title: 'דירת גן 4 חדרים עם גינה פרטית',
     description: 'דירת גן מקסימה במיקום שקט',
@@ -141,7 +156,12 @@ export const sampleProperties: Property[] = [
       hasSunroom: false,
       hasBoiler: true,
       hasSafeRoom: false,
-      hasElevator: true
+      hasElevator: true,
+      hasMamak: false,
+      hasBars: false,
+      hasPets: false,
+      hasHousingUnit: false,
+      hasShelter: true
     },
     title: 'סטודיו מעוצב ליד הים',
     description: 'סטודיו חמוד ומעוצב במיקום מרכזי',
@@ -179,7 +199,12 @@ export const sampleProperties: Property[] = [
       hasSunroom: true,
       hasBoiler: true,
       hasSafeRoom: true,
-      hasElevator: true
+      hasElevator: true,
+      hasMamak: true,
+      hasBars: true,
+      hasPets: false,
+      hasHousingUnit: true,
+      hasShelter: true
     },
     title: 'דופלקס מהמם 6 חדרים בנווה צדק',
     description: 'דופלקס יוקרתי בלב נווה צדק',

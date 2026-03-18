@@ -1,11 +1,12 @@
 import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
+import { DealType } from '@/types/property.types';
 
 interface PriceCardProps {
   price: string;
   originalPrice?: string;
   isSold: boolean;
-  dealType?: string;
+  dealType?: DealType;
 }
 
 export function PriceCard({ price, originalPrice, isSold, dealType }: PriceCardProps) {

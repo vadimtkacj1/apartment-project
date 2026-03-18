@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, Phone, CheckCircle2 } from 'lucide-react';
 import { ContactFormData } from './types';
 import { analytics } from '@/lib/analytics';
+import { DealType } from '@/types/property.types';
 
 interface Owner {
   id: number;
@@ -15,7 +16,7 @@ interface ContactFormProps {
   propertyId: string;
   isSold: boolean;
   owners?: Owner[];
-  dealType?: string;
+  dealType?: DealType;
 }
 
 export function ContactForm({ propertyId, isSold, owners = [], dealType }: ContactFormProps) {

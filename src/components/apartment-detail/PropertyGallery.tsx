@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Autoplay } from 'swiper/modules';
+import { DealType } from '@/types/property.types';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -12,7 +13,7 @@ import 'swiper/css/thumbs';
 interface PropertyGalleryProps {
   images: string[];
   isSold: boolean;
-  dealType?: string;
+  dealType?: DealType;
 }
 
 export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryProps) {

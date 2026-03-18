@@ -79,7 +79,7 @@ export default async function Footer() {
 
           {/* For Renters Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">עבור שוכרים</h4>
+            <div className="text-xl font-bold mb-4 text-white">עבור שוכרים</div>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/apartments" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">דירות להשכרה</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">שאלות ותשובות</Link></li>
@@ -89,7 +89,7 @@ export default async function Footer() {
 
           {/* For Owners Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">קונים ומוכרים</h4>
+            <div className="text-xl font-bold mb-4 text-white">קונים ומוכרים</div>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
@@ -98,7 +98,7 @@ export default async function Footer() {
 
           {/* Resources Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">משאבים</h4>
+            <div className="text-xl font-bold mb-4 text-white">משאבים</div>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מאמרים</Link></li>
               <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">למכור לבד?</Link></li>
@@ -110,7 +110,7 @@ export default async function Footer() {
 
           {/* Company Section */}
           <div>
-            <h4 className="text-xl font-bold mb-4 text-white">החברה</h4>
+            <div className="text-xl font-bold mb-4 text-white">החברה</div>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
             </ul>
@@ -119,7 +119,7 @@ export default async function Footer() {
           {/* Contact Section */}
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
-              <h2 className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</h2>
+              <div className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</div>
               <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
                 {owners.map((owner) => (
                   <div key={owner.id} className="space-y-1">
@@ -174,9 +174,9 @@ export default async function Footer() {
 
         {/* Legal Content Section */}
         <div className="mt-12 pt-8 border-t-2 border-[#c5a357]/30 text-center">
-          <h5 className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
+          <div className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
             תוכן משפטי
-          </h5>
+          </div>
 
           <p className="text-gray-500 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
             © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.

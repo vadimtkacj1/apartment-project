@@ -1,9 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
+import { DealType } from '@/types/property.types';
 
 interface SoldBadgeProps {
   isSold: boolean;
-  dealType?: string;
+  dealType?: DealType;
 }
 
 export function SoldBadge({ isSold, dealType }: SoldBadgeProps) {
