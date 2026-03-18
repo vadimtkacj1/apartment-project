@@ -74,7 +74,8 @@ export async function GET(
 
     const formatted = formatProperty(property);
 
-    // Fetch agents (owners and team members) for this property
+    // Fetch owners and agents (team members) for this property
+    let owners: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
     let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
     if (formatted.agentIds.length > 0) {
       // Separate owner IDs and team IDs
@@ -88,35 +89,52 @@ export async function GET(
           teamIds.push(parseInt(id.replace('team-', ''), 10));
         }
       });
+      // Deduplicate while preserving order (e.g. ["owner-1","owner-2","owner-1"] -> [1,2])
+      const seenOwner = new Set<number>();
+      const seenTeam = new Set<number>();
+      const dedupedOwnerIds = ownerIds.filter((id) => {
+        if (seenOwner.has(id)) return false;
+        seenOwner.add(id);
+        return true;
+      });
+      const dedupedTeamIds = teamIds.filter((id) => {
+        if (seenTeam.has(id)) return false;
+        seenTeam.add(id);
+        return true;
+      });
 
-      // Fetch owners
-      if (ownerIds.length > 0) {
-        const owners = await prisma.owner.findMany({
-          where: { id: { in: ownerIds }, isActive: true },
+      // Fetch owners (for contact form "call directly"), preserve order from agentIds
+      if (dedupedOwnerIds.length > 0) {
+        const ownerRecords = await prisma.owner.findMany({
+          where: { id: { in: dedupedOwnerIds }, isActive: true },
         });
-        agents.push(...owners.map((o) => ({
-          id: o.id,
-          name: o.name,
-          phone: o.phone || '',
-          whatsapp: o.whatsapp ?? undefined,
-        })));
+        const ownerMap = new Map(ownerRecords.map((o) => [o.id, o]));
+        owners = dedupedOwnerIds
+          .map((id) => ownerMap.get(id))
+          .filter(Boolean)
+          .map((o) => ({
+            id: o!.id,
+            name: o!.name,
+            phone: o!.phone || o!.whatsapp || '',
+            whatsapp: o!.whatsapp ?? undefined,
+          }));
       }
 
-      // Fetch team members
-      if (teamIds.length > 0) {
+      // Fetch team members (for PropertyAgentBlock)
+      if (dedupedTeamIds.length > 0) {
         const teamMembers = await prisma.teamMember.findMany({
-          where: { id: { in: teamIds }, isActive: true },
+          where: { id: { in: dedupedTeamIds }, isActive: true },
         });
-        agents.push(...teamMembers.map((t) => ({
+        agents = teamMembers.map((t) => ({
           id: t.id,
           name: t.name,
           phone: t.mobile || t.phone || '',
           whatsapp: (t as { whatsapp?: string | null }).whatsapp ?? undefined,
-        })));
+        }));
       }
     }
 
-    return NextResponse.json({ ...formatted, agents });
+    return NextResponse.json({ ...formatted, owners, agents });
   } catch (error) {
     console.error('Error fetching property:', error);
     return NextResponse.json(

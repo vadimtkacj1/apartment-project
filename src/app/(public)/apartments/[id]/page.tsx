@@ -26,9 +26,11 @@ interface Owner {
   phone: string;
 }
 
-// Type guard to check if an agent/owner has a phone
-function hasPhone(contact: { id: number; name: string; phone?: string }): contact is Owner {
-  return typeof contact.phone === 'string' && contact.phone.length > 0;
+// Type guard to check if an agent/owner has a phone or whatsapp
+function hasContact(contact: { id: number; name: string; phone?: string; whatsapp?: string }): contact is Owner {
+  const phone = contact.phone ?? '';
+  const whatsapp = contact.whatsapp ?? '';
+  return (typeof phone === 'string' && phone.length > 0) || (typeof whatsapp === 'string' && whatsapp.length > 0);
 }
 
 export default function ApartmentDetailPage() {
@@ -161,10 +163,7 @@ export default function ApartmentDetailPage() {
               <ContactForm
                 propertyId={propertyId}
                 isSold={isSold}
-                owners={property.agents && property.agents.length > 0
-                  ? property.agents.filter(hasPhone)
-                  : owners.filter(hasPhone)
-                }
+                owners={owners.filter(hasContact)}
                 dealType={property.dealType}
               />
             </motion.div>

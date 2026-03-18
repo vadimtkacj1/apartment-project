@@ -41,6 +41,7 @@ export interface PropertyData {
   isSold?: boolean;
   dealType?: string;
   agents?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
+  owners?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
 }
 
 export interface ContactFormData {

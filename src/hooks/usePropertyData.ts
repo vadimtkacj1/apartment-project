@@ -324,6 +324,7 @@ export function usePropertyData(propertyId: string) {
           specs,
           directions: data.directions || [],
           agents: data.agents || [],
+          owners: data.owners || [],
         };
 
         setProperty(mappedProperty);

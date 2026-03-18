@@ -7,7 +7,8 @@ import { analytics } from '@/lib/analytics';
 interface Owner {
   id: number;
   name: string;
-  phone: string;
+  phone?: string;
+  whatsapp?: string;
 }
 
 interface ContactFormProps {
@@ -109,17 +110,21 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm font-semibold text-gray-600 mb-3">או התקשר ישירות:</p>
               <div className="flex flex-col gap-2">
-                {owners.map((owner) => (
-                  <a
-                    key={owner.id}
-                    href={`tel:${owner.phone.replace(/[^0-9+]/g, '')}`}
-                    onClick={() => analytics.trackPhoneClick(propertyId)}
-                    className="inline-flex items-center justify-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
-                  >
-                    <Phone size={20} />
-                    <span>{owner.name} - {owner.phone}</span>
-                  </a>
-                ))}
+                {owners.map((owner) => {
+                  const contactPhone = owner.phone || owner.whatsapp || '';
+                  if (!contactPhone) return null;
+                  return (
+                    <a
+                      key={owner.id}
+                      href={`tel:${contactPhone.replace(/[^0-9+]/g, '')}`}
+                      onClick={() => analytics.trackPhoneClick(propertyId)}
+                      className="inline-flex items-center justify-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
+                    >
+                      <Phone size={20} />
+                      <span>{owner.name} - {contactPhone}</span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}
