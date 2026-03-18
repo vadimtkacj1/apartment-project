@@ -403,13 +403,6 @@ export default function PropertiesPage() {
                     checkedChildren={record.dealType === 'rent' ? 'מושכר' : 'נמכר'}
                     unCheckedChildren="פנוי"
                   />
-                  <Switch
-                    size="small"
-                    checked={record.isPinned}
-                    onChange={(v) => handleStatusChange(record.id, 'isPinned', v)}
-                    checkedChildren="נצמד"
-                    unCheckedChildren="סטנדרט"
-                  />
                 </Space>
               ),
             },

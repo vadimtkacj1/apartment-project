@@ -46,6 +46,11 @@ function formatProperty(property: any) {
     hasBoiler: Boolean(property.hasBoiler),
     hasSafeRoom: Boolean(property.hasSafeRoom),
     hasElevator: Boolean(property.hasElevator),
+    hasMamak: Boolean(property.hasMamak),
+    hasBars: Boolean(property.hasBars),
+    hasPets: Boolean(property.hasPets),
+    hasHousingUnit: Boolean(property.hasHousingUnit),
+    hasShelter: Boolean(property.hasShelter),
     isHotProposition: Boolean(property.isHotProposition),
     isNoCommission: Boolean(property.isNoCommission),
   };

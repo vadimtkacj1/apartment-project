@@ -173,7 +173,8 @@ function HotPropositions() {
           status: prop.status,
           isSold: prop.isSold || false,
           floor: prop.floor,
-          dealType: prop.dealType || 'sale',
+          dealType: prop.dealType || (prop.category === 'rentals' || prop.category === 'commercial' ? 'rent' : 'sale'),
+          category: prop.category,
           propertyType: (prop.propertyType && ['apartment', 'garden-apartment', 'cottage', 'house', 'duplex', 'penthouse', 'roof-apartment', 'housing-unit', 'studio', 'basement-apartment', 'villa'].includes(prop.propertyType))
             ? prop.propertyType as PropertyType
             : undefined,

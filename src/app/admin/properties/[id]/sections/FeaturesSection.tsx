@@ -8,6 +8,11 @@ import {
   Shield,
   ArrowUpDown,
   Waves,
+  ShieldCheck,
+  GripVertical,
+  Dog,
+  Building2,
+  Home,
 } from 'lucide-react';
 import { PropertyFormSectionProps, PropertyForm } from '../types';
 
@@ -20,6 +25,11 @@ const FEATURES = [
   { key: 'hasBoiler', label: 'דוד שמש', icon: Flame },
   { key: 'hasSafeRoom', label: 'ממ״ד', icon: Shield },
   { key: 'hasElevator', label: 'מעלית', icon: ArrowUpDown },
+  { key: 'hasMamak', label: 'ממ״ק', icon: ShieldCheck },
+  { key: 'hasBars', label: 'סורגים', icon: GripVertical },
+  { key: 'hasPets', label: 'חיות מחמד', icon: Dog },
+  { key: 'hasHousingUnit', label: 'יחידת דיור', icon: Building2 },
+  { key: 'hasShelter', label: 'מקלט בבניין', icon: Home },
 ];
 
 export function FeaturesSection({ formData, handleChange }: PropertyFormSectionProps) {

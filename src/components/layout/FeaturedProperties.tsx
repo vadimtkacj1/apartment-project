@@ -12,9 +12,16 @@ interface Property {
   price: string;
   originalPrice?: string;
   bedrooms: string;
+  rooms?: string;
   bathrooms: number;
   area: number;
+  dealType: string;
   status?: string;
+  propertyType?: string;
+  floor?: number;
+  totalFloors?: number;
+  neighborhood?: string;
+  features?: any;
   images?: string[];
   image?: string;
   isSold?: boolean;
@@ -86,10 +93,19 @@ const FeaturedProperties: React.FC = () => {
           price: prop.price,
           originalPrice: prop.originalPrice,
           bedrooms: prop.rooms,
+          rooms: prop.rooms,
           bathrooms: prop.bathrooms,
           area: prop.area,
+          dealType: prop.dealType || (prop.category === 'rentals' || prop.category === 'commercial' ? 'rent' : 'sale'),
+          category: prop.category,
           status: prop.status,
+          propertyType: prop.propertyType,
+          floor: prop.floor,
+          totalFloors: prop.totalFloors,
+          neighborhood: prop.neighborhood,
+          features: prop.features,
           image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
+          images: prop.images,
           isSold: false,
         }));
 

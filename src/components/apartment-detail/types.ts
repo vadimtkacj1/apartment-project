@@ -34,6 +34,11 @@ export interface PropertyData {
     boiler: boolean;
     mamad: boolean;
     elevator: boolean;
+    mamak: boolean;
+    bars: boolean;
+    pets: boolean;
+    housingUnit: boolean;
+    shelter: boolean;
   };
   specs: Array<{ label: string; value: string; icon: any }>;
   description: string;

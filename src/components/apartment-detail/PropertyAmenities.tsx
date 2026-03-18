@@ -12,11 +12,19 @@ interface PropertyAmenitiesProps {
     boiler: boolean;
     mamad: boolean;
     elevator: boolean;
+    mamak?: boolean;
+    bars?: boolean;
+    pets?: boolean;
+    housingUnit?: boolean;
+    shelter?: boolean;
   };
   isSold: boolean;
 }
 
 export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps) {
+  const availableAmenities = ALL_AMENITIES.filter((item) => amenities[item.key as keyof typeof amenities]);
+  if (availableAmenities.length === 0) return null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -31,28 +39,19 @@ export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps)
       }`}>תוספות</h2>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-6">
-        {ALL_AMENITIES.map((item) => {
-          const isAvailable = amenities[item.key as keyof typeof amenities];
-          const IconComponent = item.icon;
-
-          return (
-            <div key={item.key} className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors
-                ${isAvailable
-                  ? 'text-[#1c3664] bg-[#1c3664]/10'
-                  : 'text-gray-300 bg-gray-50'
-                }`}
-              >
-                <IconComponent size={24} strokeWidth={isAvailable ? 2.5 : 1.5} />
+        {availableAmenities.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <div key={item.key} className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center transition-colors text-[#1c3664] bg-[#1c3664]/10">
+                  <IconComponent size={24} strokeWidth={2.5} />
+                </div>
+                <span className="font-bold text-base text-[#1a1a1a]">
+                  {item.label}
+                </span>
               </div>
-              <span className={`font-bold text-base ${
-                isAvailable ? 'text-[#1a1a1a]' : 'text-gray-400 line-through decoration-gray-300'
-              }`}>
-                {item.label}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </motion.div>
   );

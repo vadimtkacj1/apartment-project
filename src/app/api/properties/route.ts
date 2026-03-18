@@ -14,8 +14,16 @@ function parseJsonArray(value: string | null): string[] {
 
 // Helper to convert property from DB format to API format
 function formatProperty(property: any) {
+  // Синхронизация dealType с category при расхождении (category — приоритет)
+  let dealType = property.dealType;
+  if (property.category === 'rentals' || property.category === 'commercial') {
+    dealType = 'rent';
+  } else if (property.category === 'sales' || property.category === 'land') {
+    dealType = 'sale';
+  }
   return {
     ...property,
+    dealType,
     directions: parseJsonArray(property.directions),
     images: parseJsonArray(property.images),
     // Explicitly convert boolean fields from SQLite (0/1) to true booleans
@@ -30,6 +38,11 @@ function formatProperty(property: any) {
     hasBoiler: Boolean(property.hasBoiler),
     hasSafeRoom: Boolean(property.hasSafeRoom),
     hasElevator: Boolean(property.hasElevator),
+    hasMamak: Boolean(property.hasMamak),
+    hasBars: Boolean(property.hasBars),
+    hasPets: Boolean(property.hasPets),
+    hasHousingUnit: Boolean(property.hasHousingUnit),
+    hasShelter: Boolean(property.hasShelter),
     isHotProposition: Boolean(property.isHotProposition),
     isNoCommission: Boolean(property.isNoCommission),
   };
@@ -83,6 +96,11 @@ export async function GET(request: NextRequest) {
     const hasSafeRoom = searchParams.get('hasSafeRoom');
     const hasStorage = searchParams.get('hasStorage');
     const hasDisabledAccess = searchParams.get('hasDisabledAccess');
+    const hasMamak = searchParams.get('hasMamak');
+    const hasBars = searchParams.get('hasBars');
+    const hasPets = searchParams.get('hasPets');
+    const hasHousingUnit = searchParams.get('hasHousingUnit');
+    const hasShelter = searchParams.get('hasShelter');
 
     const where: any = {
       isActive: true,
@@ -197,6 +215,11 @@ export async function GET(request: NextRequest) {
     if (hasDisabledAccess === 'true') {
       where.hasDisabledAccess = true;
     }
+    if (hasMamak === 'true') where.hasMamak = true;
+    if (hasBars === 'true') where.hasBars = true;
+    if (hasPets === 'true') where.hasPets = true;
+    if (hasHousingUnit === 'true') where.hasHousingUnit = true;
+    if (hasShelter === 'true') where.hasShelter = true;
 
     let properties = await prisma.property.findMany({
       where,

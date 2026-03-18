@@ -390,6 +390,51 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                         />
                         <span className="text-sm font-semibold text-gray-700">גישה לנכים</span>
                       </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={filters.features?.hasMamak || false}
+                          onChange={() => toggleFeature('hasMamak')}
+                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
+                        />
+                        <span className="text-sm font-semibold text-gray-700">ממ״ק</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={filters.features?.hasBars || false}
+                          onChange={() => toggleFeature('hasBars')}
+                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
+                        />
+                        <span className="text-sm font-semibold text-gray-700">סורגים</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={filters.features?.hasPets || false}
+                          onChange={() => toggleFeature('hasPets')}
+                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
+                        />
+                        <span className="text-sm font-semibold text-gray-700">חיות מחמד</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={filters.features?.hasHousingUnit || false}
+                          onChange={() => toggleFeature('hasHousingUnit')}
+                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
+                        />
+                        <span className="text-sm font-semibold text-gray-700">יחידת דיור</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={filters.features?.hasShelter || false}
+                          onChange={() => toggleFeature('hasShelter')}
+                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
+                        />
+                        <span className="text-sm font-semibold text-gray-700">מקלט בבניין</span>
+                      </label>
                  </div>
              </div>
           </motion.div>

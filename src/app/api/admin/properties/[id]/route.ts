@@ -47,6 +47,11 @@ function formatProperty(property: any) {
     hasBoiler: Boolean(property.hasBoiler),
     hasSafeRoom: Boolean(property.hasSafeRoom),
     hasElevator: Boolean(property.hasElevator),
+    hasMamak: Boolean(property.hasMamak),
+    hasBars: Boolean(property.hasBars),
+    hasPets: Boolean(property.hasPets),
+    hasHousingUnit: Boolean(property.hasHousingUnit),
+    hasShelter: Boolean(property.hasShelter),
     isHotProposition: Boolean(property.isHotProposition),
     isNoCommission: Boolean(property.isNoCommission),
   };
@@ -166,6 +171,11 @@ export async function PUT(
         hasBoiler: body.hasBoiler || false,
         hasSafeRoom: body.hasSafeRoom || false,
         hasElevator: body.hasElevator || false,
+        hasMamak: body.hasMamak || false,
+        hasBars: body.hasBars || false,
+        hasPets: body.hasPets || false,
+        hasHousingUnit: body.hasHousingUnit || false,
+        hasShelter: body.hasShelter || false,
 
         // Display Info
         title: body.title,

@@ -93,7 +93,7 @@ model Property {
   // Additional Info
   vacancyDate String?
 
-  // Features (8 boolean fields)
+  // Features
   hasAirConditioning Boolean @default(false)
   hasDisabledAccess  Boolean @default(false)
   hasSunBalcony      Boolean @default(false)
@@ -102,6 +102,11 @@ model Property {
   hasBoiler          Boolean @default(false)
   hasSafeRoom        Boolean @default(false)
   hasElevator        Boolean @default(false)
+  hasMamak           Boolean @default(false) // ממ"ק
+  hasBars            Boolean @default(false) // סורגים
+  hasPets            Boolean @default(false) // חיות מחמד
+  hasHousingUnit     Boolean @default(false) // יחידת דיור
+  hasShelter         Boolean @default(false) // מקלט בבניין
 
   // Display Info
   title         String

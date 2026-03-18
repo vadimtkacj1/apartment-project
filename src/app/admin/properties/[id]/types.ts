@@ -28,6 +28,11 @@ export interface PropertyForm {
   hasBoiler: boolean;
   hasSafeRoom: boolean;
   hasElevator: boolean;
+  hasMamak: boolean;
+  hasBars: boolean;
+  hasPets: boolean;
+  hasHousingUnit: boolean;
+  hasShelter: boolean;
   title: string;
   description: string;
   price: string;

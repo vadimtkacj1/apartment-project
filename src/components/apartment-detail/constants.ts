@@ -6,7 +6,12 @@ import {
   Waves,
   Flame,
   Shield,
-  ArrowUpDown
+  ArrowUpDown,
+  ShieldCheck,
+  GripVertical,
+  Dog,
+  Building2,
+  Home,
 } from 'lucide-react';
 
 export const ALL_AMENITIES = [
@@ -17,5 +22,10 @@ export const ALL_AMENITIES = [
   { key: 'sunBalcony', label: 'מרפסת שמש', icon: Waves },
   { key: 'boiler', label: 'דוד', icon: Flame },
   { key: 'mamad', label: 'ממ״ד', icon: Shield },
-  { key: 'elevator', label: 'מעלית', icon: ArrowUpDown }
+  { key: 'elevator', label: 'מעלית', icon: ArrowUpDown },
+  { key: 'mamak', label: 'ממ״ק', icon: ShieldCheck },
+  { key: 'bars', label: 'סורגים', icon: GripVertical },
+  { key: 'pets', label: 'חיות מחמד', icon: Dog },
+  { key: 'housingUnit', label: 'יחידת דיור', icon: Building2 },
+  { key: 'shelter', label: 'מקלט בבניין', icon: Home },
 ];

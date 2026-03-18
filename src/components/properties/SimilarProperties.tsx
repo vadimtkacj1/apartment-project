@@ -13,9 +13,17 @@ interface Property {
   bedrooms: string;
   bathrooms: number;
   area: number;
+  dealType: string;
   status?: string;
   category?: string;
   isSold?: boolean;
+  images?: string[];
+  rooms?: string;
+  propertyType?: string;
+  floor?: number;
+  totalFloors?: number;
+  neighborhood?: string;
+  features?: any;
 }
 
 interface SimilarPropertiesProps {

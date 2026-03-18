@@ -87,8 +87,8 @@ export default function ApartmentDetailPage() {
   const isSold = property.isSold || false;
 
   return (
-    <div className={`min-h-screen bg-warm pt-32 pb-16 relative ${isSold ? 'opacity-75' : ''}`} dir="rtl">
-      <div className={`w-full ${isSold ? 'pointer-events-none' : ''}`}>
+    <div className="min-h-screen bg-warm pt-32 pb-16 relative" dir="rtl">
+      <div className="w-full">
         {/* Back to apartments link */}
         <div className="w-full px-6 flex justify-end mb-4 lg:px-12">
           <Link
@@ -102,7 +102,7 @@ export default function ApartmentDetailPage() {
 
         {/* Property Navigation */}
         <div className="w-full px-6 lg:px-12">
-          <PropertyNavigation previousId={previousId} nextId={nextId} isSold={isSold} />
+          <PropertyNavigation previousId={previousId} nextId={nextId} isSold={false} />
         </div>
 
         {/* Property Title - always show at top */}
@@ -114,7 +114,7 @@ export default function ApartmentDetailPage() {
           {/* Right Side - Gallery & Description */}
           <div className="lg:col-span-2">
             <div className="-mx-6 lg:mx-0">
-              <PropertyGallery images={property.images} isSold={isSold} />
+              <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
             </div>
             {property.agents && property.agents.length > 0 && (
               <div className="px-6 mb-6">

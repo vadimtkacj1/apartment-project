@@ -314,12 +314,17 @@ export function usePropertyData(propertyId: string) {
           amenities: {
             ac: data.hasAirConditioning || false,
             handicap: data.hasDisabledAccess || false,
-            solarHeater: data.hasSunroom || false, // Map hasSunroom to solarHeater
+            solarHeater: data.hasSunroom || false,
             storage: data.hasStorage || false,
             sunBalcony: data.hasSunBalcony || false,
             boiler: data.hasBoiler || false,
             mamad: data.hasSafeRoom || false,
             elevator: data.hasElevator || false,
+            mamak: data.hasMamak || false,
+            bars: data.hasBars || false,
+            pets: data.hasPets || false,
+            housingUnit: data.hasHousingUnit || false,
+            shelter: data.hasShelter || false,
           },
           specs,
           directions: data.directions || [],

@@ -202,6 +202,11 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         if (appliedFilters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
         if (appliedFilters.features?.hasStorage) params.append('hasStorage', 'true');
         if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
+        if (appliedFilters.features?.hasMamak) params.append('hasMamak', 'true');
+        if (appliedFilters.features?.hasBars) params.append('hasBars', 'true');
+        if (appliedFilters.features?.hasPets) params.append('hasPets', 'true');
+        if (appliedFilters.features?.hasHousingUnit) params.append('hasHousingUnit', 'true');
+        if (appliedFilters.features?.hasShelter) params.append('hasShelter', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
           cache: 'no-store',
@@ -267,6 +272,11 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     if (f.features?.hasSafeRoom) params.set('hasSafeRoom', 'true');
     if (f.features?.hasStorage) params.set('hasStorage', 'true');
     if (f.features?.hasDisabledAccess) params.set('hasDisabledAccess', 'true');
+    if (f.features?.hasMamak) params.set('hasMamak', 'true');
+    if (f.features?.hasBars) params.set('hasBars', 'true');
+    if (f.features?.hasPets) params.set('hasPets', 'true');
+    if (f.features?.hasHousingUnit) params.set('hasHousingUnit', 'true');
+    if (f.features?.hasShelter) params.set('hasShelter', 'true');
     params.set('page', page.toString());
     router.push(`?${params.toString()}`, { scroll: false });
   };

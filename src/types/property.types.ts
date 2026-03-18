@@ -59,6 +59,11 @@ export interface PropertyFeatures {
   hasBoiler: boolean;           // דוד
   hasSafeRoom: boolean;         // ממ"ד
   hasElevator: boolean;         // מעלית
+  hasMamak: boolean;            // ממ"ק
+  hasBars: boolean;             // סורגים
+  hasPets: boolean;             // חיות מחמד
+  hasHousingUnit: boolean;      // יחידת דיור
+  hasShelter: boolean;          // מקלט בבניין
 }
 
 export interface Property {
