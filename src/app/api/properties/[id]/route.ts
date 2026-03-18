@@ -10,11 +10,18 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
-function parseAgentIds(value: string | null): number[] {
+function parseAgentIds(value: string | null): string[] {
   if (!value) return [];
   try {
     const arr = JSON.parse(value);
-    return Array.isArray(arr) ? arr.map((x: any) => parseInt(String(x), 10)).filter((n) => !isNaN(n)) : [];
+    if (!Array.isArray(arr)) return [];
+
+    // Support both old format (numbers) and new format (strings with prefixes)
+    return arr.map((x: any) => {
+      if (typeof x === 'string') return x; // New format: "owner-1", "team-2"
+      if (typeof x === 'number') return `team-${x}`; // Old format: convert to team
+      return null;
+    }).filter(Boolean) as string[];
   } catch {
     return [];
   }
@@ -67,19 +74,46 @@ export async function GET(
 
     const formatted = formatProperty(property);
 
-    // Fetch agents (team members) for this property
+    // Fetch agents (owners and team members) for this property
     let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
     if (formatted.agentIds.length > 0) {
-      const teamMembers = await prisma.teamMember.findMany({
-        where: { id: { in: formatted.agentIds }, isActive: true },
-        select: { id: true, name: true, phone: true, mobile: true, whatsapp: true },
+      // Separate owner IDs and team IDs
+      const ownerIds: number[] = [];
+      const teamIds: number[] = [];
+
+      formatted.agentIds.forEach((id: string) => {
+        if (id.startsWith('owner-')) {
+          ownerIds.push(parseInt(id.replace('owner-', ''), 10));
+        } else if (id.startsWith('team-')) {
+          teamIds.push(parseInt(id.replace('team-', ''), 10));
+        }
       });
-      agents = teamMembers.map((t) => ({
-        id: t.id,
-        name: t.name,
-        phone: t.mobile || t.phone || '',
-        whatsapp: t.whatsapp || undefined,
-      }));
+
+      // Fetch owners
+      if (ownerIds.length > 0) {
+        const owners = await prisma.owner.findMany({
+          where: { id: { in: ownerIds }, isActive: true },
+        });
+        agents.push(...owners.map((o) => ({
+          id: o.id,
+          name: o.name,
+          phone: o.phone || '',
+          whatsapp: o.whatsapp ?? undefined,
+        })));
+      }
+
+      // Fetch team members
+      if (teamIds.length > 0) {
+        const teamMembers = await prisma.teamMember.findMany({
+          where: { id: { in: teamIds }, isActive: true },
+        });
+        agents.push(...teamMembers.map((t) => ({
+          id: t.id,
+          name: t.name,
+          phone: t.mobile || t.phone || '',
+          whatsapp: (t as { whatsapp?: string | null }).whatsapp ?? undefined,
+        })));
+      }
     }
 
     return NextResponse.json({ ...formatted, agents });

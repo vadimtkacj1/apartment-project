@@ -14,20 +14,49 @@ interface TeamMember {
   isActive: boolean;
 }
 
+interface Owner {
+  id: number;
+  name: string;
+  phone?: string;
+  title?: string;
+  isActive: boolean;
+}
+
 export function AgentSection({ formData, handleChange }: PropertyFormSectionProps) {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [owners, setOwners] = useState<Owner[]>([]);
 
   useEffect(() => {
+    // Load team members
     fetch('/api/admin/team')
       .then((res) => res.json())
       .then((data) => setTeamMembers(data.filter((t: TeamMember) => t.isActive)))
       .catch(() => setTeamMembers([]));
+
+    // Load owners
+    fetch('/api/admin/owners')
+      .then((res) => res.json())
+      .then((data) => setOwners(data.filter((o: Owner) => o.isActive)))
+      .catch(() => setOwners([]));
   }, []);
 
-  const options = teamMembers.map((t) => ({
-    value: t.id,
-    label: `${t.name}${t.mobile || t.phone ? ` — ${t.mobile || t.phone}` : ''}`,
-  }));
+  // Combine owners and team members into one list with prefixes
+  const options = [
+    {
+      label: 'בעלים',
+      options: owners.map((o) => ({
+        value: `owner-${o.id}`,
+        label: `👤 ${o.name}${o.phone ? ` — ${o.phone}` : ''}`,
+      })),
+    },
+    {
+      label: 'סוכנים',
+      options: teamMembers.map((t) => ({
+        value: `team-${t.id}`,
+        label: `👔 ${t.name}${t.mobile || t.phone ? ` — ${t.mobile || t.phone}` : ''}`,
+      })),
+    },
+  ];
 
   return (
     <Card
@@ -57,8 +86,8 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
           options={options}
           value={formData.agentIds}
           onChange={(ids) => handleChange('agentIds', ids)}
-          disabled={teamMembers.length === 0}
-          notFoundContent={teamMembers.length === 0 ? 'אין סוכנים פעילים. הוסף ב"צוות"' : 'לא נמצא'}
+          disabled={teamMembers.length === 0 && owners.length === 0}
+          notFoundContent={teamMembers.length === 0 && owners.length === 0 ? 'אין סוכנים או בעלים פעילים' : 'לא נמצא'}
         />
       </Form.Item>
     </Card>

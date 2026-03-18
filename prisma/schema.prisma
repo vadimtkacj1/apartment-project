@@ -132,7 +132,8 @@ model Property {
   isHotProposition Boolean @default(false) // Show in Hot Propositions section
   isNoCommission   Boolean @default(false) // Show in No Commission section
 
-  // Agent(s) for this property - JSON array of TeamMember IDs, e.g. "[1,2]"
+  // Agent(s) for this property - JSON array with type prefix, e.g. '["owner-1", "team-2"]'
+  // Supports both Owner and TeamMember IDs
   agentIds String @default("[]")
 
   // Timestamps

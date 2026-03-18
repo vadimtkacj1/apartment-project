@@ -61,6 +61,10 @@ export default function PropertyEditPage() {
         form={form}
         layout="vertical"
         onFinish={(values) => handleSubmit(values, () => router.push('/admin/properties'))}
+        onFinishFailed={({ errorFields }) => {
+          form.scrollToField(errorFields[0]?.name?.[0], { behavior: 'smooth' });
+        }}
+        scrollToFirstError
         initialValues={formData}
       >
         <BasicInfoSection formData={formData} handleChange={handleChange} />

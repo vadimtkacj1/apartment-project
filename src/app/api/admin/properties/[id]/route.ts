@@ -11,11 +11,18 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
-function parseAgentIds(value: string | null): number[] {
+// Support both old format (numbers) and new format (strings: "owner-1", "team-2")
+function parseAgentIds(value: string | null): string[] {
   if (!value) return [];
   try {
     const arr = JSON.parse(value);
-    return Array.isArray(arr) ? arr.map((x: any) => parseInt(String(x), 10)).filter((n) => !isNaN(n)) : [];
+    if (!Array.isArray(arr)) return [];
+
+    return arr.map((x: any) => {
+      if (typeof x === 'string') return x; // New format: "owner-1", "team-2"
+      if (typeof x === 'number') return `team-${x}`; // Old format: convert to team
+      return null;
+    }).filter(Boolean) as string[];
   } catch {
     return [];
   }

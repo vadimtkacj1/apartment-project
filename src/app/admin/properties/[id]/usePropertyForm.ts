@@ -67,15 +67,24 @@ export function usePropertyForm(
           }
         }
 
+        // Convert agentIds to new format if needed (backward compatibility)
+        let agentIds = data.agentIds || [];
+        if (agentIds.length > 0 && typeof agentIds[0] === 'number') {
+          // Old format: convert numbers to "team-X" format
+          agentIds = agentIds.map((id: number) => `team-${id}`);
+        }
+
         const formValues = {
           ...data,
           vacancyDate: vacancyDateValue,
+          agentIds,
         };
 
         // Keep vacancyDate as string in formData for API submission
         setFormData({
           ...data,
-          vacancyDate: data.vacancyDate || null
+          vacancyDate: data.vacancyDate || null,
+          agentIds,
         });
         form.setFieldsValue(formValues);
       }
