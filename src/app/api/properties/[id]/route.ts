@@ -67,18 +67,18 @@ export async function GET(
 
     const formatted = formatProperty(property);
 
-    // Fetch agents (owners) for this property
+    // Fetch agents (team members) for this property
     let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
     if (formatted.agentIds.length > 0) {
-      const owners = await prisma.owner.findMany({
+      const teamMembers = await prisma.teamMember.findMany({
         where: { id: { in: formatted.agentIds }, isActive: true },
-        select: { id: true, name: true, phone: true, whatsapp: true },
+        select: { id: true, name: true, phone: true, mobile: true, whatsapp: true },
       });
-      agents = owners.map((o) => ({
-        id: o.id,
-        name: o.name,
-        phone: o.phone || '',
-        whatsapp: o.whatsapp || undefined,
+      agents = teamMembers.map((t) => ({
+        id: t.id,
+        name: t.name,
+        phone: t.mobile || t.phone || '',
+        whatsapp: t.whatsapp || undefined,
       }));
     }
 

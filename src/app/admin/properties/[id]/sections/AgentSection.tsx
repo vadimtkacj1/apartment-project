@@ -5,28 +5,28 @@ import { UserOutlined } from '@ant-design/icons';
 import { PropertyFormSectionProps } from '../types';
 import { useState, useEffect } from 'react';
 
-interface Owner {
+interface TeamMember {
   id: number;
   name: string;
-  phone: string;
-  whatsapp?: string;
-  title?: string;
+  phone?: string;
+  mobile?: string;
+  role?: string;
   isActive: boolean;
 }
 
 export function AgentSection({ formData, handleChange }: PropertyFormSectionProps) {
-  const [owners, setOwners] = useState<Owner[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
-    fetch('/api/admin/owners')
+    fetch('/api/admin/team')
       .then((res) => res.json())
-      .then((data) => setOwners(data.filter((o: Owner) => o.isActive)))
-      .catch(() => setOwners([]));
+      .then((data) => setTeamMembers(data.filter((t: TeamMember) => t.isActive)))
+      .catch(() => setTeamMembers([]));
   }, []);
 
-  const options = owners.map((o) => ({
-    value: o.id,
-    label: `${o.name}${o.phone ? ` — ${o.phone}` : ''}`,
+  const options = teamMembers.map((t) => ({
+    value: t.id,
+    label: `${t.name}${t.mobile || t.phone ? ` — ${t.mobile || t.phone}` : ''}`,
   }));
 
   return (
@@ -57,8 +57,8 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
           options={options}
           value={formData.agentIds}
           onChange={(ids) => handleChange('agentIds', ids)}
-          disabled={owners.length === 0}
-          notFoundContent={owners.length === 0 ? 'אין סוכנים פעילים. הוסף ב"בעלים/סוכנים"' : 'לא נמצא'}
+          disabled={teamMembers.length === 0}
+          notFoundContent={teamMembers.length === 0 ? 'אין סוכנים פעילים. הוסף ב"צוות"' : 'לא נמצא'}
         />
       </Form.Item>
     </Card>

@@ -64,7 +64,24 @@ export default function OwnerEditPage() {
     }
   };
 
+  const formatPhoneNumber = (value: string): string => {
+    const digits = value.replace(/\D/g, '');
+
+    const limited = digits.slice(0, 10);
+
+    if (limited.length <= 3) {
+      return limited;
+    } else if (limited.length <= 6) {
+      return `${limited.slice(0, 3)}-${limited.slice(3)}`;
+    } else {
+      return `${limited.slice(0, 3)}-${limited.slice(3, 6)}-${limited.slice(6)}`;
+    }
+  };
+
   const handleChange = (field: keyof OwnerForm, value: any) => {
+    if (field === 'phone' || field === 'whatsapp') {
+      value = formatPhoneNumber(value);
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -79,6 +96,16 @@ export default function OwnerEditPage() {
     }
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       message.error('כתובת אימייל לא תקינה');
+      return false;
+    }
+    // Проверка формата телефона (опционально)
+    const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
+    if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
+      message.error('טלפון לא תקין. פורמט: 050-123-4567');
+      return false;
+    }
+    if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
+      message.error('WhatsApp לא תקין. פורמט: 050-123-4567');
       return false;
     }
     return true;

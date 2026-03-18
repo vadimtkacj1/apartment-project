@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle, Phone, User } from "lucide-react";
+import { Phone, User } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { analytics } from "@/lib/analytics";
 
 export interface Agent {
@@ -41,7 +42,7 @@ export function PropertyAgentBlock({
       }`}
     >
       <h3 className="mb-4 text-xl font-bold text-[#1c3664]">יצירת קשר</h3>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3">
         {agents.map((agent) => {
           const whatsappNum = agent.whatsapp || agent.phone;
           const whatsappLink = whatsappNum
@@ -51,18 +52,18 @@ export function PropertyAgentBlock({
           return (
             <div
               key={agent.id}
-              className="flex flex-wrap items-center gap-3 rounded-xl bg-gray-50 p-4"
+              className="flex flex-wrap items-center gap-3 py-2"
             >
-              <div className="flex items-center gap-2 text-gray-900">
+              <div className="flex items-center gap-2 text-gray-900 font-semibold">
                 <User size={18} className="text-[#1c3664]" />
-                <span className="font-semibold">{agent.name}</span>
+                <span>{agent.name}</span>
               </div>
               {agent.phone && (
                 <a
                   href={`tel:${agent.phone.replace(/\D/g, "")}`}
                   onClick={() => propertyId && analytics.trackPhoneClick(propertyId)}
                   className={`inline-flex items-center gap-1.5 font-medium ${
-                    isSold ? "pointer-events-none text-gray-500" : "text-[#1c3664] hover:underline"
+                    isSold ? "pointer-events-none text-gray-400" : "text-[#1c3664] hover:underline"
                   }`}
                 >
                   <Phone size={16} />
@@ -75,14 +76,14 @@ export function PropertyAgentBlock({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => propertyId && analytics.trackWhatsAppClick(propertyId)}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-medium transition-all shadow-md ${
                     isSold
-                      ? "pointer-events-none bg-gray-200 text-gray-500"
-                      : "bg-[#25D366] text-white hover:bg-[#20bd5a]"
+                      ? "pointer-events-none bg-gray-300 text-gray-500"
+                      : "bg-[#25D366] text-white hover:bg-[#20bd5a] hover:shadow-lg"
                   }`}
                 >
-                  <MessageCircle size={18} />
-                  WhatsApp
+                  <FaWhatsapp size={20} />
+                  <span>WhatsApp</span>
                 </a>
               )}
             </div>

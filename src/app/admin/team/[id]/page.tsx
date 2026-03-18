@@ -14,6 +14,7 @@ interface TeamMemberForm {
   image: string | null;
   phone: string;
   mobile: string;
+  whatsapp: string;
   fax: string;
   email: string;
   licenceNumber: string;
@@ -28,6 +29,7 @@ const INITIAL_FORM: TeamMemberForm = {
   image: null,
   phone: '',
   mobile: '',
+  whatsapp: '',
   fax: '',
   email: '',
   licenceNumber: '',
@@ -66,7 +68,28 @@ export default function TeamMemberEditPage() {
     }
   };
 
+  const formatPhoneNumber = (value: string): string => {
+    // Удаляем все нецифровые символы
+    const digits = value.replace(/\D/g, '');
+
+    // Ограничиваем максимум 10 цифр для мобильных (05X-XXX-XXXX)
+    const limited = digits.slice(0, 10);
+
+    // Форматируем номер
+    if (limited.length <= 3) {
+      return limited;
+    } else if (limited.length <= 6) {
+      return `${limited.slice(0, 3)}-${limited.slice(3)}`;
+    } else {
+      return `${limited.slice(0, 3)}-${limited.slice(3, 6)}-${limited.slice(6)}`;
+    }
+  };
+
   const handleChange = (field: keyof TeamMemberForm, value: any) => {
+    // Форматируем телефонные номера автоматически
+    if (field === 'phone' || field === 'mobile' || field === 'whatsapp' || field === 'fax') {
+      value = formatPhoneNumber(value);
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -81,6 +104,20 @@ export default function TeamMemberEditPage() {
     }
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       message.error('כתובת אימייל לא תקינה');
+      return false;
+    }
+    // Проверка формата телефона (опционально)
+    const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
+    if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
+      message.error('טלפון לא תקין. פורמט: 050-123-4567');
+      return false;
+    }
+    if (formData.mobile && formData.mobile.trim() && !phoneRegex.test(formData.mobile)) {
+      message.error('נייד לא תקין. פורמט: 052-123-4567');
+      return false;
+    }
+    if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
+      message.error('WhatsApp לא תקין. פורמט: 050-123-4567');
       return false;
     }
     return true;
@@ -220,6 +257,17 @@ export default function TeamMemberEditPage() {
               value={formData.mobile}
               onChange={(e) => handleChange('mobile', e.target.value)}
               placeholder="052-123-4567"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              WhatsApp
+            </label>
+            <Input
+              value={formData.whatsapp}
+              onChange={(e) => handleChange('whatsapp', e.target.value)}
+              placeholder="050-123-4567"
               size="large"
             />
           </div>

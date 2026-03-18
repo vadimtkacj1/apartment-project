@@ -132,7 +132,7 @@ model Property {
   isHotProposition Boolean @default(false) // Show in Hot Propositions section
   isNoCommission   Boolean @default(false) // Show in No Commission section
 
-  // Agent(s) for this property - JSON array of Owner IDs, e.g. "[1,2]"
+  // Agent(s) for this property - JSON array of TeamMember IDs, e.g. "[1,2]"
   agentIds String @default("[]")
 
   // Timestamps
@@ -266,6 +266,7 @@ model TeamMember {
   image         String?  // Path to profile image
   phone         String?
   mobile        String?
+  whatsapp      String?  // WhatsApp number
   fax           String?
   email         String?
   licenceNumber String?  // License number
