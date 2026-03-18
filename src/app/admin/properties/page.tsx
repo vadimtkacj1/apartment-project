@@ -32,7 +32,7 @@ import { getCityLabel } from '@/data/cities';
 
 interface Property {
   id: number;
-  dealType: string;
+  dealType: DealType;
   city: string;
   neighborhood: string | null;
   street: string | null;

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { DealType } from '@/types/property.types';
 
 interface Property {
   id: number;
@@ -15,7 +16,7 @@ interface Property {
   rooms?: string;
   bathrooms: number;
   area: number;
-  dealType: string;
+  dealType: DealType;
   status?: string;
   propertyType?: string;
   floor?: number;

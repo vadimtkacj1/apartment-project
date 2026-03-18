@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import PropertyCard from './PropertyCard';
+import { DealType } from '@/types/property.types';
 
 // Define the Property interface to avoid 'any' types
 interface Property {
@@ -13,7 +14,7 @@ interface Property {
   bedrooms: string;
   bathrooms: number;
   area: number;
-  dealType: string;
+  dealType: DealType;
   status?: string;
   category?: string;
   isSold?: boolean;
