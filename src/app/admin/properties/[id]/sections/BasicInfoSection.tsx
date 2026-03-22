@@ -172,7 +172,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               unCheckedChildren={formData.dealType === 'rent' ? 'לא מושכר' : 'לא נמכר'}
               onChange={(checked) => handleChange('isSold', checked)}
             />
-            <span style={{ marginRight: '8px' }}>נכס {formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
+            <span style={{ marginRight: '8px' }}>אקטואלי</span>
           </Form.Item>
         </Col>
         <Col xs={24} sm={8}>

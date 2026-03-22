@@ -57,7 +57,7 @@ export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryPro
                   }}
                 >
                   <img
-                    src="/images/logos.png"
+                    src="/watermark.svg"
                     alt="Logo"
                     className="w-full h-auto drop-shadow-2xl"
                   />

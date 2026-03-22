@@ -10,6 +10,7 @@ export interface Agent {
   name: string;
   phone?: string;
   whatsapp?: string;
+  image?: string;
 }
 
 interface PropertyAgentBlockProps {
@@ -54,8 +55,18 @@ export function PropertyAgentBlock({
               key={agent.id}
               className="flex flex-wrap items-center gap-3 py-2"
             >
-              <div className="flex items-center gap-2 text-gray-900 font-semibold">
-                <User size={18} className="text-[#1c3664]" />
+              <div className="flex items-center gap-3 text-gray-900 font-semibold">
+                {agent.image ? (
+                  <img
+                    src={agent.image}
+                    alt={agent.name}
+                    className="w-20 h-24 rounded-2xl object-cover shadow-md"
+                  />
+                ) : (
+                  <div className="w-20 h-24 rounded-2xl bg-[#1c3664] flex items-center justify-center text-white shadow-md">
+                    <User size={32} />
+                  </div>
+                )}
                 <span>{agent.name}</span>
               </div>
               {agent.phone && (

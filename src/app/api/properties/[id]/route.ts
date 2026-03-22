@@ -80,8 +80,8 @@ export async function GET(
     const formatted = formatProperty(property);
 
     // Fetch owners and agents (team members) for this property
-    let owners: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
-    let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string }> = [];
+    let owners: Array<{ id: number; name: string; phone: string; whatsapp?: string; image?: string }> = [];
+    let agents: Array<{ id: number; name: string; phone: string; whatsapp?: string; image?: string }> = [];
     if (formatted.agentIds.length > 0) {
       // Separate owner IDs and team IDs
       const ownerIds: number[] = [];
@@ -122,6 +122,7 @@ export async function GET(
             name: o!.name,
             phone: o!.phone || o!.whatsapp || '',
             whatsapp: o!.whatsapp ?? undefined,
+            image: o!.image ?? undefined,
           }));
       }
 
@@ -135,6 +136,7 @@ export async function GET(
           name: t.name,
           phone: t.mobile || t.phone || '',
           whatsapp: (t as { whatsapp?: string | null }).whatsapp ?? undefined,
+          image: (t as { image?: string | null }).image ?? undefined,
         }));
       }
     }
