@@ -13,10 +13,10 @@ const getPropertyTypeLabel = (type?: string) => {
     'duplex': 'דופלקס',
     'penthouse': 'פנטהאוז',
     'mini-penthouse': 'מיני פנטהאוז',
-    'rooftop': 'דירת גג',
-    'unit': 'יחידת דיור',
+    'roof-apartment': 'דירת גג',
+    'housing-unit': 'יחידת דיור',
     'studio': 'סטודיו',
-    'basement': 'דירת מרתף',
+    'basement-apartment': 'דירת מרתף',
     'villa': 'וילה'
   };
   return type ? labels[type] || type : '';
