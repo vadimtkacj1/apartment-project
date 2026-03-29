@@ -17,7 +17,9 @@ const WhatsAppButton: React.FC = () => {
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0 && data[0].whatsapp) {
-          setWhatsappNumber(data[0].whatsapp.replace(/\D/g, ''));
+          const digits = data[0].whatsapp.replace(/\D/g, '');
+          const formatted = digits.startsWith('972') ? digits : digits.startsWith('0') ? '972' + digits.slice(1) : '972' + digits;
+          setWhatsappNumber(formatted);
         }
       })
       .catch(err => console.error('Error fetching owner WhatsApp:', err));

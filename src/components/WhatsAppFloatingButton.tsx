@@ -44,11 +44,17 @@ export default function WhatsAppFloatingButton() {
     }
   };
 
+  const formatWhatsAppNumber = (num: string): string => {
+    const digits = num.replace(/\D/g, '');
+    if (digits.startsWith('972')) return digits;
+    if (digits.startsWith('0')) return '972' + digits.slice(1);
+    return '972' + digits;
+  };
+
   const handleWhatsAppClick = (whatsapp: string | null, name: string) => {
     if (!whatsapp) return;
 
-    // Remove any non-digit characters from whatsapp
-    const cleanWhatsapp = whatsapp.replace(/\D/g, '');
+    const cleanWhatsapp = formatWhatsAppNumber(whatsapp);
     const message = encodeURIComponent(`שלום, אני מעוניין/ת לקבל מידע נוסף`);
     const whatsappUrl = `https://wa.me/${cleanWhatsapp}?text=${message}`;
 
