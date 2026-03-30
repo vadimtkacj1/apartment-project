@@ -1,7 +1,7 @@
 "use client";
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
@@ -41,6 +41,14 @@ export default function ApartmentDetailPage() {
   const [owners, setOwners] = useState<Owner[]>([]);
   const [previousId, setPreviousId] = useState<number | null>(null);
   const [nextId, setNextId] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
     fetch('/api/owners')
@@ -88,9 +96,37 @@ export default function ApartmentDetailPage() {
 
   return (
     <div className="min-h-screen bg-warm pt-32 pb-16 relative" dir="rtl">
+      {/* Copy toast */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: copied ? 1 : 0, y: copied ? 0 : 20 }}
+        transition={{ duration: 0.25 }}
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+      >
+        <div className="flex items-center gap-2 bg-[#1c3664] text-white px-5 py-3 rounded-full shadow-lg text-sm font-medium">
+          <Check size={16} />
+          <span>הקישור הועתק ללוח!</span>
+        </div>
+      </motion.div>
       <div className="w-full">
-        {/* Back to apartments link */}
-        <div className="w-full px-6 flex justify-end mb-4 lg:px-12">
+        {/* Back to apartments link + Share button */}
+        <div className="w-full px-6 flex justify-between items-center mb-4 lg:px-12">
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#1c3664] text-[#1c3664] hover:bg-[#1c3664] hover:text-white transition-all duration-200 text-sm font-medium"
+          >
+            {copied ? (
+              <>
+                <Check size={16} />
+                <span>הקישור הועתק!</span>
+              </>
+            ) : (
+              <>
+                <Share2 size={16} />
+                <span>שתף נכס</span>
+              </>
+            )}
+          </button>
           <Link
             href="/apartments"
             className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#1c3664] transition-colors duration-300 font-bold text-lg"
