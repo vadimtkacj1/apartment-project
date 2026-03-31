@@ -50,7 +50,7 @@ interface PropertyCardProps extends Partial<Property> {
   bathrooms?: number;
   area: number;
   status?: string;
-  category?: string; // 'sales' | 'rentals' | etc. — fallback для dealType
+  category?: string;
   index?: number;
   mapUrl?: string;
   images?: string[];
@@ -85,7 +85,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 }) => {
   const router = useRouter();
 
-  // Состояние
   const displayImage = image || images?.find(img => img?.trim()) || DEFAULT_IMAGE;
   const [imageSrc, setImageSrc] = useState(displayImage);
   const [imageError, setImageError] = useState(false);
@@ -99,7 +98,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const soldLabel = actualDealType === 'rent' ? 'מושכר' : 'נמכר';
   const displayRooms = rooms || bedrooms || 0;
 
-  // Обработчики
   const handleClick = () => {
     if (!isSold) analytics.trackPropertyClick(id, 'card');
     router.push(`/apartments/${id}`);
@@ -132,6 +130,26 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
         style={{ boxShadow: cardShadow }}
         dir="rtl"
       >
+        <div className={`p-4 sm:p-5 pb-3 ${isSold ? 'bg-gray-50' : 'bg-white'}`}>
+          <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
+            isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+          }`}>
+            {title}
+          </h3>
+          <div className={`flex items-start gap-1.5 text-xs ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>
+            <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
+            <span className="break-words">
+              {location}{neighborhood && ` • ${neighborhood}`}
+            </span>
+          </div>
+          {isSold && (
+            <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mt-2">
+              <CheckCircle2 size={10} />
+              <span>{soldLabel}</span>
+            </div>
+          )}
+        </div>
+
         {showImage && (
           <div className="relative w-full aspect-4/3 overflow-hidden bg-gray-100">
             <img
@@ -154,7 +172,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               isSold ? 'opacity-40' : 'opacity-60'
             }`} />
 
-            {/* Штамп продано/сдано */}
             {isSold && (
               <div className="absolute inset-0 z-20 flex items-center justify-center p-4">
                 <img
@@ -165,13 +182,11 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               </div>
             )}
 
-            {/* Бейдж типа сделки */}
             <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm bg-[#1c3664]/90 text-white border border-white/20">
               <Tag size={13} />
               <span>{dealTypeLabel}</span>
             </div>
 
-            {/* Бейдж статуса */}
             {status && !isSold && (
               <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md tracking-wide uppercase ${
                 STATUS_STYLES[status] || 'bg-white/90 text-[#1c3664]'
@@ -180,7 +195,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               </div>
             )}
 
-            {/* Тип недвижимости */}
             {propertyType && (
               <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
                 {PROPERTY_TYPE_LABELS[propertyType] || propertyType}
@@ -189,30 +203,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
           </div>
         )}
 
-        {/* Контент карточки */}
-        <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
-          {/* Заголовок */}
-          <div className="mb-3">
-            <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
-              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-            }`}>
-              {title}
-            </h3>
-            <div className={`flex items-start gap-1.5 text-xs mb-2 ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>
-              <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
-              <span className="break-words">
-                {location}{neighborhood && ` • ${neighborhood}`}
-              </span>
-            </div>
-            {isSold && (
-              <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
-                <CheckCircle2 size={10} />
-                <span>{soldLabel}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Основная информация */}
+        <div className={`p-4 sm:p-5 pt-4 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
           <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4 sm:mb-5">
             <StatBox isSold={isSold} icon={Bed} label={`${displayRooms} חדרים`} />
             <StatBox
@@ -226,7 +217,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <StatBox isSold={isSold} icon={Maximize} label={`${area} מ״ר`} />
           </div>
 
-          {/* Особенности */}
           {features && (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
               {features.hasAirConditioning && <FeatureTag icon={Wind} label="מיזוג" color="blue" />}
@@ -243,7 +233,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             </div>
           )}
 
-          {/* Цена и кнопка */}
           <div className={`mt-auto border-t pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
             isSold ? 'border-gray-300' : 'border-gray-100'
           }`}>
@@ -277,7 +266,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   );
 });
 
-// Вспомогательные компоненты
 const StatBox: React.FC<{ isSold?: boolean; icon: any; label: string }> = ({ isSold, icon: Icon, label }) => (
   <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
     isSold ? 'bg-gray-200' : 'bg-gray-50'
