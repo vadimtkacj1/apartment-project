@@ -86,7 +86,6 @@ body {
   /* Reduce layout shifts */
   img {
     max-width: 100%;
-    height: auto;
   }
 }
 
