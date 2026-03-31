@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 export default function AlternatingFavicon() {
   useEffect(() => {
-    const favicons = ['/favicon-ha.png', '/favicon-rm.png'];
+    const favicons = ['/favicon-rm.png', '/favicon-ha.png'];
     let currentIndex = 0;
 
     // Update favicon function

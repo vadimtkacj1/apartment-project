@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, Suspense, useMemo, useState } from 'react';
+import React, { useEffect, Suspense, useMemo, useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
@@ -34,6 +34,7 @@ interface Property {
 }
 
 const ITEMS_PER_PAGE = 8;
+const LOAD_MORE_COUNT = 8;
 
 function getInitialCategory(initialDealType?: DealType): Category {
   if (initialDealType === 'sale') return 'sales';
@@ -48,8 +49,9 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   const [selectedCategory, setSelectedCategory] = useState<Category>(() => getInitialCategory(initialDealType));
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [showFilters, setShowFilters] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const [filters, setFilters] = useState<FilterState>(() => ({
     dealType: initialDealType ?? 'all',
@@ -64,9 +66,6 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const pageFromUrl = searchParams.get('page');
-    if (pageFromUrl) setCurrentPage(parseInt(pageFromUrl, 10));
-
     const dealTypeFromUrl = searchParams.get('dealType');
     const cityFromUrl = searchParams.get('city');
 
@@ -99,7 +98,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
 
   const handleCategoryChange = (category: Category) => {
     setSelectedCategory(category);
-    setCurrentPage(1);
+    setVisibleCount(ITEMS_PER_PAGE);
 
     // Sync dealType filter and apply immediately
     let newDealType: DealType | 'all' = 'all';
@@ -232,6 +231,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         });
 
         setProperties(sortedProperties);
+        setVisibleCount(ITEMS_PER_PAGE);
       } catch (error) {
         setProperties([]);
       } finally {
@@ -242,12 +242,32 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   }, [appliedFilters, selectedCategory]);
 
   const currentProperties = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return properties.slice(start, start + ITEMS_PER_PAGE);
-  }, [properties, currentPage]);
+    return properties.slice(0, visibleCount);
+  }, [properties, visibleCount]);
+
+  const hasMore = visibleCount < properties.length;
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, properties.length));
+  }, [properties.length]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadMore]);
 
   /** Sync URL with applied filters (call when applying or resetting). */
-  const syncUrlFromFilters = (f: FilterState, page: number = 1) => {
+  const syncUrlFromFilters = (f: FilterState) => {
     const params = new URLSearchParams();
     if (f.dealType && f.dealType !== 'all') params.set('dealType', f.dealType);
     if (f.city && f.city !== 'all') params.set('city', f.city);
@@ -277,13 +297,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
     if (f.features?.hasPets) params.set('hasPets', 'true');
     if (f.features?.hasHousingUnit) params.set('hasHousingUnit', 'true');
     if (f.features?.hasShelter) params.set('hasShelter', 'true');
-    params.set('page', page.toString());
     router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  const updatePage = (page: number) => {
-    setCurrentPage(page);
-    syncUrlFromFilters(appliedFilters, page);
   };
 
   return (
@@ -353,15 +367,15 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
                   onFiltersChange={setFilters}
                   onApply={() => {
                     setAppliedFilters(filters);
-                    setCurrentPage(1);
-                    syncUrlFromFilters(filters, 1);
+                    setVisibleCount(ITEMS_PER_PAGE);
+                    syncUrlFromFilters(filters);
                   }}
                   onReset={() => {
                     const resetFilters: FilterState = { dealType: initialDealType ?? 'all', city: 'all' };
                     setFilters(resetFilters);
                     setAppliedFilters(resetFilters);
-                    setCurrentPage(1);
-                    syncUrlFromFilters(resetFilters, 1);
+                    setVisibleCount(ITEMS_PER_PAGE);
+                    syncUrlFromFilters(resetFilters);
                   }}
                 />
               </motion.div>
@@ -378,56 +392,19 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
                 ))}
               </div>
 
-              {/* Pagination */}
-              {properties.length > ITEMS_PER_PAGE && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex justify-center items-center gap-2 mt-12"
-                >
-                  {/* Previous Button */}
-                  <button
-                    onClick={() => updatePage(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
-                      currentPage === 1
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
-                    }`}
+              {/* Infinite scroll sentinel */}
+              <div ref={sentinelRef} className="mt-8 flex justify-center">
+                {hasMore && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-2 text-gray-400 font-bold py-4"
                   >
-                    הקודם
-                  </button>
-
-                  {/* Page Numbers */}
-                  {Array.from({ length: Math.ceil(properties.length / ITEMS_PER_PAGE) }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => updatePage(page)}
-                      className={`w-10 h-10 rounded-lg font-bold transition-all ${
-                        currentPage === page
-                          ? 'bg-[#1c3664] text-white shadow-lg scale-110'
-                          : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#1c3664]'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-
-                  {/* Next Button */}
-                  <button
-                    onClick={() => updatePage(currentPage + 1)}
-                    disabled={currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)}
-                    className={`px-4 py-2 rounded-lg font-bold transition-all ${
-                      currentPage === Math.ceil(properties.length / ITEMS_PER_PAGE)
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-white text-[#1c3664] border-2 border-gray-200 hover:border-[#1c3664] hover:bg-[#1c3664] hover:text-white'
-                    }`}
-                  >
-                    הבא
-                  </button>
-                </motion.div>
-              )}
+                    <span className="w-5 h-5 border-2 border-[#1c3664] border-t-transparent rounded-full animate-spin inline-block" />
+                    <span>טוען עוד נכסים...</span>
+                  </motion.div>
+                )}
+              </div>
             </>
           )}
         </div>
