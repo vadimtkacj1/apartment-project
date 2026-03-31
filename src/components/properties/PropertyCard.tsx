@@ -137,10 +137,9 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <img
               src={imageSrc}
               alt={title}
-              className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 ${
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
-              style={{ objectPosition: 'center 60%' }}
               onError={handleImageError}
               loading="lazy"
             />
