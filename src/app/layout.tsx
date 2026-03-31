@@ -65,7 +65,7 @@ export const metadata: Metadata = {
   creator: "רם נכסים חיים ענבי",
   publisher: "רם נכסים חיים ענבי",
   icons: {
-    icon: '/favicon-ha.png',
+    icon: '/favicon-rm.png',
   },
   alternates: {
     canonical: siteUrl,
