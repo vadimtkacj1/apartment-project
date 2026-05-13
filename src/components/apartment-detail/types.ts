@@ -47,8 +47,8 @@ export interface PropertyData {
   directions?: string[];
   isSold?: boolean;
   dealType?: DealType;
-  agents?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
-  owners?: Array<{ id: number; name: string; phone?: string; whatsapp?: string }>;
+  agents?: Array<{ id: number; name: string; phone?: string; whatsapp?: string; image?: string }>;
+  owners?: Array<{ id: number; name: string; phone?: string; whatsapp?: string; image?: string }>;
 }
 
 export interface ContactFormData {

@@ -20,25 +20,11 @@ import {
   PropertyNavigation
 } from '@/components/apartment-detail';
 
-interface Owner {
-  id: number;
-  name: string;
-  phone: string;
-}
-
-// Type guard to check if an agent/owner has a phone or whatsapp
-function hasContact(contact: { id: number; name: string; phone?: string; whatsapp?: string }): contact is Owner {
-  const phone = contact.phone ?? '';
-  const whatsapp = contact.whatsapp ?? '';
-  return (typeof phone === 'string' && phone.length > 0) || (typeof whatsapp === 'string' && whatsapp.length > 0);
-}
-
 export default function ApartmentDetailPage() {
   const params = useParams();
   const propertyId = params.id as string;
 
   const { property, loading, error } = usePropertyData(propertyId);
-  const [owners, setOwners] = useState<Owner[]>([]);
   const [previousId, setPreviousId] = useState<number | null>(null);
   const [nextId, setNextId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -49,13 +35,6 @@ export default function ApartmentDetailPage() {
       setTimeout(() => setCopied(false), 2000);
     });
   };
-
-  useEffect(() => {
-    fetch('/api/owners')
-      .then((res) => res.json())
-      .then((data) => setOwners(data))
-      .catch((err) => console.error('Error fetching owners:', err));
-  }, []);
 
   // Fetch all property IDs to determine previous/next navigation
   useEffect(() => {
@@ -152,10 +131,10 @@ export default function ApartmentDetailPage() {
             <div className="-mx-6 lg:mx-0">
               <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
             </div>
-            {property.agents && property.agents.length > 0 && (
+            {((property.owners && property.owners.length > 0) || (property.agents && property.agents.length > 0)) && (
               <div className="px-6 mb-6">
                 <PropertyAgentBlock
-                  agents={property.agents}
+                  agents={[...(property.owners ?? []), ...(property.agents ?? [])]}
                   isSold={isSold}
                   propertyId={propertyId}
                 />
@@ -199,7 +178,7 @@ export default function ApartmentDetailPage() {
               <ContactForm
                 propertyId={propertyId}
                 isSold={isSold}
-                owners={owners.filter(hasContact)}
+                owners={property.owners ?? []}
                 dealType={property.dealType}
               />
             </motion.div>
