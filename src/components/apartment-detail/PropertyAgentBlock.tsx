@@ -44,7 +44,7 @@ export function PropertyAgentBlock({
     >
       <h3 className="mb-4 text-xl font-bold text-[#1c3664]">יצירת קשר</h3>
       <div className="flex flex-col gap-3">
-        {agents.map((agent) => {
+        {agents.filter((agent) => agent.image).map((agent) => {
           const whatsappNum = agent.whatsapp || agent.phone;
           const whatsappLink = whatsappNum
             ? `https://wa.me/${formatWhatsAppNumber(whatsappNum)}`
