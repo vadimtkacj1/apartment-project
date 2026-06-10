@@ -133,26 +133,17 @@ function HotPropositions() {
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
-        
-        // Fetch title
-        const titlesResponse = await fetch('/api/homepage-titles', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
-        });
+
+        // Fetch title and properties in parallel
+        const [titlesResponse, response] = await Promise.all([
+          fetch('/api/homepage-titles', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }),
+          fetch('/api/properties?hotProposition=true&limit=12', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }),
+        ]);
+
         if (titlesResponse.ok) {
           const titlesData = await titlesResponse.json();
           setTitle(titlesData.hotPropositionsTitle || 'הצעות חמות');
         }
-        
-        // Fetch all hot propositions (for sale and for rent)
-        const response = await fetch('/api/properties?hotProposition=true&limit=12', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
-        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch properties');

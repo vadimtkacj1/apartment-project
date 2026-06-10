@@ -1,10 +1,25 @@
-'use client';
-
+import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import './articles.css';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+
+export const metadata: Metadata = {
+  title: 'מאמרים ומדריכים | נדל״ן בחולון',
+  description: 'מדריכים מקצועיים בנושאי נדל״ן: רכישת דירה בישראל עבור תושבי חוץ, מכירת דירה עם מתווך לעומת עצמאית, ועוד טיפים ממומחי רם נכסים.',
+  alternates: {
+    canonical: `${siteUrl}/articles`,
+  },
+  openGraph: {
+    title: 'מאמרים ומדריכים | נדל״ן בחולון',
+    description: 'מדריכים מקצועיים בנושאי נדל״ן מאת צוות רם נכסים חיים ענבי.',
+    url: `${siteUrl}/articles`,
+  },
+};
 
 interface Article {
   id: string;
@@ -43,24 +58,18 @@ const articles: Article[] = [
 export default function ArticlesPage() {
   return (
     <div className="articles-page" dir="rtl">
-      {/* Hero with Background Image */}
+      <BreadcrumbSchema items={[{ name: 'מאמרים', path: '/articles' }]} />
       <SecondaryHero
         img="/7.jpg"
         title="מאמרים ומדריכים"
         centered={true}
       />
-
-      {/* Breadcrumbs */}
       <Breadcrumbs />
-
       <div className="articles-container">
-        {/* Articles Grid */}
         <div className="articles-grid">
           {articles.map((article, index) => (
             <article key={article.id} className="article-card" style={{ animationDelay: `${index * 0.1}s` }}>
-              {/* Decorative corner accent */}
               <div className="card-accent"></div>
-
               <Link href={`/articles/${article.id}`} className="article-image-container">
                 <div className="image-overlay"></div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -77,7 +86,6 @@ export default function ArticlesPage() {
                   {article.category}
                 </span>
               </Link>
-
               <div className="article-content">
                 <div className="article-meta">
                   <span className="article-date">
@@ -100,20 +108,17 @@ export default function ArticlesPage() {
                     {article.readTime}
                   </span>
                 </div>
-
                 <h2 className="article-title">
                   <Link href={`/articles/${article.id}`}>
                     {article.title}
                   </Link>
                 </h2>
-
                 <p className="article-description">
                   {article.description}
                 </p>
-
                 <div className="article-tags">
-                  {article.tags.map((tag, index) => (
-                    <span key={index} className="tag">
+                  {article.tags.map((tag, i) => (
+                    <span key={i} className="tag">
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="tag-icon">
                         <path d="M2 2L6 1L10 2L11 6L10 10L6 11L2 10L1 6L2 2Z" stroke="currentColor" strokeWidth="1"/>
                       </svg>
@@ -121,7 +126,6 @@ export default function ArticlesPage() {
                     </span>
                   ))}
                 </div>
-
                 <Link href={`/articles/${article.id}`} className="read-more">
                   <span>קרא עוד</span>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="arrow-icon">

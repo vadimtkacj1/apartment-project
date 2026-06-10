@@ -224,7 +224,7 @@ const Hero: React.FC = () => {
           loop
           muted
           playsInline
-          preload="none"
+          preload="metadata"
           poster="/hero-poster.jpg"
           webkit-playsinline="true"
           x5-playsinline="true"
@@ -309,7 +309,7 @@ const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="text-white/75 font-medium max-w-2xl leading-relaxed text-center md:text-right"
+            className="text-white/75 font-medium max-w-2xl leading-relaxed text-center md:text-start"
             style={{ fontSize: 'clamp(0.82rem, 1.5vw, 1.2rem)' }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן

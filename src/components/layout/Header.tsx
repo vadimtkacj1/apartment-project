@@ -11,6 +11,29 @@ interface NavLink {
   submenu?: { label: string; href: string }[];
 }
 
+const NAV_LINKS: NavLink[] = [
+  { label: "דף הבית", href: "/" },
+  { label: "הנכסים השלנו", href: "/apartments" },
+  {
+    label: 'מידע מקצועי בנדל"ן',
+    href: "#",
+    submenu: [
+      { label: "מוכרים דירה", href: "/selling-apartment" },
+      { label: "קונים דירה", href: "/buying-apartment" },
+    ],
+  },
+  { label: "מאמרים", href: "/articles" },
+  {
+    label: "אזור המידע והכלים",
+    href: "#",
+    submenu: [
+      { label: "קישורים שימושיים", href: "/links" },
+      { label: "שאלות ותשובות", href: "/faq" },
+    ],
+  },
+  { label: "אודות", href: "/about" },
+];
+
 export default function Header() {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,29 +54,6 @@ export default function Header() {
       window.removeEventListener("resize", onResize);
     };
   }, []);
-
-  const navLinks: NavLink[] = [
-    { label: "דף הבית", href: "/" },
-    { label: "הנכסים השלנו", href: "/apartments" },
-    {
-      label: 'מידע מקצועי בנדל"ן',
-      href: "#",
-      submenu: [
-        { label: "מוכרים דירה", href: "/selling-apartment" },
-        { label: "קונים דירה", href: "/buying-apartment" },
-      ],
-    },
-    { label: "מאמרים", href: "/articles" },
-    {
-      label: "אזור המידע והכלים",
-      href: "#",
-      submenu: [
-        { label: "קישורים שימושיים", href: "/links" },
-        { label: "שאלות ותשובות", href: "/faq" },
-      ],
-    },
-    { label: "אודות", href: "/about" },
-  ];
 
   const isHomePage = pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled;
@@ -129,7 +129,7 @@ export default function Header() {
         {/* Desktop menu */}
         {!isMobile && (
           <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            {navLinks.map((link) => {
+            {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
 
@@ -313,7 +313,7 @@ export default function Header() {
           </button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
                 <Link
@@ -352,7 +352,7 @@ export default function Header() {
                         fontWeight: 600,
                         color: "#1c3664",
                         textDecoration: "none",
-                        borderRight: "3px solid #1c3664",
+                        borderInlineStart: "3px solid #1c3664",
                         fontFamily: "var(--font-caramel), cursive, sans-serif",
                       }}
                     >

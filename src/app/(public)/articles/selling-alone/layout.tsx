@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: { absolute: 'למכור דירה לבד? למה זה עולה לכם יותר | רם נכסים חיים ענבי' },
+  title: 'למכור דירה לבד? למה זה עולה לכם יותר',
   description: 'מדריך למכירת דירה. למה מכירה עצמאית עולה יותר? תמחור כירורגי, סינון פיננסי, ניהול מו״מ מקצועי. נמכור את הדירה שלכם במחיר המקסימלי.',
   keywords: [
     'מכירת דירה לבד',

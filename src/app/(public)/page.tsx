@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import Hero from '@/components/layout/Hero';
 
 // Lazy load heavy components below the fold
@@ -41,6 +42,21 @@ export default function Home() {
 
       {/* Content below hero - lazy loaded */}
       <div className="relative bg-warm">
+        {/* Service navigation links — static for SEO */}
+        <nav aria-label="שירותי המשרד" className="bg-warm border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-6 py-6" dir="rtl">
+            <ul className="flex flex-wrap gap-x-8 gap-y-3 justify-center text-sm font-semibold text-[#1c3664]">
+              <li><Link href="/buying-apartment" className="hover:underline underline-offset-4">קניית דירה בחולון</Link></li>
+              <li><Link href="/selling-apartment" className="hover:underline underline-offset-4">מכירת דירה בחולון</Link></li>
+              <li><Link href="/apartments?dealType=rent" className="hover:underline underline-offset-4">דירות להשכרה בחולון</Link></li>
+              <li><Link href="/apartments?dealType=sale" className="hover:underline underline-offset-4">דירות למכירה בחולון</Link></li>
+              <li><Link href="/articles" className="hover:underline underline-offset-4">מדריכים ומאמרים</Link></li>
+              <li><Link href="/faq" className="hover:underline underline-offset-4">שאלות ותשובות</Link></li>
+              <li><Link href="/about" className="hover:underline underline-offset-4">אודות המשרד</Link></li>
+            </ul>
+          </div>
+        </nav>
+
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
           <NoCommissionSection />
         </Suspense>

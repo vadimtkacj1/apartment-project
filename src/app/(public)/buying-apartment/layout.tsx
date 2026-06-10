@@ -3,37 +3,38 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: { absolute: 'קונים דירה - רם נכסים חיים ענבי' },
-  description: 'מדריך מקיף לרכישת דירה. בירור צרכים, בדיקת מימון, איתור נכס, ניהול מו״מ וסגירת עסקה. ליווי מקצועי משלב התכנון ועד לקבלת המפתחות.',
+  title: 'קניית דירה בחולון - מדריך שלב אחר שלב',
+  description: 'איך קונים דירה בחולון? מבירור צרכים ובדיקת מימון, דרך איתור נכס, ועד ניהול מו״מ וסגירת עסקה. ליווי מקצועי אישי עם מתווך מנוסה לאורך כל הדרך.',
   keywords: [
-    'קונים דירה',
+    'קניית דירה בחולון',
     'רכישת דירה',
     'איך קונים דירה',
     'תהליך רכישת דירה',
-    'קניית דירה בחולון',
     'ייעוץ רכישת דירה',
+    'מתווך לרכישת דירה',
+    'קונים דירה חולון',
   ],
   alternates: {
     canonical: `${siteUrl}/buying-apartment`,
   },
   openGraph: {
-    title: 'קונים דירה - רם נכסים חיים ענבי',
-    description: 'מדריך מקיף לרכישת דירה. ליווי מקצועי משלב התכנון ועד לקבלת המפתחות.',
+    title: 'קניית דירה בחולון - מדריך שלב אחר שלב',
+    description: 'מבירור צרכים ועד קבלת המפתחות — ליווי מקצועי אישי לרכישת דירה בחולון.',
     url: `${siteUrl}/buying-apartment`,
     images: [
       {
-        url: `${siteUrl}/7.jpg`,
+        url: `${siteUrl}/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png`,
         width: 1200,
         height: 630,
-        alt: 'קונים דירה',
+        alt: 'קניית דירה בחולון - ליווי מקצועי',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'קונים דירה - רם נכסים חיים ענבי',
-    description: 'מדריך מקיף לרכישת דירה. ליווי מקצועי משלב התכנון ועד לקבלת המפתחות.',
-    images: [`${siteUrl}/7.jpg`],
+    title: 'קניית דירה בחולון - מדריך שלב אחר שלב',
+    description: 'מבירור צרכים ועד קבלת המפתחות — ליווי מקצועי אישי לרכישת דירה בחולון.',
+    images: [`${siteUrl}/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png`],
   },
 };
 

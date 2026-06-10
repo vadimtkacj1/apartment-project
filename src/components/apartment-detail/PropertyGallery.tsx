@@ -14,9 +14,11 @@ interface PropertyGalleryProps {
   images: string[];
   isSold: boolean;
   dealType?: DealType;
+  propertyTitle?: string;
 }
 
-export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryProps) {
+export function PropertyGallery({ images, isSold, dealType, propertyTitle }: PropertyGalleryProps) {
+  const imageAlt = propertyTitle || `דירה ${dealType === 'rent' ? 'להשכרה' : 'למכירה'}`;
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   return (
@@ -44,7 +46,7 @@ export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryPro
               <div className="relative max-h-full max-w-full flex items-center justify-center">
                 <img
                   src={image}
-                  alt="Property"
+                  alt={imageAlt}
                   className={`object-contain max-h-[85vh] w-auto h-auto ${isSold ? 'grayscale opacity-60' : ''}`}
                 />
                 
@@ -123,7 +125,7 @@ export function PropertyGallery({ images, isSold, dealType }: PropertyGalleryPro
             <div className={`relative aspect-video rounded-lg overflow-hidden transition-colors ${
               isSold ? 'opacity-60' : ''
             }`}>
-              <Image src={image} alt="Thumb" fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
+              <Image src={image} alt={imageAlt} fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
             </div>
           </SwiperSlide>
         ))}

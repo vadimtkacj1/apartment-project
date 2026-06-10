@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: { absolute: 'נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה - רם נכסים חיים ענבי' },
+  title: 'נדל״ן בשלט רחוק: מדריך למשקיעים זרים בישראל',
   description: 'מדריך מקיף למשקיעים זרים שרוצים לקנות נדל״ן בישראל. ניהול נכסים מרחוק, שיפוץ, מעטפת פיננסית וניהול שוטף. תושבי חוץ - אפשר לנהל נדל״ן בישראל באפס מאמץ.',
   keywords: [
     'משקיעים זרים',
