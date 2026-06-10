@@ -4,7 +4,6 @@ import { getCityLabel } from '@/data/cities';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
-// Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
   if (!value) return [];
   try {
@@ -14,12 +13,19 @@ function parseJsonArray(value: string | null): string[] {
   }
 }
 
+async function getProperty(id: number) {
+  try {
+    return await prisma.property.findUnique({ where: { id } });
+  } catch {
+    return null;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   try {
     const resolvedParams = await params;
     const propertyId = parseInt(resolvedParams.id);
 
-    // Validate that id is a valid number
     if (!resolvedParams.id || isNaN(propertyId)) {
       return {
         title: 'נכס לא נמצא',
@@ -27,9 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       };
     }
 
-    const property = await prisma.property.findUnique({
-      where: { id: propertyId },
-    });
+    const property = await getProperty(propertyId);
 
     if (!property || !property.isActive) {
       return {
@@ -50,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const cityName = getCityLabel(property.city) || property.city;
     const dealTypeName = dealTypeNames[property.dealType] || '';
     const propertyTitle = `דירה ${dealTypeName} ב${cityName} - ${property.rooms} חדרים, ${property.area} מ״ר`;
-    const propertyDescription = property.description || 
+    const propertyDescription = property.description ||
       `דירה ${dealTypeName} ב${cityName}. ${property.rooms} חדרים, ${property.area} מ״ר${property.builtArea ? `, ${property.builtArea} מ״ר בנוי` : ''}. ${property.floor ? `קומה ${property.floor}` : ''}${property.totalFloors ? ` מתוך ${property.totalFloors}` : ''}. מחיר: ${property.price}`;
 
     const url = `${siteUrl}/apartments/${resolvedParams.id}`;
@@ -105,11 +109,90 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default function ApartmentDetailLayout({
+export default async function ApartmentDetailLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ id: string }>;
 }) {
-  return <>{children}</>;
-}
+  let propertySchema = null;
+  let breadcrumbSchema = null;
 
+  try {
+    const resolvedParams = await params;
+    const propertyId = parseInt(resolvedParams.id);
+
+    if (!isNaN(propertyId)) {
+      const property = await getProperty(propertyId);
+
+      if (property && property.isActive) {
+        const images = parseJsonArray(property.images);
+        const dealTypeNames: Record<string, string> = { sale: 'למכירה', rent: 'להשכרה' };
+        const cityName = getCityLabel(property.city) || property.city;
+        const dealTypeName = dealTypeNames[property.dealType] || '';
+        const propertyTitle = `דירה ${dealTypeName} ב${cityName} - ${property.rooms} חדרים, ${property.area} מ״ר`;
+        const url = `${siteUrl}/apartments/${resolvedParams.id}`;
+
+        propertySchema = {
+          '@context': 'https://schema.org',
+          '@type': 'RealEstateListing',
+          name: propertyTitle,
+          description: property.description || propertyTitle,
+          url,
+          image: images.map((img: string) =>
+            img.startsWith('http') ? img : `${siteUrl}${img}`
+          ),
+          offers: {
+            '@type': 'Offer',
+            price: property.price,
+            priceCurrency: 'ILS',
+            availability: 'https://schema.org/InStock',
+          },
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: property.location || undefined,
+            addressLocality: cityName,
+            addressRegion: property.neighborhood || undefined,
+            addressCountry: 'IL',
+          },
+          numberOfRooms: property.rooms,
+          floorLevel: property.floor || undefined,
+          floorSize: property.area
+            ? { '@type': 'QuantitativeValue', value: property.area, unitCode: 'MTK' }
+            : undefined,
+        };
+
+        breadcrumbSchema = {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'דף הבית', item: siteUrl },
+            { '@type': 'ListItem', position: 2, name: 'דירות', item: `${siteUrl}/apartments` },
+            { '@type': 'ListItem', position: 3, name: propertyTitle, item: url },
+          ],
+        };
+      }
+    }
+  } catch (error) {
+    console.error('Error generating property structured data:', error);
+  }
+
+  return (
+    <>
+      {propertySchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(propertySchema) }}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+        />
+      )}
+      {children}
+    </>
+  );
+}

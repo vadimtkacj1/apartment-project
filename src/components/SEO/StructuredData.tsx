@@ -1,17 +1,42 @@
+import { prisma } from '@/lib/prisma';
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
-interface StructuredDataProps {
-  type?: 'Organization' | 'RealEstateAgent' | 'WebSite';
-  propertyData?: {
-    name?: string;
-    description?: string;
-    price?: string;
-    address?: string;
-    images?: string[];
-  };
-}
+export default async function StructuredData() {
+  let contactInfo: {
+    phone: string | null;
+    address: string | null;
+    city: string | null;
+    facebook: string | null;
+    instagram: string | null;
+    weekdayHours: string | null;
+    fridayHours: string | null;
+  } | null = null;
 
-export default function StructuredData({ type = 'Organization', propertyData }: StructuredDataProps) {
+  try {
+    contactInfo = await prisma.contactInfo.findFirst({
+      select: {
+        phone: true,
+        address: true,
+        city: true,
+        facebook: true,
+        instagram: true,
+        weekdayHours: true,
+        fridayHours: true,
+      },
+    });
+  } catch {
+    // non-critical — structured data falls back to static values
+  }
+
+  const sameAs = [contactInfo?.facebook, contactInfo?.instagram].filter(
+    (v): v is string => typeof v === 'string' && v.length > 0
+  );
+
+  const openingHours: string[] = [];
+  if (contactInfo?.weekdayHours) openingHours.push(`Mo-Fr ${contactInfo.weekdayHours}`);
+  if (contactInfo?.fridayHours) openingHours.push(`Fr ${contactInfo.fridayHours}`);
+
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateAgent',
@@ -23,22 +48,37 @@ export default function StructuredData({ type = 'Organization', propertyData }: 
     image: `${siteUrl}/images/hero/main-hero.jpg`,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: 'חולון',
+      ...(contactInfo?.address ? { streetAddress: contactInfo.address } : {}),
+      addressLocality: contactInfo?.city || 'חולון',
       addressRegion: 'מרכז',
       addressCountry: 'IL',
     },
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'Customer Service',
-      availableLanguage: ['Hebrew', 'English'],
-    },
-    sameAs: [
-      // Add social media links if available
+    ...(contactInfo?.phone ? { telephone: contactInfo.phone } : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+    ...(openingHours.length > 0 ? { openingHours } : {}),
+    contactPoint: [
+      {
+        '@type': 'ContactPoint',
+        telephone: '+972-50-549-6626',
+        email: 'rammiz800@gmail.com',
+        name: 'רם מזרחי',
+        contactType: 'Customer Service',
+        availableLanguage: ['Hebrew', 'English'],
+      },
+      {
+        '@type': 'ContactPoint',
+        telephone: '+972-50-675-9999',
+        email: 'hd.nadlan@gmail.com',
+        name: 'חיים ענבי',
+        contactType: 'Customer Service',
+        availableLanguage: ['Hebrew', 'English'],
+      },
     ],
-    areaServed: {
-      '@type': 'City',
-      name: 'חולון',
-    },
+    areaServed: [
+      { '@type': 'City', name: 'חולון' },
+      { '@type': 'City', name: 'בת ים' },
+      { '@type': 'City', name: 'ראשון לציון' },
+    ],
     serviceType: [
       'Real Estate Brokerage',
       'Property Sales',
@@ -52,6 +92,7 @@ export default function StructuredData({ type = 'Organization', propertyData }: 
     '@type': 'WebSite',
     name: 'רם נכסים חיים ענבי',
     url: siteUrl,
+    inLanguage: 'he',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
@@ -62,35 +103,16 @@ export default function StructuredData({ type = 'Organization', propertyData }: 
     },
   };
 
-  const propertySchema = propertyData ? {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: propertyData.name,
-    description: propertyData.description,
-    image: propertyData.images || [],
-    offers: {
-      '@type': 'Offer',
-      price: propertyData.price,
-      priceCurrency: 'ILS',
-      availability: 'https://schema.org/InStock',
-    },
-  } : null;
-
-  const schemas: Array<Record<string, any>> = [organizationSchema, websiteSchema];
-  if (propertySchema) {
-    schemas.push(propertySchema);
-  }
-
   return (
     <>
-      {schemas.map((schema, index) => (
-        <script
-          key={index}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-        />
-      ))}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
     </>
   );
 }
-

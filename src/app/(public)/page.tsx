@@ -1,5 +1,4 @@
-"use client";
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import Hero from '@/components/layout/Hero';
 
@@ -33,55 +32,11 @@ const ContactForm = dynamic(() => import('@/components/layout/ContactForm'), {
 });
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Handle hash navigation on page load
-    if (window.location.hash === '#contact') {
-      setTimeout(() => {
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    }
-
-    const hideLoader = () => setIsLoading(false);
-
-    // If all resources (images, video poster, etc.) are already loaded
-    if (document.readyState === 'complete') {
-      hideLoader();
-      return;
-    }
-
-    // Hide loader only when ALL images/resources have finished loading
-    window.addEventListener('load', hideLoader);
-
-    // Safety fallback: hide after 6s maximum so spinner never stays forever
-    const fallback = setTimeout(hideLoader, 6000);
-
-    return () => {
-      window.removeEventListener('load', hideLoader);
-      clearTimeout(fallback);
-    };
-  }, []);
-
   return (
     <>
-      {/* Полноэкранный спиннер */}
-      {isLoading && (
-        <div className="fixed inset-0 z-9999 bg-[#2A4A8A] flex items-center justify-center">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-[#c5a357]/30 border-t-[#c5a357] rounded-full animate-spin"></div>
-          </div>
-        </div>
-      )}
-
       {/* Hero section - scrolls normally */}
       <div className="w-full">
-        <Hero
-          img="/images/hero/main-hero.jpg"
-        />
+        <Hero />
       </div>
 
       {/* Content below hero - lazy loaded */}

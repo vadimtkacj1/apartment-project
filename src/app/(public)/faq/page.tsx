@@ -1,4 +1,3 @@
-'use client';
 import React from 'react';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';

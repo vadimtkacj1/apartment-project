@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: 'אודות - רם נכסים חיים ענבי',
+  title: { absolute: 'אודות - רם נכסים חיים ענבי' },
   description: 'למידע נוסף על משרד התיווך שלנו. ניסיון מצטבר של שנים בעולם הנדל״ן, הכרות עמוקה עם השוק המקומי ושיטות עבודה מוכחות. צוות מקצועי ומנוסה.',
   keywords: [
     'אודות רם נכסים',
@@ -36,11 +36,28 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'דף הבית', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'אודות', item: `${siteUrl}/about` },
+  ],
+};
+
 export default function AboutLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }
 

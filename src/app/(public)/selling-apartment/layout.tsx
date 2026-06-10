@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: 'תהליך מכירת דירה - רם נכסים חיים ענבי',
+  title: { absolute: 'תהליך מכירת דירה - רם נכסים חיים ענבי' },
   description: 'מדריך מקיף למכירת דירה. בדיקות משפטיות ותכנוניות, בדיקות מס, הערכת שווי, שיווק מקיף וניהול מו״מ מקצועי. נמכור את הדירה שלכם במחיר הטוב ביותר.',
   keywords: [
     'מוכרים דירה',
@@ -38,11 +38,28 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'דף הבית', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'מוכרים דירה', item: `${siteUrl}/selling-apartment` },
+  ],
+};
+
 export default function SellingApartmentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }
 

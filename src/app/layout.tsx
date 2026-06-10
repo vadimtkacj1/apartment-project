@@ -40,7 +40,6 @@ const assistant = localFont({
   display: 'swap',
   variable: '--font-assistant',
   fallback: ['Arial', 'Helvetica', 'sans-serif'],
-  adjustFontFallback: false,
 });
 
 const caramel = localFont({
@@ -48,7 +47,6 @@ const caramel = localFont({
   display: 'swap',
   variable: '--font-caramel',
   fallback: ['cursive', 'sans-serif'],
-  adjustFontFallback: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
@@ -137,11 +135,16 @@ export default function RootLayout({
         `}} />
         <link
           rel="preload"
+          href="/hero-poster.jpg"
+          as="image"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
           href="/fonts/Carmela-Regular.ttf"
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
-          media="(min-width: 768px)"
         />
         <link
           rel="preload"
@@ -149,7 +152,13 @@ export default function RootLayout({
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
-          media="(min-width: 768px)"
+        />
+        <link
+          rel="preload"
+          href="/fonts/static/Assistant-Regular.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>

@@ -58,11 +58,9 @@ const nextConfig: NextConfig = {
   // Webpack optimizations
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Tree shaking for client bundle
       config.optimization = {
         ...config.optimization,
         usedExports: true,
-        sideEffects: false,
       };
     }
     return config;

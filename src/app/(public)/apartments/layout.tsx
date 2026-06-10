@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: 'נכסים למכירה והשכרה - רם נכסים חיים ענבי',
+  title: { absolute: 'נכסים למכירה והשכרה - רם נכסים חיים ענבי' },
   description: 'גלה את מבחר הנכסים שלנו למכירה ולהשכרה בחולון והסביבה. דירות, גינות, קוטג׳ים ועוד. תיווך נדל״ן מקצועי עם ניסיון של שנים.',
   keywords: [
     'נכסים למכירה',
@@ -39,11 +39,28 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'דף הבית', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'דירות', item: `${siteUrl}/apartments` },
+  ],
+};
+
 export default function ApartmentsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  );
 }
 

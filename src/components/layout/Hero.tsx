@@ -5,10 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
-interface HeroProps {
-  img?: string;
-}
-
 function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
@@ -38,7 +34,7 @@ function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
   return { displayed, done };
 }
 
-const Hero: React.FC<HeroProps> = () => {
+const Hero: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
@@ -54,28 +50,13 @@ const Hero: React.FC<HeroProps> = () => {
 
   const showRest = done2;
 
-  // Определяем размер экрана для адаптивного видео
-  const [isMobile, setIsMobile] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Force video play
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
-    // Reset states when video source changes
-    setVideoLoaded(false);
-    setVideoError(false);
 
     let attempts = 0;
     const maxAttempts = 5;
@@ -97,16 +78,13 @@ const Hero: React.FC<HeroProps> = () => {
         video.setAttribute('webkit-playsinline', 'true');
         video.setAttribute('x-webkit-airplay', 'allow');
         video.setAttribute('x5-playsinline', 'true');
-        video.load(); // Force reload video
         await video.play();
         setVideoLoaded(true);
         isPlaying = true;
         isTryingToPlay = false;
-        console.log('✅ Video playing successfully');
       } catch (err) {
         attempts++;
         isTryingToPlay = false;
-        console.warn(`❌ Video play attempt ${attempts} failed:`, err);
 
         if (attempts < maxAttempts && !isPlaying) {
           setTimeout(tryPlay, 500 * attempts);
@@ -117,13 +95,11 @@ const Hero: React.FC<HeroProps> = () => {
     };
 
     const handlePlaying = () => {
-      console.log('▶️ Video is actually playing now!');
       setVideoLoaded(true);
       isPlaying = true;
     };
 
-    const handleError = (e: Event) => {
-      console.error('❌ Video error:', e);
+    const handleError = () => {
       setVideoError(true);
     };
 
@@ -151,7 +127,7 @@ const Hero: React.FC<HeroProps> = () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       clearTimeout(timeoutId);
     };
-  }, [isMobile]);
+  }, []);
 
   return (
     <section
@@ -248,7 +224,7 @@ const Hero: React.FC<HeroProps> = () => {
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           poster="/hero-poster.jpg"
           webkit-playsinline="true"
           x5-playsinline="true"
@@ -261,8 +237,8 @@ const Hero: React.FC<HeroProps> = () => {
             opacity: videoLoaded ? 1 : 0,
             transition: 'opacity 0.5s ease',
           }}
-          key={isMobile ? 'mobile-video' : 'desktop-video'}
         >
+          <source src="/hero-mobile.mp4" media="(max-width: 767px)" type="video/mp4" />
           <source src="/hero.mp4" type="video/mp4" />
         </video>
       </div>

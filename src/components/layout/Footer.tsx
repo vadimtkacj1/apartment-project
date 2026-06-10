@@ -197,7 +197,7 @@ export default async function Footer() {
           </div>
 
           <p className="text-gray-600 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
-            Built by <a href="https://aiterra.agency/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#c5a357] transition-colors">Aiterra</a>
+            Built by <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>
