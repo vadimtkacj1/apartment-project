@@ -123,13 +123,20 @@ const MarqueeRow = ({
   );
 };
 
-function HotPropositions() {
+interface HotPropositionsProps {
+  initialProperties?: Property[];
+  initialTitle?: string;
+}
+
+function HotPropositions({ initialProperties, initialTitle }: HotPropositionsProps = {}) {
   const { isMobile } = usePerformanceSettings();
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [title, setTitle] = useState('הצעות חמות');
+  const [properties, setProperties] = useState<Property[]>(initialProperties ?? []);
+  const [loading, setLoading] = useState(initialProperties === undefined);
+  const [title, setTitle] = useState(initialTitle ?? 'הצעות חמות');
 
   useEffect(() => {
+    if (initialProperties !== undefined) return;
+
     const fetchHotProperties = async () => {
       try {
         setLoading(true);
@@ -194,6 +201,7 @@ function HotPropositions() {
     };
 
     fetchHotProperties();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {

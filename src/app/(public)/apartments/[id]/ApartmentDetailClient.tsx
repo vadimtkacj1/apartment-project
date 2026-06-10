@@ -21,9 +21,10 @@ import {
 
 interface ApartmentDetailClientProps {
   propertyId: string;
+  initialTitle?: string;
 }
 
-export default function ApartmentDetailClient({ propertyId }: ApartmentDetailClientProps) {
+export default function ApartmentDetailClient({ propertyId, initialTitle }: ApartmentDetailClientProps) {
   const { property, loading, error } = usePropertyData(propertyId);
   const [previousId, setPreviousId] = useState<number | null>(null);
   const [nextId, setNextId] = useState<number | null>(null);
@@ -55,10 +56,8 @@ export default function ApartmentDetailClient({ propertyId }: ApartmentDetailCli
     if (propertyId) fetchPropertyIds();
   }, [propertyId]);
 
-  if (loading) return <LoadingState />;
-  if (error || !property) return <ErrorState error={error || undefined} />;
-
-  const isSold = property.isSold || false;
+  const isSold = property?.isSold || false;
+  const displayTitle = property?.title?.trim() || property?.location || initialTitle || '';
 
   return (
     <div className="min-h-screen bg-warm pt-32 pb-16 relative" dir="rtl">
@@ -100,73 +99,85 @@ export default function ApartmentDetailClient({ propertyId }: ApartmentDetailCli
           </Link>
         </div>
 
-        <div className="w-full px-6 lg:px-12">
-          <PropertyNavigation previousId={previousId} nextId={nextId} isSold={false} />
-        </div>
+        {property && (
+          <div className="w-full px-6 lg:px-12">
+            <PropertyNavigation previousId={previousId} nextId={nextId} isSold={false} />
+          </div>
+        )}
 
-        <h1 className="w-full px-6 lg:px-12 text-2xl md:text-3xl font-bold text-[#1c3664] mb-6 text-center md:text-right" dir="rtl">
-          {property.title?.trim() || property.location || `דירה ${property.dealType === 'rent' ? 'להשכרה' : 'למכירה'}`}
-        </h1>
+        {displayTitle && (
+          <h1 className="w-full px-6 lg:px-12 text-2xl md:text-3xl font-bold text-[#1c3664] mb-6 text-center md:text-right" dir="rtl">
+            {displayTitle}
+          </h1>
+        )}
 
-        <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 lg:px-12">
-          <div className="lg:col-span-2">
-            <div className="-mx-6 lg:mx-0">
-              <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
-            </div>
-            {((property.owners && property.owners.length > 0) || (property.agents && property.agents.length > 0)) && (
-              <div className="px-6 mb-6">
-                <PropertyAgentBlock
-                  agents={[...(property.owners ?? []), ...(property.agents ?? [])]}
-                  isSold={isSold}
-                  propertyId={propertyId}
-                />
+        {loading && !property ? (
+          <LoadingState />
+        ) : !property ? (
+          <ErrorState error={error || undefined} />
+        ) : (
+          <>
+            <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 lg:px-12">
+              <div className="lg:col-span-2">
+                <div className="-mx-6 lg:mx-0">
+                  <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
+                </div>
+                {((property.owners && property.owners.length > 0) || (property.agents && property.agents.length > 0)) && (
+                  <div className="px-6 mb-6">
+                    <PropertyAgentBlock
+                      agents={[...(property.owners ?? []), ...(property.agents ?? [])]}
+                      isSold={isSold}
+                      propertyId={propertyId}
+                    />
+                  </div>
+                )}
+                <div className="px-6">
+                  <PropertyDescription
+                    description={property.description}
+                    bedrooms={property.bedrooms}
+                    floor={property.floor}
+                    totalFloors={property.totalFloors}
+                    area={property.area}
+                    builtArea={property.builtArea}
+                    isSold={isSold}
+                  />
+                  <PropertyAmenities amenities={property.amenities} isSold={isSold} />
+                  <PropertySpecs specs={property.specs} isSold={isSold} />
+                  <PropertyMap
+                    isSold={isSold}
+                    latitude={property.latitude}
+                    longitude={property.longitude}
+                    location={property.location}
+                  />
+                </div>
               </div>
-            )}
-            <div className="px-6">
-              <PropertyDescription
-                description={property.description}
-                bedrooms={property.bedrooms}
-                floor={property.floor}
-                totalFloors={property.totalFloors}
-                area={property.area}
-                builtArea={property.builtArea}
-                isSold={isSold}
-              />
-              <PropertyAmenities amenities={property.amenities} isSold={isSold} />
-              <PropertySpecs specs={property.specs} isSold={isSold} />
-              <PropertyMap
-                isSold={isSold}
-                latitude={property.latitude}
-                longitude={property.longitude}
-                location={property.location}
-              />
+
+              <div className="lg:col-span-1 px-6">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="sticky top-24"
+                >
+                  <PriceCard
+                    price={property.price}
+                    originalPrice={property.originalPrice}
+                    isSold={isSold}
+                    dealType={property.dealType}
+                  />
+                  <ContactForm
+                    propertyId={propertyId}
+                    isSold={isSold}
+                    owners={property.owners ?? []}
+                    dealType={property.dealType}
+                  />
+                </motion.div>
+              </div>
             </div>
-          </div>
 
-          <div className="lg:col-span-1 px-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="sticky top-24"
-            >
-              <PriceCard
-                price={property.price}
-                originalPrice={property.originalPrice}
-                isSold={isSold}
-                dealType={property.dealType}
-              />
-              <ContactForm
-                propertyId={propertyId}
-                isSold={isSold}
-                owners={property.owners ?? []}
-                dealType={property.dealType}
-              />
-            </motion.div>
-          </div>
-        </div>
-
-        <SimilarProperties currentPropertyId={property.id} limit={3} />
+            <SimilarProperties currentPropertyId={property.id} limit={3} />
+          </>
+        )}
       </div>
     </div>
   );

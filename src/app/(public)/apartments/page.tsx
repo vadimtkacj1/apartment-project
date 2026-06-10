@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import ApartmentsPageClient from '@/components/pages/ApartmentsPageClient';
 import { DealType } from '@/types/property.types';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
+import { prisma } from '@/lib/prisma';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -42,6 +43,15 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function ApartmentsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const dealType = params.dealType as DealType | undefined;
+
+  // Fetch active properties server-side so Google can crawl links to individual pages
+  const activeProperties = await prisma.property.findMany({
+    where: { isActive: true },
+    select: { id: true, title: true, location: true, rooms: true, dealType: true },
+    orderBy: { updatedAt: 'desc' },
+    take: 100,
+  });
+
   return (
     <>
       <BreadcrumbSchema items={[{ name: 'דירות', path: '/apartments' }]} />
@@ -53,6 +63,15 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
           רם נכסים וחיים ענבי — משרד תיווך עם ניסיון של מעל 24 שנה,
           מלווה קונים, מוכרים ומשכירים לאורך כל הדרך.
         </p>
+        <nav aria-label="רשימת נכסים">
+          {activeProperties.map((p) => {
+            const label = p.title?.trim() ||
+              `${p.rooms} חדרים ${p.dealType === 'rent' ? 'להשכרה' : 'למכירה'} ב${p.location}`;
+            return (
+              <a key={p.id} href={`/apartments/${p.id}`}>{label}</a>
+            );
+          })}
+        </nav>
       </div>
       <ApartmentsPageClient initialDealType={dealType} />
     </>

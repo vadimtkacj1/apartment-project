@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 
@@ -32,13 +33,20 @@ interface Property {
   vacancyDate?: string;
 }
 
-function NoCommissionSection() {
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
+interface NoCommissionSectionProps {
+  initialProperty?: Property | null;
+  initialTitle?: string;
+}
+
+function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSectionProps = {}) {
+  const [property, setProperty] = useState<Property | null>(initialProperty !== undefined ? initialProperty : null);
+  const [loading, setLoading] = useState(initialProperty === undefined);
   const [error, setError] = useState<string | null>(null);
-  const [title, setTitle] = useState('דירה ללא עמלת תיווך');
+  const [title, setTitle] = useState(initialTitle ?? 'דירה ללא עמלת תיווך');
 
   useEffect(() => {
+    if (initialProperty !== undefined) return;
+
     const fetchNoCommissionProperty = async () => {
       try {
         setLoading(true);
@@ -115,6 +123,7 @@ function NoCommissionSection() {
       }
     };
     fetchNoCommissionProperty();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Loading state
@@ -221,10 +230,12 @@ function NoCommissionSection() {
 
               {/* Image — 3/5 width */}
               <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
-                <img
-                  src={property.image}
+                <Image
+                  src={property.image || '/images/hero/sales.jpg'}
                   alt={property.title}
-                  className="property-image w-full h-full object-cover transition-transform duration-700 rounded-2xl"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 60vw"
+                  className="property-image object-cover transition-transform duration-700 rounded-2xl"
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">

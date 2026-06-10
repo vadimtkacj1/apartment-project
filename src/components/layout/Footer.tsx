@@ -52,8 +52,7 @@ async function getSocialLinks(): Promise<ContactInfo | null> {
 }
 
 export default async function Footer() {
-  const owners = await getOwners();
-  const socialLinks = await getSocialLinks();
+  const [owners, socialLinks] = await Promise.all([getOwners(), getSocialLinks()]);
 
   return (
     <footer dir="rtl" className="bg-[#1a1a1a] text-white pt-12 pb-10 px-6 lg:px-20 2xl:px-24 relative min-h-70 overflow-hidden flex flex-col items-start justify-start">
@@ -172,8 +171,29 @@ export default async function Footer() {
           </div>
         </div>
 
+        {/* SEO Service Links */}
+        <nav aria-label="שירותי המשרד" className="mt-10 pt-8 border-t border-white/10">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 justify-center" dir="rtl">
+            {[
+              { label: 'קניית דירה בחולון', href: '/buying-apartment' },
+              { label: 'מכירת דירה בחולון', href: '/selling-apartment' },
+              { label: 'דירות להשכרה בחולון', href: '/apartments?dealType=rent' },
+              { label: 'דירות למכירה בחולון', href: '/apartments?dealType=sale' },
+              { label: 'מדריכים ומאמרים', href: '/articles' },
+              { label: 'שאלות ותשובות', href: '/faq' },
+              { label: 'אודות המשרד', href: '/about' },
+            ].map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="text-gray-500 hover:text-gray-300 transition-colors font-medium" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {/* Legal Content Section */}
-        <div className="mt-12 pt-8 border-t-2 border-[#c5a357]/30 text-center">
+        <div className="mt-8 pt-8 border-t-2 border-[#c5a357]/30 text-center">
           <div className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
             תוכן משפטי
           </div>

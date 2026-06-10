@@ -1,5 +1,6 @@
 "use client";
 import React, { memo, useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
@@ -134,10 +135,12 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
       >
         {showImage && (
           <div className="relative w-full aspect-4/3 overflow-hidden bg-gray-100">
-            <img
+            <Image
               src={imageSrc}
               alt={title}
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 ${
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+              className={`object-cover object-center transition-transform duration-700 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
               onError={handleImageError}

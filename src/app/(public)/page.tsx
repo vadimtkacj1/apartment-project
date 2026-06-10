@@ -1,7 +1,11 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import Hero from '@/components/layout/Hero';
+import { prisma } from '@/lib/prisma';
+import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
+
+// Cache SSR output for 60 seconds — balances freshness with server load
+export const revalidate = 60;
 
 // Lazy load heavy components below the fold
 const NoCommissionSection = dynamic(() => import('@/components/layout/NoCommissionSection'), {
@@ -32,7 +36,126 @@ const ContactForm = dynamic(() => import('@/components/layout/ContactForm'), {
   loading: () => <div className="h-96 bg-warm animate-pulse" />,
 });
 
-export default function Home() {
+function parseJson(val: string | null | undefined): string[] {
+  if (!val) return [];
+  try { return JSON.parse(val); } catch { return []; }
+}
+
+function resolveDealType(dealType: string, category?: string | null): string {
+  if (category === 'rentals' || category === 'commercial') return 'rent';
+  if (category === 'sales' || category === 'land') return 'sale';
+  return dealType;
+}
+
+export default async function Home() {
+  // Fetch all homepage section data in parallel — eliminates client-side waterfall
+  const HomepageSettings = (prisma as any).homepageSettings;
+
+  const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings] = await Promise.all([
+    prisma.property.findMany({
+      where: { isActive: true, isHotProposition: true, isSold: false },
+      take: 12,
+      select: {
+        id: true, title: true, price: true, rooms: true, bathrooms: true, area: true,
+        location: true, images: true, status: true, isSold: true, floor: true,
+        dealType: true, category: true, propertyType: true, totalFloors: true,
+        neighborhood: true, street: true, streetNumber: true, parking: true,
+        position: true, furniture: true, directions: true, vacancyDate: true,
+      },
+    }),
+    prisma.property.findFirst({
+      where: { isActive: true, isNoCommission: true, isSold: false },
+      select: {
+        id: true, title: true, price: true, rooms: true, bathrooms: true, area: true,
+        location: true, images: true, status: true, isSold: true, floor: true,
+        description: true, propertyType: true, parking: true, furniture: true,
+        directions: true, hasAirConditioning: true, hasElevator: true,
+        hasStorage: true, hasSafeRoom: true, hasSunBalcony: true, hasBoiler: true,
+        vacancyDate: true,
+      },
+    }),
+    prisma.property.findMany({
+      where: { isActive: true, dealType: 'sale', isSold: false },
+      take: 3,
+      orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+      select: {
+        id: true, title: true, location: true, price: true, rooms: true,
+        bathrooms: true, area: true, dealType: true, category: true, status: true,
+        propertyType: true, floor: true, totalFloors: true, neighborhood: true,
+        images: true, isSold: true, isPinned: true,
+      },
+    }),
+    HomepageSettings ? HomepageSettings.findFirst().catch(() => null) : Promise.resolve(null),
+  ]);
+
+  const hotProperties = hotPropsRaw.map((p: any) => {
+    const images = parseJson(p.images);
+    return {
+      id: p.id, title: p.title, price: p.price,
+      rooms: p.rooms, bedrooms: p.rooms,
+      bathrooms: p.bathrooms, area: p.area, location: p.location,
+      images, image: images[0] || '/images/hero/sales.jpg',
+      status: p.status ?? undefined, isSold: Boolean(p.isSold),
+      floor: p.floor ?? undefined,
+      dealType: resolveDealType(p.dealType, p.category) as DealType,
+      category: p.category, propertyType: p.propertyType ?? undefined,
+      totalFloors: p.totalFloors ?? undefined, neighborhood: p.neighborhood ?? undefined,
+      street: p.street ?? undefined, streetNumber: p.streetNumber ?? undefined,
+      parking: p.parking ?? undefined, position: p.position ?? undefined,
+      furniture: p.furniture ?? undefined,
+      directions: parseJson(p.directions) as Direction[],
+      vacancyDate: p.vacancyDate ?? undefined,
+    };
+  });
+
+  const noCommProperty = noCommPropRaw ? (() => {
+    const images = parseJson(noCommPropRaw.images);
+    return {
+      id: noCommPropRaw.id, title: noCommPropRaw.title, price: noCommPropRaw.price,
+      rooms: noCommPropRaw.rooms, bedrooms: noCommPropRaw.rooms,
+      bathrooms: noCommPropRaw.bathrooms, area: noCommPropRaw.area,
+      location: noCommPropRaw.location,
+      images, image: images[0] || '/images/hero/sales.jpg',
+      status: noCommPropRaw.status ?? undefined, isSold: Boolean(noCommPropRaw.isSold),
+      floor: noCommPropRaw.floor ?? undefined,
+      description: noCommPropRaw.description ?? undefined,
+      propertyType: noCommPropRaw.propertyType as PropertyType | undefined,
+      parking: noCommPropRaw.parking as ParkingType | undefined,
+      furniture: noCommPropRaw.furniture as FurnitureLevel | undefined,
+      directions: parseJson(noCommPropRaw.directions as string | null),
+      hasAirConditioning: Boolean(noCommPropRaw.hasAirConditioning),
+      hasElevator: Boolean(noCommPropRaw.hasElevator),
+      hasStorage: Boolean(noCommPropRaw.hasStorage),
+      hasSafeRoom: Boolean(noCommPropRaw.hasSafeRoom),
+      hasSunBalcony: Boolean(noCommPropRaw.hasSunBalcony),
+      hasBoiler: Boolean(noCommPropRaw.hasBoiler),
+      vacancyDate: noCommPropRaw.vacancyDate ?? undefined,
+    };
+  })() : null;
+
+  const featuredProperties = featuredPropsRaw.map((p: any) => {
+    const images = parseJson(p.images);
+    return {
+      id: p.id, title: p.title, location: p.location, price: p.price,
+      bedrooms: p.rooms, rooms: p.rooms,
+      bathrooms: p.bathrooms, area: p.area,
+      dealType: resolveDealType(p.dealType, p.category) as DealType,
+      category: p.category, status: p.status ?? undefined,
+      propertyType: p.propertyType ?? undefined,
+      floor: p.floor, totalFloors: p.totalFloors,
+      neighborhood: p.neighborhood ?? undefined,
+      images, image: images[0] || '/images/hero/sales.jpg',
+      isSold: false as const,
+    };
+  });
+
+  const homepageTitles = {
+    hotPropositionsTitle: settings?.hotPropositionsTitle || 'הצעות חמות',
+    noCommissionTitle: settings?.noCommissionTitle || 'דירה ללא עמלת תיווך',
+    featuredPropertiesTitle: settings?.featuredPropertiesTitle || 'נכסים באיזור המרכז',
+    featuredPropertiesSubtitle: settings?.featuredPropertiesSubtitle || 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
+  };
+
   return (
     <>
       {/* Hero section - scrolls normally */}
@@ -42,26 +165,17 @@ export default function Home() {
 
       {/* Content below hero - lazy loaded */}
       <div className="relative bg-warm">
-        {/* Service navigation links — static for SEO */}
-        <nav aria-label="שירותי המשרד" className="bg-warm border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-6 py-6" dir="rtl">
-            <ul className="flex flex-wrap gap-x-8 gap-y-3 justify-center text-sm font-semibold text-[#1c3664]">
-              <li><Link href="/buying-apartment" className="hover:underline underline-offset-4">קניית דירה בחולון</Link></li>
-              <li><Link href="/selling-apartment" className="hover:underline underline-offset-4">מכירת דירה בחולון</Link></li>
-              <li><Link href="/apartments?dealType=rent" className="hover:underline underline-offset-4">דירות להשכרה בחולון</Link></li>
-              <li><Link href="/apartments?dealType=sale" className="hover:underline underline-offset-4">דירות למכירה בחולון</Link></li>
-              <li><Link href="/articles" className="hover:underline underline-offset-4">מדריכים ומאמרים</Link></li>
-              <li><Link href="/faq" className="hover:underline underline-offset-4">שאלות ותשובות</Link></li>
-              <li><Link href="/about" className="hover:underline underline-offset-4">אודות המשרד</Link></li>
-            </ul>
-          </div>
-        </nav>
-
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
-          <NoCommissionSection />
+          <NoCommissionSection
+            initialProperty={noCommProperty}
+            initialTitle={homepageTitles.noCommissionTitle}
+          />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <HotPropositions />
+          <HotPropositions
+            initialProperties={hotProperties}
+            initialTitle={homepageTitles.hotPropositionsTitle}
+          />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <AboutSection />
@@ -73,7 +187,13 @@ export default function Home() {
           <Testimonials />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <FeaturedProperties />
+          <FeaturedProperties
+            initialProperties={featuredProperties}
+            initialTitles={{
+              featuredPropertiesTitle: homepageTitles.featuredPropertiesTitle,
+              featuredPropertiesSubtitle: homepageTitles.featuredPropertiesSubtitle,
+            }}
+          />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ContactForm />

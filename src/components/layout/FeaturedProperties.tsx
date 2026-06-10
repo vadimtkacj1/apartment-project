@@ -28,27 +28,39 @@ interface Property {
   isSold?: boolean;
 }
 
-const FeaturedProperties: React.FC = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [titles, setTitles] = useState({
-    featuredPropertiesTitle: 'נכסים באיזור המרכז',
-    featuredPropertiesSubtitle: 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
-  });
+interface FeaturedTitles {
+  featuredPropertiesTitle: string;
+  featuredPropertiesSubtitle: string;
+}
+
+interface FeaturedPropertiesProps {
+  initialProperties?: Property[];
+  initialTitles?: FeaturedTitles;
+}
+
+const DEFAULT_TITLES: FeaturedTitles = {
+  featuredPropertiesTitle: 'נכסים באיזור המרכז',
+  featuredPropertiesSubtitle: 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
+};
+
+const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperties, initialTitles }) => {
+  const [properties, setProperties] = useState<Property[]>(initialProperties ?? []);
+  const [loading, setLoading] = useState(initialProperties === undefined);
+  const [titles, setTitles] = useState<FeaturedTitles>(initialTitles ?? DEFAULT_TITLES);
 
   // Fetch featured properties from API
   useEffect(() => {
+    if (initialProperties !== undefined) return;
+
     const fetchFeaturedProperties = async () => {
       try {
         setLoading(true);
-        
-        // Fetch titles
-        const titlesResponse = await fetch('/api/homepage-titles', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
-        });
+
+        const [titlesResponse, response] = await Promise.all([
+          fetch('/api/homepage-titles', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }),
+          fetch('/api/properties?dealType=sale&limit=20', { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }),
+        ]);
+
         if (titlesResponse.ok) {
           const titlesData = await titlesResponse.json();
           setTitles({
@@ -56,15 +68,6 @@ const FeaturedProperties: React.FC = () => {
             featuredPropertiesSubtitle: titlesData.featuredPropertiesSubtitle || 'מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז',
           });
         }
-        
-        // Fetch properties for sale (excluding sold/rented),
-        // then pick up to 3 ones.
-        const response = await fetch('/api/properties?dealType=sale&limit=20', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
-        });
 
         if (!response.ok) {
           throw new Error('Failed to fetch properties');
@@ -120,6 +123,7 @@ const FeaturedProperties: React.FC = () => {
     };
 
     fetchFeaturedProperties();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Show loading state
