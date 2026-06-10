@@ -141,7 +141,9 @@ export async function GET(
       }
     }
 
-    return NextResponse.json({ ...formatted, owners, agents });
+    const response = NextResponse.json({ ...formatted, owners, agents });
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
+    return response;
   } catch (error) {
     console.error('Error fetching property:', error);
     return NextResponse.json(

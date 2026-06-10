@@ -47,6 +47,9 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
                 <img
                   src={image}
                   alt={imageAlt}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                  decoding={index === 0 ? 'sync' : 'async'}
                   className={`object-contain max-h-[85vh] w-auto h-auto ${isSold ? 'grayscale opacity-60' : ''}`}
                 />
                 

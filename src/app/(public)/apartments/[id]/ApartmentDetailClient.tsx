@@ -22,9 +22,10 @@ import {
 interface ApartmentDetailClientProps {
   propertyId: string;
   initialTitle?: string;
+  initialDescription?: string;
 }
 
-export default function ApartmentDetailClient({ propertyId, initialTitle }: ApartmentDetailClientProps) {
+export default function ApartmentDetailClient({ propertyId, initialTitle, initialDescription }: ApartmentDetailClientProps) {
   const { property, loading, error } = usePropertyData(propertyId);
   const [previousId, setPreviousId] = useState<number | null>(null);
   const [nextId, setNextId] = useState<number | null>(null);
@@ -38,22 +39,18 @@ export default function ApartmentDetailClient({ propertyId, initialTitle }: Apar
   };
 
   useEffect(() => {
-    const fetchPropertyIds = async () => {
+    const fetchNeighbors = async () => {
       try {
-        const response = await fetch('/api/properties');
+        const response = await fetch(`/api/properties/${propertyId}/neighbors`);
         if (!response.ok) return;
-        const properties = await response.json();
-        const propertyIds = properties.map((p: { id: number }) => p.id);
-        const currentIndex = propertyIds.indexOf(Number(propertyId));
-        if (currentIndex !== -1) {
-          setPreviousId(currentIndex > 0 ? propertyIds[currentIndex - 1] : null);
-          setNextId(currentIndex < propertyIds.length - 1 ? propertyIds[currentIndex + 1] : null);
-        }
+        const { previousId: prev, nextId: next } = await response.json();
+        setPreviousId(prev);
+        setNextId(next);
       } catch (err) {
-        console.error('Error fetching property IDs:', err);
+        console.error('Error fetching property neighbors:', err);
       }
     };
-    if (propertyId) fetchPropertyIds();
+    if (propertyId) fetchNeighbors();
   }, [propertyId]);
 
   const isSold = property?.isSold || false;
@@ -109,6 +106,12 @@ export default function ApartmentDetailClient({ propertyId, initialTitle }: Apar
           <h1 className="w-full px-6 lg:px-12 text-2xl md:text-3xl font-bold text-[#1c3664] mb-6 text-center md:text-right" dir="rtl">
             {displayTitle}
           </h1>
+        )}
+
+        {!property && initialDescription && (
+          <p className="w-full px-6 lg:px-12 text-gray-700 leading-relaxed mb-6 text-right" dir="rtl">
+            {initialDescription}
+          </p>
         )}
 
         {loading && !property ? (

@@ -99,6 +99,13 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const dealTypeLabel = property.dealType === 'rent' ? 'להשכרה' : 'למכירה';
   const initialTitle = property.title?.trim() ||
     `${property.rooms} חדרים ${dealTypeLabel} ב${property.location}`;
+  const initialDescription = property.description?.trim() || undefined;
 
-  return <ApartmentDetailClient propertyId={id} initialTitle={initialTitle} />;
+  return (
+    <ApartmentDetailClient
+      propertyId={id}
+      initialTitle={initialTitle}
+      initialDescription={initialDescription}
+    />
+  );
 }

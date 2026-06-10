@@ -101,21 +101,6 @@ export function usePropertyData(propertyId: string) {
 
         const data = await response.json();
 
-        // Debug: log all data to see what we're working with
-        console.log('Property data received:', {
-          vacancyDate: data.vacancyDate,
-          floor: data.floor,
-          totalFloors: data.totalFloors,
-          builtArea: data.builtArea,
-          bathrooms: data.bathrooms,
-          propertyType: data.propertyType,
-          parking: data.parking,
-          position: data.position,
-          furniture: data.furniture,
-          kitchen: data.kitchen,
-          directions: data.directions
-        });
-
         // Build specs array with all available data
         const specs: Array<{ label: string; value: string; icon: any }> = [];
 
