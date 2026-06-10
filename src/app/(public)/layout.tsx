@@ -1,7 +1,8 @@
+import React from "react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import SocialSidebar from "@/components/ui/SocialSidebar";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
 import "../(public)/about/about.css";
 
 export default function PublicLayout({
@@ -21,9 +22,9 @@ export default function PublicLayout({
       } as React.CSSProperties}
     >
       <Header />
-      <main 
+      <main
         className="flex-grow bg-warm"
-        style={{ 
+        style={{
           background: '#faf7f2',
           color: '#171717'
         } as React.CSSProperties}
@@ -31,8 +32,8 @@ export default function PublicLayout({
         {children}
       </main>
       <Footer />
-      {/* <SocialSidebar /> */}
       <AccessibilityWidget />
+      <WhatsAppFloatingButton />
     </div>
   );
 }

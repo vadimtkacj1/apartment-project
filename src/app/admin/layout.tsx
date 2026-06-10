@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { SessionProvider } from 'next-auth/react';
 import MainLayout from '@/components/admin/antd/MainLayout';
 import { usePathname } from 'next/navigation';
 import { ConfigProvider } from 'antd';
@@ -14,18 +15,21 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
 
-  // Login page should not show the admin chrome (sidebar/header)
   if (pathname === '/admin/login') {
     return (
-      <ConfigProvider direction="rtl">
-        {children}
-      </ConfigProvider>
+      <SessionProvider>
+        <ConfigProvider direction="rtl">
+          {children}
+        </ConfigProvider>
+      </SessionProvider>
     );
   }
 
   return (
-    <ConfigProvider direction="rtl">
-      <MainLayout>{children}</MainLayout>
-    </ConfigProvider>
+    <SessionProvider>
+      <ConfigProvider direction="rtl">
+        <MainLayout>{children}</MainLayout>
+      </ConfigProvider>
+    </SessionProvider>
   );
 }

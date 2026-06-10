@@ -1,50 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import localFont from "next/font/local";
-import AccessibilityWidget from "@/components/AccessibilityWidget";
-import WhatsAppFloatingButton from "@/components/WhatsAppFloatingButton";
-import Providers from "@/components/Providers";
 import StructuredData from "@/components/SEO/StructuredData";
-import PageLoader from "@/components/ui/PageLoader";
-import AlternatingFavicon from "@/components/AlternatingFavicon";
 import "./globals.css";
 
 const assistant = localFont({
-  src: [
-    {
-      path: '../../public/fonts/static/Assistant-Regular.ttf',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/static/Assistant-Medium.ttf',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/static/Assistant-SemiBold.ttf',
-      weight: '600',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/static/Assistant-Bold.ttf',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: '../../public/fonts/static/Assistant-ExtraBold.ttf',
-      weight: '800',
-      style: 'normal',
-    },
-  ],
-  display: 'swap',
+  src: '../../public/fonts/Assistant-VariableFont_wght.ttf',
+  display: 'optional',
   variable: '--font-assistant',
   fallback: ['Arial', 'Helvetica', 'sans-serif'],
+  weight: '200 800',
+  style: 'normal',
 });
 
 const caramel = localFont({
   src: '../../public/fonts/Carmela-Regular.ttf',
-  display: 'swap',
+  display: 'optional',
   variable: '--font-caramel',
   fallback: ['cursive', 'sans-serif'],
 });
@@ -141,35 +112,22 @@ export default function RootLayout({
         />
         <link
           rel="preload"
+          href="/fonts/Assistant-VariableFont_wght.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
           href="/fonts/Carmela-Regular.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/static/Assistant-Bold.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/static/Assistant-Regular.ttf"
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
         />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
-        <AlternatingFavicon />
-        <PageLoader />
         <StructuredData />
-        <Providers>
-          {children}
-          <AccessibilityWidget />
-          <WhatsAppFloatingButton />
-        </Providers>
+        {children}
       </body>
     </html>
   );

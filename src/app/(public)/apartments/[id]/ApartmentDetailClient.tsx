@@ -1,4 +1,5 @@
 "use client";
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -13,11 +14,18 @@ import {
   PropertyDescription,
   PropertyAmenities,
   PropertySpecs,
-  PropertyMap,
   PriceCard,
   ContactForm,
   PropertyNavigation
 } from '@/components/apartment-detail';
+
+const PropertyMap = dynamic(
+  () => import('@/components/apartment-detail/PropertyMap').then(m => ({ default: m.PropertyMap })),
+  {
+    ssr: false,
+    loading: () => <div className="h-[450px] bg-gray-100 rounded-2xl animate-pulse mb-8" />,
+  }
+);
 
 interface ApartmentDetailClientProps {
   propertyId: string;
