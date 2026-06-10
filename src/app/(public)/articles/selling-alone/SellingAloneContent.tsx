@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
@@ -49,7 +50,7 @@ export default function SellingAloneContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/masterkaspler_A_candid_photograph_of_a_stressed_homeowner_sit_6c1f29f0-7069-4770-a24a-f80d5f110b06_2.png" alt="מכירת דירה" className="article-side-img" />
+                  <Image src="/images/masterkaspler_A_candid_photograph_of_a_stressed_homeowner_sit_6c1f29f0-7069-4770-a24a-f80d5f110b06_2.png" alt="מכירת דירה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
@@ -79,7 +80,7 @@ export default function SellingAloneContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/Gemini_Generated_Image_u7vh7fu7vh7fu7vh - Edited.png" alt="תיווך נדל״ן" className="article-side-img" />
+                  <Image src="/images/Gemini_Generated_Image_u7vh7fu7vh7fu7vh - Edited.png" alt="תיווך נדל״ן" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
@@ -103,7 +104,7 @@ export default function SellingAloneContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/masterkaspler_Macro_photography_of_a_rough_unpolished_dirty_d_9ea3dc86-3e2d-4f5c-81f0-19cc7083f257_2.png" alt="ייעוץ מקצועי" className="article-side-img" />
+                  <Image src="/images/masterkaspler_Macro_photography_of_a_rough_unpolished_dirty_d_9ea3dc86-3e2d-4f5c-81f0-19cc7083f257_2.png" alt="ייעוץ מקצועי" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
@@ -120,7 +121,7 @@ export default function SellingAloneContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png" alt="מכירת נכס" className="article-side-img" />
+                  <Image src="/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png" alt="מכירת נכס" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>

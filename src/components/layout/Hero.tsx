@@ -53,80 +53,45 @@ const Hero: React.FC = () => {
   const [videoError, setVideoError] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Force video play
+  // Defer video loading until after page load + browser idle.
+  // This keeps the video out of the critical path so LCP (poster JPEG) isn't delayed.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    let destroyed = false;
 
-    let attempts = 0;
-    const maxAttempts = 5;
-    let isPlaying = false;
-    let isTryingToPlay = false;
+    const tryPlay = () => {
+      if (destroyed) return;
+      video.muted = true;
+      video.play()
+        .then(() => { if (!destroyed) setVideoLoaded(true); })
+        .catch(() => { if (!destroyed) setVideoError(true); });
+    };
 
-    const tryPlay = async () => {
-      // Prevent multiple simultaneous play attempts
-      if (isTryingToPlay || isPlaying) {
-        return;
-      }
+    const loadVideo = () => {
+      if (destroyed) return;
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      video.src = isMobile ? '/hero-mobile.mp4' : '/hero.mp4';
+      video.load();
+      video.addEventListener('canplaythrough', tryPlay, { once: true });
+      video.addEventListener('error', () => { if (!destroyed) setVideoError(true); }, { once: true });
+    };
 
-      isTryingToPlay = true;
-
-      try {
-        video.muted = true;
-        video.playsInline = true;
-        video.setAttribute('playsinline', 'true');
-        video.setAttribute('webkit-playsinline', 'true');
-        video.setAttribute('x-webkit-airplay', 'allow');
-        video.setAttribute('x5-playsinline', 'true');
-        await video.play();
-        setVideoLoaded(true);
-        isPlaying = true;
-        isTryingToPlay = false;
-      } catch (err) {
-        attempts++;
-        isTryingToPlay = false;
-
-        if (attempts < maxAttempts && !isPlaying) {
-          setTimeout(tryPlay, 500 * attempts);
-        } else {
-          setVideoError(true);
-        }
+    const schedule = () => {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(loadVideo, { timeout: 2500 });
+      } else {
+        setTimeout(loadVideo, 1000);
       }
     };
 
-    const handlePlaying = () => {
-      setVideoLoaded(true);
-      isPlaying = true;
-    };
+    if (document.readyState === 'complete') {
+      schedule();
+    } else {
+      window.addEventListener('load', schedule, { once: true });
+    }
 
-    const handleError = () => {
-      setVideoError(true);
-    };
-
-    const handleVisibility = () => {
-      if (!document.hidden && video.paused && !isTryingToPlay) {
-        tryPlay();
-      }
-    };
-
-    // Add event listeners
-    video.addEventListener('playing', handlePlaying);
-    video.addEventListener('error', handleError);
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    // Single play attempt
-    const timeoutId = setTimeout(() => {
-      if (!videoLoaded && !videoError && !isPlaying) {
-        tryPlay();
-      }
-    }, 500);
-
-    return () => {
-      video.removeEventListener('playing', handlePlaying);
-      video.removeEventListener('error', handleError);
-      document.removeEventListener('visibilitychange', handleVisibility);
-      clearTimeout(timeoutId);
-    };
+    return () => { destroyed = true; };
   }, []);
 
   return (
@@ -220,15 +185,11 @@ const Hero: React.FC = () => {
         <video
           ref={videoRef}
           className="hero-video"
-          autoPlay
           loop
           muted
           playsInline
-          preload="metadata"
+          preload="none"
           poster="/hero-poster.jpg"
-          webkit-playsinline="true"
-          x5-playsinline="true"
-          x-webkit-airplay="allow"
           style={{
             width: '100%',
             height: '100%',
@@ -237,10 +198,7 @@ const Hero: React.FC = () => {
             opacity: videoLoaded ? 1 : 0,
             transition: 'opacity 0.5s ease',
           }}
-        >
-          <source src="/hero-mobile.mp4" media="(max-width: 767px)" type="video/mp4" />
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
+        />
       </div>
 
       {/* ── Content ── */}

@@ -126,6 +126,8 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   }, [filters.dealType]);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProperties = async () => {
       try {
         setLoading(true);
@@ -208,10 +210,7 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         if (appliedFilters.features?.hasShelter) params.append('hasShelter', 'true');
 
         const response = await fetch(`/api/properties?${params.toString()}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
-          }
+          signal: controller.signal,
         });
         if (!response.ok) throw new Error('Failed');
         const data = await response.json();
@@ -233,12 +232,14 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
         setProperties(sortedProperties);
         setVisibleCount(ITEMS_PER_PAGE);
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
         setProperties([]);
       } finally {
         setLoading(false);
       }
     };
     fetchProperties();
+    return () => controller.abort();
   }, [appliedFilters, selectedCategory]);
 
   const currentProperties = useMemo(() => {

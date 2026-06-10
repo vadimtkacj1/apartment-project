@@ -52,30 +52,20 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         setLoading(true);
         setError(null);
 
-        // Fetch title (non-blocking - if it fails, just use default)
-        try {
-          const titlesResponse = await fetch('/api/homepage-titles', {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache'
-            }
-          });
-          if (titlesResponse.ok) {
-            const titlesData = await titlesResponse.json();
-            if (titlesData.noCommissionTitle) {
-              setTitle(titlesData.noCommissionTitle);
-            }
-          }
-        } catch (titleError) {
-          console.warn('Could not load custom title, using default:', titleError);
-        }
+        // Fetch title and property in parallel
+        const [titlesResponse, response] = await Promise.all([
+          fetch('/api/homepage-titles').catch(() => null),
+          fetch('/api/properties?noCommission=true&limit=1'),
+        ]);
 
-        const response = await fetch('/api/properties?noCommission=true&limit=1', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache'
+        if (titlesResponse?.ok) {
+          try {
+            const titlesData = await titlesResponse.json();
+            if (titlesData.noCommissionTitle) setTitle(titlesData.noCommissionTitle);
+          } catch {
+            // use default title
           }
-        });
+        }
 
         if (!response.ok) {
           throw new Error('שגיאה בטעינת הנכסים');

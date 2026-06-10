@@ -41,7 +41,7 @@ const SkewedSlider: React.FC = () => {
         heading: 'מומחיות מקומית',
         description: 'היכרות עמוקה עם השוק המקומי בחולון ובת ים'
       },
-      rightImage: '/images/hero/aboutus.png'
+      rightImage: '/images/hero/aboutus.webp'
     },
     {
       id: 3,
@@ -57,7 +57,7 @@ const SkewedSlider: React.FC = () => {
         heading: 'ניסיון של 24+ שנים',
         description: 'מאות עסקאות מוצלחות ולקוחות מרוצים'
       },
-      rightImage: '/images/hero/rent.png'
+      rightImage: '/images/hero/rent.webp'
     },
     {
       id: 5,

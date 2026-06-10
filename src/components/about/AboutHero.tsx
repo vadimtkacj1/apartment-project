@@ -18,12 +18,12 @@ export default function AboutHero() {
     >
       <div className="hero-background">
         <Image
-          src="/images/hero/aboutus.png"
+          src="/images/hero/aboutus.webp"
           alt="Our Team"
           fill
           className="hero-bg-image"
           priority
-          quality={90}
+          quality={80}
         />
       </div>
 

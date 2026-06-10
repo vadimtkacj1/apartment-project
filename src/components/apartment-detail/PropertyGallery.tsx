@@ -43,14 +43,15 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
         {images.map((image: string, index: number) => (
           <SwiperSlide key={index}>
             <div className="relative w-full h-full flex items-center justify-center bg-black/5">
-              <div className="relative max-h-full max-w-full flex items-center justify-center">
-                <img
+              <div className="relative w-full h-full">
+                <Image
                   src={image}
                   alt={imageAlt}
+                  fill
+                  priority={index === 0}
                   loading={index === 0 ? 'eager' : 'lazy'}
-                  fetchPriority={index === 0 ? 'high' : 'low'}
-                  decoding={index === 0 ? 'sync' : 'async'}
-                  className={`object-contain max-h-[85vh] w-auto h-auto ${isSold ? 'grayscale opacity-60' : ''}`}
+                  sizes="100vw"
+                  className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`}
                 />
                 
                 <div 

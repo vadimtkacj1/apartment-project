@@ -108,11 +108,17 @@ export async function GET(
         return true;
       });
 
-      // Fetch owners (for contact form "call directly"), preserve order from agentIds
-      if (dedupedOwnerIds.length > 0) {
-        const ownerRecords = await prisma.owner.findMany({
-          where: { id: { in: dedupedOwnerIds }, isActive: true },
-        });
+      // Fetch owners and team members in parallel
+      const [ownerRecords, teamMembers] = await Promise.all([
+        dedupedOwnerIds.length > 0
+          ? prisma.owner.findMany({ where: { id: { in: dedupedOwnerIds }, isActive: true } })
+          : Promise.resolve([]),
+        dedupedTeamIds.length > 0
+          ? prisma.teamMember.findMany({ where: { id: { in: dedupedTeamIds }, isActive: true } })
+          : Promise.resolve([]),
+      ]);
+
+      if (ownerRecords.length > 0) {
         const ownerMap = new Map(ownerRecords.map((o) => [o.id, o]));
         owners = dedupedOwnerIds
           .map((id) => ownerMap.get(id))
@@ -126,11 +132,7 @@ export async function GET(
           }));
       }
 
-      // Fetch team members (for PropertyAgentBlock)
-      if (dedupedTeamIds.length > 0) {
-        const teamMembers = await prisma.teamMember.findMany({
-          where: { id: { in: dedupedTeamIds }, isActive: true },
-        });
+      if (teamMembers.length > 0) {
         agents = teamMembers.map((t) => ({
           id: t.id,
           name: t.name,

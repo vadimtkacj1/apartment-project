@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
@@ -57,7 +58,7 @@ export default function ForeignInvestorsContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/LuxuryLiving.jpg" alt="נדל״ן בישראל" className="article-side-img" />
+                  <Image src="/images/LuxuryLiving.jpg" alt="נדל״ן בישראל" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
@@ -95,7 +96,7 @@ export default function ForeignInvestorsContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/minimalist-tel-aviv-apartment.jpg" alt="ניהול נכסים" className="article-side-img" />
+                  <Image src="/images/minimalist-tel-aviv-apartment.jpg" alt="ניהול נכסים" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
@@ -130,7 +131,7 @@ export default function ForeignInvestorsContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <img src="/images/360_F_651602712_C8pj3T2vA73H0oyL1tSF9pvU6ginjecp.jpg" alt="שירותי נדל״ן" className="article-side-img" />
+                  <Image src="/images/360_F_651602712_C8pj3T2vA73H0oyL1tSF9pvU6ginjecp.jpg" alt="שירותי נדל״ן" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>
