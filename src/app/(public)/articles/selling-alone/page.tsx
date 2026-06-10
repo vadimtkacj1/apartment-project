@@ -25,6 +25,7 @@ const articleSchema = {
   description: 'למה מכירה עצמאית של דירה עלולה לעלות ביוקר, ואיך מתווך מנוסה משיג תוצאות טובות יותר.',
   url: `${siteUrl}/articles/selling-alone`,
   datePublished: '2026-01-14',
+  dateModified: '2026-06-11',
   inLanguage: 'he',
   author: {
     '@type': 'Organization',

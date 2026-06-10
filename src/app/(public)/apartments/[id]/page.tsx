@@ -29,6 +29,7 @@ const getProperty = cache(async (id: string) => {
         images: true,
         isSold: true,
         city: true,
+        updatedAt: true,
       },
     });
   } catch {
@@ -101,11 +102,54 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     `${property.rooms} חדרים ${dealTypeLabel} ב${property.location}`;
   const initialDescription = property.description?.trim() || undefined;
 
+  const images = JSON.parse(property.images || '[]') as string[];
+  const firstImage = images[0];
+  const ogImage = firstImage
+    ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
+    : `${siteUrl}/images/hero/main-hero.jpg`;
+
+  const priceValidUntil = new Date(property.updatedAt);
+  priceValidUntil.setDate(priceValidUntil.getDate() + (property.dealType === 'rent' ? 30 : 90));
+  const numericPrice = property.price != null
+    ? parseFloat(String(property.price).replace(/[^\d.]/g, ''))
+    : NaN;
+
+  const apartmentSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Apartment',
+    name: initialTitle,
+    ...(property.description && { description: property.description.slice(0, 300) }),
+    url: `${siteUrl}/apartments/${id}`,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: property.city || property.location,
+      addressCountry: 'IL',
+    },
+    ...(property.rooms && { numberOfRooms: property.rooms }),
+    ...(property.area && { floorSize: { '@type': 'QuantitativeValue', value: property.area, unitCode: 'MTK' } }),
+    image: ogImage,
+    offers: {
+      '@type': 'Offer',
+      ...(!isNaN(numericPrice) && { price: numericPrice }),
+      priceCurrency: 'ILS',
+      availability: property.isSold
+        ? 'https://schema.org/SoldOut'
+        : 'https://schema.org/InStock',
+      priceValidUntil: priceValidUntil.toISOString().split('T')[0],
+    },
+  };
+
   return (
-    <ApartmentDetailClient
-      propertyId={id}
-      initialTitle={initialTitle}
-      initialDescription={initialDescription}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(apartmentSchema) }}
+      />
+      <ApartmentDetailClient
+        propertyId={id}
+        initialTitle={initialTitle}
+        initialDescription={initialDescription}
+      />
+    </>
   );
 }

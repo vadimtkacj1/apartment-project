@@ -35,8 +35,6 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Track contact form submission
     analytics.trackContactForm(propertyId);
   };
 

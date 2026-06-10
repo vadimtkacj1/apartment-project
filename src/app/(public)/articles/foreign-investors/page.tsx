@@ -25,6 +25,7 @@ const articleSchema = {
   description: 'מדריך מקיף לרכישת דירה בישראל מרחוק עבור תושבי חוץ ומשקיעים זרים.',
   url: `${siteUrl}/articles/foreign-investors`,
   datePublished: '2026-01-15',
+  dateModified: '2026-06-11',
   inLanguage: 'he',
   author: {
     '@type': 'Organization',

@@ -161,25 +161,41 @@ const Hero: React.FC = () => {
       {/* ── Video ── */}
       <div className="hero-video-wrap">
         {!videoLoaded && !videoError && (
-          <div
-            style={{
+          <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+            {/* Real <img> so the browser counts this as the LCP element */}
+            <img
+              src="/hero-poster.jpg"
+              alt=""
+              aria-hidden="true"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore — fetchpriority is a valid HTML attribute
+              fetchpriority="high"
+              decoding="sync"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                display: 'block',
+              }}
+            />
+            <div style={{
               position: 'absolute',
               inset: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: `url('/hero-poster.jpg') center/cover`,
-              zIndex: 1,
-            }}
-          >
-            <div style={{
-              width: '50px',
-              height: '50px',
-              border: '4px solid rgba(255,255,255,0.3)',
-              borderTopColor: 'white',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }} />
+            }}>
+              <div style={{
+                width: '50px',
+                height: '50px',
+                border: '4px solid rgba(255,255,255,0.3)',
+                borderTopColor: 'white',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }} />
+            </div>
           </div>
         )}
         <video
