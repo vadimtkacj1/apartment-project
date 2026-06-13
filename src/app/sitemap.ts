@@ -8,101 +8,91 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static routes - optimized priorities based on SEO best practices
   // Priority scale: 1.0 (highest) to 0.1 (lowest)
-  // Higher priority = more important pages that change frequently
+  // No lastModified on static routes: stamping them with the current date on
+  // every request teaches Google to distrust the sitemap's lastmod values.
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0, // Homepage - highest priority
     },
     {
       url: `${baseUrl}/apartments`,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
+      // Indexable landing page: self-canonical with its own title/description
       url: `${baseUrl}/apartments?dealType=sale`,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
+      // Indexable landing page: self-canonical with its own title/description
       url: `${baseUrl}/apartments?dealType=rent`,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // About page changes less frequently
       priority: 0.8, // Important but static content
     },
     {
       url: `${baseUrl}/buying-apartment`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // Service page - occasional updates
       priority: 0.8, // High priority service page
     },
     {
       url: `${baseUrl}/selling-apartment`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // Service page - occasional updates
       priority: 0.8, // High priority service page
     },
     {
       url: `${baseUrl}/articles`,
-      lastModified: new Date(),
       changeFrequency: 'weekly', // Articles section may have new content
       priority: 0.7, // Content section - medium-high priority
     },
     {
       url: `${baseUrl}/articles/foreign-investors`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // Individual article - less frequent updates
       priority: 0.6, // Article page - medium priority
     },
     {
       url: `${baseUrl}/articles/selling-alone`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // Individual article - less frequent updates
       priority: 0.6, // Article page - medium priority
     },
     {
       url: `${baseUrl}/faq`,
-      lastModified: new Date(),
       changeFrequency: 'monthly', // FAQ may be updated occasionally
       priority: 0.5, // Support page - medium priority
     },
     {
       url: `${baseUrl}/links`,
-      lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.4,
     },
     {
       url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.2,
     },
     {
       url: `${baseUrl}/accessibility`,
-      lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.2,
     },
   ];
 
   try {
-    // Fetch all active properties from database
-    // Note: The size of the sitemap depends on the number of active properties in the database
-    // Each property will generate a separate URL in the sitemap
+    // Active, still-available properties only. Sold/rented listings stay live
+    // but are not promoted in the sitemap — to Google's crawl scheduler they
+    // read as low-value pages and drag down the rest of the queue.
     const properties = await prisma.property.findMany({
       where: {
         isActive: true,
+        isSold: false,
       },
       select: {
         id: true,

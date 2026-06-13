@@ -63,8 +63,11 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
                   }}
                 >
                   <img
-                    src="/watermark.svg"
+                    src="/watermark.webp"
                     alt="Logo"
+                    width={512}
+                    height={267}
+                    loading="lazy"
                     className="w-full h-auto drop-shadow-2xl"
                   />
                 </div>

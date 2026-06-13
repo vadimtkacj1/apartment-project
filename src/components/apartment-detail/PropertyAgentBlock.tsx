@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { analytics } from "@/lib/analytics";
@@ -57,9 +58,11 @@ export function PropertyAgentBlock({
             >
               <div className="flex items-center gap-3 text-gray-900 font-semibold">
                 {agent.image && (
-                  <img
+                  <Image
                     src={agent.image}
                     alt={agent.name}
+                    width={80}
+                    height={96}
                     className="w-20 h-24 rounded-2xl object-cover shadow-md"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />

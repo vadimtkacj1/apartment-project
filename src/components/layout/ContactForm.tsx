@@ -1,18 +1,20 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
 import dynamic from 'next/dynamic';
 
+const MapPlaceholder = () => (
+  <div style={{ height: '100%', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <span>טוען מפה...</span>
+  </div>
+);
+
 // Dynamically import ContactMap with SSR disabled
 const ContactMap = dynamic(() => import('./ContactMap'), {
   ssr: false,
-  loading: () => (
-    <div style={{ height: '100%', background: '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <span>טוען מפה...</span>
-    </div>
-  )
+  loading: MapPlaceholder,
 });
 
 interface Owner {
@@ -45,6 +47,12 @@ const ContactForm: React.FC = () => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Mount the Google Map only when the section approaches the viewport — the
+  // Maps API is ~190KB of JS and was loading (and executing) on initial page
+  // load even though the map sits at the bottom of the page.
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapNearViewport = useInView(mapContainerRef, { once: true, margin: '600px 0px' });
 
   useEffect(() => {
     fetchContactInfo();
@@ -128,6 +136,7 @@ const ContactForm: React.FC = () => {
           <div className="flex flex-col space-y-6 md:space-y-8 lg:order-1">
             {/* Map */}
             <motion.div
+              ref={mapContainerRef}
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -135,12 +144,16 @@ const ContactForm: React.FC = () => {
               className="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-200 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
               style={{ isolation: 'isolate' }}
             >
-              <ContactMap
-                latitude={mapLatitude}
-                longitude={mapLongitude}
-                address={address}
-                city={city}
-              />
+              {mapNearViewport ? (
+                <ContactMap
+                  latitude={mapLatitude}
+                  longitude={mapLongitude}
+                  address={address}
+                  city={city}
+                />
+              ) : (
+                <MapPlaceholder />
+              )}
             </motion.div>
 
             {/* Contact Info Cards */}

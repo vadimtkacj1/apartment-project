@@ -1,102 +1,19 @@
-'use client';
-
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import HeroMedia from './HeroMedia';
 
-function useTypewriter(text: string, startDelay = 0, charDelay = 38) {
-  const [displayed, setDisplayed] = useState('');
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout>;
-    let interval: ReturnType<typeof setInterval>;
-    let i = 0;
-
-    timeout = setTimeout(() => {
-      interval = setInterval(() => {
-        i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) {
-          clearInterval(interval);
-          setDone(true);
-        }
-      }, charDelay);
-    }, startDelay);
-
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
-    };
-  }, [text, startDelay, charDelay]);
-
-  return { displayed, done };
-}
-
+/**
+ * Server component: the headline text ships in the initial HTML so LCP fires
+ * at first paint instead of after hydration. The typewriter look is recreated
+ * with CSS steps() clip-path reveals — zero JS, no per-keystroke re-layouts.
+ */
 const Hero: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-
   const line1 = 'רם נכסים';
   const line2 = 'חיים ענבי';
 
-  const line1StartDelay = 400;
-  const line1Duration = line1.length * 55;
-  const line2StartDelay = line1StartDelay + line1Duration + 200;
-
-  const { displayed: text1, done: done1 } = useTypewriter(line1, line1StartDelay, 55);
-  const { displayed: text2, done: done2 } = useTypewriter(line2, line2StartDelay, 55);
-
-  const showRest = done2;
-
-  const [videoError, setVideoError] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-
-  // Defer video loading until after page load + browser idle.
-  // This keeps the video out of the critical path so LCP (poster JPEG) isn't delayed.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    let destroyed = false;
-
-    const tryPlay = () => {
-      if (destroyed) return;
-      video.muted = true;
-      video.play()
-        .then(() => { if (!destroyed) setVideoLoaded(true); })
-        .catch(() => { if (!destroyed) setVideoError(true); });
-    };
-
-    const loadVideo = () => {
-      if (destroyed) return;
-      const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      video.src = isMobile ? '/hero-mobile.mp4' : '/hero.mp4';
-      video.load();
-      video.addEventListener('canplaythrough', tryPlay, { once: true });
-      video.addEventListener('error', () => { if (!destroyed) setVideoError(true); }, { once: true });
-    };
-
-    const schedule = () => {
-      if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(loadVideo, { timeout: 2500 });
-      } else {
-        setTimeout(loadVideo, 1000);
-      }
-    };
-
-    if (document.readyState === 'complete') {
-      schedule();
-    } else {
-      window.addEventListener('load', schedule, { once: true });
-    }
-
-    return () => { destroyed = true; };
-  }, []);
-
   return (
     <section
-      ref={sectionRef}
       dir="rtl"
       className="relative w-full overflow-hidden"
       style={{ height: '100dvh', maxWidth: '100vw' }}
@@ -122,6 +39,38 @@ const Hero: React.FC = () => {
         .hero-video[poster] {
           background: transparent;
         }
+        /* RTL typewriter: reveal right-to-left in discrete steps.
+           Negative outsets keep the text-shadow from being clipped. */
+        @keyframes typeReveal {
+          from { clip-path: inset(-40px -40px -40px 100%); }
+          to   { clip-path: inset(-40px -40px -40px -40px); }
+        }
+        .type-line1 {
+          animation: typeReveal 0.45s steps(8, end) 0.35s both;
+        }
+        .type-line2 {
+          animation: typeReveal 0.45s steps(8, end) 0.95s both;
+        }
+        @keyframes ampPop {
+          from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
+          to   { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .amp-pop {
+          animation: ampPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.85s both;
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: none; }
+        }
+        .hero-fade-1 { animation: fadeUp 0.7s ease-out 1.55s both; }
+        .hero-fade-2 { animation: fadeUp 0.7s ease-out 1.75s both; }
+        @keyframes cursorBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+        @keyframes cursorHide {
+          to { opacity: 0; visibility: hidden; }
+        }
         .cursor {
           display: inline-block;
           width: 3px;
@@ -130,6 +79,16 @@ const Hero: React.FC = () => {
           margin-right: 4px;
           vertical-align: middle;
           border-radius: 1px;
+          opacity: 0;
+          animation:
+            cursorBlink 0.7s step-end 1.4s 2,
+            cursorHide 0.01s linear 2.8s forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .type-line1, .type-line2, .amp-pop, .hero-fade-1, .hero-fade-2 {
+            animation: none;
+          }
+          .cursor { animation: none; opacity: 0; }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
@@ -153,69 +112,18 @@ const Hero: React.FC = () => {
           border-color: rgba(255,255,255,0.7) !important;
           box-shadow: 0 0 24px rgba(255,255,255,0.12);
         }
+        .btn-lift {
+          transition: transform 0.25s ease;
+        }
+        .btn-lift:hover { transform: translateY(-3px) scale(1.02); }
+        .btn-lift:active { transform: scale(0.97); }
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
       `}</style>
 
-      {/* ── Video ── */}
-      <div className="hero-video-wrap">
-        {!videoLoaded && !videoError && (
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-            {/* Real <img> so the browser counts this as the LCP element */}
-            <img
-              src="/hero-poster.jpg"
-              alt=""
-              aria-hidden="true"
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore — fetchpriority is a valid HTML attribute
-              fetchpriority="high"
-              decoding="sync"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <div style={{
-                width: '50px',
-                height: '50px',
-                border: '4px solid rgba(255,255,255,0.3)',
-                borderTopColor: 'white',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }} />
-            </div>
-          </div>
-        )}
-        <video
-          ref={videoRef}
-          className="hero-video"
-          loop
-          muted
-          playsInline
-          preload="none"
-          poster="/hero-poster.jpg"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            opacity: videoLoaded ? 1 : 0,
-            transition: 'opacity 0.5s ease',
-          }}
-        />
-      </div>
+      {/* ── Video / poster ── */}
+      <HeroMedia />
 
       {/* ── Content ── */}
       <div
@@ -244,15 +152,11 @@ const Hero: React.FC = () => {
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
-              {text1}
-              {!done1 && <span className="cursor" />}
+              <span className="type-line1 inline-block">{line1}</span>
             </h1>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.3, rotate: -20 }}
-              animate={done1 ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0.3, rotate: -20 }}
-              transition={{ type: 'spring', stiffness: 120, damping: 12 }}
-              className="relative shrink-0"
+            <span
+              className="amp-pop relative shrink-0 inline-block"
               style={{ width: 'clamp(1.6rem, 5vw, 4.5rem)', height: 'clamp(1.6rem, 5vw, 4.5rem)' }}
             >
               <Image
@@ -263,7 +167,7 @@ const Hero: React.FC = () => {
                 style={{ filter: 'brightness(0) invert(1)' }}
                 priority
               />
-            </motion.div>
+            </span>
 
             <h1
               className="font-black text-white leading-none"
@@ -274,34 +178,22 @@ const Hero: React.FC = () => {
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
-              {text2}
-              {!done2 && text2.length > 0 && <span className="cursor" />}
+              <span className="type-line2 inline-block">{line2}</span>
+              <span className="cursor" />
             </h1>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="text-white/75 font-medium max-w-2xl leading-relaxed text-center md:text-start"
+          <p
+            className="hero-fade-1 text-white/75 font-medium max-w-2xl leading-relaxed text-center md:text-start"
             style={{ fontSize: 'clamp(0.82rem, 1.5vw, 1.2rem)' }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
-          </motion.p>
+          </p>
         </div>
 
         {/* BOTTOM: CTA buttons */}
-        <motion.div
-          className="flex flex-col gap-4 items-center md:items-start w-full"
-          initial={{ opacity: 0, y: 30 }}
-          animate={showRest ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
-        >
-          <motion.div
-            whileHover={{ scale: 1.02, y: -3 }}
-            whileTap={{ scale: 0.97 }}
-            className="w-[70%] sm:w-[55%] md:w-auto"
-          >
+        <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
+          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
               href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
@@ -331,13 +223,9 @@ const Hero: React.FC = () => {
                 </svg>
               </span>
             </Link>
-          </motion.div>
+          </div>
 
-          <motion.div
-            whileHover={{ scale: 1.02, y: -3 }}
-            whileTap={{ scale: 0.97 }}
-            className="w-[70%] sm:w-[55%] md:w-auto"
-          >
+          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
               href="/apartments?dealType=sale"
               className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
@@ -364,8 +252,8 @@ const Hero: React.FC = () => {
                 </svg>
               </span>
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
       </div>
     </section>

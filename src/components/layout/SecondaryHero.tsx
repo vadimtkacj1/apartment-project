@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface SecondaryHeroProps {
   img: string;
@@ -16,16 +17,18 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
       <div
         className="relative w-full overflow-hidden flex items-center min-h-[30vh] md:min-h-[40vh] pt-[70px]"
       >
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 w-full h-full"
-          style={{
-            backgroundImage: `url(${img})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
+        {/* Background Image — next/image so it's resized/AVIF'd and, as the
+            LCP element of these pages, fetched with high priority */}
+        <div className="absolute inset-0 w-full h-full">
+          <Image
+            src={img}
+            alt=""
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            className="object-cover object-center"
+          />
           {/* Dark overlay */}
           <div className="absolute inset-0 bg-black/40" />
         </div>

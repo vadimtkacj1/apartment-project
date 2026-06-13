@@ -1,8 +1,26 @@
 import type { Metadata } from 'next';
 import ApartmentsPageClient from '@/components/pages/ApartmentsPageClient';
-import { DealType } from '@/types/property.types';
+import { DealType, City } from '@/types/property.types';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import { prisma } from '@/lib/prisma';
+import { ISRAELI_CITIES } from '@/data/cities';
+
+function parseImages(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const arr = JSON.parse(value);
+    return Array.isArray(arr) ? arr : [];
+  } catch {
+    return [];
+  }
+}
+
+// category has priority over dealType when they disagree (mirrors /api/properties)
+function resolveDealType(dealType: string, category?: string | null): string {
+  if (category === 'rentals' || category === 'commercial') return 'rent';
+  if (category === 'sales' || category === 'land') return 'sale';
+  return dealType;
+}
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -10,47 +28,106 @@ interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+const listingOgImage = {
+  url: `${siteUrl}/images/hero/main-hero.jpg`,
+  width: 1200,
+  height: 630,
+  alt: 'דירות למכירה ולהשכרה בחולון',
+};
+
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const params = await searchParams;
   const dealType = params.dealType as string | undefined;
 
   if (dealType === 'rent') {
+    const title = 'דירות להשכרה בחולון';
+    const description = 'מאגר דירות להשכרה בחולון, בת ים וראשון לציון. מגוון נכסים להשכרה — 2, 3, 4 חדרים ויותר. ליווי מקצועי מהחיפוש ועד חתימת החוזה.';
     return {
-      title: 'דירות להשכרה בחולון',
-      description: 'מאגר דירות להשכרה בחולון, בת ים וראשון לציון. מגוון נכסים להשכרה — 2, 3, 4 חדרים ויותר. ליווי מקצועי מהחיפוש ועד חתימת החוזה.',
+      title,
+      description,
+      keywords: ['דירות להשכרה בחולון', 'השכרת דירה חולון', 'דירות להשכרה בת ים', 'נדל״ן חולון'],
       alternates: { canonical: `${siteUrl}/apartments?dealType=rent` },
-      openGraph: { url: `${siteUrl}/apartments?dealType=rent` },
+      openGraph: { title, description, url: `${siteUrl}/apartments?dealType=rent`, images: [listingOgImage] },
+      twitter: { card: 'summary_large_image', title, description, images: [listingOgImage.url] },
     };
   }
 
   if (dealType === 'sale') {
+    const title = 'דירות למכירה בחולון';
+    const description = 'מאגר דירות למכירה בחולון, בת ים וראשון לציון. תמחור מדויק וליווי מלא עד סגירת העסקה.';
     return {
-      title: 'דירות למכירה בחולון',
-      description: 'מאגר דירות למכירה בחולון, בת ים וראשון לציון. תמחור מדויק וליווי מלא עד סגירת העסקה.',
+      title,
+      description,
+      keywords: ['דירות למכירה בחולון', 'נכסים למכירה חולון', 'דירות למכירה בת ים', 'נדל״ן חולון'],
       alternates: { canonical: `${siteUrl}/apartments?dealType=sale` },
-      openGraph: { url: `${siteUrl}/apartments?dealType=sale` },
+      openGraph: { title, description, url: `${siteUrl}/apartments?dealType=sale`, images: [listingOgImage] },
+      twitter: { card: 'summary_large_image', title, description, images: [listingOgImage.url] },
     };
   }
 
+  const title = 'דירות למכירה ולהשכרה בחולון';
+  const description = 'מאגר מלא של דירות למכירה ולהשכרה בחולון, בת ים וראשון לציון. סינון לפי מחיר, גודל, קומה ועוד. ליווי מקצועי בכל שלבי העסקה.';
   return {
-    title: 'דירות למכירה ולהשכרה בחולון',
-    description: 'מאגר מלא של דירות למכירה ולהשכרה בחולון, בת ים וראשון לציון. סינון לפי מחיר, גודל, קומה ועוד. ליווי מקצועי בכל שלבי העסקה.',
+    title,
+    description,
+    keywords: ['דירות למכירה בחולון', 'דירות להשכרה בחולון', 'נכסים למכירה חולון', 'נדל״ן חולון', 'דירות בחולון', 'נכסים להשקעה חולון', 'דירות בת ים'],
     alternates: { canonical: `${siteUrl}/apartments` },
-    openGraph: { url: `${siteUrl}/apartments` },
+    openGraph: { title, description, url: `${siteUrl}/apartments`, images: [listingOgImage] },
+    twitter: { card: 'summary_large_image', title, description, images: [listingOgImage.url] },
   };
 }
 
 export default async function ApartmentsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const dealType = params.dealType as DealType | undefined;
+  const cityParam = typeof params.city === 'string' ? params.city : undefined;
+  const city = cityParam && ISRAELI_CITIES.some((c) => c.value === cityParam) ? cityParam : undefined;
 
-  // Fetch active properties server-side so Google can crawl links to individual pages
-  const activeProperties = await prisma.property.findMany({
-    where: { isActive: true },
-    select: { id: true, title: true, location: true, rooms: true, dealType: true },
-    orderBy: { updatedAt: 'desc' },
-    take: 100,
+  // Fetch the initial listing server-side: the first paint shows property cards
+  // without waiting for hydration + a client /api/properties round-trip, and
+  // Google can crawl links to individual pages.
+  const where: Record<string, unknown> = { isActive: true };
+  if (dealType === 'sale' || dealType === 'rent') where.dealType = dealType;
+  if (city) where.city = city;
+
+  const rows = await prisma.property.findMany({
+    where,
+    select: {
+      id: true, title: true, location: true, price: true, rooms: true,
+      bathrooms: true, area: true, status: true, category: true,
+      dealType: true, city: true, images: true, isSold: true,
+    },
+    orderBy: { createdAt: 'desc' },
   });
+
+  // Same shape ApartmentsPageClient builds from the API response
+  const initialProperties = rows.map((p) => {
+    const resolvedDealType = resolveDealType(p.dealType, p.category) as DealType;
+    return {
+      id: p.id,
+      title: p.title,
+      location: p.location,
+      price: p.price,
+      bedrooms: p.rooms,
+      bathrooms: p.bathrooms,
+      area: p.area,
+      status: p.status ?? undefined,
+      category: p.category || (resolvedDealType === 'sale' ? 'sales' : 'rentals'),
+      dealType: resolvedDealType,
+      city: (p.city ?? undefined) as City | undefined,
+      image: parseImages(p.images)[0] || '/images/hero/sales.jpg',
+      isSold: Boolean(p.isSold),
+    };
+  });
+
+  // Query string these filters would produce client-side — the client skips
+  // its first fetch when its own filter state serializes to the same string.
+  const keyParams = new URLSearchParams();
+  if (dealType === 'sale' || dealType === 'rent') keyParams.append('dealType', dealType);
+  if (city) keyParams.append('city', city);
+  const initialFilterKey = keyParams.toString();
+
+  const activeProperties = initialProperties;
 
   return (
     <>
@@ -66,14 +143,19 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
         <nav aria-label="רשימת נכסים">
           {activeProperties.map((p) => {
             const label = p.title?.trim() ||
-              `${p.rooms} חדרים ${p.dealType === 'rent' ? 'להשכרה' : 'למכירה'} ב${p.location}`;
+              `${p.bedrooms} חדרים ${p.dealType === 'rent' ? 'להשכרה' : 'למכירה'} ב${p.location}`;
             return (
               <a key={p.id} href={`/apartments/${p.id}`}>{label}</a>
             );
           })}
         </nav>
       </div>
-      <ApartmentsPageClient initialDealType={dealType} />
+      <ApartmentsPageClient
+        initialDealType={dealType}
+        initialCity={city as City | undefined}
+        initialProperties={initialProperties}
+        initialFilterKey={initialFilterKey}
+      />
     </>
   );
 }

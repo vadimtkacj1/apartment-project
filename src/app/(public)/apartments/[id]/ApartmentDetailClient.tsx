@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import {
@@ -29,15 +29,23 @@ const PropertyMap = dynamic(
 
 interface ApartmentDetailClientProps {
   propertyId: string;
+  /** Full property in /api/properties/[id] response shape, fetched server-side */
+  initialProperty?: any;
   initialTitle?: string;
   initialDescription?: string;
 }
 
-export default function ApartmentDetailClient({ propertyId, initialTitle, initialDescription }: ApartmentDetailClientProps) {
-  const { property, loading, error } = usePropertyData(propertyId);
+export default function ApartmentDetailClient({ propertyId, initialProperty, initialTitle, initialDescription }: ApartmentDetailClientProps) {
+  const { property, loading, error } = usePropertyData(propertyId, initialProperty);
   const [previousId, setPreviousId] = useState<number | null>(null);
   const [nextId, setNextId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Mount the Google Map (and its ~190KB Maps API) only when the user scrolls
+  // near it instead of on page load. Explicit observer (not useInView) because
+  // the target div mounts only after `property` is available.
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapNearViewport, setMapNearViewport] = useState(false);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -45,6 +53,22 @@ export default function ApartmentDetailClient({ propertyId, initialTitle, initia
       setTimeout(() => setCopied(false), 2000);
     });
   };
+
+  useEffect(() => {
+    const el = mapContainerRef.current;
+    if (!el || mapNearViewport) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setMapNearViewport(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [property, mapNearViewport]);
 
   useEffect(() => {
     const fetchNeighbors = async () => {
@@ -154,12 +178,18 @@ export default function ApartmentDetailClient({ propertyId, initialTitle, initia
                   />
                   <PropertyAmenities amenities={property.amenities} isSold={isSold} />
                   <PropertySpecs specs={property.specs} isSold={isSold} />
-                  <PropertyMap
-                    isSold={isSold}
-                    latitude={property.latitude}
-                    longitude={property.longitude}
-                    location={property.location}
-                  />
+                  <div ref={mapContainerRef}>
+                    {mapNearViewport ? (
+                      <PropertyMap
+                        isSold={isSold}
+                        latitude={property.latitude}
+                        longitude={property.longitude}
+                        location={property.location}
+                      />
+                    ) : (
+                      <div className="h-[450px] bg-gray-100 rounded-2xl animate-pulse mb-8" />
+                    )}
+                  </div>
                 </div>
               </div>
 

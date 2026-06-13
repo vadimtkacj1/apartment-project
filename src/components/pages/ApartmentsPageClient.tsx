@@ -42,7 +42,26 @@ function getInitialCategory(initialDealType?: DealType): Category {
   return 'all';
 }
 
-function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType }) {
+// Available properties first, sold/rented last (stable otherwise)
+function sortSoldLast(list: Property[]): Property[] {
+  return [...list].sort((a, b) => {
+    if (a.isSold && !b.isSold) return 1;
+    if (!a.isSold && b.isSold) return -1;
+    return 0;
+  });
+}
+
+interface ApartmentsPageProps {
+  initialDealType?: DealType;
+  /** Validated city from the URL, already applied to initialProperties server-side */
+  initialCity?: City;
+  /** Server-rendered listing matching initialFilterKey — lets the first paint skip the client fetch */
+  initialProperties?: Property[];
+  /** Query string the server data corresponds to (e.g. "dealType=rent") */
+  initialFilterKey?: string;
+}
+
+function ApartmentsPageContent({ initialDealType, initialCity, initialProperties, initialFilterKey }: ApartmentsPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -55,42 +74,46 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
 
   const [filters, setFilters] = useState<FilterState>(() => ({
     dealType: initialDealType ?? 'all',
-    city: 'all',
+    city: initialCity ?? 'all',
   }));
   const [appliedFilters, setAppliedFilters] = useState<FilterState>(() => ({
     dealType: initialDealType ?? 'all',
-    city: 'all',
+    city: initialCity ?? 'all',
   }));
 
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [properties, setProperties] = useState<Property[]>(() =>
+    initialProperties ? sortSoldLast(initialProperties) : []
+  );
+  const [loading, setLoading] = useState(!initialProperties);
+
+  // Consumed on the first fetch-effect run: when the client's filter state
+  // serializes to the same query string the server already fetched, the
+  // initial round-trip to /api/properties is skipped.
+  const pendingInitialKey = useRef<string | null>(
+    initialProperties ? (initialFilterKey ?? '') : null
+  );
 
   useEffect(() => {
     const dealTypeFromUrl = searchParams.get('dealType');
     const cityFromUrl = searchParams.get('city');
 
-    setFilters((prev) => {
-      let next = { ...prev };
+    // Return prev unchanged when values are equal — a new object identity here
+    // re-triggers the fetch effect and causes a duplicate API call.
+    const syncFromUrl = (prev: FilterState): FilterState => {
+      let nextDealType = prev.dealType;
+      let nextCity = prev.city;
       if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
-        next.dealType = dealTypeFromUrl as DealType;
+        nextDealType = dealTypeFromUrl as DealType;
       }
       if (cityFromUrl) {
-        const validCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
-        next.city = validCity;
+        nextCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
       }
-      return next;
-    });
-    setAppliedFilters((prev) => {
-      let next = { ...prev };
-      if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
-        next.dealType = dealTypeFromUrl as DealType;
-      }
-      if (cityFromUrl) {
-        const validCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
-        next.city = validCity;
-      }
-      return next;
-    });
+      if (nextDealType === prev.dealType && nextCity === prev.city) return prev;
+      return { ...prev, dealType: nextDealType, city: nextCity };
+    };
+
+    setFilters(syncFromUrl);
+    setAppliedFilters(syncFromUrl);
     if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
       setSelectedCategory(getInitialCategory(dealTypeFromUrl as DealType));
     }
@@ -126,110 +149,113 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   }, [filters.dealType]);
 
   useEffect(() => {
+    const params = new URLSearchParams();
+
+    // Basic filters
+    if (appliedFilters.dealType && appliedFilters.dealType !== 'all') params.append('dealType', appliedFilters.dealType);
+    if (appliedFilters.city && appliedFilters.city !== 'all') params.append('city', appliedFilters.city);
+
+    // Property type filter
+    if (appliedFilters.propertyType && appliedFilters.propertyType !== 'all') {
+      params.append('propertyType', appliedFilters.propertyType);
+    }
+
+    // Rooms filter
+    if (appliedFilters.minRooms !== undefined && appliedFilters.minRooms !== null) {
+      params.append('minRooms', String(appliedFilters.minRooms));
+    }
+    if (appliedFilters.maxRooms !== undefined && appliedFilters.maxRooms !== null) {
+      params.append('maxRooms', String(appliedFilters.maxRooms));
+    }
+
+    // Price filter
+    if (appliedFilters.minPrice !== undefined) params.append('minPrice', String(appliedFilters.minPrice));
+    if (appliedFilters.maxPrice !== undefined) params.append('maxPrice', String(appliedFilters.maxPrice));
+
+    // Area filter
+    if (appliedFilters.minArea !== undefined) params.append('minArea', String(appliedFilters.minArea));
+    if (appliedFilters.maxArea !== undefined) params.append('maxArea', String(appliedFilters.maxArea));
+
+    // Floor filter
+    if (appliedFilters.floor !== undefined) params.append('floor', String(appliedFilters.floor));
+
+    // Parking filter
+    if (appliedFilters.parking && appliedFilters.parking !== 'all') {
+      params.append('parking', appliedFilters.parking);
+    }
+
+    // Furniture filter
+    if (appliedFilters.furniture && appliedFilters.furniture !== 'all') {
+      params.append('furniture', appliedFilters.furniture);
+    }
+
+    // Kitchen filter
+    if (appliedFilters.kitchen && appliedFilters.kitchen !== 'all') {
+      params.append('kitchen', appliedFilters.kitchen);
+    }
+
+    // Position filter
+    if (appliedFilters.position && appliedFilters.position !== 'all') {
+      params.append('position', appliedFilters.position);
+    }
+
+    // Neighborhood filter
+    if (appliedFilters.neighborhood) {
+      params.append('neighborhood', appliedFilters.neighborhood);
+    }
+
+    // Street filter
+    if (appliedFilters.street) {
+      params.append('street', appliedFilters.street);
+    }
+
+    // Vacancy date filter
+    if (appliedFilters.vacancyDate) {
+      params.append('vacancyDate', appliedFilters.vacancyDate);
+    }
+
+    // Feature filters
+    if (appliedFilters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
+    if (appliedFilters.features?.hasElevator) params.append('hasElevator', 'true');
+    if (appliedFilters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
+    if (appliedFilters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
+    if (appliedFilters.features?.hasStorage) params.append('hasStorage', 'true');
+    if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
+    if (appliedFilters.features?.hasMamak) params.append('hasMamak', 'true');
+    if (appliedFilters.features?.hasBars) params.append('hasBars', 'true');
+    if (appliedFilters.features?.hasPets) params.append('hasPets', 'true');
+    if (appliedFilters.features?.hasHousingUnit) params.append('hasHousingUnit', 'true');
+    if (appliedFilters.features?.hasShelter) params.append('hasShelter', 'true');
+
+    const qs = params.toString();
+
+    // First run with server-rendered data for these exact filters — skip the
+    // redundant round-trip. Consumed once; later filter changes always fetch.
+    if (pendingInitialKey.current !== null) {
+      const matchesServerData = pendingInitialKey.current === qs;
+      pendingInitialKey.current = null;
+      if (matchesServerData) return;
+    }
+
     const controller = new AbortController();
 
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        const params = new URLSearchParams();
-
-        // Basic filters
-        if (appliedFilters.dealType && appliedFilters.dealType !== 'all') params.append('dealType', appliedFilters.dealType);
-        if (appliedFilters.city && appliedFilters.city !== 'all') params.append('city', appliedFilters.city);
-
-        // Property type filter
-        if (appliedFilters.propertyType && appliedFilters.propertyType !== 'all') {
-          params.append('propertyType', appliedFilters.propertyType);
-        }
-
-        // Rooms filter
-        if (appliedFilters.minRooms !== undefined && appliedFilters.minRooms !== null) {
-          params.append('minRooms', String(appliedFilters.minRooms));
-        }
-        if (appliedFilters.maxRooms !== undefined && appliedFilters.maxRooms !== null) {
-          params.append('maxRooms', String(appliedFilters.maxRooms));
-        }
-
-        // Price filter
-        if (appliedFilters.minPrice !== undefined) params.append('minPrice', String(appliedFilters.minPrice));
-        if (appliedFilters.maxPrice !== undefined) params.append('maxPrice', String(appliedFilters.maxPrice));
-
-        // Area filter
-        if (appliedFilters.minArea !== undefined) params.append('minArea', String(appliedFilters.minArea));
-        if (appliedFilters.maxArea !== undefined) params.append('maxArea', String(appliedFilters.maxArea));
-
-        // Floor filter
-        if (appliedFilters.floor !== undefined) params.append('floor', String(appliedFilters.floor));
-
-        // Parking filter
-        if (appliedFilters.parking && appliedFilters.parking !== 'all') {
-          params.append('parking', appliedFilters.parking);
-        }
-
-        // Furniture filter
-        if (appliedFilters.furniture && appliedFilters.furniture !== 'all') {
-          params.append('furniture', appliedFilters.furniture);
-        }
-
-        // Kitchen filter
-        if (appliedFilters.kitchen && appliedFilters.kitchen !== 'all') {
-          params.append('kitchen', appliedFilters.kitchen);
-        }
-
-        // Position filter
-        if (appliedFilters.position && appliedFilters.position !== 'all') {
-          params.append('position', appliedFilters.position);
-        }
-
-        // Neighborhood filter
-        if (appliedFilters.neighborhood) {
-          params.append('neighborhood', appliedFilters.neighborhood);
-        }
-
-        // Street filter
-        if (appliedFilters.street) {
-          params.append('street', appliedFilters.street);
-        }
-
-        // Vacancy date filter
-        if (appliedFilters.vacancyDate) {
-          params.append('vacancyDate', appliedFilters.vacancyDate);
-        }
-
-        // Feature filters
-        if (appliedFilters.features?.hasAirConditioning) params.append('hasAirConditioning', 'true');
-        if (appliedFilters.features?.hasElevator) params.append('hasElevator', 'true');
-        if (appliedFilters.features?.hasSunBalcony) params.append('hasSunBalcony', 'true');
-        if (appliedFilters.features?.hasSafeRoom) params.append('hasSafeRoom', 'true');
-        if (appliedFilters.features?.hasStorage) params.append('hasStorage', 'true');
-        if (appliedFilters.features?.hasDisabledAccess) params.append('hasDisabledAccess', 'true');
-        if (appliedFilters.features?.hasMamak) params.append('hasMamak', 'true');
-        if (appliedFilters.features?.hasBars) params.append('hasBars', 'true');
-        if (appliedFilters.features?.hasPets) params.append('hasPets', 'true');
-        if (appliedFilters.features?.hasHousingUnit) params.append('hasHousingUnit', 'true');
-        if (appliedFilters.features?.hasShelter) params.append('hasShelter', 'true');
-
-        const response = await fetch(`/api/properties?${params.toString()}`, {
+        const response = await fetch(`/api/properties?${qs}`, {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error('Failed');
         const data = await response.json();
 
-        const mappedProperties = data.map((prop: any) => ({
+        const mappedProperties: Property[] = data.map((prop: any) => ({
           ...prop,
           bedrooms: prop.rooms,
           category: prop.category || (prop.dealType === 'sale' ? 'sales' : 'rentals'),
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        // Sort: available properties first, sold/rented last
-        const sortedProperties = mappedProperties.sort((a: Property, b: Property) => {
-          if (a.isSold && !b.isSold) return 1;  // a is sold, b is not -> a goes after b
-          if (!a.isSold && b.isSold) return -1; // a is not sold, b is sold -> a goes before b
-          return 0; // both sold or both available -> keep original order
-        });
-
-        setProperties(sortedProperties);
+        setProperties(sortSoldLast(mappedProperties));
         setVisibleCount(ITEMS_PER_PAGE);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') return;
@@ -414,10 +440,15 @@ function ApartmentsPageContent({ initialDealType }: { initialDealType?: DealType
   );
 }
 
-export default function ApartmentsPageClient({ initialDealType }: { initialDealType?: DealType }) {
+export default function ApartmentsPageClient({ initialDealType, initialCity, initialProperties, initialFilterKey }: ApartmentsPageProps) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ApartmentsPageContent initialDealType={initialDealType} />
+      <ApartmentsPageContent
+        initialDealType={initialDealType}
+        initialCity={initialCity}
+        initialProperties={initialProperties}
+        initialFilterKey={initialFilterKey}
+      />
     </Suspense>
   );
 }

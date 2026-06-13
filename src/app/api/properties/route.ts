@@ -182,18 +182,21 @@ export async function GET(request: NextRequest) {
     }
 
     // Neighborhood filter
+    // NOTE: `mode: 'insensitive'` is not supported by Prisma on SQLite and made
+    // these filters throw (HTTP 500). SQLite's `contains` (LIKE) is already
+    // case-insensitive for ASCII, and Hebrew has no letter case.
     if (neighborhood) {
-      where.neighborhood = { contains: neighborhood, mode: 'insensitive' };
+      where.neighborhood = { contains: neighborhood };
     }
 
     // Street filter
     if (street) {
-      where.street = { contains: street, mode: 'insensitive' };
+      where.street = { contains: street };
     }
 
     // Vacancy date filter
     if (vacancyDate) {
-      where.vacancyDate = { contains: vacancyDate, mode: 'insensitive' };
+      where.vacancyDate = { contains: vacancyDate };
     }
 
     // Feature filters

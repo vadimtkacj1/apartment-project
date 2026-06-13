@@ -9,15 +9,37 @@ import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: 'שאלות ותשובות בנדל״ן | רם נכסים חיים ענבי',
+  title: 'שאלות ותשובות בנדל״ן',
   description: 'תשובות לשאלות הנפוצות ביותר בנושאי קנייה, מכירה והשכרה של דירות בחולון. מס רכישה, תהליך מכירה, הערכת שווי נכס, חוזי שכירות ועוד.',
+  keywords: [
+    'שאלות על תיווך חולון',
+    'FAQ נדל״ן',
+    'כמה עולה מתווך',
+    'שאלות על רכישת דירה',
+    'שאלות על מכירת דירה',
+    'מידע נדל״ן חולון',
+  ],
   alternates: {
     canonical: `${siteUrl}/faq`,
   },
   openGraph: {
-    title: 'שאלות ותשובות בנדל״ן | רם נכסים חיים ענבי',
+    title: 'שאלות ותשובות בנדל״ן',
     description: 'תשובות לשאלות הנפוצות ביותר בנושאי קנייה, מכירה והשכרה של דירות בחולון.',
     url: `${siteUrl}/faq`,
+    images: [
+      {
+        url: `${siteUrl}/images/hero/main-hero.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'שאלות ותשובות תיווך נדל״ן חולון',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'שאלות ותשובות בנדל״ן',
+    description: 'תשובות לשאלות הנפוצות ביותר בנושאי קנייה, מכירה והשכרה של דירות בחולון.',
+    images: [`${siteUrl}/images/hero/main-hero.jpg`],
   },
 };
 

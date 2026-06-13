@@ -5,7 +5,7 @@ import StructuredData from "@/components/SEO/StructuredData";
 import "./globals.css";
 
 const assistant = localFont({
-  src: '../../public/fonts/Assistant-VariableFont_wght.ttf',
+  src: '../../public/fonts/Assistant-VariableFont_wght.woff2',
   display: 'optional',
   variable: '--font-assistant',
   fallback: ['Arial', 'Helvetica', 'sans-serif'],
@@ -14,7 +14,7 @@ const assistant = localFont({
 });
 
 const caramel = localFont({
-  src: '../../public/fonts/Carmela-Regular.ttf',
+  src: '../../public/fonts/Carmela-Regular.woff2',
   display: 'optional',
   variable: '--font-caramel',
   fallback: ['cursive', 'sans-serif'],
@@ -104,26 +104,6 @@ export default function RootLayout({
           html { color-scheme: only light !important; background: #faf7f2 !important; }
           body { color-scheme: only light !important; background: #faf7f2 !important; color: #171717 !important; }
         `}} />
-        <link
-          rel="preload"
-          href="/hero-poster.jpg"
-          as="image"
-          fetchPriority="high"
-        />
-        <link
-          rel="preload"
-          href="/fonts/Assistant-VariableFont_wght.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/Carmela-Regular.ttf"
-          as="font"
-          type="font/ttf"
-          crossOrigin="anonymous"
-        />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
         <StructuredData />

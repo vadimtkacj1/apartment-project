@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { preload } from 'react-dom';
 import Hero from '@/components/layout/Hero';
 import { prisma } from '@/lib/prisma';
 import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
@@ -48,6 +49,10 @@ function resolveDealType(dealType: string, category?: string | null): string {
 }
 
 export default async function Home() {
+  // Hero poster is referenced via <video poster> (low browser priority) —
+  // preload it here, scoped to the homepage only, so it paints at FCP.
+  preload('/hero-poster.jpg', { as: 'image', fetchPriority: 'high' });
+
   // Fetch all homepage section data in parallel — eliminates client-side waterfall
   const HomepageSettings = (prisma as any).homepageSettings;
 
