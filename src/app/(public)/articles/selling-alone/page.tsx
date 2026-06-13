@@ -50,7 +50,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/selling-alone`,
   image: ogImage,
   datePublished: '2026-01-14',
-  dateModified: '2026-01-14',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'קניה ומכירה',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/selling-alone` },
@@ -80,7 +80,7 @@ const faqSchema = {
       name: 'האם זה אומר שאני אקבל פחות כסף בסוף?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'להפך. הסטטיסטיקה מראה שדירה שנמכרת בעזרת מתווך מנוסה נסגרת במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. זה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.',
+        text: 'להפך. מהניסיון שלנו לאורך 24 שנה, דירה שנמכרת בעזרת מתווך מנוסה נסגרת לרוב במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. הפער הזה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.',
       },
     },
     {

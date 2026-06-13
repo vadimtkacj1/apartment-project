@@ -98,7 +98,7 @@ export default function LinksPage() {
                     {link.types && (
                       <ul className="mb-4 space-y-2">
                         {link.types.map((type: string, index: number) => (
-                          <li key={index} className="text-gray-600 text-sm pr-4">
+                          <li key={index} className="text-gray-600 text-sm ps-4">
                             • {type}
                           </li>
                         ))}
@@ -108,7 +108,7 @@ export default function LinksPage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex flex-row-reverse items-center gap-2 text-[#1c3664] hover:text-[#2a4a8a] font-medium transition-colors"
+                      className="inline-flex items-center gap-2 text-[#1c3664] hover:text-[#2a4a8a] font-medium transition-colors"
                     >
                       <span>למעבר לאתר</span>
                       <ExternalLink size={18} />

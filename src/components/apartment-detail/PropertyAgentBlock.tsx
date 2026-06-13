@@ -78,7 +78,7 @@ export function PropertyAgentBlock({
                   }`}
                 >
                   <Phone size={16} />
-                  {agent.phone}
+                  <span dir="ltr">{agent.phone}</span>
                 </a>
               )}
               {whatsappLink && (

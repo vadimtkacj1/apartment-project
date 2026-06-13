@@ -15,7 +15,7 @@ const PropertiesBanner: React.FC<PropertiesBannerProps> = ({ img = "/7.jpg" }) =
       <div className="absolute inset-0 m-0 p-0">
         <Image
           src={img}
-          alt="Cityscape background"
+          alt="רקע נוף עירוני"
           fill
           className="object-cover"
           style={{

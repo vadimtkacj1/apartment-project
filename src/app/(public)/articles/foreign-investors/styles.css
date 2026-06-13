@@ -322,3 +322,138 @@ em {
     font-size: 1.5rem;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   GEO / citation-ready components (shared by all article pages)
+   Used to give AI answer engines liftable, attributed content:
+   .definition-block  → answer-first 25–50 word standalone definition
+   .geo-table         → bracket / comparison / tier tables (machine-parseable)
+   .geo-list          → real scannable lists (replace <p><strong>…</strong></p>)
+   .source-note       → named + dated source attribution under a stat/table
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Standalone definition — a self-contained answer block an AI can quote verbatim */
+.definition-block {
+  background: #ffffff;
+  border-right: 4px solid #1c3664;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+  box-shadow: 0 2px 10px rgba(28, 54, 100, 0.06);
+}
+.definition-block p {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.85;
+  color: #1f2937;
+}
+.definition-block .definition-term {
+  color: #1c3664;
+  font-weight: 700;
+}
+
+/* Citation-ready data table (tax brackets, comparisons, LTV tiers …) */
+.geo-table-wrap {
+  margin: 1.75rem 0;
+  overflow-x: auto;
+}
+.geo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.05rem;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(28, 54, 100, 0.06);
+}
+.geo-table caption {
+  caption-side: top;
+  text-align: right;
+  font-weight: 700;
+  color: #1c3664;
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+}
+.geo-table th,
+.geo-table td {
+  padding: 0.85rem 1.1rem;
+  text-align: right;
+  border-bottom: 1px solid #e5e7eb;
+  line-height: 1.6;
+}
+.geo-table thead th {
+  background: #1c3664;
+  color: #ffffff;
+  font-weight: 600;
+}
+.geo-table tbody tr:nth-child(even) {
+  background: #faf7f2;
+}
+.geo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Real scannable lists — replace pseudo-lists so engines parse discrete items */
+.geo-list {
+  margin: 1.25rem 0 2rem;
+  padding: 0;
+  list-style: none;
+}
+.geo-list li {
+  position: relative;
+  font-size: 1.125rem;
+  line-height: 1.85;
+  color: #374151;
+  margin-bottom: 0.9rem;
+  padding-right: 1.9rem;
+}
+.geo-list li::before {
+  content: "✓";
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #1c3664;
+  font-weight: 700;
+}
+.geo-list.ordered {
+  counter-reset: geo;
+}
+.geo-list.ordered li::before {
+  content: counter(geo);
+  counter-increment: geo;
+  font-size: 0.85rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  line-height: 1.4rem;
+  text-align: center;
+  background: #1c3664;
+  color: #fff;
+  border-radius: 50%;
+  top: 0.25rem;
+}
+
+/* Named + dated source attribution under a stat or table */
+.source-note {
+  display: block;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0.5rem 0 1.75rem;
+  font-weight: 500;
+}
+.source-note a {
+  color: #1c3664;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .geo-table {
+    font-size: 0.95rem;
+  }
+  .geo-table th,
+  .geo-table td {
+    padding: 0.65rem 0.7rem;
+  }
+  .definition-block p {
+    font-size: 1.05rem;
+  }
+}

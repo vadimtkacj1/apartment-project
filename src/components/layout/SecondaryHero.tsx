@@ -38,7 +38,7 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
           <div className={`flex flex-col ${
             centered
               ? 'mx-auto items-center text-center'
-              : 'mr-0 ml-auto items-start text-right max-w-full md:max-w-[75%] lg:max-w-[65%]'
+              : 'ms-0 me-auto items-start text-right max-w-full md:max-w-[75%] lg:max-w-[65%]'
           }`}>
 
             <h1

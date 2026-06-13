@@ -106,12 +106,12 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/favicon-rm.png" alt="Logo" width={60} height={60}
+            <Image src="/favicon-rm.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain" priority
               style={{ transition: "filter 0.35s ease" }}
             />
           </Link>
-          <Image src="/images/second-and.svg" alt="and" width={36} height={36}
+          <Image src="/images/second-and.svg" alt="" width={36} height={36}
             className="object-contain"
             style={{ transition: "filter 0.35s ease", marginBottom: "8px" }}
           />
@@ -119,7 +119,7 @@ export default function Header() {
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/favicon-ha.png" alt="Logo 2" width={60} height={60}
+            <Image src="/favicon-ha.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain"
               style={{ transition: "filter 0.35s ease" }}
             />

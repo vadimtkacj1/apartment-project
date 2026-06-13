@@ -11,7 +11,7 @@ export default function SellingAloneContent() {
   const faqItems: FAQItem[] = [
     {
       question: '"האם זה אומר שאני אקבל פחות כסף בסוף?"',
-      answer: '<strong>להפך.</strong> הסטטיסטיקה מראה שדירה שנמכרת בעזרת מתווך מנוסה נסגרת במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. זה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.'
+      answer: '<strong>להפך.</strong> מהניסיון שלנו לאורך 24 שנה, דירה שנמכרת בעזרת מתווך מנוסה נסגרת לרוב במחיר הגבוה ב-5% עד 10% ממכירה עצמאית. הפער הזה מכסה את העמלה ומשאיר לכם עודף גדול בכיס.'
     },
     {
       question: '"למה שלא אפרסם לבד ורק אם לא ילך אפנה אליכם?"',
@@ -39,6 +39,9 @@ export default function SellingAloneContent() {
               <p className="lead-paragraph">
                 אין תחושה מפתה יותר מזו: החלטתם למכור את הדירה, עשיתם חישוב מהיר במחשבון, ואמרתם לעצמכם: &quot;למה שנשלם 2% למתווך? נעלה מודעה ליד2, נראה את הבית פעמיים בשבוע, והכסף יישאר בכיס שלנו&quot;.
               </p>
+              <div className="definition-block">
+                <p><span className="definition-term">מכירה עצמאית</span> (FSBO – For Sale By Owner) היא מכירת דירה בידי הבעלים עצמם, ללא מתווך נדל&quot;ן: המוכר אחראי לבדו על התמחור, הפרסום, סינון הקונים, תיאום הסיורים וניהול המשא ומתן. הוא חוסך את עמלת התיווך, אך נושא לבדו בכל הסיכון והעומס.</p>
+              </div>
               <div className="content-flex-layout">
                 <div className="text-column">
                   <p>
@@ -62,8 +65,31 @@ export default function SellingAloneContent() {
               <p>
                 בשוק הנדל&quot;ן של היום, הרושם הראשוני הוא הכל. קונים פוטנציאליים סורקים עשרות מודעות בדקה ומשווים אתכם לדירות בשכונת אגרובנק בחולון או בפרויקטים החדשים בפארק הים בבת ים הם רואים מה שאנחנו קוראים לו &quot;רמזור&quot;:
               </p>
-              <p><strong>ירוק:</strong> דירה אטרקטיבית, מתומחרת נכון, מוצגת מקצועית.</p>
-              <p><strong>אדום:</strong> דירה ש&quot;יושבת&quot; הרבה זמן, מחיר לא ריאלי, תמונות חשוכות.</p>
+              <div className="geo-table-wrap">
+                <table className="geo-table">
+                  <caption>&quot;הרמזור&quot; של הקונים — איך נתפסת דירה בשוק</caption>
+                  <thead>
+                    <tr>
+                      <th>רמזור</th>
+                      <th>מאפייני הדירה</th>
+                      <th>איך הקונים מגיבים</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ירוק</td>
+                      <td>מתומחרת נכון, מוצגת מקצועית, תמונות מוארות</td>
+                      <td>נכנסים לצפייה ומגישים הצעות רציניות במהירות</td>
+                    </tr>
+                    <tr>
+                      <td>אדום</td>
+                      <td>מחיר לא ריאלי, &quot;יושבת&quot; בשוק זמן רב, תמונות חשוכות</td>
+                      <td>מדלגים, או מציעים הצעות נמוכות (&quot;כנראה יש כאן בעיה&quot;)</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <span className="source-note">מקור: ניסיון המשרד בשוק חולון, בת ים וראשון לציון.</span>
+              </div>
               <p>
                 הבעיה היא שמוכר פרטי פועל מהבטן. הוא מתמחר לפי הרגש ולא לפי השוק. מבחינת הקונים? אתם &quot;מוכרים לא רציניים&quot;. <strong>מבחינתנו? יש כאן נכס יהלום שרק צריך ליטוש נכון כדי לזהור.</strong>
               </p>
@@ -82,7 +108,7 @@ export default function SellingAloneContent() {
                   </p>
                 </div>
                 <div className="image-column">
-                  <Image src="/images/Gemini_Generated_Image_u7vh7fu7vh7fu7vh - Edited.png" alt="תיווך נדל״ן" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
+                  <Image src="/images/selling-alone.webp" alt="תיווך נדל״ן" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
             </section>

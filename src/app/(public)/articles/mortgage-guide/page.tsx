@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/mortgage-guide`,
   image: ogImage,
   datePublished: '2026-04-07',
-  dateModified: '2026-04-07',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'מימון ומיסוי',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/mortgage-guide` },

@@ -442,7 +442,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
 
 export default function ApartmentsPageClient({ initialDealType, initialCity, initialProperties, initialFilterKey }: ApartmentsPageProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>טוען...</div>}>
       <ApartmentsPageContent
         initialDealType={initialDealType}
         initialCity={initialCity}

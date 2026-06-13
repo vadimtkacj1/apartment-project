@@ -175,7 +175,7 @@ const ContactForm: React.FC = () => {
                     {/* Owner Name */}
                     <div className="mb-2">
                       <p className="text-lg font-bold text-[#1c3664]">{owner.name}</p>
-                      {owner.title && <p className="text-sm text-slate-500">{owner.title}</p>}
+                      {owner.title && <p className="text-sm text-slate-600">{owner.title}</p>}
                     </div>
 
                     {/* Phone */}
@@ -185,12 +185,12 @@ const ContactForm: React.FC = () => {
                           <Phone size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-slate-400 font-semibold mb-1">טלפון</p>
+                          <p className="text-sm text-slate-600 font-semibold mb-1">טלפון</p>
                           <a
                             href={`tel:${owner.phone.replace(/[^0-9+]/g, '')}`}
                             className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
                           >
-                            {owner.phone}
+                            <span dir="ltr">{owner.phone}</span>
                           </a>
                         </div>
                       </div>
@@ -203,12 +203,12 @@ const ContactForm: React.FC = () => {
                           <Mail size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-slate-400 font-semibold mb-1">דוא״ל</p>
+                          <p className="text-sm text-slate-600 font-semibold mb-1">דוא״ל</p>
                           <a
                             href={`mailto:${owner.email}`}
                             className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
                           >
-                            {owner.email}
+                            <span dir="ltr">{owner.email}</span>
                           </a>
                         </div>
                       </div>
@@ -216,7 +216,7 @@ const ContactForm: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <p className="text-slate-400">טוען פרטי התקשרות...</p>
+                <p className="text-slate-600">טוען פרטי התקשרות...</p>
               )}
 
               {/* Address - Same for all */}
@@ -225,7 +225,7 @@ const ContactForm: React.FC = () => {
                   <MapPin size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-slate-400 font-semibold mb-1">כתובת</p>
+                  <p className="text-sm text-slate-600 font-semibold mb-1">כתובת</p>
                   <p className="text-lg font-bold text-gray-900">
                     {address}, {city}
                   </p>

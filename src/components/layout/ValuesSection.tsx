@@ -165,7 +165,7 @@ const ValuesSection: React.FC = () => {
                     <Image src={value.image} alt={value.title} width={256} height={256} className="object-contain" loading="lazy" />
                   </div>
                   <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
-                  <p className="text-base text-slate-500 leading-relaxed">{value.description}</p>
+                  <p className="text-base text-slate-600 leading-relaxed">{value.description}</p>
                 </div>
               </SwiperSlide>
             ))}
@@ -189,7 +189,7 @@ const ValuesSection: React.FC = () => {
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
-              <p className="text-base md:text-lg text-slate-500 leading-relaxed">{value.description}</p>
+              <p className="text-base md:text-lg text-slate-600 leading-relaxed">{value.description}</p>
             </m.div>
           ))}
         </div>

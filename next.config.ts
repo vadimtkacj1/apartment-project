@@ -128,6 +128,15 @@ const nextConfig: NextConfig = {
             value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()'
           },
           {
+            // Cross-origin window isolation (XS-Leaks / reverse-tabnabbing /
+            // opener abuse). 'same-origin' is safe here: the site opens no
+            // cross-origin auth/payment popups and keeps no window.open refs
+            // (WhatsApp/social links are fire-and-forget _blank). NOT COEP:
+            // require-corp would break Google Maps tiles/fonts and img-src https:.
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin'
+          },
+          {
             // Defense-in-depth against XSS/clickjacking/data exfiltration.
             // script-src keeps 'unsafe-inline'/'unsafe-eval' because the app
             // ships inline bootstrap scripts and uses the Google Maps JS API

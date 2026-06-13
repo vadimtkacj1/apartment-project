@@ -97,6 +97,56 @@ export default function HolonNeighborhoodsContent() {
               </p>
             </section>
 
+            {/* Neighborhoods comparison table */}
+            <section className="article-section">
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שכונות חולון במבט מהיר</h2>
+              <div className="geo-table-wrap">
+                <table className="geo-table">
+                  <caption>שכונות חולון לפי אופי, קהל יעד ושלב התחדשות</caption>
+                  <thead>
+                    <tr>
+                      <th>שכונה</th>
+                      <th>אופי / קהל יעד</th>
+                      <th>שלב התחדשות</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>קרית שרת</td>
+                      <td>מבוססת ומשפחתית; בתי ספר חזקים, מרכזים מסחריים והרבה ירוק במרחק הליכה</td>
+                      <td>שכונה ותיקה ומבוססת, ללא התחדשות רחבת היקף</td>
+                    </tr>
+                    <tr>
+                      <td>נאות שושנים</td>
+                      <td>ירוקה ושקטה, אוכלוסייה מבוססת; דירות מרווחות בבנייה ותיקה ואיכותית</td>
+                      <td>בנייה ותיקה לצד פרויקטים חדשים נקודתיים</td>
+                    </tr>
+                    <tr>
+                      <td>מרכז העיר</td>
+                      <td>קרבה לכל; זוגות צעירים ומשקיעים שמחפשים ביקוש שכירות קבוע</td>
+                      <td>היצע מעורב — מדירות ישנות ועד בניינים חדשים</td>
+                    </tr>
+                    <tr>
+                      <td>ג׳סי כהן</td>
+                      <td>שכונה ותיקה עם פוטנציאל השבחה; מתאימה למשקיעים לטווח ארוך</td>
+                      <td>פינוי-בינוי רחב היקף בשלבי תכנון וביצוע</td>
+                    </tr>
+                    <tr>
+                      <td>תל גיבורים</td>
+                      <td>גובלת בתל אביב ובפארק החולות; מושכת זוגות צעירים ומשקיעים</td>
+                      <td>מתחמי התחדשות מקודמים</td>
+                    </tr>
+                    <tr>
+                      <td>השכונות החדשות (מזרח העיר)</td>
+                      <td>מי שרוצה חדש מהניילון; מגדלים מודרניים, ממ״ד, חניונים ולובי מעוצב</td>
+                      <td>בנייה חדשה</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <span className="source-note">מקור: סיווג איכותני על בסיס ניסיון השטח של רם נכסים חיים ענבי. שלבי ההתחדשות משתנים — בדקו את הסטטוס של מתחם ספציפי לפני רכישה. מחירי עסקאות אמת למ״ר זמינים במאגר עסקאות הנדל״ן של רשות המסים.</span>
+              </div>
+            </section>
+
             {/* Section 4 */}
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>אז איפה כדאי לקנות?</h2>

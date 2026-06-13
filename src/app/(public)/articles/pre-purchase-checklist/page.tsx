@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/pre-purchase-checklist`,
   image: ogImage,
   datePublished: '2026-05-19',
-  dateModified: '2026-05-19',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'קניה ומכירה',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/pre-purchase-checklist` },

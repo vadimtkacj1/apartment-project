@@ -64,7 +64,7 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
                 >
                   <img
                     src="/watermark.webp"
-                    alt="Logo"
+                    alt="לוגו רם נכסים חיים ענבי"
                     width={512}
                     height={267}
                     loading="lazy"

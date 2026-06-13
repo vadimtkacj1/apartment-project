@@ -19,7 +19,7 @@ export default function AboutHero() {
       <div className="hero-background">
         <Image
           src="/images/hero/aboutus.webp"
-          alt="Our Team"
+          alt="הצוות שלנו"
           fill
           className="hero-bg-image"
           priority

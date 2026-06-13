@@ -59,6 +59,11 @@ export default function UrbanRenewalContent() {
               </div>
             </section>
 
+            {/* Definition: פינוי-בינוי מול תמ״א 38 */}
+            <div className="definition-block">
+              <p><span className="definition-term">פינוי-בינוי</span> הוא הליך שבו מפנים מתחם שלם של בניינים ישנים, הורסים אותו ובונים במקומו שכונה חדשה בצפיפות גבוהה יותר — פרויקט רחב היקף וארוך טווח. <span className="definition-term">תמ״א 38</span>, לעומת זאת, חלה על בניין בודד: חיזוקו ותוספת קומות, ממ״דים ומעלית (38/1), או הריסתו ובנייתו מחדש (38/2).</p>
+            </div>
+
             {/* Section 1 */}
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>פינוי-בינוי: שכונה שלמה נולדת מחדש</h2>
@@ -77,8 +82,9 @@ export default function UrbanRenewalContent() {
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>תמ״א 38: השדרוג של הבניין הבודד</h2>
               <p>
-                תוכנית מתאר ארצית 38 נולדה כדי לחזק מבנים ישנים מפני רעידות אדמה. בפועל היא הפכה למנוע התחדשות לבניינים בודדים, בשני מסלולים:
+                תוכנית מתאר ארצית 38 (תמ״א 38) אושרה בשנת 2005 במטרה לחזק מבנים ישנים מפני רעידות אדמה. בפועל היא הפכה למנוע התחדשות לבניינים בודדים, בשני מסלולים:
               </p>
+              <span className="source-note">מקור: מינהל התכנון — הרשות הממשלתית להתחדשות עירונית, <a href="https://www.gov.il" target="_blank" rel="noopener noreferrer">gov.il</a></span>
               <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>תמ״א 38/1 — חיזוק ותוספת</h3>
               <p>
                 הבניין הקיים מחוזק, נוספים לו ממ״דים, מרפסות ומעלית, והיזם מקבל בתמורה זכויות לבנות קומות נוספות. הדיירים נשארים בדירותיהם במהלך העבודות.
@@ -87,6 +93,47 @@ export default function UrbanRenewalContent() {
               <p>
                 הבניין נהרס ונבנה מחדש מהיסוד. הדיירים מקבלים דירה חדשה לחלוטין בבניין חדש — מסלול שדומה במהותו לפינוי-בינוי, אבל בקנה מידה של בניין אחד ולוחות זמנים קצרים יותר.
               </p>
+
+              <div className="geo-table-wrap">
+                <table className="geo-table">
+                  <caption>פינוי-בינוי מול תמ״א 38/1 ותמ״א 38/2 — השוואה</caption>
+                  <thead>
+                    <tr>
+                      <th>היבט</th>
+                      <th>פינוי-בינוי</th>
+                      <th>תמ״א 38/1</th>
+                      <th>תמ״א 38/2</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>מהות והיקף</td>
+                      <td>הריסת מתחם שלם והקמת שכונה חדשה בצפיפות גבוהה יותר</td>
+                      <td>חיזוק הבניין הקיים ותוספת קומות, ממ״דים ומעלית</td>
+                      <td>הריסת הבניין הבודד ובנייתו מחדש</td>
+                    </tr>
+                    <tr>
+                      <td>מי נשאר במהלך הבנייה</td>
+                      <td>הדיירים מתפנים לדיור חלופי (על חשבון היזם)</td>
+                      <td>הדיירים נשארים בדירותיהם</td>
+                      <td>הדיירים מתפנים לדיור חלופי</td>
+                    </tr>
+                    <tr>
+                      <td>משך משוער</td>
+                      <td>8–15 שנים</td>
+                      <td>קצר יותר מפינוי-בינוי</td>
+                      <td>קצר יותר מפינוי-בינוי</td>
+                    </tr>
+                    <tr>
+                      <td>התוצר</td>
+                      <td>דירה חדשה בשכונה חדשה</td>
+                      <td>דירה משודרגת בבניין מחוזק</td>
+                      <td>דירה חדשה בבניין חדש</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <span className="source-note">מקור: הרשות הממשלתית להתחדשות עירונית, gov.il. משכי הזמן הם הערכה ומשתנים בין פרויקטים.</span>
+              </div>
             </section>
 
             {/* Section 3 */}

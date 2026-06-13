@@ -126,14 +126,14 @@ export default async function Footer() {
                     {owner.phone && (
                       <p>
                         <a href={`tel:${owner.phone}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
-                          {owner.phone}
+                          <span dir="ltr">{owner.phone}</span>
                         </a>
                       </p>
                     )}
                     {owner.email && (
                       <p>
                         <a href={`mailto:${owner.email}`} className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">
-                          {owner.email}
+                          <span dir="ltr">{owner.email}</span>
                         </a>
                       </p>
                     )}
@@ -217,7 +217,7 @@ export default async function Footer() {
           </div>
 
           <p className="text-gray-400 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
-            Built by <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#c5a357] transition-colors">Aiterra</a>
+            נבנה על ידי <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>

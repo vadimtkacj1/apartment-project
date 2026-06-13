@@ -120,7 +120,7 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
                       className="inline-flex items-center justify-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
                     >
                       <Phone size={20} />
-                      <span>{owner.name} - {contactPhone}</span>
+                      <span>{owner.name} - <span dir="ltr">{contactPhone}</span></span>
                     </a>
                   );
                 })}

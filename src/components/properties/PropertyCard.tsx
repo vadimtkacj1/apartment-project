@@ -252,12 +252,12 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
           }`}>
             <div className="w-full sm:w-auto">
               {originalPrice && (
-                <p className="text-xs text-gray-400 line-through mb-0.5">{originalPrice} <span className="text-[0.65em]">₪</span></p>
+                <p className="text-xs text-gray-400 line-through mb-0.5"><span dir="ltr">{originalPrice} <span className="text-[0.65em]">₪</span></span></p>
               )}
               <p className={`text-lg sm:text-xl font-black ${
                 isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
               }`}>
-                {price} <span className="text-sm sm:text-base font-bold">₪</span>
+                <span dir="ltr">{price} <span className="text-sm sm:text-base font-bold">₪</span></span>
               </p>
             </div>
 

@@ -46,7 +46,7 @@ export default function Breadcrumbs() {
   return (
     <nav
       className="py-5 px-4 md:px-8 bg-[#faf7f2]"
-      aria-label="Breadcrumb"
+      aria-label="מסלול ניווט"
       dir="rtl" // Standard for Hebrew
     >
       <ol className="flex items-center text-base">
@@ -55,7 +55,7 @@ export default function Breadcrumbs() {
           <Link
             href="/"
             className="text-gray-500 hover:text-gray-700 transition-colors flex items-center"
-            aria-label="Home"
+            aria-label="דף הבית"
           >
             <Home className="w-5 h-5" />
           </Link>

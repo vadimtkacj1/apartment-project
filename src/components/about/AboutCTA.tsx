@@ -11,7 +11,7 @@ export default function AboutCTA() {
       <div className="cta-background">
         <Image
           src="/images/hero/sales.jpg"
-          alt="Contact Us"
+          alt="צרו קשר"
           fill
           className="cta-bg-image"
           quality={90}

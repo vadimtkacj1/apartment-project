@@ -69,8 +69,8 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
         }`}>מיקום</h2>
         <div className="rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center" style={{ height: '450px' }}>
           <div className="text-center p-8">
-            <p className="text-gray-600 mb-2">Google Maps API key is missing</p>
-            <p className="text-sm text-gray-500">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+            <p className="text-gray-600 mb-2">מפתח המפה חסר</p>
+            <p className="text-sm text-gray-500">יש להוסיף את NEXT_PUBLIC_GOOGLE_MAPS_API_KEY לקובץ ה-env</p>
           </div>
         </div>
       </m.div>
@@ -92,8 +92,8 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
         }`}>מיקום</h2>
         <div className="rounded-xl overflow-hidden shadow-md bg-gray-100 flex items-center justify-center" style={{ height: '450px' }}>
           <div className="text-center p-8">
-            <p className="text-gray-600 mb-2">Google Maps failed to load</p>
-            <p className="text-sm text-gray-500">Check API key, billing, and allowed referrer domains</p>
+            <p className="text-gray-600 mb-2">טעינת המפה נכשלה</p>
+            <p className="text-sm text-gray-500">אנא נסו לרענן את העמוד</p>
           </div>
         </div>
       </m.div>

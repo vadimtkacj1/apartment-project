@@ -124,7 +124,7 @@ export const sampleProperties: Property[] = [
     title: 'דירת גן 4 חדרים עם גינה פרטית',
     description: 'דירת גן מקסימה במיקום שקט',
     price: '2,200,000',
-    images: ['/images/hero/rent.png'],
+    images: ['/images/hero/rent.webp'],
     location: 'ראשון לציון, שכונת הגפן',
     bedrooms: '4',
     bathrooms: 2

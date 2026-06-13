@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/new-vs-secondhand`,
   image: ogImage,
   datePublished: '2026-06-02',
-  dateModified: '2026-06-02',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'קניה ומכירה',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/new-vs-secondhand` },

@@ -22,7 +22,7 @@ export const heroSlides = [
     colorDeep: "#2ECC71",
     mainText: "ניהול נכסים", // Управление
     subText: "ראש שקט לבעלי דירות. אנחנו ננהל עבורכם את הנכס, מהדייר ועד התחזוקה השוטפת.",
-    img: "/images/hero/rent.png",
+    img: "/images/hero/rent.webp",
     shadow: "0px 10px 30px rgba(46,204,113,0.3)",
     mobileShadow: "0px 5px 15px rgba(46,204,113,0.2)"
   },

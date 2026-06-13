@@ -74,10 +74,10 @@ async function main() {
   const israelApartmentImages = [
     '/images/hero/sales.jpg', // Local image
     '/images/hero/rentals.webp', // Local image
-    '/images/hero/rent.png', // Local image
+    '/images/hero/rent.webp', // Local image
     '/images/hero/main-hero.jpg', // Local image
     '/images/hero/other-hero.jpeg', // Local image
-    '/images/hero/aboutus.png', // Local image
+    '/images/hero/aboutus.webp', // Local image
     '/images/minimalist-tel-aviv-apartment.jpg', // Local image
     '/images/LuxuryLiving.jpg', // Local image
     '/images/buildings.jpeg', // Local image

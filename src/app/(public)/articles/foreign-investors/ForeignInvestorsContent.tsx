@@ -63,6 +63,8 @@ export default function ForeignInvestorsContent() {
                   <Image src="/images/LuxuryLiving.jpg" alt="נדל״ן בישראל" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
               </div>
+
+              <div className="definition-block"><p><span className="definition-term">ייפוי כוח נוטריוני</span> הוא מסמך משפטי המאומת על ידי נוטריון, המעניק לנציג מוסמך בישראל — לרוב עורך דין — סמכות לחתום על מסמכי הרכישה והרישום בשם הרוכש. הוא מאפשר לתושב חוץ להשלים עסקה מרחוק, בלי טיסה לארץ.</p></div>
             </section>
 
             {/* Section 1: Why Foreign Investors Fear */}
@@ -100,6 +102,42 @@ export default function ForeignInvestorsContent() {
                 <div className="image-column">
                   <Image src="/images/minimalist-tel-aviv-apartment.jpg" alt="ניהול נכסים" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
                 </div>
+              </div>
+
+              <p>
+                <strong>מס רכישה לתושב חוץ:</strong> רוכש שאינו תושב ישראל — ובדרך כלל גם מי שבבעלותו דירה בחו"ל — מסווג בעת הרכישה כבעל דירה נוספת, ולכן ממוסה לפי מדרגות המשקיע ואינו זכאי להטבת מדרגות "דירה יחידה" המופחתות. כך נראות מדרגות מס הרכישה למשקיע נכון ל-2026:
+              </p>
+              <div className="geo-table-wrap">
+                <table className="geo-table">
+                  <caption>מס רכישה — מדרגות משקיע / דירה נוספת (2026)</caption>
+                  <thead>
+                    <tr><th>שווי הרכישה</th><th>שיעור מס הרכישה</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>עד ₪6,055,070</td><td>8%</td></tr>
+                    <tr><td>מעל ₪6,055,070</td><td>10%</td></tr>
+                  </tbody>
+                </table>
+                <span className="source-note">מקור: רשות המסים בישראל (gov.il), מדרגות מס רכישה 2026. תושב חוץ שבבעלותו דירה בחו"ל מסווג בדרך כלל כבעל דירה נוספת — מומלץ לאמת את הסיווג מול יועץ מס לגבי המקרה הפרטני.</span>
+              </div>
+
+              <p>
+                <strong>מימון משכנתא לתושב חוץ:</strong> שיעור המימון המרבי (אחוז המשכנתא משווי הנכס) קבוע בהוראת ניהול בנקאי תקין 329 של בנק ישראל. תושב חוץ ממומן בדרך כלל בשיעור נמוך יותר מרוכש דירה ראשונה תושב ישראל — בסביבות מדרגת המשקיע (כ-50%) — ולכן נדרש הון עצמי גבוה יותר:
+              </p>
+              <div className="geo-table-wrap">
+                <table className="geo-table">
+                  <caption>שיעור מימון משכנתא מרבי לפי סוג רוכש</caption>
+                  <thead>
+                    <tr><th>סוג הרוכש</th><th>מימון מרבי</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>דירה יחידה (תושב ישראל)</td><td>עד 75%</td></tr>
+                    <tr><td>משפר דיור</td><td>עד 70%</td></tr>
+                    <tr><td>דירה להשקעה / נוספת</td><td>עד 50%</td></tr>
+                    <tr><td>תושב חוץ (לרוב)</td><td>כ-50%</td></tr>
+                  </tbody>
+                </table>
+                <span className="source-note">מקור: בנק ישראל (boi.org.il), הוראת ניהול בנקאי תקין 329 — מגבלות על שיעור המימון במשכנתאות לדיור.</span>
               </div>
             </section>
 

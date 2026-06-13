@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/apartment-pricing`,
   image: ogImage,
   datePublished: '2026-03-10',
-  dateModified: '2026-03-10',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'קניה ומכירה',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/apartment-pricing` },

@@ -77,8 +77,8 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
         padding: '20px',
         textAlign: 'center'
       }}>
-        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>Google Maps API key is missing</p>
-        <p style={{ fontSize: '14px', color: '#666' }}>Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
+        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>מפתח המפה חסר</p>
+        <p style={{ fontSize: '14px', color: '#666' }}>יש להוסיף את NEXT_PUBLIC_GOOGLE_MAPS_API_KEY לקובץ ה-env</p>
       </div>
     );
   }
@@ -95,8 +95,8 @@ const ContactMap: React.FC<ContactMapProps> = ({ latitude, longitude, address, c
         padding: '20px',
         textAlign: 'center'
       }}>
-        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>Google Maps failed to load</p>
-        <p style={{ fontSize: '14px', color: '#666' }}>Check API key, billing, and allowed referrer domains</p>
+        <p style={{ marginBottom: '8px', fontWeight: 'bold' }}>טעינת המפה נכשלה</p>
+        <p style={{ fontSize: '14px', color: '#666' }}>אנא נסו לרענן את העמוד</p>
       </div>
     );
   }

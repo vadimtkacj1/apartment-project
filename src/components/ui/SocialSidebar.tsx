@@ -238,7 +238,7 @@ const SocialSidebar = () => {
                     <div className="text-center">
                       <div className="text-lg font-bold mb-1">{owners[0].name}</div>
                       {owners[0].whatsapp && (
-                        <div className="text-sm opacity-90">{owners[0].whatsapp}</div>
+                        <div className="text-sm opacity-90" dir="ltr">{owners[0].whatsapp}</div>
                       )}
                     </div>
                   )}
@@ -254,7 +254,7 @@ const SocialSidebar = () => {
                         <div className="text-lg font-bold mb-1">{contactInfo.phoneName}</div>
                       )}
                       {contactInfo?.phone && (
-                        <div className="text-sm opacity-90">{contactInfo.phone}</div>
+                        <div className="text-sm opacity-90" dir="ltr">{contactInfo.phone}</div>
                       )}
                     </div>
                   )}
@@ -268,7 +268,7 @@ const SocialSidebar = () => {
                     <div className="text-center">
                       <div className="text-lg font-bold mb-1">{owners[1].name}</div>
                       {owners[1].whatsapp && (
-                        <div className="text-sm opacity-90">{owners[1].whatsapp}</div>
+                        <div className="text-sm opacity-90" dir="ltr">{owners[1].whatsapp}</div>
                       )}
                     </div>
                   )}
@@ -284,7 +284,7 @@ const SocialSidebar = () => {
                         <div className="text-lg font-bold mb-1">{contactInfo.phoneName2}</div>
                       )}
                       {contactInfo?.phone2 && (
-                        <div className="text-sm opacity-90">{contactInfo.phone2}</div>
+                        <div className="text-sm opacity-90" dir="ltr">{contactInfo.phone2}</div>
                       )}
                     </div>
                   )}
@@ -327,7 +327,7 @@ const SocialSidebar = () => {
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="md:hidden bg-[#1c3664] text-white p-2 h-10 flex items-center justify-center rounded-r-lg shadow-lg border-l border-white/10"
-          aria-label="Toggle menu"
+          aria-label="פתיחת תפריט"
         >
           {isMobileMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>

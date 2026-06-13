@@ -89,7 +89,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
           <div className="absolute top-4 left-4 z-30 pointer-events-none">
             <Image
               src="/images/logos.png"
-              alt="Logo"
+              alt="לוגו רם נכסים חיים ענבי"
               width={70}
               height={35}
               className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
@@ -113,7 +113,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
                 : 'bg-[#1c3664]/90 text-white'
             }`}>
               <p className={`text-2xl sm:text-3xl font-black ${isSold ? 'line-through' : ''}`}>
-                {price} ₪
+                <span dir="ltr">{price} ₪</span>
               </p>
               {isSold && (
                 <div className="flex items-center gap-1.5 bg-red-600 px-3 py-1 text-xs font-bold rounded-md">

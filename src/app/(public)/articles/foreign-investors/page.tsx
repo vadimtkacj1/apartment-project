@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/foreign-investors`,
   image: ogImage,
   datePublished: '2026-01-15',
-  dateModified: '2026-01-15',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'משקיעים זרים',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/foreign-investors` },

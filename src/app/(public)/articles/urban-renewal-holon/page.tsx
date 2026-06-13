@@ -51,7 +51,7 @@ const articleSchema = {
   url: `${siteUrl}/articles/urban-renewal-holon`,
   image: ogImage,
   datePublished: '2026-02-24',
-  dateModified: '2026-02-24',
+  dateModified: '2026-06-13',
   inLanguage: 'he',
   articleSection: 'אזור ומיקום',
   mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/urban-renewal-holon` },

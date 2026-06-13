@@ -117,11 +117,13 @@ const Testimonials: React.FC = () => {
             {testimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
                 {({ isActive }) => (
-                  <div className={`
+                  <div
+                    aria-hidden={!isActive}
+                    className={`
                     relative bg-white rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-14 flex flex-col items-center text-center transition-all duration-700 h-full shadow-none
-                    ${isActive 
-                      ? 'scale-100 opacity-100' 
-                      : 'scale-90 opacity-40 blur-[0.5px]'}
+                    ${isActive
+                      ? 'scale-100'
+                      : 'scale-90 blur-[2px]'}
                   `}>
                     
                     <div className="flex gap-1.5 mb-6">
@@ -132,12 +134,12 @@ const Testimonials: React.FC = () => {
 
                     <div className="min-h-[120px] md:min-h-[140px] flex items-center">
                       <p className={`text-lg md:text-2xl leading-[1.6] md:leading-[1.8] transition-colors duration-500
-                        ${isActive ? 'text-gray-700 font-medium italic' : 'text-gray-400'}`}>
+                        ${isActive ? 'text-gray-700 font-medium italic' : 'text-gray-500'}`}>
                         "{testimonial.text}"
                       </p>
                     </div>
 
-                    <h3 className={`text-xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
+                    <h3 className={`text-xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-500'}`}>
                       {testimonial.name}
                     </h3>
                   </div>
@@ -148,17 +150,19 @@ const Testimonials: React.FC = () => {
 
           {/* Buttons: Desktop only */}
           <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 right-0 z-30 pointer-events-none justify-between px-4">
-            <button 
+            <button
               onClick={() => swiperInstance?.slideNext()} // במצב RTL, Next זה שמאלה
+              aria-label="חוות הדעת הבאה"
               className="pointer-events-auto w-14 h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
             >
-              <ChevronRight size={32} />
+              <ChevronRight size={32} aria-hidden="true" />
             </button>
-            <button 
+            <button
               onClick={() => swiperInstance?.slidePrev()} // במצב RTL, Prev זה ימינה
+              aria-label="חוות הדעת הקודמת"
               className="pointer-events-auto w-14 h-14 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
             >
-              <ChevronLeft size={32} />
+              <ChevronLeft size={32} aria-hidden="true" />
             </button>
           </div>
 
