@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import OwnerCard from './OwnerCard';
 
 type Owner = {
@@ -42,7 +42,7 @@ export default function AboutOwners() {
   }, []);
 
   return (
-    <motion.section
+    <m.section
       ref={ownersRef}
       className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
       dir="rtl"
@@ -77,6 +77,6 @@ export default function AboutOwners() {
         </div>
         
       </div>
-    </motion.section>
+    </m.section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
@@ -120,14 +120,14 @@ const ValuesSection: React.FC = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-20 max-w-[1400px] 2xl:max-w-[1800px] relative z-10">
 
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -137,7 +137,7 @@ const ValuesSection: React.FC = () => {
             <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               היתרונות שלנו
             </span>
-          </motion.div>
+          </m.div>
 
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
@@ -146,7 +146,7 @@ const ValuesSection: React.FC = () => {
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             שלושת העמודים המרכזיים שעליהם בנוי השירות שלנו
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Mobile View */}
         <div className="block lg:hidden">
@@ -175,7 +175,7 @@ const ValuesSection: React.FC = () => {
         {/* Desktop View */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-12">
           {values.map((value, index) => (
-            <motion.div
+            <m.div
               key={value.id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -190,7 +190,7 @@ const ValuesSection: React.FC = () => {
               </div>
               <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
               <p className="text-base md:text-lg text-slate-500 leading-relaxed">{value.description}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 

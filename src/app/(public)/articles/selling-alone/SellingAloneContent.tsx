@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
 import '../foreign-investors/styles.css';
 
@@ -33,6 +34,7 @@ export default function SellingAloneContent() {
       <div className="article-container">
         <article className="article-content">
           <div className="article-body">
+            <ArticleByline id="selling-alone" />
             <section className="article-section">
               <p className="lead-paragraph">
                 אין תחושה מפתה יותר מזו: החלטתם למכור את הדירה, עשיתם חישוב מהיר במחשבון, ואמרתם לעצמכם: &quot;למה שנשלם 2% למתווך? נעלה מודעה ליד2, נראה את הבית פעמיים בשבוע, והכסף יישאר בכיס שלנו&quot;.

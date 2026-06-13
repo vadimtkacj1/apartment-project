@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Building2, Users, ThumbsUp, Award } from 'lucide-react';
 
 interface StatItemProps {
@@ -12,7 +12,7 @@ interface StatItemProps {
 
 const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -23,15 +23,15 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
       }}
       className="flex flex-col items-center justify-center p-4 group transition-all duration-300"
     >
-      <motion.div
+      <m.div
         whileHover={{ scale: 1.1, rotate: 5 }}
         transition={{ type: "spring", stiffness: 300 }}
         className="mb-4 text-[#1c3664]"
       >
         {icon}
-      </motion.div>
+      </m.div>
 
-      <motion.div
+      <m.div
         initial={{ scale: 0.8 }}
         whileInView={{ scale: 1 }}
         viewport={{ once: true }}
@@ -45,12 +45,12 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
         style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
       >
         {value}
-      </motion.div>
+      </m.div>
 
       <div className="text-base md:text-lg font-bold text-gray-600 text-center uppercase tracking-wide">
         {label}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

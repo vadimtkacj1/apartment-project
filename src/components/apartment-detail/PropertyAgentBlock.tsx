@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import Image from "next/image";
 import { Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
@@ -35,7 +35,7 @@ export function PropertyAgentBlock({
   if (!agents || agents.length === 0) return null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -101,6 +101,6 @@ export function PropertyAgentBlock({
           );
         })}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

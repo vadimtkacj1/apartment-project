@@ -1,10 +1,10 @@
 "use client";
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const MarketingMessage: React.FC = () => {
   return (
-    <motion.div
+    <m.div
       // Animation: Fade in and move up
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -33,7 +33,7 @@ const MarketingMessage: React.FC = () => {
         </p>
 
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

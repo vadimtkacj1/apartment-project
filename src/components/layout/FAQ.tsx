@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { faqData } from '@/data/faqData';
 
@@ -25,14 +25,14 @@ const FAQ: React.FC = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -43,7 +43,7 @@ const FAQ: React.FC = () => {
             <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               שאלות נפוצות
             </span>
-          </motion.div>
+          </m.div>
 
           <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
             שאלות ותשובות
@@ -54,12 +54,12 @@ const FAQ: React.FC = () => {
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             מצאנו עבורכם את התשובות לשאלות הנפוצות ביותר בתחום הנדל&quot;ן
           </p>
-        </motion.div>
+        </m.div>
 
         {/* FAQ Items */}
         <div className="space-y-4">
           {faqItems.map((item, index) => (
-            <motion.div
+            <m.div
               key={item.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -75,7 +75,7 @@ const FAQ: React.FC = () => {
                 <span className="text-lg md:text-xl font-bold text-gray-900 flex-1">
                   {item.question}
                 </span>
-                <motion.div
+                <m.div
                   animate={{ rotate: openId === item.id ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
                   className="flex-shrink-0"
@@ -86,10 +86,10 @@ const FAQ: React.FC = () => {
                     } transition-colors duration-200`}
                     size={28}
                   />
-                </motion.div>
+                </m.div>
               </button>
 
-              <motion.div
+              <m.div
                 initial={false}
                 animate={{
                   height: openId === item.id ? 'auto' : 0,
@@ -104,13 +104,13 @@ const FAQ: React.FC = () => {
                     {item.answer}
                   </p>
                 </div>
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -132,7 +132,7 @@ const FAQ: React.FC = () => {
               צור קשר
             </a>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

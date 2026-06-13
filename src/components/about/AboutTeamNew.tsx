@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 export default function AboutTeamNew() {
   return (
@@ -8,30 +8,30 @@ export default function AboutTeamNew() {
       <div className="max-w-[1200px] mx-auto px-6">
 
         {/* H2 Title */}
-        <motion.h2
+        <m.h2
           className="text-3xl md:text-4xl font-bold text-[#1c3664] mb-8 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
           הצוות המקצועי
-        </motion.h2>
+        </m.h2>
 
         {/* Subtitle */}
-        <motion.p
+        <m.p
           className="text-lg text-slate-600 text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           סוכני הנדל"ן המומחים שלנו כאן כדי לעזור לכם בכל שלב – משלב החיפוש הראשוני ועד לסגירת העסקה.
-        </motion.p>
+        </m.p>
 
         {/* Team Members Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
 
           {/* ליאור */}
-          <motion.div
+          <m.div
             className="space-y-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -43,10 +43,10 @@ export default function AboutTeamNew() {
             <p className="text-lg text-slate-700 leading-relaxed">
               ליאור היא סוכנת נדל"ן המתמחה בדירות להשכרה ובאיתור נכסים המתאימים לצרכי הלקוח.
             </p>
-          </motion.div>
+          </m.div>
 
           {/* תומר */}
-          <motion.div
+          <m.div
             className="space-y-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -58,7 +58,7 @@ export default function AboutTeamNew() {
             <p className="text-lg text-slate-700 leading-relaxed">
               תומר היא סוכנת נדל"ן המתמחה בדירות למכירה בחולון, עם דגש על שירות אישי וניהול תהליך יעיל ומדויק.
             </p>
-          </motion.div>
+          </m.div>
 
         </div>
       </div>

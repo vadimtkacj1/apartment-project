@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Phone, Mail, Check } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
@@ -50,7 +50,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
   const showImage = owner.image && !imgError;
 
   return (
-    <motion.div
+    <m.div
       className="flex flex-col items-center text-center max-w-lg mx-auto"
       initial={{ y: 50, opacity: 0 }}
       animate={inView ? { y: 0, opacity: 1 } : {}}
@@ -151,6 +151,6 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           )}
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

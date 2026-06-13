@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
+import PersonSchema from '@/components/SEO/PersonSchema';
 import AboutLocalExpertise from '@/components/about/AboutLocalExpertise';
 import AboutServicesNew from '@/components/about/AboutServicesNew';
 import AboutMarketing from '@/components/about/AboutMarketing';
@@ -28,6 +29,7 @@ export default function AboutPage() {
   return (
     <div className="about-page bg-[#faf7f2]" dir="rtl">
       <BreadcrumbSchema items={[{ name: 'אודות', path: '/about' }]} />
+      <PersonSchema />
       <SecondaryHero
         img="/7.jpg"
         title="אודות"

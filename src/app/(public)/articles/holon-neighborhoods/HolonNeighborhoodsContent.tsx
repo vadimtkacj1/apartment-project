@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
 import '../foreign-investors/styles.css';
 
@@ -36,6 +37,7 @@ export default function HolonNeighborhoodsContent() {
       <div className="article-container">
         <article className="article-content">
           <div className="article-body">
+            <ArticleByline id="holon-neighborhoods" />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">

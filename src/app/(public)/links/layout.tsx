@@ -2,9 +2,12 @@ import { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
+const linksTitle = 'קישורים שימושיים | כלים לרכישה ומכירת נדל״ן';
+const linksDescription = 'כלים ומקורות מידע רשמיים לבדיקת נכסים ותכנון עסקאות נדל״ן: נסח טאבו, מסמכי בית משותף, מדד תשומות הבנייה, מדד המחירים לצרכן ומחשבון משכנתא.';
+
 export const metadata: Metadata = {
-  title: { absolute: 'קישורים שימושיים - רם נכסים חיים ענבי' },
-  description: 'קישורים שימושיים למידע על נדל״ן: נסח טאבו, תשריט בית משותף, מדד תשומות הבנייה, מחשבון משכנתא ועוד. כלים מקצועיים לבדיקת נכסים.',
+  title: { absolute: linksTitle },
+  description: linksDescription,
   keywords: [
     'קישורים שימושיים',
     'נסח טאבו',
@@ -17,8 +20,8 @@ export const metadata: Metadata = {
     canonical: `${siteUrl}/links`,
   },
   openGraph: {
-    title: 'קישורים שימושיים - רם נכסים חיים ענבי',
-    description: 'קישורים שימושיים למידע על נדל״ן: נסח טאבו, תשריט בית משותף, מחשבון משכנתא ועוד.',
+    title: linksTitle,
+    description: linksDescription,
     url: `${siteUrl}/links`,
     images: [
       {
@@ -31,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'קישורים שימושיים - רם נכסים חיים ענבי',
-    description: 'קישורים שימושיים למידע על נדל״ן: נסח טאבו, תשריט בית משותף, מחשבון משכנתא ועוד.',
+    title: linksTitle,
+    description: linksDescription,
     images: [`${siteUrl}/7.jpg`],
   },
 };

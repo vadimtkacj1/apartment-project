@@ -3,8 +3,30 @@
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import ContactForm from '@/components/layout/ContactForm';
+import FAQ, { FAQItem } from '@/components/ui/FAQ';
+
+// Plain-text answers (no markup) so the visible FAQ text matches the FAQPage
+// JSON-LD in page.tsx verbatim — a mismatch is a structured-data spam signal.
+const faqItems: FAQItem[] = [
+  {
+    question: 'מהן העלויות הנלוות ברכישת דירה?',
+    answer: 'מעבר למחיר הדירה כדאי להיערך לכ-3%–5% הוצאות נלוות: מס רכישה, שכר טרחת עורך דין, דמי תיווך ועלויות שיפוץ. אנחנו דואגים שהתקציב שלכם יכסה את כל ההוצאות מראש, בלי הפתעות.',
+  },
+  {
+    question: 'מה זה אישור עקרוני ולמה כדאי להוציא אותו מראש?',
+    answer: 'אישור עקרוני הוא התחייבות ראשונית של הבנק לסכום המימון. מומלץ להוציא אותו לפני שמתחילים לחפש דירה, כדי לנהל משא ומתן בביטחון ולא לפספס דירה טובה בגלל עיכובים בנקאיים.',
+  },
+  {
+    question: 'אילו מסמכים בודקים לפני קניית דירה?',
+    answer: 'לכל נכס שמעניין אתכם אנחנו מוציאים נסח טאבו ותרשים בית משותף, ובודקים היסטוריית מחירים ועסקאות שבוצעו באותו בניין ובאותה שכונה — כדי שתדעו בדיוק מה אתם קונים.',
+  },
+  {
+    question: 'באילו שכונות בחולון אתם מתמחים?',
+    answer: 'אנחנו מכירים לעומק את כל שכונות העיר — גרין, נווה רמז, רסקו, קרית שרת, נאות שושנים ועוד — ומתאימים את החיפוש לצרכים ולתקציב שלכם על בסיס עסקאות שבוצעו באזור.',
+  },
+];
 
 export default function BuyingApartmentContent() {
   const sections = [
@@ -111,7 +133,7 @@ export default function BuyingApartmentContent() {
       <Breadcrumbs />
       <main className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         {sections.map((section, index) => (
-          <motion.section
+          <m.section
             key={section.id}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -135,9 +157,10 @@ export default function BuyingApartmentContent() {
                 className="object-contain"
               />
             </div>
-          </motion.section>
+          </m.section>
         ))}
-        <motion.section
+        <FAQ items={faqItems} />
+        <m.section
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -146,7 +169,7 @@ export default function BuyingApartmentContent() {
           id="contact"
         >
           <ContactForm />
-        </motion.section>
+        </m.section>
       </main>
     </div>
   );

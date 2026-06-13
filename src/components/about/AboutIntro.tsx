@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import Image from 'next/image';
 
 const stats = [
@@ -32,7 +32,7 @@ export default function AboutIntro() {
   const introInView = useInView(introRef, { once: true, amount: 0.3 });
 
   return (
-    <motion.section
+    <m.section
       ref={introRef}
       className="intro-section"
       initial={{ opacity: 0 }}
@@ -42,7 +42,7 @@ export default function AboutIntro() {
       <div className="intro-container">
         
         {/* Main Text Content */}
-        <motion.div
+        <m.div
           className="intro-content"
           initial={{ y: 30, opacity: 0 }}
           animate={introInView ? { y: 0, opacity: 1 } : {}}
@@ -56,10 +56,10 @@ export default function AboutIntro() {
             עם ניסיון מצטבר של למעלה מ-20 שנה בעולם הנדל"ן, הכרות עמוקה עם השוק המקומי ושיטות עבודה מוכחות,
             אנחנו מלווים כל לקוח באופן אישי ומקצועי עד להשלמת עסקה בתנאים הטובים ביותר.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Stats Grid - Icons without background cards */}
-        <motion.div
+        <m.div
           className="stats-grid"
           initial={{ y: 30, opacity: 0 }}
           animate={introInView ? { y: 0, opacity: 1 } : {}}
@@ -73,7 +73,7 @@ export default function AboutIntro() {
           }}
         >
           {stats.map((stat, index) => (
-            <motion.div
+            <m.div
               key={index}
               className="stat-card"
               initial={{ scale: 0.8, opacity: 0 }}
@@ -112,10 +112,10 @@ export default function AboutIntro() {
               </div>
               <div className="stat-value">{stat.value}</div>
               <div className="stat-label">{stat.label}</div>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       </div>
-    </motion.section>
+    </m.section>
   );
 }

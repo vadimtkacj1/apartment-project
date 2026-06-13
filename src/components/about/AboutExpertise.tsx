@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import Image from 'next/image';
 
 export default function AboutExpertise() {
@@ -9,7 +9,7 @@ export default function AboutExpertise() {
   const expertiseInView = useInView(expertiseRef, { once: true, amount: 0.3 });
 
   return (
-    <motion.section
+    <m.section
       ref={expertiseRef}
       className="expertise-section"
       initial={{ opacity: 0 }}
@@ -18,7 +18,7 @@ export default function AboutExpertise() {
       <div className="expertise-container">
         <div className="expertise-grid">
           {/* Text Content */}
-          <motion.div
+          <m.div
             className="expertise-content"
             initial={{ x: 50, opacity: 0 }}
             animate={expertiseInView ? { x: 0, opacity: 1 } : {}}
@@ -36,10 +36,10 @@ export default function AboutExpertise() {
                 אם אתם מחפשים דירה למכירה בחולון, דירה להשכרה בחולון או רוצים למכור נכס בעיר – אתם צריכים צוות שמכיר כל רחוב, כל שכונה וכל הזדמנות.
               </p>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Image */}
-          <motion.div
+          <m.div
             className="expertise-image"
             initial={{ x: -50, opacity: 0 }}
             animate={expertiseInView ? { x: 0, opacity: 1 } : {}}
@@ -52,9 +52,9 @@ export default function AboutExpertise() {
               height={400}
               className="rounded-xl"
             />
-          </motion.div>
+          </m.div>
         </div>
       </div>
-    </motion.section>
+    </m.section>
   );
 }

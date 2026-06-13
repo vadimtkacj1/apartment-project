@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import Image from 'next/image';
 
 // Data for the milestones/story steps
@@ -42,7 +42,7 @@ export default function AboutStory() {
       <div className="max-w-[1300px] mx-auto px-6">
         
         {/* Section Header */}
-        <motion.div
+        <m.div
           className="text-center mb-12"
           initial={{ y: -20, opacity: 0 }}
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
@@ -54,10 +54,10 @@ export default function AboutStory() {
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
             מתוך חזון לשנות את תחום הנדל"ן בחולון, הקמנו משרד שמציב את הלקוח במרכז
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Intro Text Paragraphs */}
-        <motion.div
+        <m.div
           className="max-w-4xl mx-auto text-center mb-20 space-y-6"
           initial={{ y: 20, opacity: 0 }}
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
@@ -69,10 +69,10 @@ export default function AboutStory() {
           <p className="text-lg text-slate-500 leading-relaxed">
             הגישה שלהם מבוססת על אמינות, עבודה יסודית והבנה עמוקה של כל עסקה. במקום שיווק כללי ולא ממוקד, הם בנו שיטת עבודה שמתחילה בתמחור נכון, ממשיכה בשיווק ממוקד ומסתיימת בניהול משא ומתן מדויק.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Milestones Grid - NO CARD BACKGROUND */}
-        <motion.div 
+        <m.div 
           // Layout: 1 col (mobile) -> 2 cols (tablet) -> 4 cols (desktop)
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20"
           initial="hidden"
@@ -82,7 +82,7 @@ export default function AboutStory() {
           }}
         >
           {milestones.map((milestone, index) => (
-            <motion.div
+            <m.div
               key={index}
               // Clean look: No 'bg-white', no 'shadow', no 'border'.
               // Just layout and a slight hover lift effect.
@@ -110,12 +110,12 @@ export default function AboutStory() {
               <p className="text-slate-500 text-[1.05rem] leading-relaxed">
                 {milestone.description}
               </p>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Footer Section (Dark Blue Block) */}
-        <motion.div
+        <m.div
           className="bg-[#1c3664] text-white p-8 md:p-12 rounded-3xl text-center shadow-xl shadow-blue-900/10 relative overflow-hidden"
           initial={{ y: 30, opacity: 0 }}
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
@@ -128,7 +128,7 @@ export default function AboutStory() {
             כיום רם וחיים מלווים עשרות עסקאות של דירות למכירה ודירות להשכרה בחולון מדי שנה,
             עם דגש על שירות אישי, שקיפות מלאה ותוצאות מוכחות.
           </p>
-        </motion.div>
+        </m.div>
 
       </div>
     </section>

@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -55,7 +55,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
       }}
       className="block h-full"
     >
-      <motion.div
+      <m.div
         whileHover={isSold ? {} : { y: -4, scale: 1.02 }}
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
           isSold
@@ -180,7 +180,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </Link>
   );
 };

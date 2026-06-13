@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface Spec {
   label: string;
@@ -14,7 +14,7 @@ interface PropertySpecsProps {
 
 export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.35 }}
@@ -48,6 +48,6 @@ export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
           )
         })}
       </div>
-    </motion.div>
+    </m.div>
   );
 }

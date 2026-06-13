@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import React from "react";
 import localFont from "next/font/local";
 import StructuredData from "@/components/SEO/StructuredData";
+import NavigationProgress from "@/components/NavigationProgress";
+import MotionProvider from "@/components/MotionProvider";
 import "./globals.css";
 
 const assistant = localFont({
@@ -38,6 +40,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: siteUrl,
+    types: {
+      'application/rss+xml': `${siteUrl}/feed.xml`,
+    },
   },
   openGraph: {
     type: 'website',
@@ -106,8 +111,9 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+        <NavigationProgress />
         <StructuredData />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

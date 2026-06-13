@@ -1,6 +1,6 @@
 "use client";
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
@@ -9,7 +9,6 @@ import { usePropertyData } from '@/hooks/usePropertyData';
 import {
   LoadingState,
   ErrorState,
-  PropertyGallery,
   PropertyAgentBlock,
   PropertyDescription,
   PropertyAmenities,
@@ -18,6 +17,16 @@ import {
   ContactForm,
   PropertyNavigation
 } from '@/components/apartment-detail';
+
+// Gallery pulls in Swiper (~35KB + its CSS). Code-split it so Swiper isn't in
+// the detail page's initial JS — but keep SSR on (no ssr:false) so the first
+// image stays in the prerendered HTML and the LCP isn't pushed to the client.
+const PropertyGallery = dynamic(
+  () => import('@/components/apartment-detail/PropertyGallery').then(mod => ({ default: mod.PropertyGallery })),
+  {
+    loading: () => <div style={{ height: '85vh' }} className="w-full bg-black/5 animate-pulse" />,
+  }
+);
 
 const PropertyMap = dynamic(
   () => import('@/components/apartment-detail/PropertyMap').then(m => ({ default: m.PropertyMap })),
@@ -90,7 +99,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
 
   return (
     <div className="min-h-screen bg-warm pt-32 pb-16 relative" dir="rtl">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: copied ? 1 : 0, y: copied ? 0 : 20 }}
         transition={{ duration: 0.25 }}
@@ -100,7 +109,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
           <Check size={16} />
           <span>הקישור הועתק ללוח!</span>
         </div>
-      </motion.div>
+      </m.div>
       <div className="w-full">
         <div className="w-full px-6 flex justify-between items-center mb-4 lg:px-12">
           <button
@@ -194,7 +203,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
               </div>
 
               <div className="lg:col-span-1 px-6">
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
@@ -212,7 +221,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
                     owners={property.owners ?? []}
                     dealType={property.dealType}
                   />
-                </motion.div>
+                </m.div>
               </div>
             </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 interface PropertyMapProps {
@@ -56,7 +56,7 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
 
   if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
@@ -73,13 +73,13 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
             <p className="text-sm text-gray-500">Please add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env file</p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   if (loadError) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
@@ -96,13 +96,13 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
             <p className="text-sm text-gray-500">Check API key, billing, and allowed referrer domains</p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   if (!isLoaded) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
@@ -118,12 +118,12 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
             <p className="text-gray-600">טוען מפה...</p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.4 }}
@@ -172,6 +172,6 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
           )}
         </GoogleMap>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import React, { memo, useState } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
   Bed, Maximize, MapPin, Wind, Warehouse, Sun,
@@ -127,7 +127,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
       onClick={disableClick ? undefined : handleClick}
       className={`block h-full ${disableClick ? '' : 'cursor-pointer'}`}
     >
-      <motion.div
+      <m.div
         whileHover={isSold ? {} : { y: -5 }}
         className={cardClasses}
         style={{ boxShadow: cardShadow }}
@@ -275,7 +275,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 });

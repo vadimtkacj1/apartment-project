@@ -116,11 +116,13 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
     : `${siteUrl}/images/hero/main-hero.jpg`;
 
+  const isRent = property.dealType === 'rent';
   const priceValidUntil = new Date(property.updatedAt);
-  priceValidUntil.setDate(priceValidUntil.getDate() + (property.dealType === 'rent' ? 30 : 90));
+  priceValidUntil.setDate(priceValidUntil.getDate() + (isRent ? 30 : 90));
   const numericPrice = property.price != null
     ? parseFloat(String(property.price).replace(/[^\d.]/g, ''))
     : NaN;
+  const roomsNum = parseFloat(String(property.rooms));
 
   const apartmentSchema = {
     '@context': 'https://schema.org',
@@ -130,22 +132,42 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     url: `${siteUrl}/apartments/${id}`,
     address: {
       '@type': 'PostalAddress',
-      addressLocality: property.city || property.location,
+      // Region intentionally omitted: listings span the Tel Aviv District (Holon,
+      // Bat Yam) and the Central District (Rishon LeZion) — no single value is correct.
+      ...(property.street && {
+        streetAddress: `${property.street} ${property.streetNumber ?? ''}`.trim(),
+      }),
+      addressLocality: getCityLabel(property.city) || property.location,
       addressCountry: 'IL',
     },
-    ...(property.rooms && { numberOfRooms: property.rooms }),
+    ...(property.latitude != null && property.longitude != null && {
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: property.latitude,
+        longitude: property.longitude,
+      },
+    }),
+    ...(Number.isFinite(roomsNum) && { numberOfRooms: roomsNum }),
+    ...(property.bathrooms != null && { numberOfBathroomsTotal: property.bathrooms }),
+    ...(property.floor != null && { floorLevel: String(property.floor) }),
     ...(property.area && { floorSize: { '@type': 'QuantitativeValue', value: property.area, unitCode: 'MTK' } }),
     image: images.length > 0
       ? images.map((img) => (img.startsWith('http') ? img : `${siteUrl}${img}`))
       : ogImage,
     offers: {
       '@type': 'Offer',
-      ...(!isNaN(numericPrice) && { price: numericPrice }),
+      // Distinguishes a monthly lease from an outright sale so AI engines never
+      // quote a rent figure as a purchase price.
+      businessFunction: isRent ? 'https://schema.org/LeaseOut' : 'https://schema.org/Sell',
       priceCurrency: 'ILS',
       availability: property.isSold
-        ? 'https://schema.org/SoldOut'
+        ? (isRent ? 'https://schema.org/OutOfStock' : 'https://schema.org/SoldOut')
         : 'https://schema.org/InStock',
       priceValidUntil: priceValidUntil.toISOString().split('T')[0],
+      ...(!isNaN(numericPrice) && (isRent
+        ? { priceSpecification: { '@type': 'UnitPriceSpecification', price: numericPrice, priceCurrency: 'ILS', unitCode: 'MON' } }
+        : { price: numericPrice })),
+      seller: { '@id': `${siteUrl}/#organization` },
     },
   };
 

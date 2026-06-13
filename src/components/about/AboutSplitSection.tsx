@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 
@@ -18,7 +18,7 @@ export default function AboutSplitSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
           {/* Image Section - Left */}
-          <motion.div
+          <m.div
             className="relative h-[450px] lg:h-[550px] rounded-[2rem] overflow-hidden shadow-2xl"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -31,10 +31,10 @@ export default function AboutSplitSection() {
               className="object-cover"
               priority
             />
-          </motion.div>
+          </m.div>
 
           {/* Text Content - Right */}
-          <motion.div
+          <m.div
             className="space-y-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -75,7 +75,7 @@ export default function AboutSplitSection() {
                 <span>קרא עוד על המשרד</span>
               </button>
             </div>
-          </motion.div>
+          </m.div>
 
         </div>
       </div>

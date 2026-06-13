@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Phone, Mail, Check } from 'lucide-react';
 import { useState } from 'react';
@@ -43,7 +43,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 50, opacity: 0 }}
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -148,6 +148,6 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
+import { articles } from '@/data/articles';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -54,66 +55,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7, // Content section - medium-high priority
     },
     {
-      url: `${baseUrl}/articles/foreign-investors`,
-      changeFrequency: 'monthly', // Individual article - less frequent updates
-      priority: 0.6, // Article page - medium priority
-    },
-    {
-      url: `${baseUrl}/articles/selling-alone`,
-      changeFrequency: 'monthly', // Individual article - less frequent updates
-      priority: 0.6, // Article page - medium priority
-    },
-    {
-      url: `${baseUrl}/articles/purchase-tax-guide`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/urban-renewal-holon`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/apartment-pricing`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/first-apartment-guide`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/mortgage-guide`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/landlord-guide`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/holon-neighborhoods`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/pre-purchase-checklist`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/new-vs-secondhand`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/articles/home-staging`,
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
-    {
       url: `${baseUrl}/faq`,
       changeFrequency: 'monthly', // FAQ may be updated occasionally
       priority: 0.5, // Support page - medium priority
@@ -124,16 +65,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.4,
     },
     {
-      url: `${baseUrl}/privacy-policy`,
-      changeFrequency: 'yearly',
-      priority: 0.2,
-    },
-    {
+      // privacy-policy is intentionally omitted: it is robots noindex, so listing
+      // it in the sitemap triggers a "Submitted URL marked noindex" warning that
+      // erodes crawl-budget trust for the legitimate URLs alongside it.
       url: `${baseUrl}/accessibility`,
       changeFrequency: 'yearly',
       priority: 0.2,
     },
   ];
+
+  // Articles come from the shared registry (src/data/articles.ts) so a new guide
+  // is added in exactly one place and still lands in the sitemap, with a truthful
+  // lastModified derived from its publish date.
+  const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => ({
+    url: `${baseUrl}/articles/${a.id}`,
+    lastModified: new Date(a.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
 
   try {
     // Active, still-available properties only. Sold/rented listings stay live
@@ -165,11 +114,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Combine static routes with dynamic property routes
     // Total sitemap size = static routes (10) + number of active properties
-    return [...staticRoutes, ...propertyRoutes];
+    return [...staticRoutes, ...articleRoutes, ...propertyRoutes];
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    // Return static routes if database query fails
-    return staticRoutes;
+    // Return static + article routes if the property query fails
+    return [...staticRoutes, ...articleRoutes];
   }
 }
 

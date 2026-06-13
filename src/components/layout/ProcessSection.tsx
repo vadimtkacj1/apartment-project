@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Home, Calculator, FileCheck } from 'lucide-react';
 
 const ProcessSection: React.FC = () => {
@@ -59,14 +59,14 @@ const ProcessSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
 
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -76,19 +76,19 @@ const ProcessSection: React.FC = () => {
             <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               מדריך
             </span>
-          </motion.div>
+          </m.div>
 
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
           {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <motion.div
+              <m.div
                 key={index}
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -145,7 +145,7 @@ const ProcessSection: React.FC = () => {
                   {/* Bottom Accent */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#1c3664] to-transparent"></div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

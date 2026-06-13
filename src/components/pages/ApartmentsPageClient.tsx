@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, Suspense, useMemo, useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
 
@@ -383,7 +383,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
 
           <AnimatePresence>
             {showFilters && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -405,7 +405,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                     syncUrlFromFilters(resetFilters);
                   }}
                 />
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
@@ -422,14 +422,14 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
               {/* Infinite scroll sentinel */}
               <div ref={sentinelRef} className="mt-8 flex justify-center">
                 {hasMore && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="flex items-center gap-2 text-gray-400 font-bold py-4"
                   >
                     <span className="w-5 h-5 border-2 border-[#1c3664] border-t-transparent rounded-full animate-spin inline-block" />
                     <span>טוען עוד נכסים...</span>
-                  </motion.div>
+                  </m.div>
                 )}
               </div>
             </>

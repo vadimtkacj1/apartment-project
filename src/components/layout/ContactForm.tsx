@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
 import dynamic from 'next/dynamic';
@@ -104,7 +104,7 @@ const ContactForm: React.FC = () => {
     >
       <div className="relative max-w-7xl mx-auto px-6 lg:px-12 z-10">
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -117,12 +117,12 @@ const ContactForm: React.FC = () => {
           <p className="text-xl md:text-2xl text-slate-500 font-semibold max-w-3xl mx-auto">
             השאיר פרטים ונחזור אליכם בהקדם האפשרי
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Right Column - Contact Form */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -130,12 +130,12 @@ const ContactForm: React.FC = () => {
             className="bg-white rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-slate-200 lg:order-2"
           >
             <ContactFormFields idPrefix="contact-" />
-          </motion.div>
+          </m.div>
 
           {/* Left Column - Map & Contact Info */}
           <div className="flex flex-col space-y-6 md:space-y-8 lg:order-1">
             {/* Map */}
-            <motion.div
+            <m.div
               ref={mapContainerRef}
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -154,10 +154,10 @@ const ContactForm: React.FC = () => {
               ) : (
                 <MapPlaceholder />
               )}
-            </motion.div>
+            </m.div>
 
             {/* Contact Info Cards */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -231,7 +231,7 @@ const ContactForm: React.FC = () => {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </div>

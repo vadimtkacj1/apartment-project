@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Phone, Instagram, Facebook, ChevronRight, ChevronLeft, X, Mail } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
 import ContactFormPopup from '@/components/layout/ContactFormPopup';
@@ -202,14 +202,14 @@ const SocialSidebar = () => {
       {/* Choice Modal */}
       <AnimatePresence>
         {choiceModal.isOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 z-[900] flex items-center justify-center p-4"
             onClick={() => setChoiceModal({ ...choiceModal, isOpen: false })}
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -290,12 +290,12 @@ const SocialSidebar = () => {
                   )}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
-      <motion.div
+      <m.div
         className="fixed left-0 top-1/2 -translate-y-1/2 z-[50] flex items-center"
         initial={false}
         animate={{
@@ -331,7 +331,7 @@ const SocialSidebar = () => {
         >
           {isMobileMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
-      </motion.div>
+      </m.div>
     </>
   );
 };

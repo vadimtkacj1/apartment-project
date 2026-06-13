@@ -37,28 +37,14 @@ export const metadata: Metadata = {
   },
 };
 
-const breadcrumbSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'דף הבית', item: siteUrl },
-    { '@type': 'ListItem', position: 2, name: 'מאמרים', item: `${siteUrl}/articles` },
-  ],
-};
-
+// Breadcrumb JSON-LD is emitted per-page (the index renders Home > מאמרים and each
+// article renders the full Home > מאמרים > Article trail), so the layout no longer
+// emits its own truncated BreadcrumbList — that produced two competing breadcrumbs.
 export default function ArticlesLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
 

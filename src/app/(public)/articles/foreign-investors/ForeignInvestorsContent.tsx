@@ -3,6 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
 import './styles.css';
 
@@ -39,6 +40,7 @@ export default function ForeignInvestorsContent() {
 
           {/* Main Content */}
           <div className="article-body">
+            <ArticleByline id="foreign-investors" />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">

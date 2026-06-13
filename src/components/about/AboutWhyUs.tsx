@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import { MapPin, Target, Handshake, Zap, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const features = [
@@ -49,7 +49,7 @@ export default function AboutWhyUs() {
     >
       <div className="max-w-[1200px] 2xl:max-w-[1800px] mx-auto px-6 2xl:px-16">
         {/* Заголовок */}
-        <motion.div
+        <m.div
           className="text-center mb-20"
           initial={{ y: -20, opacity: 0 }}
           animate={whyInView ? { y: 0, opacity: 1 } : {}}
@@ -61,10 +61,10 @@ export default function AboutWhyUs() {
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
             אנחנו לא רק מתווכים – אנחנו שותפים שלכם להצלחה
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Сетка Grid */}
-        <motion.div 
+        <m.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
           initial="hidden"
           animate={whyInView ? "visible" : "hidden"}
@@ -75,7 +75,7 @@ export default function AboutWhyUs() {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <motion.div
+              <m.div
                 key={index}
                 className="flex flex-col items-center text-center group"
                 variants={{
@@ -95,10 +95,10 @@ export default function AboutWhyUs() {
                 <p className="text-[1.05rem] text-slate-500 leading-relaxed max-w-xs mx-auto">
                   {feature.description}
                 </p>
-              </motion.div>
+              </m.div>
             );
           })}
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

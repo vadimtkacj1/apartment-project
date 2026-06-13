@@ -1,6 +1,6 @@
 "use client";
 import React, { memo, useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { m, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -45,7 +45,7 @@ const AboutSection: React.FC = memo(() => {
       style={{ background: 'rgb(42, 74, 138)' }}
     >
       {/* Скрываем белый фон с паттерном на мобильных (hidden md:block) */}
-      <motion.div
+      <m.div
         className="absolute z-0 hidden md:block"
         style={{
           y: patternY,
@@ -65,7 +65,7 @@ const AboutSection: React.FC = memo(() => {
             backgroundPosition: 'center',
           }}
         />
-      </motion.div>
+      </m.div>
 
       {/* Скрываем синие блоки с clip-path на мобильных (hidden md:block) */}
       <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
@@ -89,7 +89,7 @@ const AboutSection: React.FC = memo(() => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -101,9 +101,9 @@ const AboutSection: React.FC = memo(() => {
                 קצת עלינו
               </span>
             </div>
-            <motion.h2 className="text-5xl md:text-6xl font-black mb-6 uppercase tracking-tight text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            <m.h2 className="text-5xl md:text-6xl font-black mb-6 uppercase tracking-tight text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               {title}
-            </motion.h2>
+            </m.h2>
 
             <div className="space-y-6">
               <p className="text-xl sm:text-3xl font-bold leading-tight text-[#c5a357]">
@@ -128,9 +128,9 @@ const AboutSection: React.FC = memo(() => {
                 <ArrowLeft className="w-6 h-6" />
               </Link>
             </div>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -149,7 +149,7 @@ const AboutSection: React.FC = memo(() => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent pointer-events-none" />
             </div>
-          </motion.div>
+          </m.div>
 
         </div>
       </div>

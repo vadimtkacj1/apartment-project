@@ -1,22 +1,9 @@
-import type { Metadata } from 'next';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { FileText, Home, TrendingUp, DollarSign, Calculator, ExternalLink, LucideIcon } from 'lucide-react';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
-
-export const metadata: Metadata = {
-  title: 'קישורים שימושיים | כלים לרכישה ומכירת נדל״ן',
-  description: 'קישורים רשמיים לכלים חיוניים בעסקת נדל״ן: הפקת נסח טאבו, מסמכי בית משותף, מדד תשומות הבנייה, מדד המחירים לצרכן ומחשבון משכנתא.',
-  alternates: {
-    canonical: `${siteUrl}/links`,
-  },
-  openGraph: {
-    title: 'קישורים שימושיים | כלים לרכישה ומכירת נדל״ן',
-    description: 'כלים ומקורות מידע רשמיים לבדיקת נכסים ותכנון עסקאות נדל״ן.',
-    url: `${siteUrl}/links`,
-  },
-};
+// Metadata for /links lives solely in layout.tsx (single source of truth) so the
+// OG image and a consistent OG/Twitter title are not lost to a competing export.
 
 interface Link {
   id: number;

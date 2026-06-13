@@ -53,8 +53,10 @@ const nextConfig: NextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'swiper', '@ant-design/icons', 'react-icons'],
-    // Enable optimized CSS loading
-    optimizeCss: true,
+    // NOTE: optimizeCss was removed — it requires the `beasties` (or legacy
+    // `critters`) package to inline critical CSS, which isn't installed, so the
+    // flag was a no-op at best and a build hazard at worst. Re-add it together
+    // with `npm i -D beasties` if critical-CSS inlining is wanted later.
   },
   
   // Webpack optimizations

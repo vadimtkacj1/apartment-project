@@ -42,6 +42,33 @@
   font-weight: 500;
 }
 
+/* Article byline (author + updated date) */
+.article-byline {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0 0 1.75rem;
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.article-byline a {
+  color: #1c3664;
+  text-decoration: none;
+}
+.article-byline a:hover {
+  text-decoration: underline;
+}
+.article-byline time {
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .article-byline-sep {
+    display: block;
+    height: 0;
+    overflow: hidden;
+  }
+}
+
 .separator {
   color: #d1d5db;
 }

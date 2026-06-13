@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { FilterState } from '@/types/property.types';
 import { ISRAELI_CITIES } from '@/data/cities';
@@ -137,7 +137,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
       {/* --- ADVANCED FILTERS (Collapsible) --- */}
       <AnimatePresence>
         {isExpanded && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -437,7 +437,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                       </label>
                  </div>
              </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

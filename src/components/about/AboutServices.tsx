@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import Image from 'next/image';
 
 // Убедитесь, что пути к иконкам правильные
@@ -41,7 +41,7 @@ export default function AboutServices() {
       <div className="max-w-[1300px] mx-auto px-6">
         
         {/* Заголовок */}
-        <motion.div
+        <m.div
           className="text-center mb-16"
           initial={{ y: -20, opacity: 0 }}
           animate={servicesInView ? { y: 0, opacity: 1 } : {}}
@@ -53,10 +53,10 @@ export default function AboutServices() {
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
              מעטפת שירותים מלאה בתחום הנדל"ן בחולון
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Сетка услуг (Grid) - Clean design без фона */}
-        <motion.div
+        <m.div
           className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12"
           initial="hidden"
           animate={servicesInView ? "visible" : "hidden"}
@@ -65,7 +65,7 @@ export default function AboutServices() {
           }}
         >
           {services.map((service, index) => (
-            <motion.div
+            <m.div
               key={index}
               className="group relative"
               variants={{
@@ -99,9 +99,9 @@ export default function AboutServices() {
 
               {/* Subtle bottom border for separation */}
               <div className="absolute bottom-0 right-0 w-full h-px bg-gradient-to-l from-transparent via-slate-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
       </div>
     </section>

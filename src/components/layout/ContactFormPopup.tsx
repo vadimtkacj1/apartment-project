@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
 
@@ -46,7 +46,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
           `}</style>
 
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -55,7 +55,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
           />
 
           {/* Modal Positioning */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -90,7 +90,7 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
                 />
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Send, Phone, CheckCircle2 } from 'lucide-react';
 import { ContactFormData } from './types';
 import { analytics } from '@/lib/analytics';
@@ -95,7 +95,7 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
                 placeholder="ספר לנו עוד..."
               />
             </div>
-            <motion.button
+            <m.button
               type="submit"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -103,7 +103,7 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
             >
               <span>שלח הודעה</span>
               <Send size={20} className="transform rotate-180" />
-            </motion.button>
+            </m.button>
           </form>
           {owners.length > 0 && (
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">

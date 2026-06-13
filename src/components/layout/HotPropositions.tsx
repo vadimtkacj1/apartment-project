@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, memo, useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
@@ -72,7 +72,7 @@ const MarqueeRow = ({
 
   return (
     <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
-      <motion.div
+      <m.div
         key={`hot-propositions-marquee-${direction}-${animationDuration}`}
         className="flex gap-4 md:gap-6 py-4 md:py-6"
         style={{
@@ -118,7 +118,7 @@ const MarqueeRow = ({
             </a>
           );
         })}
-      </motion.div>
+      </m.div>
     </div>
   );
 };
@@ -222,14 +222,14 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
     <section className="relative py-16 md:py-20 overflow-hidden w-full" dir="rtl">
       <div className="relative z-10 w-full">
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16 px-4 md:px-6"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -239,12 +239,12 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
             <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               מבחר נכסים
             </span>
-          </motion.div>
+          </m.div>
 
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
-        </motion.div>
+        </m.div>
 
         {/* Scrolling Rows */}
         <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">

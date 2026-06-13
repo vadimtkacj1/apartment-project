@@ -3,8 +3,34 @@
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import ContactForm from '@/components/layout/ContactForm';
+import FAQ, { FAQItem } from '@/components/ui/FAQ';
+
+// Plain-text answers (no markup) so the visible FAQ text matches the FAQPage
+// JSON-LD in page.tsx verbatim — a mismatch is a structured-data spam signal.
+const faqItems: FAQItem[] = [
+  {
+    question: 'אילו בדיקות צריך לעשות לפני מכירת דירה?',
+    answer: 'לפני הפרסום מומלץ לבצע בדיקת כשירות מלאה: הפקת נסח טאבו עדכני, בדיקת ארנונה, הוצאת תשריט בית משותף ובדיקת תיק הבניין בעירייה — כדי לוודא שהנכס נבנה לפי היתר. נכס עם תיק מסודר נמכר מהר יותר ובאמון גבוה יותר מקונים.',
+  },
+  {
+    question: 'אילו מסים צריך לבדוק לפני מכירת דירה?',
+    answer: 'שני המרכיבים המרכזיים הם מס שבח והיטל השבחה. בדיקה מוקדמת של חבות המס מאפשרת לקבוע מחיר נכון לשוק ולהימנע ממצב שבו העסקה נתקעת ברגע האחרון.',
+  },
+  {
+    question: 'מה עושים עם משכנתא קיימת בעת מכירה?',
+    answer: 'מוציאים מהבנק מכתב כוונות המפרט את יתרת המשכנתא כולל קנסות פירעון מוקדם, ובודקים אם כדאי לגרור את המשכנתא או למחזר. אם אתם משפרי דיור, מומלץ לקבל במקביל אישור עקרוני לנכס הבא.',
+  },
+  {
+    question: 'איך נקבע מחיר היציאה של הדירה?',
+    answer: 'אנחנו מבצעים ניתוח שוק מבוסס עסקאות שבוצעו באזור — ולא הערכות כלליות — מגדירים קהל יעד מדויק וקובעים מחיר יציאה שמייצר ביקוש אמיתי כבר בתחילת הפרסום, במקום הורדות מחיר בהמשך.',
+  },
+  {
+    question: 'באילו ערוצים משווקים את הדירה?',
+    answer: 'הנכס משווק במקביל בכמה ערוצים: צילום מקצועי, פרסום באתרי נדל״ן מובילים, קמפיינים ממומנים ברשתות ובגוגל, חשיפה למאגר קונים קיים, שיתופי פעולה עם מתווכים, ושילוט ופעילות שטח. שיווק נכון מייצר תחרות בין קונים.',
+  },
+];
 
 export default function SellingApartmentContent() {
   const sections = [
@@ -129,7 +155,7 @@ export default function SellingApartmentContent() {
       <Breadcrumbs />
       <main className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         {sections.map((section, index) => (
-          <motion.section
+          <m.section
             key={section.id}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -153,9 +179,10 @@ export default function SellingApartmentContent() {
                 className="object-contain"
               />
             </div>
-          </motion.section>
+          </m.section>
         ))}
-        <motion.section
+        <FAQ items={faqItems} />
+        <m.section
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -164,7 +191,7 @@ export default function SellingApartmentContent() {
           id="contact"
         >
           <ContactForm />
-        </motion.section>
+        </m.section>
       </main>
     </div>
   );

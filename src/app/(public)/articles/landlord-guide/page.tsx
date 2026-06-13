@@ -51,19 +51,25 @@ const articleSchema = {
   url: `${siteUrl}/articles/landlord-guide`,
   image: ogImage,
   datePublished: '2026-04-21',
-  dateModified: '2026-06-13',
+  dateModified: '2026-04-21',
   inLanguage: 'he',
+  articleSection: 'השכרה וניהול',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/landlord-guide` },
+  isPartOf: { '@id': `${siteUrl}/#website` },
   author: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
+    '@type': 'Person',
+    '@id': `${siteUrl}/about#owner-2`,
+    name: 'חיים ענבי',
+    jobTitle: 'מתווך נדל״ן מורשה ומייסד',
+    url: `${siteUrl}/about`,
+    worksFor: { '@id': `${siteUrl}/#organization` },
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Real Estate License',
+      identifier: '3164492',
+    },
   },
-  publisher: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
-    logo: { '@type': 'ImageObject', url: `${siteUrl}/images/logos.png` },
-  },
+  publisher: { '@id': `${siteUrl}/#organization` },
 };
 
 const faqSchema = {

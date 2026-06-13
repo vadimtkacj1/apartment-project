@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Send, Phone } from 'lucide-react';
 import { analytics } from '@/lib/analytics';
 
@@ -215,7 +215,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
 
       {/* Status Messages */}
       {submitStatus.type && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className={`p-4 rounded-xl text-center font-bold ${
@@ -225,11 +225,11 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           }`}
         >
           {submitStatus.message}
-        </motion.div>
+        </m.div>
       )}
 
       {/* Submit Button */}
-      <motion.button
+      <m.button
         type="submit"
         disabled={isSubmitting}
         whileHover={!isSubmitting ? { scale: 1.01 } : {}}
@@ -247,7 +247,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
             className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
           />
         )}
-      </motion.button>
+      </m.button>
     </form>
   );
 };

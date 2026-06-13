@@ -129,8 +129,41 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
 
   const activeProperties = initialProperties;
 
+  // Filter-aware collection so the schema matches the page's own canonical/title
+  // and enumerates every crawlable listing link for Google and AI answer engines.
+  const collectionName =
+    dealType === 'rent' ? 'דירות להשכרה בחולון'
+    : dealType === 'sale' ? 'דירות למכירה בחולון'
+    : 'דירות למכירה ולהשכרה בחולון';
+  const collectionUrl = `${siteUrl}/apartments${initialFilterKey ? `?${initialFilterKey}` : ''}`;
+  const collectionSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: collectionName,
+    url: collectionUrl,
+    inLanguage: 'he',
+    isPartOf: { '@id': `${siteUrl}/#website` },
+    about: { '@id': `${siteUrl}/#organization` },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: activeProperties.length,
+      itemListElement: activeProperties.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${siteUrl}/apartments/${p.id}`,
+        name:
+          p.title?.trim() ||
+          `${p.bedrooms} חדרים ${p.dealType === 'rent' ? 'להשכרה' : 'למכירה'} ב${p.location}`,
+      })),
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
       <BreadcrumbSchema items={[{ name: 'דירות', path: '/apartments' }]} />
       <div className="sr-only">
         <h1>דירות למכירה ולהשכרה בחולון</h1>

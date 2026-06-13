@@ -51,19 +51,25 @@ const articleSchema = {
   url: `${siteUrl}/articles/pre-purchase-checklist`,
   image: ogImage,
   datePublished: '2026-05-19',
-  dateModified: '2026-06-13',
+  dateModified: '2026-05-19',
   inLanguage: 'he',
+  articleSection: 'קניה ומכירה',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/pre-purchase-checklist` },
+  isPartOf: { '@id': `${siteUrl}/#website` },
   author: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
+    '@type': 'Person',
+    '@id': `${siteUrl}/about#owner-1`,
+    name: 'רם מזרחי',
+    jobTitle: 'מתווך נדל״ן מורשה ומייסד',
+    url: `${siteUrl}/about`,
+    worksFor: { '@id': `${siteUrl}/#organization` },
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Real Estate License',
+      identifier: '3019640',
+    },
   },
-  publisher: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
-    logo: { '@type': 'ImageObject', url: `${siteUrl}/images/logos.png` },
-  },
+  publisher: { '@id': `${siteUrl}/#organization` },
 };
 
 const faqSchema = {

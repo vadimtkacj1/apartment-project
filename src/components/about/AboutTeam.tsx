@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 import AgentCard from './AgentCard';
 
 type TeamMember = {
@@ -43,7 +43,7 @@ export default function AboutTeam() {
   }, []);
 console.log(team);
   return (
-    <motion.section
+    <m.section
       ref={teamRef}
       className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
       dir="rtl"
@@ -55,22 +55,22 @@ console.log(team);
         
         {/* Section Header */}
         <div className="text-center mb-24">
-          <motion.h2 
+          <m.h2 
             initial={{ y: -20, opacity: 0 }}
             animate={teamInView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-6"
           >
             הצוות המקצועי
-          </motion.h2>
-          <motion.p 
+          </m.h2>
+          <m.p 
             initial={{ y: -20, opacity: 0 }}
             animate={teamInView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed"
           >
             סוכני הנדל"ן המומחים שלנו כאן כדי לעזור לכם בכל שלב – משלב החיפוש הראשוני ועד לסגירת העסקה.
-          </motion.p>
+          </m.p>
         </div>
 
         {/* Agents List Container */}
@@ -92,6 +92,6 @@ console.log(team);
         </div>
 
       </div>
-    </motion.section>
+    </m.section>
   );
 }

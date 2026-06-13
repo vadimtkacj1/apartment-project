@@ -1,0 +1,35 @@
+# רם נכסים חיים ענבי (Ram Nekasim Chaim Anavi)
+
+> Real-estate brokerage in Holon, Israel — sales, rentals, and property management of apartments across Holon, Bat Yam, and Rishon LeZion. Over 20 years of local experience.
+
+## Key pages
+- [Home](https://ram-haim.co.il/): agency overview and featured listings
+- [Apartments](https://ram-haim.co.il/apartments): full searchable catalog of properties for sale and rent
+- [For sale](https://ram-haim.co.il/apartments?dealType=sale): apartments for sale in Holon and the central district
+- [For rent](https://ram-haim.co.il/apartments?dealType=rent): apartments for rent
+- [Buying an apartment](https://ram-haim.co.il/buying-apartment): the buyer process, financing, and guidance
+- [Selling an apartment](https://ram-haim.co.il/selling-apartment): the seller process, legal/tax checks, valuation, and marketing
+- [About](https://ram-haim.co.il/about): about the agency and its licensed brokers
+- [FAQ](https://ram-haim.co.il/faq): common questions about buying, selling, and renting
+- [Articles](https://ram-haim.co.il/articles): guides on mortgages, purchase tax, urban renewal in Holon, neighborhoods, valuation, and more
+
+## Services
+- Property sales (apartments, garden apartments, cottages, investment properties)
+- Property rentals
+- Property management for owners and overseas investors
+- Pricing/valuation and full transaction support
+
+## Areas served
+Holon, Bat Yam, Rishon LeZion (central Israel)
+
+## Contact
+- Ram Mizrahi (licensed broker, founder): +972-50-549-6626
+- Chaim Anavi (licensed broker, founder): +972-50-675-9999
+- Website: https://ram-haim.co.il
+
+<!--
+Maintenance note: keep the names, phone numbers, areas served, and the experience
+figure in sync with src/components/SEO/StructuredData.tsx and the /about page. An
+out-of-date llms.txt would mislead AI crawlers. This file is optional — Google
+Search ignores llms.txt; some other AI engines use it for orientation.
+-->

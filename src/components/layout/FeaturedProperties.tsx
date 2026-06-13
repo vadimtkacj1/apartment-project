@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -160,14 +160,14 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -177,7 +177,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
             <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
               נכסים נבחרים
             </span>
-          </motion.div>
+          </m.div>
 
           <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {titles.featuredPropertiesTitle}
@@ -186,7 +186,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             {titles.featuredPropertiesSubtitle}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
@@ -201,7 +201,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         </div>
 
         {/* View All Button */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -219,7 +219,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
               className="transition-transform duration-300 group-hover:translate-x-2"
             />
           </Link>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

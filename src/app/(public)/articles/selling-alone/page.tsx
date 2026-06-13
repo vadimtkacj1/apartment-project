@@ -50,19 +50,25 @@ const articleSchema = {
   url: `${siteUrl}/articles/selling-alone`,
   image: ogImage,
   datePublished: '2026-01-14',
-  dateModified: '2026-06-11',
+  dateModified: '2026-01-14',
   inLanguage: 'he',
+  articleSection: 'קניה ומכירה',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': `${siteUrl}/articles/selling-alone` },
+  isPartOf: { '@id': `${siteUrl}/#website` },
   author: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
+    '@type': 'Person',
+    '@id': `${siteUrl}/about#owner-1`,
+    name: 'רם מזרחי',
+    jobTitle: 'מתווך נדל״ן מורשה ומייסד',
+    url: `${siteUrl}/about`,
+    worksFor: { '@id': `${siteUrl}/#organization` },
+    hasCredential: {
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'Real Estate License',
+      identifier: '3019640',
+    },
   },
-  publisher: {
-    '@type': 'Organization',
-    name: 'רם נכסים חיים ענבי',
-    url: siteUrl,
-    logo: { '@type': 'ImageObject', url: `${siteUrl}/images/logos.png` },
-  },
+  publisher: { '@id': `${siteUrl}/#organization` },
 };
 
 const faqSchema = {

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Building2, Phone } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function AboutCTA() {
       </div>
       <div className="cta-overlay" />
 
-      <motion.div
+      <m.div
         className="cta-container"
         initial={{ y: 50, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
@@ -32,27 +32,27 @@ export default function AboutCTA() {
         </p>
         <div className="cta-buttons">
           <Link href="/apartments">
-            <motion.button
+            <m.button
               className="cta-btn primary"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Building2 size={22} strokeWidth={2.5} />
               צפה בנכסים
-            </motion.button>
+            </m.button>
           </Link>
           <Link href="/#contact">
-            <motion.button
+            <m.button
               className="cta-btn secondary"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Phone size={22} strokeWidth={2.5} />
               צור קשר
-            </motion.button>
+            </m.button>
           </Link>
         </div>
-      </motion.div>
+      </m.div>
     </section>
   );
 }
