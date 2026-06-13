@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
 
 // GET contact info
 export async function GET(request: NextRequest) {
@@ -23,6 +24,9 @@ export async function GET(request: NextRequest) {
 // POST - Create or Update contact info
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const body = await request.json();
 
     // Check if contact info already exists

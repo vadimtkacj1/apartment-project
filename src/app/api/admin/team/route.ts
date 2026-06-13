@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
 
 // GET all team members (including inactive for admin panel)
 export async function GET(request: NextRequest) {
@@ -26,6 +27,9 @@ export async function GET(request: NextRequest) {
 // POST - Create new team member
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const body = await request.json();
 
     const teamMember = await prisma.teamMember.create({

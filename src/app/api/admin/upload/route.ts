@@ -2,9 +2,52 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { requireAdmin } from '@/lib/require-admin';
+
+// Map of allowed image types -> canonical extension, keyed by magic-byte sniff.
+// SVG is intentionally excluded: it can carry inline <script> and would be
+// served from our own origin (stored XSS).
+const ALLOWED_IMAGE_EXTENSIONS: Record<string, string> = {
+  jpg: 'jpg',
+  png: 'png',
+  webp: 'webp',
+  gif: 'gif',
+};
+
+// Inspect the real file bytes instead of trusting the client-supplied MIME type
+// or filename extension. Returns the canonical extension or null if unrecognised.
+function sniffImageExtension(buffer: Buffer): string | null {
+  if (buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return 'jpg';
+  }
+  if (
+    buffer.length >= 8 &&
+    buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4e && buffer[3] === 0x47 &&
+    buffer[4] === 0x0d && buffer[5] === 0x0a && buffer[6] === 0x1a && buffer[7] === 0x0a
+  ) {
+    return 'png';
+  }
+  if (
+    buffer.length >= 12 &&
+    buffer.toString('ascii', 0, 4) === 'RIFF' &&
+    buffer.toString('ascii', 8, 12) === 'WEBP'
+  ) {
+    return 'webp';
+  }
+  if (
+    buffer.length >= 6 &&
+    (buffer.toString('ascii', 0, 6) === 'GIF87a' || buffer.toString('ascii', 0, 6) === 'GIF89a')
+  ) {
+    return 'gif';
+  }
+  return null;
+}
 
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     console.log('📤 [UPLOAD] Starting file upload');
 
     const formData = await request.formData();
@@ -35,22 +78,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      console.log(`❌ [UPLOAD] Error: File is not an image (${file.type})`);
-      return NextResponse.json(
-        { error: 'File must be an image' },
-        { status: 400 }
-      );
-    }
-    console.log('✅ [UPLOAD] File type validation passed');
-
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB
+    // Validate file size (max 20MB) before reading it into memory
+    const maxSize = 20 * 1024 * 1024; // 20MB
     if (file.size > maxSize) {
       console.log(`❌ [UPLOAD] Error: File too large (${file.size} bytes)`);
       return NextResponse.json(
-        { error: 'File size must be less than 5MB' },
+        { error: 'File size must be less than 20MB' },
         { status: 400 }
       );
     }
@@ -62,10 +95,22 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     console.log(`✅ [UPLOAD] File read: ${buffer.length} bytes`);
 
-    // Generate unique filename
+    // Validate the actual file content (magic bytes), not the client-supplied
+    // MIME type or extension. Rejects SVG, HTML, scripts and polyglot files.
+    const sniffedExtension = sniffImageExtension(buffer);
+    if (!sniffedExtension || !ALLOWED_IMAGE_EXTENSIONS[sniffedExtension]) {
+      console.log(`❌ [UPLOAD] Error: File content is not an allowed image type`);
+      return NextResponse.json(
+        { error: 'File must be a JPG, PNG, WebP or GIF image' },
+        { status: 400 }
+      );
+    }
+    console.log(`✅ [UPLOAD] File content validated as: ${sniffedExtension}`);
+
+    // Generate unique filename using the sniffed extension (never user input)
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop() || 'jpg';
+    const extension = ALLOWED_IMAGE_EXTENSIONS[sniffedExtension];
     const filename = `${timestamp}-${randomString}.${extension}`;
     console.log(`🏷️  [UPLOAD] Generated filename: ${filename}`);
 

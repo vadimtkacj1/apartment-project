@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -75,6 +76,9 @@ export async function GET(request: NextRequest) {
 // POST - Create new property
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     console.log('💾 [DB] Received request to create property');
     const body = await request.json();
 

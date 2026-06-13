@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Helper function to add delay between Nominatim requests (respect rate limiting)
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -169,6 +170,16 @@ async function getCoordsByZip(zip: string): Promise<{ city: string; lat: number;
 // GET geocoding results using free Nominatim (OpenStreetMap)
 export async function GET(request: NextRequest) {
   try {
+    // Limit per IP — this endpoint proxies outbound requests to third-party
+    // geocoders, so cap it to prevent abuse / upstream rate-limit exhaustion.
+    const limit = rateLimit(`geocode:${getClientIp(request)}`, 30, 60_000);
+    if (!limit.ok) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const address = searchParams.get('address');
     const postalCode = searchParams.get('postalCode');

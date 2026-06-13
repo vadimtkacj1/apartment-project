@@ -38,6 +38,9 @@ yarn-error.log*
 *.db-shm
 *.db-wal
 *.db-journal
+*.db.backup*
+*.sqlite
+*.sqlite3
 
 # vercel
 .vercel

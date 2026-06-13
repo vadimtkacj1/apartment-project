@@ -10,15 +10,17 @@ const nextConfig: NextConfig = {
   
   // Optimize images
   images: {
+    // Restrict the image optimizer to known hosts. A wildcard ('**') turns
+    // /_next/image into an open proxy (SSRF). Uploaded property/team/owner
+    // images are served from same-origin '/uploads/*' (relative paths need no
+    // remotePattern), so only a handful of external hosts are required.
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
-      },
+      { protocol: 'https', hostname: 'ram-haim.co.il' },
+      { protocol: 'https', hostname: 'www.ram-haim.co.il' },
+      { protocol: 'https', hostname: '*.googleapis.com' },
+      { protocol: 'https', hostname: '*.gstatic.com' },
+      { protocol: 'https', hostname: '*.google.com' },
+      { protocol: 'http', hostname: 'localhost' },
     ],
     // Allow unoptimized images for development
     unoptimized: process.env.NODE_ENV === 'development',
@@ -113,6 +115,38 @@ const nextConfig: NextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'origin-when-cross-origin'
+          },
+          {
+            // Force HTTPS for 2 years incl. subdomains (only sent over HTTPS).
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()'
+          },
+          {
+            // Defense-in-depth against XSS/clickjacking/data exfiltration.
+            // script-src keeps 'unsafe-inline'/'unsafe-eval' because the app
+            // ships inline bootstrap scripts and uses the Google Maps JS API
+            // without a nonce; object-src/base-uri/frame-ancestors are the
+            // hard stops. Google Maps + self-hosted fonts are allowlisted.
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "base-uri 'self'",
+              "object-src 'none'",
+              "frame-ancestors 'self'",
+              "form-action 'self'",
+              "img-src 'self' data: blob: https:",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' data: https://fonts.gstatic.com",
+              "connect-src 'self' https://nominatim.openstreetmap.org https://maps.googleapis.com https://maps.gstatic.com",
+              "frame-src 'self' https://www.google.com https://maps.google.com",
+              "worker-src 'self' blob:",
+              "upgrade-insecure-requests",
+            ].join('; ')
           }
         ],
       },

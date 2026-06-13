@@ -15,7 +15,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Protect all other /admin routes
+  // Protect the admin API: respond with 401 JSON rather than an HTML redirect
+  // so unauthenticated callers can't create/edit/delete content or upload files.
+  if (pathname.startsWith('/api/admin')) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    return NextResponse.next()
+  }
+
+  // Protect all other /admin routes (UI pages → redirect to login)
   if (pathname.startsWith('/admin')) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
     if (!token) {
@@ -30,7 +40,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/auth/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*', '/api/auth/:path*'],
 }
 
 

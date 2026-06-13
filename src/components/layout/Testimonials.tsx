@@ -137,9 +137,9 @@ const Testimonials: React.FC = () => {
                       </p>
                     </div>
 
-                    <h4 className={`text-xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
+                    <h3 className={`text-xl font-black mt-8 md:mt-10 ${isActive ? 'text-[#1c3664]' : 'text-gray-300'}`}>
                       {testimonial.name}
-                    </h4>
+                    </h3>
                   </div>
                 )}
               </SwiperSlide>

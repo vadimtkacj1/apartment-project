@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
 
 // GET homepage section titles (admin)
 export async function GET(request: NextRequest) {
   try {
-    // TODO: Fix auth - temporarily disabled to debug
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     // Use Prisma client directly
     let settings = await prisma.homepageSettings.findFirst();
@@ -60,11 +56,8 @@ export async function GET(request: NextRequest) {
 // PUT update homepage section titles (admin)
 export async function PUT(request: NextRequest) {
   try {
-    // TODO: Fix auth - temporarily disabled to debug
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     const body = await request.json();
 

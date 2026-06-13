@@ -35,10 +35,14 @@ const HeroMedia: React.FC = () => {
       video.src = isMobile ? '/hero-mobile.mp4' : '/hero.mp4';
       video.load();
     }
-    if (video.readyState >= 4) {
+    // Play as soon as the first frame is decodable (loadeddata / readyState 2),
+    // not canplaythrough — that waits for ~the whole file to buffer, and the
+    // first played frame is this page's LCP. The file is a tiny 5s loop, so a
+    // mid-play stall is unlikely and harmless (it's a background ambiance).
+    if (video.readyState >= 2) {
       tryPlay();
     } else {
-      video.addEventListener('canplaythrough', tryPlay, { once: true });
+      video.addEventListener('loadeddata', tryPlay, { once: true });
     }
 
     return () => { destroyed = true; };

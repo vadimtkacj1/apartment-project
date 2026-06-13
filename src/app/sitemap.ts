@@ -64,6 +64,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6, // Article page - medium priority
     },
     {
+      url: `${baseUrl}/articles/purchase-tax-guide`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/urban-renewal-holon`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/apartment-pricing`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/first-apartment-guide`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/mortgage-guide`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/landlord-guide`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/holon-neighborhoods`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/pre-purchase-checklist`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/new-vs-secondhand`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/articles/home-staging`,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: `${baseUrl}/faq`,
       changeFrequency: 'monthly', // FAQ may be updated occasionally
       priority: 0.5, // Support page - medium priority

@@ -1,8 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
+
+// Escape user-supplied text before interpolating into the HTML email body,
+// preventing HTML/markup injection into the message staff receive.
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case "&": return "&amp;";
+      case "<": return "&lt;";
+      case ">": return "&gt;";
+      case '"': return "&quot;";
+      default: return "&#39;";
+    }
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit by IP to curb contact-form spam / SMTP abuse.
+    const limit = rateLimit(`contact:${getClientIp(request)}`, 5, 10 * 60 * 1000);
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: "יותר מדי בקשות, נסה שוב מאוחר יותר" },
+        { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+      );
+    }
+
     // 1. Validate environment variables
     const {
       EMAIL_SERVER_HOST,
@@ -62,10 +86,6 @@ export async function POST(request: NextRequest) {
         user: EMAIL_SERVER_USER,
         pass: EMAIL_SERVER_PASSWORD,
       },
-      tls: {
-        // Necessary for some Node.js environments to prevent certificate validation errors
-        rejectUnauthorized: false,
-      },
       debug: process.env.NODE_ENV === 'development',
       logger: process.env.NODE_ENV === 'development'
     });
@@ -96,10 +116,18 @@ export async function POST(request: NextRequest) {
     // EMAIL_TO can be a comma-separated list of emails
     const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com,info@ram-haim.co.il";
 
+    // Escape all user-controlled values before they enter the HTML body.
+    // Strip CR/LF from the subject to prevent header injection.
+    const safeName = escapeHtml(name.trim());
+    const safeSubjectName = name.trim().replace(/[\r\n]+/g, " ");
+    const safePhone = escapeHtml(phone);
+    const safeCleanPhone = encodeURIComponent(cleanPhone);
+    const safeMessage = message ? escapeHtml(String(message)) : "";
+
     const mailOptions = {
       from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
       to: recipients,
-      subject: `פנייה חדשה מהאתר: ${name}`,
+      subject: `פנייה חדשה מהאתר: ${safeSubjectName}`,
       html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee;">
           <div style="background-color: #1c3664; color: white; padding: 20px; text-align: center;">
@@ -108,9 +136,9 @@ export async function POST(request: NextRequest) {
           <div style="padding: 30px; background-color: #ffffff;">
             <p style="font-size: 18px;"><strong>פרטי הלקוח:</strong></p>
             <hr />
-            <p><strong>שם מלא:</strong> ${name}</p>
-            <p><strong>טלפון:</strong> <a href="tel:${cleanPhone}">${phone}</a></p>
-            ${message ? `<p><strong>הודעה:</strong></p><p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">${message}</p>` : '<p><em style="color: #999;">לא צוינה הודעה</em></p>'}
+            <p><strong>שם מלא:</strong> ${safeName}</p>
+            <p><strong>טלפון:</strong> <a href="tel:${safeCleanPhone}">${safePhone}</a></p>
+            ${safeMessage ? `<p><strong>הודעה:</strong></p><p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">${safeMessage}</p>` : '<p><em style="color: #999;">לא צוינה הודעה</em></p>'}
             <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
               <small style="color: #666;">
                 This is an automated message from the contact form at ram-haim.co.il
@@ -134,8 +162,9 @@ export async function POST(request: NextRequest) {
       command: error.command,
     });
 
+    // Do not leak internal error details to the client.
     return NextResponse.json(
-      { error: "Internal Server Error", details: error.message },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

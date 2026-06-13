@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
+import { rateLimit, getClientIp } from '@/lib/rate-limit';
 
 // Helper function to get client IP
 function getClientIP(request: NextRequest): string {
@@ -31,6 +33,15 @@ function generateSessionId(ip: string, userAgent: string | null): string {
 
 export async function POST(request: NextRequest) {
   try {
+    // Throttle unauthenticated writes so the events tables can't be flooded.
+    const limit = rateLimit(`analytics:${getClientIp(request)}`, 60, 60_000);
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } }
+      );
+    }
+
     const body = await request.json();
     const {
       eventType,
@@ -112,6 +123,10 @@ export async function POST(request: NextRequest) {
 // GET endpoint to retrieve analytics (for admin)
 export async function GET(request: NextRequest) {
   try {
+    // Returns IP addresses, user agents and other visitor PII — admin only.
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'views' | 'clicks' | 'summary'
     const propertyId = searchParams.get('propertyId');

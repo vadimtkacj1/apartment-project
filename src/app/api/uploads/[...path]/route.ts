@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve, sep } from 'path';
 import { existsSync } from 'fs';
 
 export async function GET(
@@ -15,17 +15,20 @@ export async function GET(
 
     // Only look in UPLOADS_DIR (or fixed absolute path on server).
     // Без fallback-ов на cwd/.next – все файлы хранятся в одной постоянной папке.
-    const baseDir = process.env.UPLOADS_DIR || '/opt/apartment-project/public/uploads';
-    const candidates = [baseDir];
+    const baseDir = resolve(process.env.UPLOADS_DIR || '/opt/apartment-project/public/uploads');
 
-    let fullPath: string | null = null;
-    for (const baseDir of candidates) {
-      const candidatePath = join(baseDir, relativePath);
-      if (existsSync(candidatePath)) {
-        fullPath = candidatePath;
-        break;
-      }
+    // Resolve the requested path and confirm it stays inside baseDir.
+    // Blocks path traversal via '..' / encoded segments (e.g. reading /etc/passwd
+    // or the app's .env from this public, unauthenticated endpoint).
+    const candidatePath = resolve(join(baseDir, relativePath));
+    if (candidatePath !== baseDir && !candidatePath.startsWith(baseDir + sep)) {
+      return NextResponse.json(
+        { error: 'File not found' },
+        { status: 404 }
+      );
     }
+
+    const fullPath = existsSync(candidatePath) ? candidatePath : null;
 
     if (!fullPath) {
       return NextResponse.json(

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin } from '@/lib/require-admin';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -93,6 +94,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const { id } = await params;
     console.log('🔄 [DB UPDATE] Обновление property ID:', id);
 
@@ -233,6 +237,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const { id } = await params;
     const body = await request.json();
 
@@ -292,6 +299,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const { id } = await params;
     await prisma.property.delete({
       where: {

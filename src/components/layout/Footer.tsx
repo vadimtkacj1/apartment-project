@@ -184,7 +184,7 @@ export default async function Footer() {
               { label: 'אודות המשרד', href: '/about' },
             ].map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="text-gray-500 hover:text-gray-300 transition-colors font-medium" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+                <Link href={item.href} className="text-gray-400 hover:text-gray-300 transition-colors font-medium" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
                   {item.label}
                 </Link>
               </li>
@@ -198,7 +198,7 @@ export default async function Footer() {
             תוכן משפטי
           </div>
 
-          <p className="text-gray-500 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
+          <p className="text-gray-400 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
             © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.
           </p>
 
@@ -216,8 +216,8 @@ export default async function Footer() {
             </Link>
           </div>
 
-          <p className="text-gray-600 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
-            Built by <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#c5a357] transition-colors">Aiterra</a>
+          <p className="text-gray-400 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+            Built by <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>
