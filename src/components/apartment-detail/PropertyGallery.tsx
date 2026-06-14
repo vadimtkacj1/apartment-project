@@ -44,7 +44,7 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
               <div className="relative w-full h-full">
                 <Image
                   src={image}
-                  alt={imageAlt}
+                  alt={images.length > 1 ? `${imageAlt} - תמונה ${index + 1}` : imageAlt}
                   fill
                   priority={index === 0}
                   loading={index === 0 ? 'eager' : 'lazy'}
@@ -130,7 +130,7 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
             <div className={`relative aspect-video rounded-lg overflow-hidden transition-colors ${
               isSold ? 'opacity-60' : ''
             }`}>
-              <Image src={image} alt={imageAlt} fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
+              <Image src={image} alt={`${imageAlt} - תמונה ממוזערת ${index + 1}`} fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
             </div>
           </SwiperSlide>
         ))}

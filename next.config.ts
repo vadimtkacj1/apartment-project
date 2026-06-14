@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.gstatic.com' },
       { protocol: 'https', hostname: '*.google.com' },
       { protocol: 'http', hostname: 'localhost' },
+      // Property photos referenced as Unsplash URLs. Without this exact host
+      // the optimizer returns 400 and EVERY such image is broken in production
+      // (and uncrawlable for SEO). Specific host, not a wildcard, so /_next/image
+      // is not turned into an open proxy.
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
     // Allow unoptimized images for development
     unoptimized: process.env.NODE_ENV === 'development',

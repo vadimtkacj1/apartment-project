@@ -164,7 +164,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
             <div className="mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 lg:px-12">
               <div className="lg:col-span-2">
                 <div className="-mx-6 lg:mx-0">
-                  <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} />
+                  <PropertyGallery images={property.images} isSold={isSold} dealType={property.dealType} propertyTitle={displayTitle} />
                 </div>
                 {((property.owners && property.owners.length > 0) || (property.agents && property.agents.length > 0)) && (
                   <div className="px-6 mb-6">
