@@ -139,7 +139,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               src={imageSrc}
               alt={title}
               fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 46vw, 23vw"
               className={`object-cover object-center transition-transform duration-700 ${
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}

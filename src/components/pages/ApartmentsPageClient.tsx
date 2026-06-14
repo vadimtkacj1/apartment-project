@@ -8,8 +8,16 @@ import { SlidersHorizontal } from 'lucide-react';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import PropertyCard from '@/components/properties/PropertyCard';
-import PropertyFilters from '@/components/properties/PropertyFilters';
+import dynamic from 'next/dynamic';
 import ContactFormPopup from '@/components/layout/ContactFormPopup';
+
+// The 484-line filters panel (framer-motion + many inputs) is not on the LCP/
+// critical path. Code-split it so its JS loads after hydration instead of in the
+// listing page's initial bundle. ssr:true (default) keeps it in the SSR HTML, so
+// there's no layout shift and it stays crawlable — only the JS is deferred.
+const PropertyFilters = dynamic(() => import('@/components/properties/PropertyFilters'), {
+  loading: () => <div className="h-72 w-full bg-white/60 rounded-2xl animate-pulse" />,
+});
 
 // Logic & Data Imports
 import { FilterState, DealType, City } from '@/types/property.types';
