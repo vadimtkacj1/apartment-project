@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { m } from 'framer-motion';
+import { useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Autoplay } from 'swiper/modules';
@@ -22,12 +21,11 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   return (
-    <m.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="mb-8"
-    >
+    // No entrance animation on the gallery wrapper: it holds the LCP image, and an
+    // initial opacity:0 (rendered into the SSR HTML by framer-motion) prevents the
+    // image from counting as "contentful" until the client hydrates + the fade runs,
+    // pushing LCP out by seconds on slow mobile. The hero now paints as soon as it loads.
+    <div className="mb-8">
       <Swiper
         modules={[Navigation, Pagination, Thumbs, Autoplay]}
         navigation
@@ -137,6 +135,6 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
           </SwiperSlide>
         ))}
       </Swiper>
-    </m.div>
+    </div>
   );
 }
