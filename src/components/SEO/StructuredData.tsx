@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { owners } from '@/app/(public)/about/aboutData';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -93,7 +94,10 @@ export default async function StructuredData() {
     '@type': 'RealEstateAgent',
     '@id': `${siteUrl}/#organization`,
     name: 'רם נכסים חיים ענבי',
-    alternateName: 'Ram Nekasim Chaim Anavi',
+    // Genuine alternate names of the agency — the short forms people actually type
+    // (the domain is ram-haim). These teach Google to resolve "רם חיים"/"רם נכסים"
+    // brand queries to this entity, not the generic adjective רם.
+    alternateName: ['רם חיים', 'רם נכסים', 'רם חיים נדל״ן', 'Ram Nekasim Chaim Anavi'],
     description: 'משרד תיווך ושיווק נדל״ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה',
     url: siteUrl,
     logo: `${siteUrl}/images/logos.png`,
@@ -120,6 +124,11 @@ export default async function StructuredData() {
     currenciesAccepted: 'ILS',
     ...(sameAs.length > 0 ? { sameAs } : {}),
     ...(openingHoursSpecification.length > 0 ? { openingHoursSpecification } : {}),
+    // Close the entity graph: link the agency to its named founders' Person nodes
+    // (emitted by PersonSchema on /about with matching @id). Reinforces E-E-A-T and
+    // ties the personal brand "רם מזרחי" to the organization. Derived from the same
+    // owners source so the @id scheme can never drift.
+    founder: owners.map((o) => ({ '@id': `${siteUrl}/about#owner-${o.id}` })),
     contactPoint: [
       {
         '@type': 'ContactPoint',
@@ -168,6 +177,7 @@ export default async function StructuredData() {
     '@type': 'WebSite',
     '@id': `${siteUrl}/#website`,
     name: 'רם נכסים חיים ענבי',
+    alternateName: ['רם חיים', 'רם נכסים', 'רם חיים נדל״ן'],
     url: siteUrl,
     inLanguage: 'he',
     publisher: { '@id': `${siteUrl}/#organization` },

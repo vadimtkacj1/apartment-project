@@ -4,6 +4,24 @@ import { articles } from '@/data/articles';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
+// Property.images is a JSON string column ("[]" by default). Parse it into a list
+// of absolute URLs for the image sitemap so listing photos can surface in Google
+// Images — a real traffic source for real estate. Capped at 25/listing to keep the
+// sitemap lean, and tolerant of malformed/empty values.
+function parseImageUrls(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((u): u is string => typeof u === 'string' && u.length > 0)
+      .slice(0, 25)
+      .map((u) => (u.startsWith('http') ? u : `${siteUrl}${u.startsWith('/') ? '' : '/'}${u}`));
+  } catch {
+    return [];
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteUrl;
 
@@ -96,6 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: {
         id: true,
         updatedAt: true,
+        images: true,
       },
       orderBy: {
         updatedAt: 'desc',
@@ -105,12 +124,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Dynamic property routes - only include active properties
     // Each property page is important for SEO and may be updated when status changes
     // This is where the sitemap gets its size - one URL per active property
-    const propertyRoutes: MetadataRoute.Sitemap = properties.map((property) => ({
-      url: `${baseUrl}/apartments/${property.id}`,
-      lastModified: property.updatedAt,
-      changeFrequency: 'weekly' as const, // Properties may be updated (status, price, etc.)
-      priority: 0.8, // High priority - these are the main content pages
-    }));
+    const propertyRoutes: MetadataRoute.Sitemap = properties.map((property) => {
+      const images = parseImageUrls(property.images);
+      return {
+        url: `${baseUrl}/apartments/${property.id}`,
+        lastModified: property.updatedAt,
+        changeFrequency: 'weekly' as const, // Properties may be updated (status, price, etc.)
+        priority: 0.8, // High priority - these are the main content pages
+        // Image sitemap: surfaces listing photos to Google Images.
+        ...(images.length > 0 ? { images } : {}),
+      };
+    });
 
     // Combine static routes with dynamic property routes
     // Total sitemap size = static routes (10) + number of active properties
