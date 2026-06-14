@@ -5,6 +5,7 @@ import { ArrowLeft, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
+import { PropertyGallery } from '@/components/apartment-detail/PropertyGallery';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import {
   LoadingState,
@@ -18,16 +19,12 @@ import {
   PropertyNavigation
 } from '@/components/apartment-detail';
 
-// Gallery pulls in Swiper (~35KB + its CSS). Code-split it so Swiper isn't in
-// the detail page's initial JS — but keep SSR on (no ssr:false) so the first
-// image stays in the prerendered HTML and the LCP isn't pushed to the client.
-const PropertyGallery = dynamic(
-  () => import('@/components/apartment-detail/PropertyGallery').then(mod => ({ default: mod.PropertyGallery })),
-  {
-    loading: () => <div style={{ height: '85vh' }} className="w-full bg-black/5 animate-pulse" />,
-  }
-);
-
+// PropertyGallery is imported STATICALLY (not next/dynamic): it holds the LCP
+// hero image, and a dynamic import puts it behind a Suspense boundary whose
+// content streams in a later chunk — on slow mobile the LCP image then can't
+// paint until that segment arrives, adding seconds. Static keeps the first
+// image in the immediate SSR shell. Swiper ships in this route's JS as a result,
+// which is fine (TBT has headroom); only the LCP image must be in the shell.
 const PropertyMap = dynamic(
   () => import('@/components/apartment-detail/PropertyMap').then(m => ({ default: m.PropertyMap })),
   {
