@@ -25,10 +25,10 @@ interface AgentCardProps {
 }
 
 export default function AgentCard({ member, index, isEven }: AgentCardProps) {
+  const [copied, setCopied] = useState(false);
+
   // SAFETY CHECK: If member data is missing, do not render anything to prevent crashes.
   if (!member) return null;
-
-  const [copied, setCopied] = useState(false);
 
   const handleCopyEmail = async () => {
     if (!member.email) return;
