@@ -32,7 +32,7 @@ const HeroMedia: React.FC = () => {
     // the fallback (e.g. client-side navigation, where the script doesn't run).
     if (!video.src) {
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      video.src = isMobile ? '/hero-mobile.mp4' : '/hero.mp4';
+      video.src = isMobile ? '/hero-mobile-v2.mp4' : '/hero-v2.mp4';
       video.load();
     }
     // Play as soon as the first frame is decodable (loadeddata / readyState 2),
@@ -72,7 +72,7 @@ const HeroMedia: React.FC = () => {
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src=window.matchMedia('(max-width: 767px)').matches?'/hero-mobile.mp4':'/hero.mp4';v.load();})();",
+            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src=window.matchMedia('(max-width: 767px)').matches?'/hero-mobile-v2.mp4':'/hero-v2.mp4';v.load();})();",
         }}
       />
     </div>
