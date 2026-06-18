@@ -31,8 +31,10 @@ const HeroMedia: React.FC = () => {
     // The inline script below normally sets src at HTML parse time; this is
     // the fallback (e.g. client-side navigation, where the script doesn't run).
     if (!video.src) {
-      const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      video.src = isMobile ? '/hero-mobile-v3.mp4' : '/hero-v3.mp4';
+      // Same full-quality 1080p clip on mobile too — the old 640x360 mobile
+      // file looked terrible on high-DPI phones and there's no hi-res mobile
+      // source to fall back to.
+      video.src = '/hero-v3.mp4';
       video.load();
     }
     // Play as soon as the first frame is decodable (loadeddata / readyState 2),
@@ -72,7 +74,7 @@ const HeroMedia: React.FC = () => {
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src=window.matchMedia('(max-width: 767px)').matches?'/hero-mobile-v3.mp4':'/hero-v3.mp4';v.load();})();",
+            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src='/hero-v3.mp4';v.load();})();",
         }}
       />
     </div>
