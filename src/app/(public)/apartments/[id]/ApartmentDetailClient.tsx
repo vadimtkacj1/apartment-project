@@ -95,7 +95,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
   const displayTitle = property?.title?.trim() || property?.location || initialTitle || '';
 
   return (
-    <div className="min-h-screen bg-warm pt-32 pb-16 relative" dir="rtl">
+    <div className="min-h-screen bg-warm pt-24 pb-16 relative" dir="rtl">
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: copied ? 1 : 0, y: copied ? 0 : 20 }}

@@ -34,8 +34,11 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
         loop={true}
         speed={800}
         thumbs={{ swiper: thumbsSwiper && !(thumbsSwiper as any).destroyed ? thumbsSwiper : null }}
-        className={`overflow-hidden mb-4 property-slider ${isSold ? 'grayscale opacity-60' : ''}`}
-        style={{ height: '85vh' }}
+        // Responsive height instead of a flat 85vh: on a portrait phone 85vh is a
+        // ~720px box and an `object-contain` landscape photo only fills ~220px of
+        // it, leaving huge empty bands above/below (the "broken" look under the
+        // header). A width-proportional height keeps the frame photo-shaped.
+        className={`overflow-hidden mb-4 property-slider h-75 sm:h-110 md:h-140 lg:h-[78vh] ${isSold ? 'grayscale opacity-60' : ''}`}
         dir="ltr"
       >
         {images.map((image: string, index: number) => (
@@ -50,7 +53,7 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
                   fetchPriority={index === 0 ? 'high' : 'auto'}
                   loading={index === 0 ? 'eager' : 'lazy'}
                   sizes="100vw"
-                  className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`}
+                  className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`}
                 />
                 
                 <div 

@@ -4,7 +4,7 @@
 // instantly and this barely flashes. Structure mirrors ApartmentDetailClient.
 export default function ApartmentDetailLoading() {
   return (
-    <div dir="rtl" className="min-h-screen bg-warm pt-32 pb-16">
+    <div dir="rtl" className="min-h-screen bg-warm pt-24 pb-16">
       <div className="w-full">
         {/* Share / back-to-listing bar */}
         <div className="w-full px-6 lg:px-12 flex justify-between items-center mb-6">
