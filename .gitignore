@@ -13,7 +13,7 @@
 /recovered
 # testing
 /coverage
-
+dev.db
 # next.js
 /.next/
 /out/
