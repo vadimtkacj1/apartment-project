@@ -48,8 +48,12 @@ export default async function StructuredData() {
     // non-critical — structured data falls back to static values
   }
 
+  // Guard against leftover template placeholders: an early seed shipped dead
+  // "apartment-realty" social profiles, and a WRONG sameAs actively misdirects
+  // Google's/AI's entity reconciliation — strictly worse than emitting none. Drop
+  // any known-bad value so a stale prod ContactInfo row can't poison the graph.
   const sameAs = [contactInfo?.facebook, contactInfo?.instagram, contactInfo?.linkedin].filter(
-    (v): v is string => typeof v === 'string' && v.length > 0
+    (v): v is string => typeof v === 'string' && v.length > 0 && !v.includes('apartment-realty')
   );
 
   // Coordinates: prefer the real lat/lng columns; otherwise parse them out of the
@@ -97,7 +101,7 @@ export default async function StructuredData() {
     // Genuine alternate names of the agency — the short forms people actually type
     // (the domain is ram-haim). These teach Google to resolve "רם חיים"/"רם נכסים"
     // brand queries to this entity, not the generic adjective רם.
-    alternateName: ['רם חיים', 'רם נכסים', 'רם חיים נדל״ן', 'Ram Nekasim Chaim Anavi'],
+    alternateName: ['רם חיים', 'רם נכסים', 'רם שיווק נכסים', 'רם נדל״ן', 'רם חיים נדל״ן', 'Ram Nekasim Chaim Anavi'],
     description: 'משרד תיווך ושיווק נדל״ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה',
     url: siteUrl,
     logo: `${siteUrl}/images/logos.png`,
@@ -177,7 +181,7 @@ export default async function StructuredData() {
     '@type': 'WebSite',
     '@id': `${siteUrl}/#website`,
     name: 'רם נכסים חיים ענבי',
-    alternateName: ['רם חיים', 'רם נכסים', 'רם חיים נדל״ן'],
+    alternateName: ['רם חיים', 'רם נכסים', 'רם שיווק נכסים', 'רם נדל״ן', 'רם חיים נדל״ן'],
     url: siteUrl,
     inLanguage: 'he',
     publisher: { '@id': `${siteUrl}/#organization` },

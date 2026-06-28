@@ -117,7 +117,10 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
     : `${siteUrl}/images/hero/main-hero.jpg`;
 
   const isRent = property.dealType === 'rent';
-  const priceValidUntil = new Date(property.updatedAt);
+  // Compute forward from render time (not updatedAt): a listing left unedited past
+  // the window would otherwise emit an Offer priceValidUntil in the PAST, which
+  // makes Google/AI treat the price as expired. revalidate keeps this future-dated.
+  const priceValidUntil = new Date();
   priceValidUntil.setDate(priceValidUntil.getDate() + (isRent ? 30 : 90));
   const numericPrice = property.price != null
     ? parseFloat(String(property.price).replace(/[^\d.]/g, ''))

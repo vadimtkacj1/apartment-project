@@ -56,6 +56,13 @@ export default function LinksPage() {
       url: 'https://www.mizrahi-tefahot.co.il/mortgages/calculator/',
       icon: Calculator
     },
+    {
+      id: 6,
+      title: 'ייעוץ משכנתאות — אבי בוקעי',
+      description: 'יועץ המשכנתאות שאנחנו עובדים איתו צמוד, מלווה את הלקוחות שלנו משלב האישור העקרוני ועד החתימה. ליווי אישי בבחירת תמהיל ההלוואה והשגת תנאים טובים יותר מול הבנקים.',
+      url: 'https://avi-mashkanta.com',
+      icon: Home
+    },
   ];
 
   return (

@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { preload } from 'react-dom';
 import Hero from '@/components/layout/Hero';
+import GuidesSection from '@/components/layout/GuidesSection';
 import { prisma } from '@/lib/prisma';
 import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 
@@ -188,6 +189,8 @@ export default async function Home() {
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ValuesSection />
         </Suspense>
+        {/* Server-rendered internal links to the guide/knowledge pages (SEO) */}
+        <GuidesSection />
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <Testimonials />
         </Suspense>

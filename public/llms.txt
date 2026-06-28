@@ -1,6 +1,6 @@
 # רם נכסים חיים ענבי (Ram Nekasim Chaim Anavi)
 
-> Real-estate brokerage in Holon, Israel — sales, rentals, and property management of apartments across Holon, Bat Yam, and Rishon LeZion. Over 20 years of local experience.
+> Real-estate brokerage in Holon, Israel — sales, rentals, and property management of apartments across Holon, Bat Yam, and Rishon LeZion. Over 24 years of local experience.
 
 ## Key pages
 - [Home](https://ram-haim.co.il/): agency overview and featured listings
@@ -12,6 +12,20 @@
 - [About](https://ram-haim.co.il/about): about the agency and its licensed brokers
 - [FAQ](https://ram-haim.co.il/faq): common questions about buying, selling, and renting
 - [Articles](https://ram-haim.co.il/articles): guides on mortgages, purchase tax, urban renewal in Holon, neighborhoods, valuation, and more
+
+## Articles (guides)
+- [Mortgage guide](https://ram-haim.co.il/articles/mortgage-guide): approvals, equity, rate tracks, getting better terms
+- [Purchase tax guide](https://ram-haim.co.il/articles/purchase-tax-guide): mas rechisha brackets for single-home buyers and investors
+- [First apartment guide](https://ram-haim.co.il/articles/first-apartment-guide): budgeting, equity, and buying a first home in Holon
+- [Pre-purchase checklist](https://ram-haim.co.il/articles/pre-purchase-checklist): legal, planning, physical and financial checks before buying
+- [New vs second-hand](https://ram-haim.co.il/articles/new-vs-secondhand): developer vs resale apartments, true total cost
+- [Apartment pricing](https://ram-haim.co.il/articles/apartment-pricing): how to value and price an apartment correctly
+- [Selling alone](https://ram-haim.co.il/articles/selling-alone): the real cost of selling without a broker
+- [Home staging](https://ram-haim.co.il/articles/home-staging): low-cost prep that raises the sale price
+- [Landlord guide](https://ram-haim.co.il/articles/landlord-guide): pricing, tenant screening, contracts, rental tax tracks
+- [Holon neighborhoods](https://ram-haim.co.il/articles/holon-neighborhoods): where to live and invest, neighborhood by neighborhood
+- [Urban renewal in Holon](https://ram-haim.co.il/articles/urban-renewal-holon): pinui-binui vs TAMA 38 and how to spot real opportunities
+- [Foreign investors](https://ram-haim.co.il/articles/foreign-investors): buying and managing Israeli property from abroad
 
 ## Services
 - Property sales (apartments, garden apartments, cottages, investment properties)

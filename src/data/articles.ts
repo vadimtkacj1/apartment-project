@@ -8,11 +8,18 @@ export interface Article {
   title: string;
   description: string;
   image: string;
-  date: string; // ISO yyyy-mm-dd
+  date: string; // ISO yyyy-mm-dd — publish date (must equal the page's JSON-LD datePublished)
+  updated?: string; // ISO yyyy-mm-dd — last revision; overrides the catalog default below
   category: string;
   readTime: string;
   tags: string[];
 }
+
+// The whole catalog was last revised in the June 2026 GEO content pass; this equals
+// every article page's JSON-LD `dateModified`. The sitemap uses it for <lastmod> so
+// the sitemap stops contradicting the on-page structured data (which it did when it
+// derived lastmod from the older publish date). Bump per-article via `updated`.
+export const ARTICLES_LAST_REVISED = '2026-06-13';
 
 export const articles: Article[] = [
   {

@@ -100,8 +100,11 @@ export default async function Footer() {
             <div className="text-xl font-bold mb-4 text-white">משאבים</div>
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מאמרים</Link></li>
+              <li><Link href="/articles/mortgage-guide" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מדריך משכנתא</Link></li>
+              <li><Link href="/articles/purchase-tax-guide" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מס רכישה</Link></li>
+              <li><Link href="/articles/pre-purchase-checklist" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">בדיקות לפני קנייה</Link></li>
+              <li><Link href="/articles/holon-neighborhoods" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">שכונות חולון</Link></li>
               <li><Link href="/articles/selling-alone" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">למכור לבד?</Link></li>
-              <li><Link href="/articles/foreign-investors" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">משקיעים זרים</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מרכז עזרה</Link></li>
               <li><Link href="/links" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">קישורים שימושיים</Link></li>
             </ul>

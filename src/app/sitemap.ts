@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
-import { articles } from '@/data/articles';
+import { articles, ARTICLES_LAST_REVISED } from '@/data/articles';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -93,14 +93,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Articles come from the shared registry (src/data/articles.ts) so a new guide
-  // is added in exactly one place and still lands in the sitemap, with a truthful
-  // lastModified derived from its publish date.
-  const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => ({
-    url: `${baseUrl}/articles/${a.id}`,
-    lastModified: new Date(a.date),
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+  // is added in exactly one place and still lands in the sitemap. lastModified uses
+  // the revision date (per-article `updated`, else the catalog default), NOT the
+  // publish date — so <lastmod> matches each page's JSON-LD dateModified instead of
+  // claiming the guide is months staler than its own structured data says.
+  const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => {
+    const revised = a.updated ?? (a.date > ARTICLES_LAST_REVISED ? a.date : ARTICLES_LAST_REVISED);
+    return {
+      url: `${baseUrl}/articles/${a.id}`,
+      lastModified: new Date(revised),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    };
+  });
 
   try {
     // Active, still-available properties only. Sold/rented listings stay live
