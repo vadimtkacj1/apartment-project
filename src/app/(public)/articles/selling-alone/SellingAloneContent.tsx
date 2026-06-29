@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
@@ -20,6 +21,18 @@ export default function SellingAloneContent() {
     {
       question: '"אתם עובדים בבלעדיות?"',
       answer: '<strong>כן, ובשבילכם זה יתרון.</strong> בבלעדיות אנחנו משקיעים כסף בפרסום, צילום מקצועי ושיתופי פעולה, כי אנחנו מחויבים לתוצאה. בלי בלעדיות? אף אחד לא באמת עובד בשבילכם.'
+    },
+    {
+      question: '"כמה עולה למכור דירה לבד?"',
+      answer: '<strong>לכאורה כלום — חוסכים את העמלה.</strong> בפועל מכירה עצמאית עולה לרוב הרבה יותר: תמחור שגוי, חודשים על השוק שיוצרים סטיגמה, והצעות נמוכות מקונים שמזהים חוסר ניסיון. מהניסיון שלנו דירה עם מתווך מנוסה נסגרת ב-5% עד 10% יותר — פער שמכסה את העמלה ומשאיר עודף בכיס.'
+    },
+    {
+      question: '"איך למכור דירה ללא תיווך?"',
+      answer: '<strong>אפשר — אבל לא כל אחד בנוי לזה.</strong> מכירה עצמאית דורשת תמחור מדויק מול עסקאות אמת ברחוב שלכם, צילום ושיווק מקצועי, סינון פיננסי של קונים, תיאום סיורים וניהול משא ומתן מול קונים מנוסים. טעות באחד מהשלבים עולה בדרך כלל יותר מהעמלה כולה — ולכן רוב מי שמתחיל לבד פונה אלינו בהמשך.'
+    },
+    {
+      question: '"מדוע כדאי למכור דירה עם מתווך?"',
+      answer: '<strong>כי מתווך מנוסה לא עולה לכם — הוא מרוויח לכם.</strong> תמחור נכון מהיום הראשון, חשיפה לקונים רציניים שלא יושבים כל היום ביד2, סינון שמכניס הביתה רק קונים עם יכולת כלכלית, ומשא ומתן קר ועסקי שמעלה את ההצעה למקסימום. השורה התחתונה: מחיר סופי גבוה יותר, פחות כאב ראש, ועסקה בטוחה.'
     }
   ];
 
@@ -150,6 +163,27 @@ export default function SellingAloneContent() {
                 </div>
                 <div className="image-column">
                   <Image src="/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png" alt="מכירת נכס" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
+                </div>
+              </div>
+            </section>
+
+            {/* Conversion CTA — funnels the DIY-intent reader to a free valuation
+                rather than enabling a self-sale. */}
+            <section className="article-section">
+              <div dir="rtl" className="my-6 rounded-2xl bg-[#1c3664] p-8 text-center">
+                <h2 className="text-3xl font-bold mb-3 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+                  רוצים לדעת כמה הדירה שלכם באמת שווה?
+                </h2>
+                <p className="text-lg text-gray-200 mb-6 max-w-2xl mx-auto leading-relaxed">
+                  במקום לנחש לבד — קבלו מאיתנו הערכת שווי חינם וללא התחייבות. נראה לכם בדיוק כמה אתם עלולים להפסיד במכירה עצמאית, ואיך אנחנו משיגים את המחיר המקסימלי.
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <Link href="/selling-apartment" className="px-8 py-3 rounded-sm bg-[#c5a357] text-[#1c3664] font-black hover:bg-[#d4b46b] transition-colors">
+                    איך אנחנו מוכרים את הדירה שלכם
+                  </Link>
+                  <a href="tel:+972505496626" className="px-8 py-3 rounded-sm border-2 border-[#c5a357] text-[#c5a357] font-black hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors">
+                    דברו איתנו עכשיו
+                  </a>
                 </div>
               </div>
             </section>

@@ -92,7 +92,10 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
   }, [propertyId]);
 
   const isSold = property?.isSold || false;
-  const displayTitle = property?.title?.trim() || property?.location || initialTitle || '';
+  // Prefer the SSR-composed intent title ("דירה 3 חד׳ למכירה ב…") over the raw admin
+  // title (a bare street address) so the H1, JSON-LD name and gallery alt lead with
+  // the keywords buyers actually search.
+  const displayTitle = initialTitle || property?.title?.trim() || property?.location || '';
 
   return (
     <div className="min-h-screen bg-warm pt-24 pb-16 relative" dir="rtl">

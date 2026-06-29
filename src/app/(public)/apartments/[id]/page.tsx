@@ -42,6 +42,27 @@ export async function generateStaticParams() {
   }
 }
 
+// Compose intent-led titles from structured fields. Admin always stores the street
+// address in `property.title`, so relying on it buries the keywords buyers actually
+// search ("דירה 3 חדרים למכירה בחולון"). The meta <title> leads with intent + city
+// (kept short for the SERP); the H1/JSON-LD name adds neighborhood + street as a
+// richer suffix. `4` in "אהרון יריב 4" is a street number, not rooms — so we never
+// reuse the raw title as the headline.
+function buildListingTitles(property: {
+  dealType?: string | null; rooms?: unknown; city?: string | null;
+  location?: string | null; neighborhood?: string | null; title?: string | null;
+}) {
+  const dealTypeLabel = property.dealType === 'rent' ? 'להשכרה' : 'למכירה';
+  const cityName = getCityLabel(property.city) || property.city || property.location || '';
+  const place = property.neighborhood ? `${property.neighborhood}, ${cityName}` : cityName;
+  const roomsPart = property.rooms != null && String(property.rooms).trim() ? `${property.rooms} חד׳ ` : '';
+  const street = property.title?.trim();
+  const metaTitle = `דירה ${roomsPart}${dealTypeLabel} ב${cityName}`.replace(/\s+/g, ' ').trim();
+  const base = `דירה ${roomsPart}${dealTypeLabel} ב${place}`.replace(/\s+/g, ' ').trim();
+  const h1Title = street && !street.includes(dealTypeLabel) ? `${base} — ${street}` : (street || base);
+  return { dealTypeLabel, cityName, metaTitle, h1Title };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const property = await getProperty(id);
@@ -55,19 +76,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const images = (property.images || []) as string[];
   const firstImage = images[0];
-  const dealTypeLabel = property.dealType === 'rent' ? 'להשכרה' : 'למכירה';
-  const title = property.title?.trim() ||
-    `${property.rooms} חדרים ${dealTypeLabel} ב${property.location}`;
-  const rawDesc = property.description || '';
-  const description = rawDesc.length > 0
-    ? rawDesc.slice(0, 155)
-    : `דירה ${dealTypeLabel} | ${property.rooms} חדרים | ${property.area} מ"ר | ${property.location} | מחיר: ${property.price}`;
+  const { dealTypeLabel, cityName, metaTitle } = buildListingTitles(property);
+  const title = metaTitle;
+  const rawDesc = (property.description || '').trim();
+  const description = rawDesc.length > 155
+    ? rawDesc.slice(0, Math.max(rawDesc.lastIndexOf(' ', 155), 120)).trimEnd() + '…'
+    : (rawDesc || `דירה ${dealTypeLabel} ב${cityName} · ${property.rooms} חדרים · ${property.area} מ"ר`);
 
   const ogImage = firstImage
     ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
     : `${siteUrl}/images/hero/main-hero.jpg`;
-
-  const cityName = getCityLabel(property.city) || property.city || property.location;
 
   return {
     title,
@@ -105,9 +123,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
 
   if (!property) notFound();
 
-  const dealTypeLabel = property.dealType === 'rent' ? 'להשכרה' : 'למכירה';
-  const initialTitle = property.title?.trim() ||
-    `${property.rooms} חדרים ${dealTypeLabel} ב${property.location}`;
+  const initialTitle = buildListingTitles(property).h1Title;
   const initialDescription = property.description?.trim() || undefined;
 
   const images = (property.images || []) as string[];
