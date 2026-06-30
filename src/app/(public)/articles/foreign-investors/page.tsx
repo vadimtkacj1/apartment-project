@@ -3,7 +3,7 @@ import ForeignInvestorsContent from './ForeignInvestorsContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
-const ogImage = `${siteUrl}/images/LuxuryLiving.jpg`;
+const ogImage = `${siteUrl}/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png`;
 
 export const metadata: Metadata = {
   title: 'נדל״ן בישראל עבור תושבי חוץ ומשקיעים זרים',
