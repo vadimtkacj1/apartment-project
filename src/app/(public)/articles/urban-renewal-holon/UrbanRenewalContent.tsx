@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function UrbanRenewalContent() {
                 כל מי שמסתובב בחולון בשנים האחרונות רואה את זה במו עיניו: מנופים בג׳סי כהן, שלטי &quot;כאן ייבנה&quot; בתל גיבורים, ובניינים בני 60 שנה שמפנים את מקומם למגדלים חדשים. ההתחדשות העירונית כבר לא תיאוריה — היא משנה את פני העיר, ואת מחירי הדירות יחד איתה.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    בשביל בעלי דירות ותיקים מדובר בהזדמנות של פעם בחיים: דירה ישנה בת 3 חדרים יכולה להפוך לדירה חדשה עם ממ״ד, מרפסת ומעלית — בלי לשלם שקל. בשביל קונים ומשקיעים, זו דרך לקנות היום במחיר של &quot;ישן&quot; ולקבל בעתיד נכס חדש.
-                  </p>
-                  <p>
-                    אבל בין ההבטחה למציאות יש פערים: פרויקטים שנתקעים, יזמים שנעלמים, והסכמים שכובלים דיירים לשנים. <strong>אחרי 24 שנים בשטח של חולון, אנחנו מכירים כל מתחם — ויודעים להבדיל בין הזדמנות אמיתית לחלום באספמיה.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/urban-renewal.jpg" alt="התחדשות עירונית ובנייה בחולון" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                בשביל בעלי דירות ותיקים מדובר בהזדמנות של פעם בחיים: דירה ישנה בת 3 חדרים יכולה להפוך לדירה חדשה עם ממ״ד, מרפסת ומעלית — בלי לשלם שקל. בשביל קונים ומשקיעים, זו דרך לקנות היום במחיר של &quot;ישן&quot; ולקבל בעתיד נכס חדש.
+              </p>
+              <p>
+                אבל בין ההבטחה למציאות יש פערים: פרויקטים שנתקעים, יזמים שנעלמים, והסכמים שכובלים דיירים לשנים. <strong>אחרי 24 שנים בשטח של חולון, אנחנו מכירים כל מתחם — ויודעים להבדיל בין הזדמנות אמיתית לחלום באספמיה.</strong>
+              </p>
             </section>
 
             {/* Definition: פינוי-בינוי מול תמ״א 38 */}
@@ -172,32 +164,6 @@ export default function UrbanRenewalContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

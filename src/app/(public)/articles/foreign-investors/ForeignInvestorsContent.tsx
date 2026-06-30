@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
@@ -47,22 +46,15 @@ export default function ForeignInvestorsContent() {
                 אין תחושה מתסכלת יותר מזו: אתם גרים מעבר לים, עובדים קשה, ורואים איך מחירי הנדל"ן בישראל ממשיכים לטוס למעלה בלעדיכם. אתם רוצים לקנות דירה להשקעה בחולון, דירה מול הים בבת ים, או ראשל"צ ולהבטיח את העתיד של הילדים, אבל המרחק משתק.
               </p>
               
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    איך אפשר לקנות דירה בלי לראות אותה? מי ישפץ אותה כשהקבלן יבריז? ומי ירדוף אחרי השוכר בראשון לחודש כשאתם נמצאים באזור זמן אחר לגמרי?
-                  </p>
-                  <p>
-                    באותו רגע, הפחד מניצול או מהונאה גובר על הרצון להשקיע. הכסף נשאר בבנק ונשחק. אז רגע לפני שאתם מוותרים על החלום לדירה בארץ - עצרו רגע.
-                  </p>
-                  <p>
-                    אנחנו במשרד מבינים את המצוקה הזו בדיוק. כבר שנים שאנחנו משמשים כ"עיניים והידיים" של תושבי חוץ ומשקיעים. והחדשות הטובות? <strong>אפשר לנהל נדל"ן בישראל באפס מאמץ</strong>, אם יש לכם ניהול נכס (Property Management) מקצועי בשטח.
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/LuxuryLiving.jpg" alt="נדל״ן בישראל" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                איך אפשר לקנות דירה בלי לראות אותה? מי ישפץ אותה כשהקבלן יבריז? ומי ירדוף אחרי השוכר בראשון לחודש כשאתם נמצאים באזור זמן אחר לגמרי?
+              </p>
+              <p>
+                באותו רגע, הפחד מניצול או מהונאה גובר על הרצון להשקיע. הכסף נשאר בבנק ונשחק. אז רגע לפני שאתם מוותרים על החלום לדירה בארץ - עצרו רגע.
+              </p>
+              <p>
+                אנחנו במשרד מבינים את המצוקה הזו בדיוק. כבר שנים שאנחנו משמשים כ"עיניים והידיים" של תושבי חוץ ומשקיעים. והחדשות הטובות? <strong>אפשר לנהל נדל"ן בישראל באפס מאמץ</strong>, אם יש לכם ניהול נכס (Property Management) מקצועי בשטח.
+              </p>
 
               <div className="definition-block"><p><span className="definition-term">ייפוי כוח נוטריוני</span> הוא מסמך משפטי המאומת על ידי נוטריון, המעניק לנציג מוסמך בישראל — לרוב עורך דין — סמכות לחתום על מסמכי הרכישה והרישום בשם הרוכש. הוא מאפשר לתושב חוץ להשלים עסקה מרחוק, בלי טיסה לארץ.</p></div>
             </section>
@@ -86,23 +78,16 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 2: The Biggest Mistake */}
             <section className="article-section">
-              <div className="content-flex-layout reverse">
-                <div className="text-column">
-                  <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
-                  <p>
-                    הרבה משקיעים מפילים את התיק על "דוד שגר בארץ" או מנסים לנהל את השיפוץ בוואטסאפ מול קבלן מזדמן. <strong>זו טעות קריטית.</strong>
-                  </p>
-                  <p>
-                    מעבר לכאב הראש, יש כאן מלכודות פיננסיות: החל מחישוב שגוי של <em>מס רכישה (Purchase Tax)</em> ועד אי-ידיעת החוקים לגבי <em>משכנתא לתושבי חוץ (Mortgage for Foreigners)</em>.
-                  </p>
-                  <p>
-                    הדוד מתעייף, הקבלן מבין שאתם לא בשטח ומעגל פינות, והתשואה שלכם נפגעת. <strong>נדל"ן להשקעה חייב להיות מנוהל כמו עסק, לא כמו טובה משפחתית.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/minimalist-tel-aviv-apartment.jpg" alt="ניהול נכסים" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
+              <p>
+                הרבה משקיעים מפילים את התיק על "דוד שגר בארץ" או מנסים לנהל את השיפוץ בוואטסאפ מול קבלן מזדמן. <strong>זו טעות קריטית.</strong>
+              </p>
+              <p>
+                מעבר לכאב הראש, יש כאן מלכודות פיננסיות: החל מחישוב שגוי של <em>מס רכישה (Purchase Tax)</em> ועד אי-ידיעת החוקים לגבי <em>משכנתא לתושבי חוץ (Mortgage for Foreigners)</em>.
+              </p>
+              <p>
+                הדוד מתעייף, הקבלן מבין שאתם לא בשטח ומעגל פינות, והתשואה שלכם נפגעת. <strong>נדל"ן להשקעה חייב להיות מנוהל כמו עסק, לא כמו טובה משפחתית.</strong>
+              </p>
 
               <p>
                 <strong>מס רכישה לתושב חוץ:</strong> רוכש שאינו תושב ישראל — ובדרך כלל גם מי שבבעלותו דירה בחו"ל — מסווג בעת הרכישה כבעל דירה נוספת, ולכן ממוסה לפי מדרגות המשקיע ואינו זכאי להטבת מדרגות "דירה יחידה" המופחתות. כך נראות מדרגות מס הרכישה למשקיע נכון ל-2026:
@@ -158,22 +143,15 @@ export default function ForeignInvestorsContent() {
                 יש לנו <strong>צוותי שיפוץ ותחזוקה משלנו</strong>. אנחנו לא מפנים אתכם לקבלן - אנחנו מפקחים עליו. אנחנו נהפוך חורבה לדירת בונבוניירה שתניב שכירות גבוהה.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>3. מעטפת פיננסית</h3>
-                  <p>
-                    אנחנו עובדים צמוד עם <strong>אבי בוקעי ("אבי - הבית למשכנתאות")</strong> ועם עורכי דין המתמחים במיסוי לתושבי חוץ, כדי לוודא שהכסף עובר חלק והמימון (משכנתא) מאושר בתנאים הטובים ביותר.
-                  </p>
+              <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>3. מעטפת פיננסית</h3>
+              <p>
+                אנחנו עובדים צמוד עם <strong>אבי בוקעי ("אבי - הבית למשכנתאות")</strong> ועם עורכי דין המתמחים במיסוי לתושבי חוץ, כדי לוודא שהכסף עובר חלק והמימון (משכנתא) מאושר בתנאים הטובים ביותר.
+              </p>
 
-                  <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>4. ניהול שוטף (השקט שלכם)</h3>
-                  <p>
-                    מציאת שוכרים, גביית תשלומים, ותיקון תקלות. <strong>אתם מקבלים רק את הדיווח בבנק.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/360_F_651602712_C8pj3T2vA73H0oyL1tSF9pvU6ginjecp.jpg" alt="שירותי נדל״ן" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>4. ניהול שוטף (השקט שלכם)</h3>
+              <p>
+                מציאת שוכרים, גביית תשלומים, ותיקון תקלות. <strong>אתם מקבלים רק את הדיווח בבנק.</strong>
+              </p>
             </section>
 
             {/* Section 4: Why Choose Us */}
@@ -192,38 +170,6 @@ export default function ForeignInvestorsContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        .article-side-img {
-          width: 100%;
-          height: auto;
-          border-radius: 8px;
-          object-fit: cover;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

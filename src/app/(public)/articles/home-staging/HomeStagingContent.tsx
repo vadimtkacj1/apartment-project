@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -48,19 +47,12 @@ export default function HomeStagingContent() {
                 <p><span className="definition-term">הום סטיילינג</span> (Home Staging) הוא הכנה והצגה מקצועית של דירה למכירה — צביעה, פינוי חפצים מיותרים, תאורה, סידור וצילום — שמטרתם להציג את הנכס במיטבו, לקצר את זמן המכירה ולהעלות את המחיר הסופי.</p>
               </div>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    מהניסיון שלנו, קונים מגבשים את הרושם המכריע כבר ב-90 השניות הראשונות. הם לא קונים &quot;מטרים רבועים&quot; — הם קונים תחושה: &quot;אני רואה את עצמי גר כאן&quot;. הום סטיילינג (Home Staging) הוא בדיוק האומנות הזו — להציג את הדירה כך שהקונה יתאהב.
-                  </p>
-                  <p>
-                    והחלק הטוב? <strong>זו ההשקעה עם התשואה הגבוהה ביותר בכל תהליך המכירה</strong> — אלפי שקלים שמחזירים עשרות אלפים. הנה השיטה המלאה.
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/home-staging.jpg" alt="דירה מסודרת ומוכנה למכירה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                מהניסיון שלנו, קונים מגבשים את הרושם המכריע כבר ב-90 השניות הראשונות. הם לא קונים &quot;מטרים רבועים&quot; — הם קונים תחושה: &quot;אני רואה את עצמי גר כאן&quot;. הום סטיילינג (Home Staging) הוא בדיוק האומנות הזו — להציג את הדירה כך שהקונה יתאהב.
+              </p>
+              <p>
+                והחלק הטוב? <strong>זו ההשקעה עם התשואה הגבוהה ביותר בכל תהליך המכירה</strong> — אלפי שקלים שמחזירים עשרות אלפים. הנה השיטה המלאה.
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -172,32 +164,6 @@ export default function HomeStagingContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

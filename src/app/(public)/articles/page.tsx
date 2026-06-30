@@ -37,23 +37,13 @@ export default function ArticlesPage() {
           {articles.map((article, index) => (
             <article key={article.id} className="article-card" style={{ animationDelay: `${index * 0.1}s` }}>
               <div className="card-accent"></div>
-              <Link href={`/articles/${article.id}`} className="article-image-container">
-                <div className="image-overlay"></div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="article-image"
-                  loading="lazy"
-                />
+              <div className="article-content">
                 <span className="category-badge">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="badge-icon">
                     <path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                   {article.category}
                 </span>
-              </Link>
-              <div className="article-content">
                 <div className="article-meta">
                   <span className="article-date">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="meta-icon">

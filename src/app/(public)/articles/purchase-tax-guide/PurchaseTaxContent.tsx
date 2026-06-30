@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function PurchaseTaxContent() {
                 מצאתם את דירת החלומות בחולון, סגרתם מחיר עם המוכר, וכבר מדמיינים את עצמכם בסלון החדש. ואז עורך הדין שואל שאלה קטנה: &quot;זו הדירה היחידה שלכם?&quot; — והתשובה יכולה לשנות את העסקה בעשרות ואף מאות אלפי שקלים.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    מס רכישה הוא המס שמשלם כל מי שרוכש זכות במקרקעין בישראל, והוא מחושב לפי מדרגות — בדיוק כמו מס הכנסה. הבעיה? רוב הרוכשים מגלים את הסכום האמיתי רק אחרי שכבר התחייבו.
-                  </p>
-                  <p>
-                    אחרי 24 שנים של ליווי עסקאות בחולון, בת ים וראשון לציון, ראינו לא מעט עסקאות שכמעט התפוצצו בגלל תכנון מס שגוי. <strong>החדשות הטובות: עם תכנון נכון מראש, אפשר לחסוך הרבה מאוד כסף — באופן חוקי לחלוטין.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/purchase-tax.jpg" alt="חישוב מס רכישה על דירה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                מס רכישה הוא המס שמשלם כל מי שרוכש זכות במקרקעין בישראל, והוא מחושב לפי מדרגות — בדיוק כמו מס הכנסה. הבעיה? רוב הרוכשים מגלים את הסכום האמיתי רק אחרי שכבר התחייבו.
+              </p>
+              <p>
+                אחרי 24 שנים של ליווי עסקאות בחולון, בת ים וראשון לציון, ראינו לא מעט עסקאות שכמעט התפוצצו בגלל תכנון מס שגוי. <strong>החדשות הטובות: עם תכנון נכון מראש, אפשר לחסוך הרבה מאוד כסף — באופן חוקי לחלוטין.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -179,32 +171,6 @@ export default function PurchaseTaxContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

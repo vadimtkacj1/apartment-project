@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function HolonNeighborhoodsContent() {
                 &quot;תמצאו לי דירה בחולון&quot; — זו בקשה שאנחנו שומעים כל יום. אבל חולון היא לא מקום אחד: ההבדל בין שכונה לשכונה הוא הבדל של אופי, קהילה, מחיר — ופוטנציאל השבחה. דירה זהה יכולה להתאים בול למשפחה אחת ולאכזב אחרת, רק בגלל המיקום.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    חולון היא מהערים הגדולות בישראל — עיר של משפחות, עם מערכת חינוך שמדורגת בצמרת הארצית, מוזיאונים (מוזיאון הילדים, מוזיאון העיצוב), פארקים גדולים, וקרבה של דקות לתל אביב.
-                  </p>
-                  <p>
-                    אחרי 24 שנים שאנחנו מוכרים ומשכירים דירות בכל רחבי העיר, הנה המדריך שלנו לשכונות המרכזיות — <strong>בגובה העיניים, מנקודת מבט של מי שחי את השטח.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/holon-neighborhoods.jpg" alt="שכונות מגורים בחולון" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                חולון היא מהערים הגדולות בישראל — עיר של משפחות, עם מערכת חינוך שמדורגת בצמרת הארצית, מוזיאונים (מוזיאון הילדים, מוזיאון העיצוב), פארקים גדולים, וקרבה של דקות לתל אביב.
+              </p>
+              <p>
+                אחרי 24 שנים שאנחנו מוכרים ומשכירים דירות בכל רחבי העיר, הנה המדריך שלנו לשכונות המרכזיות — <strong>בגובה העיניים, מנקודת מבט של מי שחי את השטח.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -166,32 +158,6 @@ export default function HolonNeighborhoodsContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

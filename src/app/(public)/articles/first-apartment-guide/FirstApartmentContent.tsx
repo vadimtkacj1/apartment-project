@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function FirstApartmentContent() {
                 אתם חוסכים כבר שנים, גרים בשכירות שרק עולה, וכל ביקור אצל ההורים מסתיים באותה שאלה: &quot;נו, מתי כבר תקנו דירה?&quot;. אבל בין הרצון לבין המפתח ביד עומד מסע שרוב הזוגות הצעירים עושים בפעם הראשונה בחייהם — בלי מפה.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    קניית דירה ראשונה היא העסקה הכלכלית הגדולה בחיים, והיא מגיעה דווקא בשלב שבו יש לכם הכי פחות ניסיון. טעות בתקציב, במיקום או בבדיקות יכולה ללוות אתכם 20 שנה.
-                  </p>
-                  <p>
-                    ריכזנו כאן את כל מה שלמדנו מליווי מאות זוגות צעירים בחולון ובסביבה — שלב אחרי שלב, בלי ז׳רגון ובלי הפחדות. <strong>המטרה: שתגיעו לחתימה בטוחים, מוכנים, ועם הדירה הנכונה.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/first-apartment.jpg" alt="דירה ראשונה לזוג צעיר" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                קניית דירה ראשונה היא העסקה הכלכלית הגדולה בחיים, והיא מגיעה דווקא בשלב שבו יש לכם הכי פחות ניסיון. טעות בתקציב, במיקום או בבדיקות יכולה ללוות אתכם 20 שנה.
+              </p>
+              <p>
+                ריכזנו כאן את כל מה שלמדנו מליווי מאות זוגות צעירים בחולון ובסביבה — שלב אחרי שלב, בלי ז׳רגון ובלי הפחדות. <strong>המטרה: שתגיעו לחתימה בטוחים, מוכנים, ועם הדירה הנכונה.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -184,32 +176,6 @@ export default function FirstApartmentContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

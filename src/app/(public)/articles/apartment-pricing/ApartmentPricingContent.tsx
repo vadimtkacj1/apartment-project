@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function ApartmentPricingContent() {
                 זו השאלה הראשונה של כל מוכר דירה — וגם הטעות הראשונה. רוב המוכרים קובעים את המחיר לפי מה ש&quot;השכן ביקש&quot;, לפי כתבה בעיתון, או לפי הסכום שהם צריכים לדירה הבאה. אף אחד מהשלושה הוא לא שווי השוק של הדירה.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    תמחור הוא ההחלטה הקריטית ביותר בכל עסקת מכירה. מחיר נמוך מדי — והפסדתם כסף שמגיע לכם. מחיר גבוה מדי — והדירה &quot;תישרף&quot; בשוק ותימכר בסוף בפחות ממה שהייתה שווה ביום הראשון.
-                  </p>
-                  <p>
-                    אחרי אלפי עסקאות בחולון, בת ים וראשון לציון, אנחנו רואים תבנית חוזרת: <strong>מניסיון המשרד, ההבדל בין תמחור נכון לשגוי מגיע לרוב לכ-5%–10% ממחיר הדירה.</strong> על דירה של 2 מיליון ש״ח — זה עד 200,000 ש״ח. (הערכה מניסיוננו בשטח, לא נתון רשמי.)
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/apartment-pricing.jpg" alt="הערכת שווי דירה למכירה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                תמחור הוא ההחלטה הקריטית ביותר בכל עסקת מכירה. מחיר נמוך מדי — והפסדתם כסף שמגיע לכם. מחיר גבוה מדי — והדירה &quot;תישרף&quot; בשוק ותימכר בסוף בפחות ממה שהייתה שווה ביום הראשון.
+              </p>
+              <p>
+                אחרי אלפי עסקאות בחולון, בת ים וראשון לציון, אנחנו רואים תבנית חוזרת: <strong>מניסיון המשרד, ההבדל בין תמחור נכון לשגוי מגיע לרוב לכ-5%–10% ממחיר הדירה.</strong> על דירה של 2 מיליון ש״ח — זה עד 200,000 ש״ח. (הערכה מניסיוננו בשטח, לא נתון רשמי.)
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -166,32 +158,6 @@ export default function ApartmentPricingContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

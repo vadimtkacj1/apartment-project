@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function PrePurchaseContent() {
                 הדירה מהממת, המוכר נחמד, והמחיר נראה הוגן. בדיוק ברגע הזה — כשהרגש אומר &quot;לחתום עכשיו לפני שמישהו אחר ייקח&quot; — מתרחשות הטעויות הכי יקרות בעולם הנדל״ן. כי את הבעיות האמיתיות של דירה לא רואים בסיור של 20 דקות.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    עיקול שלא הוזכר, מרפסת שנסגרה בלי היתר, רטיבות שהוסתרה מאחורי קיר טרי — כל אחד מאלה יכול להפוך עסקת חלומות לבור כספי.
-                  </p>
-                  <p>
-                    החדשות הטובות: כמעט כל הבעיות ניתנות לגילוי מראש, אם יודעים מה לבדוק. ריכזנו את הצ׳קליסט המלא שאנחנו עוברים עם הקונים שלנו — <strong>ארבע קבוצות בדיקה, לפי הסדר הנכון.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/pre-purchase.jpg" alt="בדיקה מקצועית של דירה לפני קנייה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                עיקול שלא הוזכר, מרפסת שנסגרה בלי היתר, רטיבות שהוסתרה מאחורי קיר טרי — כל אחד מאלה יכול להפוך עסקת חלומות לבור כספי.
+              </p>
+              <p>
+                החדשות הטובות: כמעט כל הבעיות ניתנות לגילוי מראש, אם יודעים מה לבדוק. ריכזנו את הצ׳קליסט המלא שאנחנו עוברים עם הקונים שלנו — <strong>ארבע קבוצות בדיקה, לפי הסדר הנכון.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -117,32 +109,6 @@ export default function PrePurchaseContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

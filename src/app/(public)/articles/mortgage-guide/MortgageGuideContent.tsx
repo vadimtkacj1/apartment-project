@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function MortgageGuideContent() {
                 בשביל רוב הישראלים, משכנתא היא ההלוואה הגדולה ביותר שייקחו אי פעם — מיליון שקל ויותר, ל-20 או 30 שנה. ובכל זאת, רבים מקדישים לבחירת המשכנתא פחות זמן מאשר לבחירת המקרר לדירה החדשה.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    ההבדל בין תמהיל משכנתא טוב לבינוני הוא לא &quot;כמה עשיריות אחוז&quot; — הוא מאות שקלים בחודש, שמצטברים לעשרות ומאות אלפי שקלים לאורך חיי ההלוואה.
-                  </p>
-                  <p>
-                    במדריך הזה ריכזנו את מה שכל רוכש צריך לדעת לפני שנכנס לסניף: מה להוציא קודם, כמה הון עצמי צריך, איך עובדים המסלולים, ואיך משיגים תנאים טובים יותר. <strong>בלי ז׳רגון בנקאי — רק מה שחשוב באמת.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/mortgage.jpg" alt="תכנון משכנתא לדירה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                ההבדל בין תמהיל משכנתא טוב לבינוני הוא לא &quot;כמה עשיריות אחוז&quot; — הוא מאות שקלים בחודש, שמצטברים לעשרות ומאות אלפי שקלים לאורך חיי ההלוואה.
+              </p>
+              <p>
+                במדריך הזה ריכזנו את מה שכל רוכש צריך לדעת לפני שנכנס לסניף: מה להוציא קודם, כמה הון עצמי צריך, איך עובדים המסלולים, ואיך משיגים תנאים טובים יותר. <strong>בלי ז׳רגון בנקאי — רק מה שחשוב באמת.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -165,32 +157,6 @@ export default function MortgageGuideContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function NewVsSecondhandContent() {
                 מצד אחד: דירה חדשה ונוצצת מקבלן, עם ממ״ד, מרפסת שמש ולובי ממוזג — ומשרד מכירות שמגיש קפה ומבטיח עולם. מצד שני: דירה יד שנייה בשכונה ותיקה, עם עצים ברחוב, שכנים שכבר מכירים — ומחיר שסגור היום. אז מה באמת משתלם יותר?
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    זו אחת השאלות הנפוצות שאנחנו מקבלים, והתשובה הכנה היא: תלוי — בתקציב, בלוח הזמנים שלכם, וביכולת שלכם לספוג הפתעות.
-                  </p>
-                  <p>
-                    מה שבטוח: ההחלטה לא צריכה להתקבל במשרד מכירות מעוצב, מול הדמיה ממוחשבת. <strong>הנה ההשוואה המלאה — כולל הסעיפים הקטנים שמשנים את התמונה.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/new-vs-secondhand.jpg" alt="דירה חדשה מקבלן מול דירה יד שנייה" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                זו אחת השאלות הנפוצות שאנחנו מקבלים, והתשובה הכנה היא: תלוי — בתקציב, בלוח הזמנים שלכם, וביכולת שלכם לספוג הפתעות.
+              </p>
+              <p>
+                מה שבטוח: ההחלטה לא צריכה להתקבל במשרד מכירות מעוצב, מול הדמיה ממוחשבת. <strong>הנה ההשוואה המלאה — כולל הסעיפים הקטנים שמשנים את התמונה.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -189,32 +181,6 @@ export default function NewVsSecondhandContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -44,19 +43,12 @@ export default function LandlordGuideContent() {
                 על הנייר, השכרת דירה נשמעת כמו הכנסה פסיבית מושלמת: שוכר נכנס, כסף נכנס, החיים יפים. בפועל, כל בעל דירה ותיק מכיר את הצד השני — שוכר שמפסיק לשלם, דוד שמתפוצץ בשישי בערב, ודירה שחוזרת אליכם במצב שדורש שיפוץ.
               </p>
 
-              <div className="content-flex-layout">
-                <div className="text-column">
-                  <p>
-                    ההבדל בין השכרה רווחית לסיוט מתמשך הוא לא מזל — הוא תהליך נכון: תמחור מדויק, סינון קפדני, חוזה שמגן עליכם, וניהול שוטף מסודר.
-                  </p>
-                  <p>
-                    אחרי 24 שנים שבהן אנחנו משכירים ומנהלים נכסים בחולון, בת ים וראשון לציון — עבור בעלי דירות בארץ ו<Link href="/articles/foreign-investors">תושבי חוץ</Link> — ריכזנו כאן את השיטה המלאה. <strong>ככה משכירים דירה כמו מקצוענים.</strong>
-                  </p>
-                </div>
-                <div className="image-column">
-                  <Image src="/images/articles/landlord.jpg" alt="השכרת דירה לבעלי נכסים" width={600} height={450} loading="lazy" sizes="(max-width: 768px) 100vw, 45vw" style={{ width: '100%', height: 'auto', borderRadius: '8px', objectFit: 'cover' }} />
-                </div>
-              </div>
+              <p>
+                ההבדל בין השכרה רווחית לסיוט מתמשך הוא לא מזל — הוא תהליך נכון: תמחור מדויק, סינון קפדני, חוזה שמגן עליכם, וניהול שוטף מסודר.
+              </p>
+              <p>
+                אחרי 24 שנים שבהן אנחנו משכירים ומנהלים נכסים בחולון, בת ים וראשון לציון — עבור בעלי דירות בארץ ו<Link href="/articles/foreign-investors">תושבי חוץ</Link> — ריכזנו כאן את השיטה המלאה. <strong>ככה משכירים דירה כמו מקצוענים.</strong>
+              </p>
             </section>
 
             {/* Section 1 */}
@@ -138,32 +130,6 @@ export default function LandlordGuideContent() {
           </div>
         </article>
       </div>
-
-      <style jsx>{`
-        .content-flex-layout {
-          display: flex;
-          gap: 40px;
-          align-items: flex-start;
-          margin: 30px 0;
-        }
-        .content-flex-layout.reverse {
-          flex-direction: row-reverse;
-        }
-        .text-column {
-          flex: 1.3;
-        }
-        .image-column {
-          flex: 1.2;
-        }
-        @media (max-width: 768px) {
-          .content-flex-layout, .content-flex-layout.reverse {
-            flex-direction: column;
-          }
-          .image-column {
-            width: 100%;
-          }
-        }
-      `}</style>
     </div>
   );
 }
