@@ -1,7 +1,6 @@
 'use client';
 
 import { m } from 'framer-motion';
-import Image from 'next/image';
 
 export default function AboutServicesNew() {
   return (
@@ -18,8 +17,8 @@ export default function AboutServicesNew() {
           השכרה, מכירה וניהול נכסים
         </m.h2>
 
-        {/* Content: Image + Text */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* Content (images hidden for now) */}
+        <div className="max-w-3xl mx-auto">
 
           {/* Text Content */}
           <m.div
@@ -54,21 +53,6 @@ export default function AboutServicesNew() {
             <p className="text-lg text-slate-700 leading-relaxed">
               המטרה שלנו היא להקל על בעלי הנכסים ולחסוך להם זמן, טעויות וכסף. אנחנו מטפלים בכל שלבי התהליך – מצילום ושיווק הנכס, דרך סינון פניות וקביעת פגישות ועד לסגירת עסקה בתנאים הטובים ביותר.
             </p>
-          </m.div>
-
-          {/* Image */}
-          <m.div
-            className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <Image
-              src="/apartment.jpg"
-              alt="השכרה, מכירה וניהול נכסים"
-              fill
-              className="object-cover"
-            />
           </m.div>
 
         </div>

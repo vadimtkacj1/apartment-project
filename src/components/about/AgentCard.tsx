@@ -42,6 +42,15 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
     }
   };
 
+  // Photos hidden for now (awaiting real/generated images) — shows a branded
+  // initials avatar instead. Set HIDE_PHOTOS = false to restore real photos.
+  const HIDE_PHOTOS = true;
+  const initials = (member.name || '')
+    .split(' ')
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('');
+
   return (
     <m.div
       initial={{ y: 50, opacity: 0 }}
@@ -59,7 +68,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
       {/* --- Image Section (45% width) --- */}
       <div className="w-full md:w-[45%] flex justify-center">
         <div className="relative aspect-[3/4] md:aspect-[4/5] w-full max-w-[320px] md:max-w-sm overflow-hidden rounded-[30px] shadow-2xl shadow-blue-900/10 border border-white/50">
-          {member.image ? (
+          {!HIDE_PHOTOS && member.image ? (
             <Image
               src={member.image}
               alt={member.name || 'Agent'}
@@ -68,9 +77,11 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
               sizes="(max-width: 768px) 100vw, 40vw"
             />
           ) : (
-            // Fallback if image URL is missing
-            <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400">
-              No Image
+            /* Fallback: branded initials avatar */
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1c3664] to-[#2d5a9e]">
+              <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
+                {initials}
+              </span>
             </div>
           )}
         </div>

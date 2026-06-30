@@ -1,7 +1,6 @@
 'use client';
 
 import { m } from 'framer-motion';
-import Image from 'next/image';
 
 export default function AboutLocalExpertise() {
   return (
@@ -18,28 +17,13 @@ export default function AboutLocalExpertise() {
           מומחיות מקומית בחולון
         </m.h2>
 
-        {/* Content: Text + Image */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-
-          {/* Image (on the right for RTL) */}
-          <m.div
-            className="relative h-[350px] md:h-[400px] rounded-2xl overflow-hidden shadow-xl order-2 md:order-1"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Image
-              src="/keys.jpeg"
-              alt="מומחיות מקומית בחולון"
-              fill
-              className="object-cover"
-            />
-          </m.div>
+        {/* Content (images hidden for now) */}
+        <div className="max-w-3xl mx-auto">
 
           {/* Text Content */}
           <m.div
-            className="space-y-6 order-1 md:order-2"
-            initial={{ opacity: 0, x: 50 }}
+            className="space-y-6"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >

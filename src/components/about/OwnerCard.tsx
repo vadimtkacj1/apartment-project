@@ -47,7 +47,10 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
     .slice(0, 2)
     .join('');
 
-  const showImage = owner.image && !imgError;
+  // Photos hidden for now (awaiting real/generated images) — shows the initials
+  // avatar instead. Set HIDE_PHOTOS = false to restore real photos.
+  const HIDE_PHOTOS = true;
+  const showImage = !HIDE_PHOTOS && owner.image && !imgError;
 
   return (
     <m.div
