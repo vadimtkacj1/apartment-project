@@ -40,6 +40,10 @@ export interface PropertyForm {
   images: string[];
   status: string;
   location: string;
+  // SEO overrides (optional — fall back to title/description/first image)
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: string;
   bedrooms: string;
   bathrooms: number;
   isActive: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Statistic, Table, Spin, Typography, DatePicker, Select, Tag, Button, Popconfirm, message } from 'antd';
+import { Row, Col, Card, Statistic, Table, Spin, DatePicker, Select, Tag, Button, Popconfirm, App } from 'antd';
 import {
   EyeOutlined,
   AppstoreOutlined,
@@ -10,12 +10,13 @@ import {
   PhoneOutlined,
   MailOutlined,
   MessageOutlined,
-  BarChartOutlined,
   DeleteOutlined,
   LineChartOutlined,
   PieChartOutlined,
   ReloadOutlined,
-  RiseOutlined
+  RiseOutlined,
+  MobileOutlined,
+  DesktopOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -35,7 +36,6 @@ import {
   AreaChart,
 } from 'recharts';
 
-const { Title } = Typography;
 const { RangePicker } = DatePicker;
 
 interface AnalyticsSummary {
@@ -89,9 +89,16 @@ interface ChartDataPoint {
   uniqueUsers: number;
 }
 
-const COLORS = ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16'];
+/* Brand palette (matches src/lib/adminTheme.ts) — navy · gold · cream, no rainbow */
+const NAVY = '#1C3664';
+const GOLD = '#C5A357';
+const GOLD_TEXT = '#8A6D2F'; // AA-safe gold for text on light surfaces
+const HAIRLINE = '#E6E8EC';
+// Categorical sequence kept within the navy/gold family + neutrals
+const COLORS = ['#1C3664', '#C5A357', '#2A4A8A', '#8A6D2F', '#5B6B8C', '#B8A98A', '#9AA0AA', '#C9CDD6'];
 
 export default function AnalyticsPage() {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [views, setViews] = useState<PropertyView[]>([]);
@@ -180,47 +187,44 @@ export default function AnalyticsPage() {
   };
 
   const processChartData = (viewsData: PropertyView[], clicksData: ClickEvent[]) => {
-    const dateMap = new Map<string, { views: Set<number>; clicks: number; uniqueIPs: Set<string> }>();
+    // Key buckets by full ISO date (YYYY-MM-DD) so they sort chronologically
+    // without relying on the customParseFormat plugin; keep DD/MM only for display.
+    const dateMap = new Map<
+      string,
+      { label: string; views: Set<number>; clicks: number; uniqueIPs: Set<string> }
+    >();
 
-    // Helper to get date key
-    const getDateKey = (dateStr: string) => dayjs(dateStr).format('DD/MM');
+    const bucketFor = (dateStr: string) => {
+      const d = dayjs(dateStr);
+      const key = d.format('YYYY-MM-DD');
+      let bucket = dateMap.get(key);
+      if (!bucket) {
+        bucket = { label: d.format('DD/MM'), views: new Set(), clicks: 0, uniqueIPs: new Set() };
+        dateMap.set(key, bucket);
+      }
+      return bucket;
+    };
 
-    // Initialize map for the date range if needed, but dynamic is fine for now
-    
-    // Process views
     viewsData.forEach(view => {
-      const date = getDateKey(view.createdAt);
-      if (!dateMap.has(date)) {
-        dateMap.set(date, { views: new Set(), clicks: 0, uniqueIPs: new Set() });
-      }
-      const data = dateMap.get(date)!;
-      data.views.add(view.id);
-      data.uniqueIPs.add(view.ipAddress);
+      const bucket = bucketFor(view.createdAt);
+      bucket.views.add(view.id);
+      bucket.uniqueIPs.add(view.ipAddress);
     });
 
-    // Process clicks
     clicksData.forEach(click => {
-      const date = getDateKey(click.createdAt);
-      if (!dateMap.has(date)) {
-        dateMap.set(date, { views: new Set(), clicks: 0, uniqueIPs: new Set() });
-      }
-      const data = dateMap.get(date)!;
-      data.clicks++;
-      data.uniqueIPs.add(click.ipAddress);
+      const bucket = bucketFor(click.createdAt);
+      bucket.clicks++;
+      bucket.uniqueIPs.add(click.ipAddress);
     });
 
-    // Convert to array, sort by date logic (simple string sort works for DD/MM if within same year, 
-    // strictly speaking should use full date for sort but keep DD/MM for display)
     const chartData: ChartDataPoint[] = Array.from(dateMap.entries())
-      .map(([date, data]) => ({
-        date,
+      .sort(([a], [b]) => a.localeCompare(b)) // ISO keys sort chronologically
+      .map(([, data]) => ({
+        date: data.label,
         views: data.views.size,
         clicks: data.clicks,
         uniqueUsers: data.uniqueIPs.size,
-        timestamp: dayjs(date, 'DD/MM').unix() // helper for sorting
       }))
-      .sort((a, b) => a.timestamp - b.timestamp) // Sort by time
-      .map(({ date, views, clicks, uniqueUsers }) => ({ date, views, clicks, uniqueUsers }))
       .slice(-30); // Show last 30 days max to avoid overcrowding
 
     setChartData(chartData);
@@ -266,17 +270,22 @@ export default function AnalyticsPage() {
     return labels[eventType] || eventType;
   };
 
-  const getEventTypeColor = (eventType: string) => {
-    const colors: Record<string, string> = {
-      'property_view': 'blue',
-      'click_property': 'green',
-      'click_phone': 'orange',
-      'click_email': 'purple',
-      'click_whatsapp': 'green',
-      'contact_form': 'red',
-      'click_button': 'cyan',
+  // Restrained, brand-aligned chip: leads in gold, views in navy, the rest neutral —
+  // replaces the previous rainbow of antd tag presets.
+  const LEAD_EVENTS = ['click_phone', 'click_whatsapp', 'click_email', 'contact_form'];
+  const getEventChipStyle = (eventType: string): React.CSSProperties => {
+    const lead = LEAD_EVENTS.includes(eventType);
+    const isView = eventType === 'property_view';
+    return {
+      background: lead ? 'rgba(197,163,87,.14)' : isView ? 'rgba(28,54,100,.08)' : '#F2F1EE',
+      color: lead ? GOLD_TEXT : isView ? NAVY : '#6B7280',
+      borderRadius: 6,
+      padding: '2px 9px',
+      fontSize: 12,
+      fontWeight: 600,
+      display: 'inline-block',
+      whiteSpace: 'nowrap',
     };
-    return colors[eventType] || 'default';
   };
 
   // --- Calculate Conversion Rate ---
@@ -304,7 +313,7 @@ export default function AnalyticsPage() {
       key: 'ipAddress',
       width: '20%',
       render: (ip) => (
-        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1890ff' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
           {getVisitorNumber(ip)}
         </span>
       ),
@@ -318,10 +327,11 @@ export default function AnalyticsPage() {
         if (!userAgent) return '-';
         const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
         const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
-        const mobile = userAgent.includes('Mobile') ? '📱' : '💻';
+        const isMobile = userAgent.includes('Mobile');
         return (
-          <span title={userAgent} style={{ fontSize: '0.9em' }}>
-            {mobile} {browser}
+          <span title={userAgent} style={{ fontSize: '0.9em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+            {browser}
           </span>
         );
       },
@@ -356,9 +366,9 @@ export default function AnalyticsPage() {
       key: 'eventType',
       width: '15%',
       render: (eventType) => (
-        <Tag color={getEventTypeColor(eventType)}>
+        <span style={getEventChipStyle(eventType)}>
           {getEventTypeLabel(eventType)}
-        </Tag>
+        </span>
       ),
     },
     {
@@ -367,7 +377,7 @@ export default function AnalyticsPage() {
       key: 'ipAddress',
       width: '18%',
       render: (ip) => (
-        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1890ff' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
           {getVisitorNumber(ip)}
         </span>
       ),
@@ -382,10 +392,11 @@ export default function AnalyticsPage() {
         // Extract browser info
         const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
         const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
-        const mobile = userAgent.includes('Mobile') ? '📱' : '💻';
+        const isMobile = userAgent.includes('Mobile');
         return (
-          <span title={userAgent} style={{ fontSize: '0.9em' }}>
-            {mobile} {browser}
+          <span title={userAgent} style={{ fontSize: '0.9em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+            {browser}
           </span>
         );
       },
@@ -403,7 +414,7 @@ export default function AnalyticsPage() {
   if (loading && !summary) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-        <Spin size="large" tip="טוען נתונים..." />
+        <Spin size="large" description="טוען נתונים..." />
       </div>
     );
   }
@@ -425,15 +436,12 @@ export default function AnalyticsPage() {
     }));
 
   return (
-    <div style={{ backgroundColor: '#ffffff', minHeight: '100vh', padding: '20px' }}>
+    <div className="px-2 sm:px-4 md:px-0 analytics-console">
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-            <Title level={2} style={{ margin: 0, color: '#001529' }}>
-            <BarChartOutlined style={{ marginLeft: '12px' }} />
-            דשבורד אנליטיקה
-            </Title>
-            <div style={{ color: '#8c8c8c', marginTop: '4px' }}>צפה בביצועי האתר והנכסים שלך בזמן אמת</div>
+          <h1 className="text-4xl font-bold" style={{ margin: 0, color: '#1C3664' }}>דשבורד אנליטיקה</h1>
+          <div style={{ color: '#8c8c8c', marginTop: '4px' }}>צפה בביצועי האתר והנכסים שלך בזמן אמת</div>
         </div>
         
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -456,7 +464,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Filters Bar */}
-      <Card style={{ marginBottom: '24px', borderRadius: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }} bodyStyle={{ padding: '16px 24px' }}>
+      <Card className="mb-6">
         <Row gutter={24} align="middle">
           <Col xs={24} md={12} lg={8}>
             <div style={{ marginBottom: '8px', fontWeight: 500 }}>טווח תאריכים:</div>
@@ -474,10 +482,10 @@ export default function AnalyticsPage() {
               value={selectedProperty}
               onChange={setSelectedProperty}
               placeholder="בחר נכס"
-              showSearch
-              filterOption={(input, option) =>
-                (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
+              }}
             >
               <Select.Option value="all">הצג הכל</Select.Option>
               {(summary?.topProperties || []).map((p) => (
@@ -494,10 +502,10 @@ export default function AnalyticsPage() {
               value={selectedIP}
               onChange={setSelectedIP}
               placeholder="בחר מבקר"
-              showSearch
-              filterOption={(input, option) =>
-                (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
+              }}
             >
               <Select.Option value="all">הצג הכל</Select.Option>
               {(summary?.topUsersByClicks || []).map((user) => (
@@ -512,21 +520,14 @@ export default function AnalyticsPage() {
 
       {/* Selected User Info */}
       {selectedIP !== 'all' && (
-        <Card
-          style={{
-            marginBottom: '24px',
-            borderRadius: '8px',
-            backgroundColor: '#e6f7ff',
-            border: '2px solid #1890ff'
-          }}
-        >
+        <Card className="mb-6">
           <Row align="middle" gutter={16}>
             <Col>
-              <UserOutlined style={{ fontSize: '32px', color: '#1890ff' }} />
+              <UserOutlined style={{ fontSize: '32px', color: '#1C3664' }} />
             </Col>
             <Col flex="auto">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                פעילות משתמש: <span style={{ fontWeight: 700, color: '#1890ff' }}>{getVisitorNumber(selectedIP)}</span>
+                פעילות משתמש: <span style={{ fontWeight: 700, color: '#1C3664' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
               <div style={{ color: '#666' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
@@ -552,47 +553,47 @@ export default function AnalyticsPage() {
       {/* Key Metrics Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} lg={6}>
-            <Card hoverable style={{ borderRadius: '8px', height: '100%' }}>
+            <Card style={{ height: '100%' }}>
             <Statistic
                 title="סה״כ צפיות"
                 value={summary?.totalViews || 0}
-                prefix={<EyeOutlined style={{ color: '#1890ff', backgroundColor: '#e6f7ff', padding: '8px', borderRadius: '50%' }} />}
-                valueStyle={{ fontWeight: 'bold', color: '#1890ff' }}
+                prefix={<EyeOutlined style={{ color: '#1C3664' }} />}
+                styles={{ content: { fontWeight: 'bold', color: '#1C3664' } }}
             />
             </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-            <Card hoverable style={{ borderRadius: '8px', height: '100%' }}>
+            <Card style={{ height: '100%' }}>
             <Statistic
                 title="סה״כ לחיצות (פעולות)"
                 value={summary?.totalClicks || 0}
-                prefix={<AppstoreOutlined style={{ color: '#52c41a', backgroundColor: '#f6ffed', padding: '8px', borderRadius: '50%' }} />}
-                valueStyle={{ fontWeight: 'bold', color: '#52c41a' }}
+                prefix={<AppstoreOutlined style={{ color: NAVY }} />}
+                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
             />
             </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-            <Card hoverable style={{ borderRadius: '8px', height: '100%' }}>
+            <Card style={{ height: '100%' }}>
             <Statistic
                 title="יחס המרה (CTR)"
                 value={conversionRate}
                 suffix="%"
-                prefix={<RiseOutlined style={{ color: '#722ed1', backgroundColor: '#f9f0ff', padding: '8px', borderRadius: '50%' }} />}
-                valueStyle={{ fontWeight: 'bold', color: '#722ed1' }}
+                prefix={<RiseOutlined style={{ color: GOLD }} />}
+                styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }}
                 precision={1}
             />
             </Card>
         </Col>
 
         <Col xs={24} sm={12} lg={6}>
-            <Card hoverable style={{ borderRadius: '8px', height: '100%' }}>
+            <Card style={{ height: '100%' }}>
             <Statistic
                 title="משתמשים ייחודיים"
                 value={summary?.uniqueVisitors || 0}
-                prefix={<UserOutlined style={{ color: '#faad14', backgroundColor: '#fffbe6', padding: '8px', borderRadius: '50%' }} />}
-                valueStyle={{ fontWeight: 'bold', color: '#faad14' }}
+                prefix={<UserOutlined style={{ color: NAVY }} />}
+                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
             />
             </Card>
         </Col>
@@ -604,18 +605,18 @@ export default function AnalyticsPage() {
         <Col xs={24} lg={16}>
           <Card
             title={<span style={{ fontWeight: 600 }}>מגמות לאורך זמן</span>}
-            style={{ borderRadius: '8px', height: '100%' }}
+            style={{ height: '100%' }}
           >
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1890ff" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#1890ff" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#1C3664" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#1C3664" stopOpacity={0.1}/>
                   </linearGradient>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#52c41a" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#52c41a" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor={GOLD} stopOpacity={0.7}/>
+                    <stop offset="95%" stopColor={GOLD} stopOpacity={0.05}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -626,8 +627,8 @@ export default function AnalyticsPage() {
                   labelStyle={{ fontWeight: 'bold', marginBottom: '5px' }}
                 />
                 <Legend verticalAlign="top" height={36} />
-                <Area type="monotone" dataKey="views" stroke="#1890ff" fillOpacity={1} fill="url(#colorViews)" name="צפיות" activeDot={{ r: 6 }} />
-                <Area type="monotone" dataKey="clicks" stroke="#52c41a" fillOpacity={1} fill="url(#colorClicks)" name="לחיצות" activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="views" stroke="#1C3664" fillOpacity={1} fill="url(#colorViews)" name="צפיות" activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name="לחיצות" activeDot={{ r: 6 }} />
               </AreaChart>
             </ResponsiveContainer>
           </Card>
@@ -637,7 +638,7 @@ export default function AnalyticsPage() {
         <Col xs={24} lg={8}>
           <Card
             title={<span style={{ fontWeight: 600 }}>התפלגות פעולות</span>}
-            style={{ borderRadius: '8px', height: '100%' }}
+            style={{ height: '100%' }}
           >
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
@@ -670,7 +671,7 @@ export default function AnalyticsPage() {
           <Col xs={24} lg={12}>
             <Card
               title={<span style={{ fontWeight: 600 }}>נכסים מובילים (לפי פעולות)</span>}
-              style={{ borderRadius: '8px', height: '100%' }}
+              style={{ height: '100%' }}
             >
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -690,7 +691,7 @@ export default function AnalyticsPage() {
                             return (
                                 <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
                                     <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
-                                    <p style={{ margin: 0, color: '#52c41a' }}>{data.clicks} לחיצות</p>
+                                    <p style={{ margin: 0, color: GOLD_TEXT }}>{data.clicks} לחיצות</p>
                                 </div>
                             );
                         }
@@ -699,7 +700,7 @@ export default function AnalyticsPage() {
                   />
                   <Bar dataKey="clicks" name="לחיצות" radius={[0, 4, 4, 0]} barSize={24}>
                     {barChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={index === 0 ? GOLD : NAVY} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -713,13 +714,14 @@ export default function AnalyticsPage() {
           <Col xs={24} lg={barChartData.length > 0 ? 12 : 24}>
             <Card
               title={<span style={{ fontWeight: 600 }}>מבקרים פעילים</span>}
-              style={{ borderRadius: '8px', height: '100%' }}
+              style={{ height: '100%' }}
             >
               <div style={{ maxHeight: 300, overflowY: 'auto' }}>
                 {summary.topUsersByClicks.map((user, index) => {
                   const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
                   const browser = user.userAgent ? browsers.find(b => user.userAgent!.includes(b)) || 'Unknown' : 'Unknown';
-                  const mobile = user.userAgent?.includes('Mobile') ? '📱' : '💻';
+                  const isMobile = !!user.userAgent?.includes('Mobile');
+                  const isSelected = selectedIP === user.ipAddress;
 
                   return (
                     <div
@@ -727,49 +729,36 @@ export default function AnalyticsPage() {
                       onClick={() => setSelectedIP(user.ipAddress)}
                       style={{
                         padding: '12px 16px',
-                        marginBottom: '8px',
-                        backgroundColor: selectedIP === user.ipAddress ? '#bae7ff' : (index < 3 ? '#f0f7ff' : '#fafafa'),
-                        borderRadius: '8px',
-                        border: selectedIP === user.ipAddress ? '2px solid #0050b3' : (index < 3 ? '2px solid #1890ff' : '1px solid #e8e8e8'),
+                        backgroundColor: isSelected ? 'rgba(28, 54, 100, 0.06)' : 'transparent',
+                        borderBottom: `1px solid ${HAIRLINE}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         cursor: 'pointer',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (selectedIP !== user.ipAddress) {
-                          e.currentTarget.style.backgroundColor = '#e6f7ff';
-                          e.currentTarget.style.transform = 'translateX(-2px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (selectedIP !== user.ipAddress) {
-                          e.currentTarget.style.backgroundColor = index < 3 ? '#f0f7ff' : '#fafafa';
-                          e.currentTarget.style.transform = 'translateX(0)';
-                        }
+                        transition: 'background-color 0.2s ease',
                       }}
                     >
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <Tag color={selectedIP === user.ipAddress ? 'blue' : (index < 3 ? 'blue' : 'default')}>#{index + 1}</Tag>
-                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#1890ff' }}>
+                          <Tag color={index < 3 ? 'gold' : 'default'}>#{index + 1}</Tag>
+                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#1C3664' }}>
                             {getVisitorNumber(user.ipAddress)}
                           </span>
-                          {selectedIP === user.ipAddress && (
-                            <Tag color="processing">מסונן</Tag>
+                          {isSelected && (
+                            <Tag color="gold">מסונן</Tag>
                           )}
                         </div>
-                        <div style={{ fontSize: '0.85em', color: '#888' }}>
-                          {mobile} {browser}
+                        <div style={{ fontSize: '0.85em', color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+                          {browser}
                         </div>
                       </div>
                       <div style={{
                         fontSize: '1.5em',
                         fontWeight: 'bold',
-                        color: index < 3 ? '#1890ff' : '#52c41a',
+                        color: '#1C3664',
                         minWidth: '60px',
-                        textAlign: 'center'
+                        textAlign: 'center',
                       }}>
                         {user.clicks}
                         <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>לחיצות</div>
@@ -786,45 +775,40 @@ export default function AnalyticsPage() {
       {/* Recent Activity Tables */}
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
-            <Card
-                title="פעולות אחרונות"
-                style={{ borderRadius: '8px' }}
-                bodyStyle={{ padding: 0 }}
-            >
+            <Card title="פעולות אחרונות">
                 <Table
                 columns={clicksColumns}
                 dataSource={Array.isArray(clicks) ? clicks.slice(0, 10) : []}
                 rowKey="id"
                 pagination={false}
-                size="small"
                 scroll={{ x: 800 }}
                 />
-                <div style={{ padding: '12px', textAlign: 'center' }}>
-                    <Button type="link">צפה בכל הפעולות</Button>
-                </div>
             </Card>
         </Col>
-        
+
         <Col xs={24} lg={12}>
-            <Card
-                title="צפיות אחרונות"
-                style={{ borderRadius: '8px' }}
-                bodyStyle={{ padding: 0 }}
-            >
+            <Card title="צפיות אחרונות">
                 <Table
                 columns={viewsColumns}
                 dataSource={Array.isArray(views) ? views.slice(0, 10) : []}
                 rowKey="id"
                 pagination={false}
-                size="small"
                 scroll={{ x: 700 }}
                 />
-                <div style={{ padding: '12px', textAlign: 'center' }}>
-                    <Button type="link">צפה בכל הצפיות</Button>
-                </div>
             </Card>
         </Col>
       </Row>
+
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+/* Flatten cards: one hairline enclosure, no border+shadow stacking — matches the dashboard */
+.layout-dashboard .analytics-console .ant-card{box-shadow:none;border:1px solid ${HAIRLINE};border-radius:12px;}
+.layout-dashboard .analytics-console .ant-card-head{border-bottom:1px solid ${HAIRLINE};}
+.analytics-console .recharts-default-legend{font-size:12px;}
+`,
+        }}
+      />
     </div>
   );
 }

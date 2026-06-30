@@ -190,6 +190,17 @@ export async function PUT(
         status: body.status || null,
         location: body.location,
 
+        // SEO overrides (optional — fall back to title/description/first image when empty)
+        metaTitle: body.metaTitle || null,
+        metaDescription: body.metaDescription || null,
+        ogImage: body.ogImage || null,
+        imageAlts:
+          body.imageAlts === undefined
+            ? '[]'
+            : typeof body.imageAlts === 'string'
+              ? body.imageAlts
+              : JSON.stringify(body.imageAlts),
+
         // Compatibility fields
         bedrooms: body.bedrooms || body.rooms,
         bathrooms: body.bathrooms || 1,

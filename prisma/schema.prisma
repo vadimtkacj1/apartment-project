@@ -16,7 +16,8 @@ model User {
   password  String // Hashed password
   name      String?
   email     String?
-  role      String   @default("admin")
+  role      String   @default("admin") // 'admin' | 'agent'
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -117,6 +118,12 @@ model Property {
   status        String? // 'Exclusive' | 'New' | 'Opportunity' | etc.
   location      String // Display location (Hebrew)
 
+  // SEO overrides (optional — fall back to title / description / first image when empty)
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String? // social-share image URL override
+  imageAlts       String  @default("[]") // JSON array of alt texts, index-aligned with `images`
+
   // For compatibility with old schema
   bedrooms  String // Same as rooms
   bathrooms Int    @default(1)
@@ -146,8 +153,9 @@ model Property {
   updatedAt DateTime @updatedAt
 
   // Relations
-  views  PropertyView[]
-  clicks ClickEvent[]
+  views     PropertyView[]
+  clicks    ClickEvent[]
+  inquiries Inquiry[]
 
   // Indexes for better query performance
   @@index([city])
@@ -262,6 +270,27 @@ model Owner {
 
   @@index([order])
   @@index([isActive])
+}
+
+// Lead / inquiry — a contact-form submission or property enquiry, managed in /admin/inquiries
+model Inquiry {
+  id         Int       @id @default(autoincrement())
+  name       String
+  phone      String?
+  email      String?
+  message    String?
+  status     String    @default("new") // 'new' | 'in_progress' | 'closed'
+  source     String? // 'contact_form' | 'property_page' | 'whatsapp' | etc.
+  propertyId Int? // optional linked property
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  agentId    String? // assigned agent — 'team-X' / 'owner-X' (matches Property.agentIds format)
+  notes      String? // internal notes
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([propertyId])
 }
 
 // Team member model - agents/employees

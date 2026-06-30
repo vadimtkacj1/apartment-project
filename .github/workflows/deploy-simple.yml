@@ -175,8 +175,14 @@ jobs:
               cp -R public .next/standalone/public
             fi
 
-            # Keep server database untouched during deployment
-            echo "⏭️ Skipping database migrations (server DB is preserved)"
+            # Apply additive schema changes (new tables/columns) to the server DB.
+            # `prisma db push` is non-destructive for additive changes and — unlike
+            # `migrate deploy` — works regardless of the migration-history state. The
+            # DB was backed up above; db push aborts rather than drop data, so existing
+            # rows are preserved. Required so new columns (e.g. User.isActive, Property
+            # SEO fields) and tables (Inquiry) exist before the app queries them.
+            echo "🗄️ Syncing database schema (additive, non-destructive)..."
+            npx prisma db push --skip-generate || echo "⚠️ Schema sync issue — check logs (app may need new columns)."
 
             # Install PM2 if not available
             if ! command -v pm2 &> /dev/null; then
@@ -189,6 +195,28 @@ jobs:
             pm2 delete $APP_NAME || true
             pm2 start server.js --name $APP_NAME --cwd "$APP_DIR/.next/standalone" --update-env
             pm2 save
+
+            # Install/refresh automatic backups (DB + uploads + .env) every 6h.
+            # Idempotent: re-run on every deploy so the schedule self-heals and
+            # always carries the latest backup script.
+            if [ -f "$APP_DIR/scripts/backup-server.sh" ]; then
+              echo "💾 Installing periodic backup job..."
+              sudo install -m 750 "$APP_DIR/scripts/backup-server.sh" /usr/local/bin/apartment-backup
+              sudo mkdir -p /var/backups/apartment-project
+              sudo chmod 700 /var/backups/apartment-project
+              sudo touch /var/log/apartment-backup.log
+              sudo tee /etc/cron.d/apartment-project-backup > /dev/null << 'CRON'
+            SHELL=/bin/bash
+            PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+            # Every 6 hours; flock prevents overlapping runs.
+            0 */6 * * * root /usr/bin/flock -n /tmp/apartment-backup.lock /usr/local/bin/apartment-backup >> /var/log/apartment-backup.log 2>&1
+            CRON
+              sudo chmod 644 /etc/cron.d/apartment-project-backup
+              sudo systemctl restart cron 2>/dev/null || sudo systemctl restart crond 2>/dev/null || true
+              # Take one backup right away so a fresh server is protected immediately.
+              sudo /usr/local/bin/apartment-backup >> /var/log/apartment-backup.log 2>&1 || true
+              echo "✅ Backup schedule installed (every 6 hours)"
+            fi
 
             # Health check
             sleep 5

@@ -9,7 +9,7 @@
 
 /* ===== LAYOUT ===== */
 .layout-dashboard {
-  background: var(--warm-sand);
+  background: #F4F6F8;
   text-align: right;
   direction: rtl;
   position: relative;
@@ -32,7 +32,9 @@
   }
 }
 
-/* ===== SIDEBAR ===== */
+/* ===== SIDEBAR =====
+   Structural shell only. All sidebar content/colors live in Sidenav.tsx
+   (the `.estate-sidenav` block) — the single source of truth. */
 .layout-dashboard .ant-layout-sider.sider-primary {
   width: 250px;
   position: fixed;
@@ -40,130 +42,21 @@
   left: auto;
   z-index: 99;
   height: 100vh;
-  overflow: auto;
+  overflow: hidden;
   margin: 0;
-  padding: 20px;
+  padding: 0;
   background: #fff !important;
-  border-left: 1px solid #f0f0f0;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.06);
+  border-left: 1px solid #E6E8EC;
+  box-shadow: none;
+  transition: right 0.3s ease, box-shadow 0.3s ease;
 }
 
-.layout-dashboard .ant-layout-sider.sider-primary .brand {
-  font-weight: 700;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0 0;
-  color: #141414;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .brand img {
-  height: 32px;
-  width: auto;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary hr {
-  margin: 16px 0;
-  border: none;
-  height: 1px;
-  background-color: #f0f0f0;
-}
-
+/* Let the Sidenav own a full-height flex column (brand · scrolling nav · footer) */
 .layout-dashboard .ant-layout-sider.sider-primary .ant-layout-sider-children {
   width: auto;
-}
-
-/* ===== SIDEBAR MENU ===== */
-.layout-dashboard .ant-menu {
-  background: transparent !important;
-  border: none !important;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item {
-  padding: 0 !important;
-  height: auto;
-  line-height: normal;
-  margin: 4px 0 !important;
-  overflow: visible;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item::after {
-  display: none;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a {
-  padding: 10px 14px;
-  color: #595959;
-  border-radius: 10px;
+  height: 100%;
   display: flex;
-  align-items: center;
-  white-space: nowrap;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover {
-  background-color: #f5f7fa;
-  color: #141414;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active {
-  background-color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  font-weight: 600;
-  color: #141414;
-}
-
-/* Sidebar menu icons */
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .icon {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  background-color: #f5f7fa;
-  border-radius: 8px;
-  justify-content: center;
-  align-items: center;
-  margin-left: 12px;
-  margin-right: 0;
-  vertical-align: middle;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active .icon {
-  background-color: #1890ff;
-  box-shadow: 0 4px 8px rgba(24, 144, 255, 0.3);
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a.active svg path {
-  fill: #fff;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item svg path {
-  fill: #8c8c8c;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover .icon {
-  background-color: #e6f4ff;
-}
-
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item a:hover svg path {
-  fill: #1890ff;
-}
-
-/* Sidebar label */
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .label {
-  font-weight: inherit;
-  font-size: 14px;
-  color: inherit;
-}
-
-/* Active menu selection background override */
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item.ant-menu-item-selected {
-  background-color: transparent !important;
+  flex-direction: column;
 }
 
 /* ===== MAIN CONTENT LAYOUT ===== */
@@ -177,6 +70,7 @@
   margin-left: 0;
   overflow-x: hidden;
   overflow-y: visible;
+  transition: margin-right 0.3s ease;
 }
 
 /* ===== HEADER ===== */
@@ -187,7 +81,7 @@
   margin: 12px 20px;
   line-height: inherit;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
   transition: 0.2s;
 }
 
@@ -249,13 +143,13 @@
 /* ===== CARDS ===== */
 .layout-dashboard .ant-card {
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f0f0f0;
+  box-shadow: none;
+  border: 1px solid #E6E8EC;
   color: #141414;
 }
 
 .layout-dashboard .ant-card-head {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E6E8EC;
   min-height: auto;
   padding: 16px 24px;
 }
@@ -312,7 +206,7 @@
 
 .layout-dashboard .criclebox {
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: none;
 }
 
 .layout-dashboard .tablespace {
@@ -320,7 +214,7 @@
 }
 
 .layout-dashboard .ant-border-space {
-  border: 1px solid #f0f0f0;
+  border: 1px solid #E6E8EC;
   border-radius: 8px;
 }
 
@@ -329,17 +223,17 @@
   font-weight: 700;
   background-color: #fafafa;
   font-size: 13px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E6E8EC;
 }
 
 .layout-dashboard .ant-table-tbody > tr > td {
   color: #141414;
   font-size: 14px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E6E8EC;
 }
 
 .layout-dashboard .ant-table-tbody > tr:hover > td {
-  background: #f5f7fa;
+  background: #F4F6F8;
 }
 
 .layout-dashboard .table-responsive {
@@ -365,7 +259,7 @@
 }
 
 .layout-dashboard .ant-btn-primary {
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  box-shadow: none;
 }
 
 /* ===== FORMS ===== */
@@ -423,24 +317,57 @@
 }
 
 .layout-dashboard .footer-menu .nav-link:hover {
-  color: #1890ff;
+  color: #1C3664;
+}
+
+/* ===== SIDEBAR COLLAPSE / BACKDROP ===== */
+/* Slide the sidebar off the right edge when collapsed (all breakpoints) */
+.layout-dashboard.sidebar-collapsed .ant-layout-sider.sider-primary {
+  right: -250px;
+  box-shadow: none;
+}
+
+/* Dim backdrop shown behind the open sidebar on mobile */
+.layout-dashboard .sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 90;
+  border: none;
+  cursor: pointer;
+  animation: sidebar-backdrop-in 0.2s ease;
+}
+
+@keyframes sidebar-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ===== RESPONSIVE ===== */
 @media (min-width: 992px) {
   .layout-dashboard .ant-layout-sider.sider-primary {
     margin: 0;
-    padding: 20px;
+    padding: 0;
     height: 100vh;
   }
 
-  .layout-dashboard .ant-layout {
+  /* The header toggle stays visible on every breakpoint — it's the always-
+     available control to collapse AND reopen the sidebar (otherwise closing
+     it on desktop is a dead-end). */
+
+  /* Open: reserve room for the sidebar. Collapsed: content reclaims the space. */
+  .layout-dashboard.sidebar-open .ant-layout {
     margin-right: 250px;
     margin-left: 0;
   }
 
-  .layout-dashboard .header-control .sidebar-toggler {
-    display: none;
+  .layout-dashboard.sidebar-collapsed .ant-layout {
+    margin-right: 0;
+    margin-left: 0;
   }
 }
 
@@ -455,19 +382,9 @@
 }
 
 @media (max-width: 991px) {
-  .layout-dashboard .ant-layout-sider.sider-primary {
-    position: fixed;
-    right: -250px;
-    left: auto;
-    transition: right 0.3s;
-  }
-
+  /* Sidebar overlays the content on mobile; never reserve space for it. */
   .layout-dashboard .ant-layout {
     margin-right: 0;
-  }
-
-  .layout-dashboard .header-control .sidebar-toggler {
-    display: block;
   }
 }
 
@@ -480,8 +397,8 @@
 }
 
 .layout-dashboard .ant-upload-drag:hover {
-  border-color: #1890ff;
-  background: #f0f7ff;
+  border-color: #1C3664;
+  background: rgba(28, 54, 100, 0.06);
 }
 
 .layout-dashboard .ant-upload-text {
@@ -579,7 +496,7 @@
 }
 
 .layout-dashboard .ant-table-cell {
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 /* Ellipsis styles for table cells */
@@ -595,12 +512,8 @@
   overflow-wrap: break-word;
 }
 
-/* Responsive table wrapper */
+/* Tables sit inset within the card body padding — uniform across all admin tables */
 .layout-dashboard .ant-card-body .ant-table-wrapper {
-  margin: -20px -24px;
-}
-
-.layout-dashboard .ant-card-body .ant-table {
   margin: 0;
 }
 

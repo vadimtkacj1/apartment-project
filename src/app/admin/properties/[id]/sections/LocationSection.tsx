@@ -17,11 +17,11 @@ export function LocationSection({ formData, handleChange }: PropertyFormSectionP
             rules={[{ required: true, message: 'עיר היא שדה חובה' }]}
           >
             <Select
-              showSearch
-              optionFilterProp="label"
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
+              showSearch={{
+                optionFilterProp: 'label',
+                filterOption: (input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase()),
+              }}
               onChange={(value) => handleChange('city', value)}
               options={ISRAELI_CITIES}
               notFoundContent="לא נמצא"

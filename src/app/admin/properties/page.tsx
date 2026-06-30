@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Row,
   Col,
@@ -9,7 +9,7 @@ import {
   Input,
   Select,
   Modal,
-  message,
+  App,
   Statistic,
   Space,
   Switch,
@@ -26,6 +26,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 import type { ColumnsType } from 'antd/es/table';
 import { getCityLabel } from '@/data/cities';
@@ -77,7 +78,11 @@ interface Property {
   updatedAt: string;
 }
 
+// Persist table view (page + filters) so editing/toggling a property keeps your place
+const TABLE_STATE_KEY = 'admin-properties-table-state';
+
 export default function PropertiesPage() {
+  const { message } = App.useApp();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -85,10 +90,45 @@ export default function PropertiesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDealType, setFilterDealType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  // Skip persisting on the very first render (before saved state is restored)
+  const skipFirstPersist = useRef(true);
 
   useEffect(() => {
+    // Restore saved table view (page, page size, search, filters) from this session
+    try {
+      const saved = sessionStorage.getItem(TABLE_STATE_KEY);
+      if (saved) {
+        const s = JSON.parse(saved);
+        if (typeof s.searchTerm === 'string') setSearchTerm(s.searchTerm);
+        if (typeof s.filterDealType === 'string') setFilterDealType(s.filterDealType);
+        if (typeof s.filterStatus === 'string') setFilterStatus(s.filterStatus);
+        if (typeof s.currentPage === 'number') setCurrentPage(s.currentPage);
+        if (typeof s.pageSize === 'number') setPageSize(s.pageSize);
+      }
+    } catch {
+      // ignore malformed/blocked storage
+    }
     fetchProperties();
   }, []);
+
+  // Persist the table view whenever it changes
+  useEffect(() => {
+    if (skipFirstPersist.current) {
+      skipFirstPersist.current = false;
+      return;
+    }
+    try {
+      sessionStorage.setItem(
+        TABLE_STATE_KEY,
+        JSON.stringify({ searchTerm, filterDealType, filterStatus, currentPage, pageSize })
+      );
+    } catch {
+      // ignore quota/blocked storage
+    }
+  }, [searchTerm, filterDealType, filterStatus, currentPage, pageSize]);
 
   const fetchProperties = async () => {
     try {
@@ -115,7 +155,7 @@ export default function PropertiesPage() {
   }, [properties]);
 
   const filteredProperties = useMemo(() => {
-    return properties.filter((property) => {
+    const filtered = properties.filter((property) => {
       const matchesSearch =
         property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -129,7 +169,17 @@ export default function PropertiesPage() {
         (filterStatus === 'available' && !property.isSold);
       return matchesSearch && matchesDealType && matchesStatus;
     });
+
+    // Push sold / rented-out properties (isSold) to the bottom of the list.
+    // Array.sort is stable, so within each group the createdAt-desc order is kept.
+    return filtered.sort((a, b) => Number(a.isSold) - Number(b.isSold));
   }, [properties, searchTerm, filterDealType, filterStatus]);
+
+  // Keep the current page within range when filtering shrinks the result set
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredProperties.length / pageSize));
+    if (currentPage > maxPage) setCurrentPage(maxPage);
+  }, [filteredProperties.length, pageSize, currentPage]);
 
   const handleDelete = async () => {
     if (!selectedProperty) return;
@@ -206,37 +256,46 @@ export default function PropertiesPage() {
 
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Card><Statistic title="סה״כ נכסים" value={stats.total} prefix={<HomeOutlined />} /></Card>
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Card><Statistic title="נכסים למכירה" value={stats.forSale} styles={{ content: { color: '#3f8600' } }} /></Card>
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Card><Statistic title="נכסים להשכרה" value={stats.forRent} styles={{ content: { color: '#1890ff' } }} /></Card>
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Card><Statistic title="נכסים פעילים" value={stats.active} styles={{ content: { color: '#faad14' } }} /></Card>
-        </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
-          <Card><Statistic title="נכסים שנמכרו" value={stats.sold} styles={{ content: { color: '#cf1322' } }} /></Card>
-        </Col>
+        {[
+          { title: 'סה״כ נכסים', value: stats.total, prefix: <HomeOutlined /> },
+          { title: 'נכסים למכירה', value: stats.forSale, color: '#3f8600' },
+          { title: 'נכסים להשכרה', value: stats.forRent, color: '#1C3664' },
+          { title: 'נכסים פעילים', value: stats.active, color: '#8A6D2F' },
+          { title: 'נכסים שנמכרו', value: stats.sold, color: '#cf1322' },
+        ].map((s) => (
+          <Col key={s.title} flex="1 1 180px">
+            <Card>
+              <Statistic
+                title={s.title}
+                value={s.value}
+                prefix={s.prefix}
+                styles={s.color ? { content: { color: s.color } } : undefined}
+              />
+            </Card>
+          </Col>
+        ))}
       </Row>
 
       {/* Filters */}
       <Card className="mb-6">
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           <Input
             placeholder="חפש לפי כותרת, מיקום או עיר..."
             prefix={<SearchOutlined />}
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
             size="large"
           />
           <Space wrap style={{ width: '100%' }}>
             <Select
               value={filterDealType}
-              onChange={setFilterDealType}
+              onChange={(v) => {
+                setFilterDealType(v);
+                setCurrentPage(1);
+              }}
               style={{ minWidth: 150, width: '100%', maxWidth: '200px' }}
               size="large"
             >
@@ -246,7 +305,10 @@ export default function PropertiesPage() {
             </Select>
             <Select
               value={filterStatus}
-              onChange={setFilterStatus}
+              onChange={(v) => {
+                setFilterStatus(v);
+                setCurrentPage(1);
+              }}
               style={{ minWidth: 120, width: '100%', maxWidth: '150px' }}
               size="large"
             >
@@ -267,12 +329,17 @@ export default function PropertiesPage() {
           loading={loading}
           rowKey="id"
           pagination={{
-            pageSize: 10,
+            current: currentPage,
+            pageSize,
             showSizeChanger: true,
             showTotal: (total) => `סה״כ ${total} נכסים`,
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size);
+            },
           }}
-          scroll={{ x: 1500 }}
-          locale={{ emptyText: 'לא נמצאו נכסים' }}
+          scroll={{ x: 'max-content' }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו נכסים" addHref="/admin/properties/new" addLabel="הוספת נכס" /> }}
           rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
           columns={[
             {
@@ -346,7 +413,7 @@ export default function PropertiesPage() {
               key: 'dealType',
               width: 100,
               render: (dealType: string) => (
-                <Tag color={dealType === 'sale' ? 'green' : 'blue'}>
+                <Tag color={dealType === 'sale' ? 'green' : '#1C3664'}>
                   {dealType === 'sale' ? 'מכירה' : 'השכרה'}
                 </Tag>
               ),
@@ -356,7 +423,14 @@ export default function PropertiesPage() {
               dataIndex: 'price',
               key: 'price',
               width: 120,
-              render: (price: string) => `₪${price}`,
+              render: (price: string) => {
+                const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
+                return (
+                  <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
+                    {Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`}
+                  </span>
+                );
+              },
             },
             {
               title: 'חדרים',
@@ -388,7 +462,7 @@ export default function PropertiesPage() {
               key: 'status',
               width: 120,
               render: (_, record: Property) => (
-                <Space direction="vertical" size={4}>
+                <Space vertical size={4}>
                   <Switch
                     size="small"
                     checked={record.isActive}

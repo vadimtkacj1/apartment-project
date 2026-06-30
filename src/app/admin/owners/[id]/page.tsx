@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Input, Switch, InputNumber, message, Spin } from 'antd';
+import { Card, Button, Input, Switch, InputNumber, App, Spin } from 'antd';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
@@ -40,9 +41,13 @@ export default function OwnerEditPage() {
   const id = params?.id as string;
   const isNew = id === 'new';
 
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<OwnerForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  // Warn before leaving with unsaved edits.
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChangesWarning(dirty);
 
   useEffect(() => {
     if (!isNew) {
@@ -79,6 +84,7 @@ export default function OwnerEditPage() {
   };
 
   const handleChange = (field: keyof OwnerForm, value: any) => {
+    setDirty(true);
     if (field === 'phone' || field === 'whatsapp') {
       value = formatPhoneNumber(value);
     }
@@ -129,6 +135,7 @@ export default function OwnerEditPage() {
         throw new Error('Failed to save owner');
       }
 
+      setDirty(false);
       message.success(isNew ? 'הבעלים נוצר בהצלחה' : 'הבעלים עודכן בהצלחה');
       router.push('/admin/owners');
     } catch (error) {

@@ -9,7 +9,7 @@ import {
   Input,
   Select,
   Modal,
-  message,
+  App,
   Statistic,
   Space,
   Switch,
@@ -24,6 +24,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 interface TeamMember {
   id: number;
@@ -42,6 +43,7 @@ interface TeamMember {
 }
 
 export default function TeamPage() {
+  const { message } = App.useApp();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -142,16 +144,16 @@ export default function TeamPage() {
           <Card><Statistic title="סה״כ חברי צוות" value={stats.total} prefix={<TeamOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות פעילים" value={stats.active} valueStyle={{ color: '#3f8600' }} /></Card>
+          <Card><Statistic title="חברי צוות פעילים" value={stats.active} styles={{ content: { color: '#3f8600' } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות לא פעילים" value={stats.inactive} valueStyle={{ color: '#cf1322' }} /></Card>
+          <Card><Statistic title="חברי צוות לא פעילים" value={stats.inactive} styles={{ content: { color: '#cf1322' } }} /></Card>
         </Col>
       </Row>
 
       {/* Filters */}
       <Card className="mb-6">
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           <Input
             placeholder="חפש לפי שם או אימייל..."
             prefix={<SearchOutlined />}
@@ -184,7 +186,7 @@ export default function TeamPage() {
             showTotal: (total) => `סה״כ ${total} חברי צוות`,
           }}
           scroll={{ x: 1200 }}
-          locale={{ emptyText: 'לא נמצאו חברי צוות' }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו חברי צוות" addHref="/admin/team/new" addLabel="הוספת חבר צוות" /> }}
           columns={[
             {
               title: 'תמונה',
@@ -213,7 +215,7 @@ export default function TeamPage() {
                         width: '60px',
                         height: '60px',
                         borderRadius: '50%',
-                        background: '#f0f0f0',
+                        background: '#E6E8EC',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

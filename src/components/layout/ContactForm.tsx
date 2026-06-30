@@ -127,7 +127,7 @@ const ContactForm: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-slate-200 lg:order-2"
+            className="bg-white rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-slate-200 lg:order-2 lg:self-start"
           >
             <ContactFormFields idPrefix="contact-" />
           </m.div>

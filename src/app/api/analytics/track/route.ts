@@ -227,10 +227,33 @@ export async function GET(request: NextRequest) {
         })
       );
 
+      // Real lead/inquiry stats — from the Inquiry table (actual submitted
+      // contact forms), accurate unlike the old clickEvent-derived "פניות".
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const totalInquiries = await prisma.inquiry.count().catch(() => 0);
+      const newInquiries = await prisma.inquiry.count({ where: { status: 'new' } }).catch(() => 0);
+      const inquiriesToday = await prisma.inquiry.count({ where: { createdAt: { gte: startOfToday } } }).catch(() => 0);
+      const inquiriesLast7Days = await prisma.inquiry.count({ where: { createdAt: { gte: sevenDaysAgo } } }).catch(() => 0);
+      const inquiriesBySourceRaw = await prisma.inquiry.groupBy({ by: ['source'], _count: { id: true } }).catch(() => []);
+      const inquiriesByStatusRaw = await prisma.inquiry.groupBy({ by: ['status'], _count: { id: true } }).catch(() => []);
+
       return NextResponse.json({
         totalViews,
         totalClicks,
         uniqueVisitors: Array.isArray(uniqueIPs) ? uniqueIPs.length : 0,
+        // Lead/inquiry KPIs (real submissions)
+        totalInquiries,
+        newInquiries,
+        inquiriesToday,
+        inquiriesLast7Days,
+        inquiriesBySource: Array.isArray(inquiriesBySourceRaw)
+          ? inquiriesBySourceRaw.map((s) => ({ source: s.source || 'unknown', count: s._count.id }))
+          : [],
+        inquiriesByStatus: Array.isArray(inquiriesByStatusRaw)
+          ? inquiriesByStatusRaw.map((s) => ({ status: s.status, count: s._count.id }))
+          : [],
         topProperties: Array.isArray(topProperties) ? topProperties.map(p => ({
           propertyId: p.propertyId,
           views: p._count.id,

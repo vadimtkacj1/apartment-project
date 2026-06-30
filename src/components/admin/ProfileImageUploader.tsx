@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Button, message, Typography } from 'antd';
+import { Upload, Button, App, Typography } from 'antd';
 import { InboxOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 
@@ -19,6 +19,7 @@ export default function ProfileImageUploader({
   onImageChange,
   uploadPath = 'owners',
 }: ProfileImageUploaderProps) {
+  const { message } = App.useApp();
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -109,9 +110,9 @@ export default function ProfileImageUploader({
             height: '200px',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: '3px solid #1890ff',
+            border: '3px solid #1C3664',
             margin: '0 auto 16px',
-            background: '#f5f5f5',
+            background: '#F1F3F5',
           }}
         >
           <img
@@ -192,12 +193,12 @@ export default function ProfileImageUploader({
         style={{
           borderRadius: '12px',
           border: '2px dashed #d9d9d9',
-          background: '#fafafa',
+          background: '#F7F8FA',
           padding: '20px',
         }}
       >
         <p className="ant-upload-drag-icon">
-          <InboxOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
+          <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
           גרור תמונה לכאן או לחץ להעלאה

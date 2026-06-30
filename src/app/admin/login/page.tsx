@@ -61,12 +61,12 @@ function LoginForm() {
           maxWidth: '400px',
           background: '#fff',
           padding: '40px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          borderRadius: '12px',
+          border: '1px solid #E6E8EC',
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <HomeOutlined style={{ fontSize: '48px', color: '#1890ff', marginBottom: '16px' }} />
+          <HomeOutlined style={{ fontSize: '48px', color: '#1C3664', marginBottom: '16px' }} />
           <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
             לוח ניהול
           </h1>
@@ -77,7 +77,7 @@ function LoginForm() {
 
         {error && (
           <Alert
-            message={error}
+            title={error}
             type="error"
             showIcon
             style={{ marginBottom: 24 }}

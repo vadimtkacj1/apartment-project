@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Button, message, Alert, Typography } from 'antd';
+import { Upload, Button, App, Alert, Typography } from 'antd';
 import { InboxOutlined, DeleteOutlined, LeftOutlined, RightOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 
@@ -19,6 +19,7 @@ export default function ImageUploader({
   onImagesChange,
   maxImages = 25,
 }: ImageUploaderProps) {
+  const { message } = App.useApp();
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -141,12 +142,12 @@ export default function ImageUploader({
           marginBottom: '24px',
           borderRadius: '12px',
           border: '2px dashed #d9d9d9',
-          background: '#fafafa',
+          background: '#F7F8FA',
           padding: '20px',
         }}
       >
         <p className="ant-upload-drag-icon">
-          <InboxOutlined style={{ fontSize: '48px', color: '#1890ff' }} />
+          <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
           גרור תמונות לכאן או לחץ להעלאה
@@ -165,7 +166,7 @@ export default function ImageUploader({
       {images.length > 0 && (
         <div>
           <Alert
-            message={`תמונות שהועלו (${images.length})`}
+            title={`תמונות שהועלו (${images.length})`}
             description="התמונה הראשונה תוצג כתמונה ראשית"
             type="info"
             showIcon
@@ -184,11 +185,11 @@ export default function ImageUploader({
                 key={`${url}-${index}`}
                 style={{
                   position: 'relative',
-                  border: index === 0 ? '3px solid #1890ff' : '1px solid #d9d9d9',
+                  border: index === 0 ? '3px solid #1C3664' : '1px solid #d9d9d9',
                   borderRadius: '10px',
                   overflow: 'hidden',
                   aspectRatio: '1',
-                  background: '#f5f5f5',
+                  background: '#F1F3F5',
                 }}
               >
                 {index === 0 && (
@@ -197,7 +198,7 @@ export default function ImageUploader({
                       position: 'absolute',
                       top: '8px',
                       right: '8px',
-                      background: '#1890ff',
+                      background: '#1C3664',
                       color: 'white',
                       padding: '2px 10px',
                       borderRadius: '6px',

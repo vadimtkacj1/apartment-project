@@ -1,223 +1,251 @@
 'use client';
 
-import { Menu, Button } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
+import { CloseOutlined, LogoutOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { sectionsForRole } from '@/config/adminSections';
 
 interface SidenavProps {
   color: string;
   onClose: () => void;
 }
 
-export default function Sidenav({ color, onClose }: SidenavProps) {
+export default function Sidenav({ onClose }: SidenavProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const user = session?.user as
+    | { name?: string; email?: string; username?: string; role?: string }
+    | undefined;
+  const role = user?.role;
 
-  const navItems = [
-    {
-      key: 'dashboard',
-      href: '/admin',
-      label: 'לוח בקרה',
-      isActive: pathname === '/admin' || pathname === '/admin/',
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M3 4C3 3.44772 3.44772 3 4 3H16C16.5523 3 17 3.44772 17 4V6C17 6.55228 16.5523 7 16 7H4C3.44772 7 3 6.55228 3 6V4Z" />
-          <path d="M3 10C3 9.44771 3.44772 9 4 9H10C10.5523 9 11 9.44771 11 10V16C11 16.5523 10.5523 17 10 17H4C3.44772 17 3 16.5523 3 16V10Z" />
-          <path d="M14 9C13.4477 9 13 9.44771 13 10V16C13 16.5523 13.4477 17 14 17H16C16.5523 17 17 16.5523 17 16V10C17 9.44771 16.5523 9 16 9H14Z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'properties',
-      href: '/admin/properties',
-      label: 'נכסים',
-      isActive: pathname.includes('/properties'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10 2L3 7V18H8V13H12V18H17V7L10 2Z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'owners',
-      href: '/admin/owners',
-      label: 'בעלים',
-      isActive: pathname.includes('/owners'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9Z" />
-          <path d="M3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18H3Z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'team',
-      href: '/admin/team',
-      label: 'צוות',
-      isActive: pathname.includes('/team'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M13 6C13 7.65685 11.6569 9 10 9C8.34315 9 7 7.65685 7 6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6Z" />
-          <path d="M18 8C18 9.10457 17.1046 10 16 10C14.8954 10 14 9.10457 14 8C14 6.89543 14.8954 6 16 6C17.1046 6 18 6.89543 18 8Z" />
-          <path d="M6 8C6 9.10457 5.10457 10 4 10C2.89543 10 2 9.10457 2 8C2 6.89543 2.89543 6 4 6C5.10457 6 6 6.89543 6 8Z" />
-          <path d="M10 11C7.79086 11 6 12.7909 6 15V17H14V15C14 12.7909 12.2091 11 10 11Z" />
-          <path d="M16 11C15.7348 11 15.4759 11.0314 15.2278 11.0914C15.7123 11.9121 16 12.8752 16 13.9V17H18V15C18 12.7909 17.2091 11 16 11Z" />
-          <path d="M4 11C3.73481 11 3.47586 11.0314 3.22784 11.0914C2.74331 11.9121 2 12.8752 2 13.9V17H4V15C4 12.7909 2.79086 11 4 11Z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'homepage',
-      href: '/admin/homepage',
-      label: 'עמוד הבית',
-      isActive: pathname.includes('/homepage'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'analytics',
-      href: '/admin/analytics',
-      label: 'אנליטיקה',
-      isActive: pathname.includes('/analytics'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M2 2C2 1.44772 2.44772 1 3 1H17C17.5523 1 18 1.44772 18 2V18C18 18.5523 17.5523 19 17 19H3C2.44772 19 2 18.5523 2 18V2ZM4 3V17H16V3H4ZM6 5H8V15H6V5ZM10 7H12V15H10V7ZM14 9H16V15H14V9Z" />
-        </svg>
-      ),
-    },
-    {
-      key: 'contact',
-      href: '/admin/contact/contact-info',
-      label: 'פרטי התקשרות',
-      isActive: pathname.includes('/contact'),
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" clipRule="evenodd" d="M18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10ZM12 7C12 8.10457 11.1046 9 10 9C8.89543 9 8 8.10457 8 7C8 5.89543 8.89543 5 10 5C11.1046 5 12 5.89543 12 7ZM9.99993 11C7.98239 11 6.24394 12.195 5.45374 13.9157C6.55403 15.192 8.18265 16 9.99998 16C11.8173 16 13.4459 15.1921 14.5462 13.9158C13.756 12.195 12.0175 11 9.99993 11Z" />
-        </svg>
-      ),
-    },
-  ];
+  // Nav items derive from the single source of truth (src/config/adminSections.tsx),
+  // filtered by the current user's role (admin-only sections hidden from agents).
+  const navItems = sectionsForRole(role).map((s) => ({
+    key: s.key,
+    href: s.href,
+    label: s.label,
+    icon: s.icon,
+    isActive: s.isActive(pathname),
+  }));
 
   return (
-    <>
-      <div className="brand" style={{ padding: '24px', textAlign: 'center', position: 'relative' }}>
+    <nav className="estate-sidenav" aria-label="ניווט ניהול">
+      {/* Brand */}
+      <div className="estate-brand">
+        <Link href="/admin" className="estate-brand-link" onClick={onClose}>
+          <span className="estate-brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 112 112" fill="currentColor">
+              <path d="M55.03 5.92L88.17 68.07L73.41 67.96L54.82 33.88L32.67 75.40L47.28 75.45L55.92 88.59L11.31 88.70Z" />
+              <path d="M57.49 75.50L92.21 75.45L99.27 88.70L66.86 88.75Z" />
+            </svg>
+          </span>
+          <span className="estate-brand-text">
+            <span className="estate-brand-title">Aiterra</span>
+            <span className="estate-brand-sub">לוח ניהול</span>
+          </span>
+        </Link>
+        <Tooltip title="סגור תפריט" placement="left">
+          <Button
+            type="text"
+            icon={<CloseOutlined />}
+            onClick={onClose}
+            aria-label="סגור תפריט"
+            className="estate-close-btn"
+          />
+        </Tooltip>
+      </div>
+
+      {/* Navigation */}
+      <ul className="estate-nav">
+        {navItems.map((item) => (
+          <li key={item.key}>
+            <Link
+              href={item.href}
+              className={`estate-nav-item ${item.isActive ? 'active' : ''}`}
+              aria-current={item.isActive ? 'page' : undefined}
+            >
+              <span className="estate-nav-icon">{item.icon}</span>
+              <span className="estate-nav-label">{item.label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      {/* Sign out */}
+      <div className="estate-user">
         <Button
           type="text"
-          icon={<CloseOutlined />}
-          onClick={onClose}
-          className="mobile-close-btn"
-          style={{
-            position: 'absolute',
-            left: '16px',
-            top: '24px',
-            color: '#8c8c8c',
-          }}
-        />
-        <span style={{ fontSize: '18px', fontWeight: 700, color: '#141414' }}>לוח ניהול</span>
+          icon={<LogoutOutlined />}
+          className="estate-logout"
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
+        >
+          התנתק
+        </Button>
       </div>
-      
-      <Menu
-        theme="light"
-        mode="inline"
-        className="custom-sidenav"
-        selectedKeys={[navItems.find(i => i.isActive)?.key || '']}
-        style={{ border: 'none', background: 'transparent' }}
-      >
-        {navItems.map((item) => (
-          <Menu.Item key={item.key} className="custom-menu-item">
-            <Link href={item.href} className={`nav-item-wrapper ${item.isActive ? 'active' : ''}`}>
-              <div
-                className="icon-box"
-                style={{
-                  backgroundColor: item.isActive ? color : '#fff',
-                  color: item.isActive ? '#fff' : '#8c8c8c',
-                  boxShadow: item.isActive ? `0 4px 12px ${color}60` : '0 2px 4px rgba(0,0,0,0.02)',
-                }}
-              >
-                {item.icon}
-              </div>
-              <span className="label-text">{item.label}</span>
-            </Link>
-          </Menu.Item>
-        ))}
-      </Menu>
 
       <style jsx global>{`
-        /* Hide close button on desktop */
-        .mobile-close-btn {
-          display: none !important;
+        /* ===== Estate Console sidebar — single source of truth =====
+           One flat, calm look: navy primary, gold used only as a hairline
+           accent, slate neutrals. Icons inherit currentColor so icon + label
+           always share one color (inactive slate · hover navy · active white). */
+        .estate-sidenav {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          background: #ffffff;
+          font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
         }
 
-        /* Show close button on mobile */
-        @media (max-width: 991px) {
-          .mobile-close-btn {
-            display: inline-flex !important;
-          }
-        }
-
-        /* Сброс стилей Ant Design, чтобы они не мешали */
-        .custom-sidenav.ant-menu-inline {
-          border-inline-end: none !important;
-        }
-        .custom-sidenav .ant-menu-item {
-          height: auto !important;
-          line-height: normal !important;
-          padding: 0 16px !important;
-          margin-bottom: 8px !important;
-          background: transparent !important;
-        }
-        .custom-sidenav .ant-menu-item::after {
-          display: none !important; /* Убираем полоску Ant Design справа */
-        }
-        .custom-sidenav .ant-menu-item-selected {
-          background: transparent !important;
-        }
-
-        /* Твои новые стили */
-        .nav-item-wrapper {
+        /* --- Brand --- */
+        .estate-brand {
+          position: relative;
           display: flex;
           align-items: center;
-          padding: 10px 12px;
-          border-radius: 12px;
-          transition: all 0.3s ease;
+          padding: 18px 18px 16px;
+          border-bottom: 1px solid #e6e8ec;
+          flex: 0 0 auto;
+        }
+        .estate-brand-link {
+          display: flex;
+          align-items: center;
+          gap: 12px;
           text-decoration: none !important;
         }
-
-        .nav-item-wrapper:hover {
-          background-color: rgba(0, 0, 0, 0.04) !important;
-        }
-
-        .nav-item-wrapper.active {
-          background-color: #fff !important;
-          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        }
-
-        .icon-box {
-          width: 36px;
-          height: 36px;
-          display: flex;
+        .estate-brand-logo {
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          border-radius: 10px;
-          margin-left: 12px;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          width: 42px;
+          height: 42px;
+          border-radius: 11px;
+          background: rgba(28, 54, 100, 0.06);
+          color: #1c3664;
+          flex-shrink: 0;
+          overflow: hidden;
         }
-
-        .label-text {
-          font-size: 14px;
-          color: #8c8c8c;
+        .estate-brand-logo svg {
+          width: 26px;
+          height: 26px;
+          fill: currentColor;
+        }
+        .estate-brand-text {
+          display: flex;
+          flex-direction: column;
+          line-height: 1.25;
+        }
+        .estate-brand-title {
+          font-size: 16px;
+          font-weight: 700;
+          color: #1c3664;
+          letter-spacing: -0.01em;
+        }
+        .estate-brand-sub {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
           font-weight: 500;
-          transition: all 0.3s ease;
+          color: #94a3b8;
+        }
+        .estate-brand-sub::before {
+          content: '';
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #c5a357; /* lone gold accent */
+          flex-shrink: 0;
+        }
+        .estate-close-btn {
+          position: absolute;
+          left: 10px;
+          top: 12px;
+          color: #94a3b8 !important;
+          border-radius: 8px;
+        }
+        .estate-close-btn:hover {
+          background: #f1f3f5 !important;
+          color: #1c3664 !important;
         }
 
-        .nav-item-wrapper.active .label-text {
-          color: #141414 !important;
-          font-weight: 700 !important;
+        /* --- Navigation --- */
+        .estate-nav {
+          list-style: none;
+          margin: 0;
+          padding: 14px 12px;
+          flex: 1 1 auto;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .estate-nav-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px;
+          border-radius: 10px;
+          color: #64748b;
+          font-size: 14.5px;
+          font-weight: 500;
+          text-decoration: none !important;
+          transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .estate-nav-item:hover {
+          background: rgba(28, 54, 100, 0.06);
+          color: #1c3664;
+        }
+        .estate-nav-item.active {
+          background: #1c3664;
+          color: #ffffff;
+          font-weight: 600;
+        }
+        .estate-nav-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          flex-shrink: 0;
+        }
+        .estate-nav-icon svg {
+          width: 20px;
+          height: 20px;
+          fill: currentColor;
+        }
+        .estate-nav-label {
+          color: inherit;
+        }
+
+        /* --- Sign-out footer --- */
+        .estate-user {
+          flex: 0 0 auto;
+          border-top: 1px solid #e6e8ec;
+          padding: 12px 16px;
+        }
+        .estate-logout.ant-btn {
+          width: 100%;
+          height: 38px;
+          justify-content: center;
+          border-radius: 9px;
+          font-weight: 600;
+          color: #64748b;
+        }
+        .estate-logout.ant-btn:hover {
+          background: rgba(28, 54, 100, 0.06) !important;
+          color: #1c3664 !important;
+        }
+
+        /* The ✕ only makes sense for the mobile overlay. On desktop the
+           sidebar is permanent and the header hamburger collapses/expands it,
+           so a second close control here is redundant — hide it. */
+        @media (min-width: 992px) {
+          .estate-close-btn.ant-btn {
+            display: none !important;
+          }
         }
       `}</style>
-    </>
+    </nav>
   );
 }

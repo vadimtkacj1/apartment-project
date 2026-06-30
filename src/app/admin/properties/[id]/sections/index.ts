@@ -5,3 +5,4 @@ export { PropertyDetailsSection } from './PropertyDetailsSection';
 export { FeaturesSection } from './FeaturesSection';
 export { MapSection } from './MapSection';
 export { ImagesSection } from './ImagesSection';
+export { SeoSection } from './SeoSection';

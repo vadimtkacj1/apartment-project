@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { Input, Button, Space, message } from 'antd';
+import { Input, Button, Space, App } from 'antd';
 import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 interface Position {
@@ -51,6 +51,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onPositionChange,
   onAddressChange,
 }) => {
+  const { message } = App.useApp();
   const [searchAddress, setSearchAddress] = useState('');
   const [searching, setSearching] = useState(false);
   const [markerPosition, setMarkerPosition] = useState<Position | null>(position);
@@ -215,7 +216,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
       <div style={{
         width: '100%',
         padding: '40px',
-        background: '#f5f5f5',
+        background: '#F1F3F5',
         borderRadius: '12px',
         textAlign: 'center'
       }}>
@@ -239,7 +240,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
       <div style={{
         width: '100%',
         padding: '40px',
-        background: '#f5f5f5',
+        background: '#F1F3F5',
         borderRadius: '12px',
         textAlign: 'center'
       }}>
@@ -287,7 +288,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#f5f5f5'
+          background: '#F1F3F5'
         }}>
           <p>טוען מפה...</p>
         </div>

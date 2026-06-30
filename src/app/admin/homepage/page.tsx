@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, message, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, RadioChangeEvent } from 'antd';
+import { Row, Col, Card, Button, App, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, Statistic, RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 
@@ -57,6 +57,7 @@ interface Property {
 }
 
 export default function HomepagePage() {
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [allProperties, setAllProperties] = useState<Property[]>([]);
@@ -371,7 +372,14 @@ export default function HomepagePage() {
       dataIndex: 'price',
       key: 'price',
       width: 120,
-      render: (price: string) => `₪${price}`,
+      render: (price: string) => {
+        const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
+        return (
+          <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
+            {Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`}
+          </span>
+        );
+      },
     },
     {
       title: 'חדרים',
@@ -415,14 +423,11 @@ export default function HomepagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="p-6 max-w-7xl mx-auto">
+    <div className="px-2 sm:px-4 md:px-0">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div>
-            <Title level={2} style={{ margin: 0, marginBottom: '4px', fontSize: 'clamp(20px, 4vw, 30px)' }}>ניהול עמוד הבית</Title>
-            <Text type="secondary" style={{ fontSize: 'clamp(12px, 2.5vw, 14px)' }}>ערוך כותרות וניהול נכסים מוצגים בדף הבית</Text>
-          </div>
+        <div style={{ marginBottom: '16px' }}>
+          <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול עמוד הבית</h1>
+          <Text type="secondary">ערוך כותרות וניהול נכסים מוצגים בדף הבית</Text>
         </div>
 
         {/* Section Titles Editor */}
@@ -443,7 +448,7 @@ export default function HomepagePage() {
                   key: 'main',
                   label: 'סעיפים ראשיים',
                   children: (
-                    <Space direction="vertical" className="w-full" size="large">
+                    <Space vertical className="w-full" size="large">
                       <Form.Item label="כותרת: הצעות חמות" name="hotPropositionsTitle">
                         <Input placeholder="הצעות חמות" disabled={titlesLoading} />
                       </Form.Item>
@@ -463,7 +468,7 @@ export default function HomepagePage() {
                   key: 'secondary',
                   label: 'סעיפים נוספים',
                   children: (
-                    <Space direction="vertical" className="w-full" size="large">
+                    <Space vertical className="w-full" size="large">
                       <Form.Item label="כותרת: אודות" name="aboutSectionTitle">
                         <Input placeholder="אודות" disabled={titlesLoading} />
                       </Form.Item>
@@ -498,47 +503,40 @@ export default function HomepagePage() {
         </Card>
 
         {/* Properties Section Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div>
-              <Title level={3} style={{ margin: 0, marginBottom: '4px', fontSize: 'clamp(18px, 3.5vw, 24px)' }}>ניהול נכסים מוצגים</Title>
-              <Text type="secondary" style={{ fontSize: 'clamp(12px, 2.5vw, 14px)' }}>בחר נכסים להצגה בסעיפים שונים בדף הבית</Text>
-            </div>
-            <Button
-              type="primary"
-              size="middle"
-              loading={saving}
-              onClick={handleSaveAll}
-              style={{ width: '100%', maxWidth: '180px' }}
-            >
-              שמור בחירת נכסים
-            </Button>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ marginTop: '24px', marginBottom: '16px' }}>
+          <div>
+            <Title level={3} style={{ margin: 0, marginBottom: '4px' }}>ניהול נכסים מוצגים</Title>
+            <Text type="secondary">בחר נכסים להצגה בסעיפים שונים בדף הבית</Text>
           </div>
+          <Button
+            type="primary"
+            size="middle"
+            loading={saving}
+            onClick={handleSaveAll}
+            style={{ width: '100%', maxWidth: '180px' }}
+          >
+            שמור בחירת נכסים
+          </Button>
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 gap-6 mb-6">
-          <Card bordered={true} className="rounded-lg">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Text type="secondary" style={{ fontSize: '14px' }}>הצעות חמות</Text>
-              <Title level={3} style={{ margin: 0 }}>{hotProperties.length} נכסים</Title>
-            </Space>
-          </Card>
-
-          <Card bordered={true} className="rounded-lg">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Text type="secondary" style={{ fontSize: '14px' }}>דירות ללא עמלה (מקסימום 1)</Text>
-              <Title level={3} style={{ margin: 0 }}>{noCommissionProperties.length}/1 נכס</Title>
-            </Space>
-          </Card>
-        </div>
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col xs={24} sm={12}>
+            <Card>
+              <Statistic title="הצעות חמות" value={hotProperties.length} suffix="נכסים" />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12}>
+            <Card>
+              <Statistic title="דירות ללא עמלה (מקסימום 1)" value={`${noCommissionProperties.length}/1`} suffix="נכס" />
+            </Card>
+          </Col>
+        </Row>
 
         {/* Sections */}
         <div className="grid grid-cols-1 gap-6">
           {/* Hot Propositions Section */}
           <Card
-            bordered={false}
-            className="rounded-xl"
             title={
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: '18px', fontWeight: 600 }}>הצעות חמות</span>
@@ -555,11 +553,9 @@ export default function HomepagePage() {
                 הוסף נכסים
               </Button>
             }
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-            styles={{ body: { padding: 0, paddingBottom: 0 } }}
           >
             {/* Compact Price Filter Settings */}
-            <div className="mb-3 p-3 mx-6 mt-6 rounded-lg" style={{ background: '#f8f9fa', border: '1px solid #e8e8e8' }}>
+            <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #f0f0f0' }}>
               <Radio.Group
                 value={hotPropositionsMode}
                 onChange={(e) => setHotPropositionsMode(e.target.value)}
@@ -571,7 +567,7 @@ export default function HomepagePage() {
               </Radio.Group>
 
               {hotPropositionsMode === 'price' && (
-                <div className="mt-2 pt-2" style={{ borderTop: '1px solid #e8e8e8' }}>
+                <div className="mt-2 pt-2" style={{ borderTop: '1px solid #f0f0f0' }}>
                   <InputNumber
                     value={hotPropositionsMaxPrice}
                     onChange={(value) => setHotPropositionsMaxPrice(value || 0)}
@@ -588,7 +584,7 @@ export default function HomepagePage() {
             </div>
 
             {hotProperties.length === 0 ? (
-              <div className="text-center py-8 mx-6 mb-6" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
+              <div className="text-center py-8">
                 <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>אין נכסים מוצגים</Text>
                 <Button
                   type="primary"
@@ -600,23 +596,18 @@ export default function HomepagePage() {
                 </Button>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <Table
-                  dataSource={hotProperties}
-                  rowKey="id"
-                  pagination={false}
-                  scroll={{ x: 'max-content' }}
-                  style={{ margin: 0 }}
-                  columns={tableColumns('hot')}
-                />
-              </div>
+              <Table
+                dataSource={hotProperties}
+                rowKey="id"
+                pagination={false}
+                scroll={{ x: 'max-content' }}
+                columns={tableColumns('hot')}
+              />
             )}
           </Card>
 
           {/* No Commission Section */}
           <Card
-            bordered={false}
-            className="rounded-xl"
             title={
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -639,11 +630,9 @@ export default function HomepagePage() {
                 {noCommissionProperties.length >= 1 ? 'נבחר נכס' : 'בחר נכס'}
               </Button>
             }
-            style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
-            styles={{ body: { padding: 0, paddingBottom: 0 } }}
           >
             {noCommissionProperties.length === 0 ? (
-              <div className="text-center py-8 mx-6 mb-6" style={{ background: '#f8f9fa', borderRadius: '8px', border: '1px dashed #dee2e6' }}>
+              <div className="text-center py-8">
                 <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>לא נבחר נכס</Text>
                 <Button
                   type="primary"
@@ -655,16 +644,13 @@ export default function HomepagePage() {
                 </Button>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <Table
-                  dataSource={noCommissionProperties}
-                  rowKey="id"
-                  pagination={false}
-                  scroll={{ x: 'max-content' }}
-                  style={{ margin: 0 }}
-                  columns={tableColumns('noCommission')}
-                />
-              </div>
+              <Table
+                dataSource={noCommissionProperties}
+                rowKey="id"
+                pagination={false}
+                scroll={{ x: 'max-content' }}
+                columns={tableColumns('noCommission')}
+              />
             )}
           </Card>
         </div>
@@ -718,7 +704,7 @@ export default function HomepagePage() {
                   onChange={handleRadioChange}
                   className="w-full"
                 >
-                  <Space direction="vertical" className="w-full">
+                  <Space vertical className="w-full">
                     {availableProperties.map((property) => (
                       <Card key={property.id} size="small" className="w-full">
                         <Radio value={property.id} className="w-full">
@@ -745,7 +731,7 @@ export default function HomepagePage() {
                   onChange={(values) => setSelectedIds(values as number[])}
                   className="w-full"
                 >
-                  <Space direction="vertical" className="w-full">
+                  <Space vertical className="w-full">
                     {availableProperties.map((property) => (
                       <Card key={property.id} size="small" className="w-full">
                         <Checkbox value={property.id} className="w-full">
@@ -770,7 +756,6 @@ export default function HomepagePage() {
             </div>
           </div>
         </Modal>
-      </div>
     </div>
   );
 }

@@ -1,28 +1,27 @@
 'use client';
 
-import { Layout, Row, Col } from 'antd';
-import { HeartFilled } from '@ant-design/icons';
+import { Layout } from 'antd';
 
 export default function Footer() {
   const { Footer: AntFooter } = Layout;
+  const year = new Date().getFullYear();
 
   return (
-    <AntFooter style={{ background: 'transparent', padding: '16px 24px' }}>
-      <Row>
-        <Col xs={24} md={12}>
-          <div style={{ color: '#8c8c8c', fontSize: '13px', textAlign: 'center' }}>
-            © 2024 מערכת ניהול נכסים {' '}
-            <HeartFilled style={{ color: '#f5222d', margin: '0 4px' }} />
-          </div>
-        </Col>
-        <Col xs={24} md={12}>
-          <div style={{ textAlign: 'center' }}>
-            <a href="/admin" style={{ color: '#8c8c8c', fontSize: '13px', textDecoration: 'none' }}>
-              לוח בקרה
-            </a>
-          </div>
-        </Col>
-      </Row>
+    <AntFooter style={{ background: 'transparent', padding: '12px 24px' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          color: '#9aa0aa',
+          fontSize: 12.5,
+        }}
+      >
+        <span>© {year} רם נכסים · כל הזכויות שמורות</span>
+        <span style={{ color: '#b08642', fontWeight: 600 }}>מערכת ניהול נכסים</span>
+      </div>
     </AntFooter>
   );
 }

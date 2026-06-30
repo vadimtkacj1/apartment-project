@@ -10,6 +10,10 @@ import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } f
 export const revalidate = 60;
 
 // Lazy load heavy components below the fold
+const FloorPlansSection = dynamic(() => import('@/components/layout/FloorPlansSection'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
 const NoCommissionSection = dynamic(() => import('@/components/layout/NoCommissionSection'), {
   loading: () => <div className="h-64 bg-warm animate-pulse" />,
 });
@@ -52,7 +56,7 @@ function resolveDealType(dealType: string, category?: string | null): string {
 export default async function Home() {
   // Hero poster is referenced via <video poster> (low browser priority) —
   // preload it here, scoped to the homepage only, so it paints at FCP.
-  preload('/hero-poster.jpg', { as: 'image', fetchPriority: 'high' });
+  preload('/hero-poster-v2.jpg', { as: 'image', fetchPriority: 'high' });
 
   // Fetch all homepage section data in parallel — eliminates client-side waterfall
   const HomepageSettings = (prisma as any).homepageSettings;
@@ -171,6 +175,9 @@ export default async function Home() {
 
       {/* Content below hero - lazy loaded */}
       <div className="relative bg-warm">
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <FloorPlansSection />
+        </Suspense>
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
           <NoCommissionSection
             initialProperty={noCommProperty}
@@ -189,8 +196,6 @@ export default async function Home() {
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ValuesSection />
         </Suspense>
-        {/* Server-rendered internal links to the guide/knowledge pages (SEO) */}
-        <GuidesSection />
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <Testimonials />
         </Suspense>
@@ -206,6 +211,9 @@ export default async function Home() {
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ContactForm />
         </Suspense>
+        {/* Server-rendered internal links to the guide/knowledge pages (SEO).
+            Placed at the very bottom, just before the footer. */}
+        <GuidesSection />
       </div>
     </>
   );

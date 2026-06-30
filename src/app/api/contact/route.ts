@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { prisma } from "@/lib/prisma";
 
 // Escape user-supplied text before interpolating into the HTML email body,
 // preventing HTML/markup injection into the message staff receive.
@@ -27,27 +28,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Validate environment variables
-    const {
-      EMAIL_SERVER_HOST,
-      EMAIL_SERVER_PORT,
-      EMAIL_SERVER_USER,
-      EMAIL_SERVER_PASSWORD,
-      EMAIL_TO,
-    } = process.env;
-
-    if (!EMAIL_SERVER_HOST || !EMAIL_SERVER_PORT || !EMAIL_SERVER_USER || !EMAIL_SERVER_PASSWORD) {
-      console.error("Missing email configuration env variables");
-      return NextResponse.json(
-        { error: "Email service not configured" },
-        { status: 500 }
-      );
-    }
-
     const body = await request.json();
-    const { name, phone, message } = body;
+    const { name, phone, message, propertyId, source } = body;
 
-    // 2. Input validation
+    // 1. Input validation
     if (!name?.trim() || name.trim().length < 2) {
       return NextResponse.json(
         { error: "שם חייב להכיל לפחות 2 תווים" },
@@ -58,7 +42,6 @@ export async function POST(request: NextRequest) {
     // Clean phone number and validate using Israeli regex
     const cleanPhone = phone?.replace(/[\s\-()]/g, "");
 
-    // More flexible Israeli phone validation
     // Accepts: 05XXXXXXXX, +97205XXXXXXXX, 97205XXXXXXXX, or other Israeli prefixes (2,3,4,5,7,8,9)
     const phoneRegex = /^(\+?972|0)?([2-9]\d{7,8})$/;
 
@@ -76,59 +59,65 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Transporter configuration (Optimized for Private Email / Titan)
-    const transporter = nodemailer.createTransport({
-      host: EMAIL_SERVER_HOST,
-      port: Number(EMAIL_SERVER_PORT),
-      // Use secure: true for port 465, false for 587
-      secure: EMAIL_SERVER_PORT === "465",
-      auth: {
-        user: EMAIL_SERVER_USER,
-        pass: EMAIL_SERVER_PASSWORD,
-      },
-      debug: process.env.NODE_ENV === 'development',
-      logger: process.env.NODE_ENV === 'development'
-    });
-
-    // 4. Verify transporter configuration
+    // 2. Persist the lead FIRST so it is never lost — even if SMTP is down or
+    //    misconfigured. Managed afterwards in /admin/inquiries. Non-fatal: a DB
+    //    hiccup must not stop the email notification below.
     try {
-      await transporter.verify();
-      console.log('✅ SMTP connection verified successfully');
-    } catch (verifyError: any) {
-      console.error('❌ SMTP verification failed:', {
-        message: verifyError.message,
-        code: verifyError.code,
-        host: EMAIL_SERVER_HOST,
-        port: EMAIL_SERVER_PORT,
-        user: EMAIL_SERVER_USER
-      });
-
-      return NextResponse.json(
-        {
-          error: "שגיאה בהגדרת שרת המייל",
-          details: "אנא בדוק את הגדרות SMTP או פנה למנהל המערכת"
+      await prisma.inquiry.create({
+        data: {
+          name: name.trim(),
+          phone: phone ? String(phone).trim() : null,
+          message: message ? String(message).trim() : null,
+          source: typeof source === "string" && source ? source.slice(0, 60) : "contact_form",
+          propertyId: Number.isInteger(propertyId) ? propertyId : null,
+          status: "new",
         },
-        { status: 500 }
-      );
+      });
+    } catch (dbError) {
+      console.error("Failed to persist inquiry:", dbError);
     }
 
-    // 5. Email template configuration
-    // EMAIL_TO can be a comma-separated list of emails
-    const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com,info@ram-haim.co.il";
+    // 3. Email notification — best-effort. Failures are logged but NOT surfaced
+    //    to the visitor, because the lead is already captured in the admin.
+    try {
+      const {
+        EMAIL_SERVER_HOST,
+        EMAIL_SERVER_PORT,
+        EMAIL_SERVER_USER,
+        EMAIL_SERVER_PASSWORD,
+        EMAIL_TO,
+      } = process.env;
 
-    // Escape all user-controlled values before they enter the HTML body.
-    // Strip CR/LF from the subject to prevent header injection.
-    const safeName = escapeHtml(name.trim());
-    const safeSubjectName = name.trim().replace(/[\r\n]+/g, " ");
-    const safePhone = escapeHtml(phone);
-    const safeCleanPhone = encodeURIComponent(cleanPhone);
-    const safeMessage = message ? escapeHtml(String(message)) : "";
+      if (!EMAIL_SERVER_HOST || !EMAIL_SERVER_PORT || !EMAIL_SERVER_USER || !EMAIL_SERVER_PASSWORD) {
+        console.error("Email not configured — inquiry saved, notification skipped");
+      } else {
+        // Transporter configuration (optimized for Private Email / Titan).
+        const transporter = nodemailer.createTransport({
+          host: EMAIL_SERVER_HOST,
+          port: Number(EMAIL_SERVER_PORT),
+          secure: EMAIL_SERVER_PORT === "465", // true for 465, false for 587
+          auth: { user: EMAIL_SERVER_USER, pass: EMAIL_SERVER_PASSWORD },
+          debug: process.env.NODE_ENV === "development",
+          logger: process.env.NODE_ENV === "development",
+        });
 
-    const mailOptions = {
-      from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
-      to: recipients,
-      subject: `פנייה חדשה מהאתר: ${safeSubjectName}`,
-      html: `
+        await transporter.verify();
+
+        // EMAIL_TO can be a comma-separated list of emails.
+        const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com,info@ram-haim.co.il";
+
+        // Escape all user-controlled values before they enter the HTML body.
+        const safeName = escapeHtml(name.trim());
+        const safeSubjectName = name.trim().replace(/[\r\n]+/g, " ");
+        const safePhone = escapeHtml(String(phone));
+        const safeCleanPhone = encodeURIComponent(cleanPhone);
+        const safeMessage = message ? escapeHtml(String(message)) : "";
+
+        await transporter.sendMail({
+          from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
+          to: recipients,
+          subject: `פנייה חדשה מהאתר: ${safeSubjectName}`,
+          html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee;">
           <div style="background-color: #1c3664; color: white; padding: 20px; text-align: center;">
             <h1 style="margin: 0; font-size: 24px;">פנייה חדשה מהאתר</h1>
@@ -147,25 +136,20 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `,
-    };
-
-    // 6. Send the email
-    await transporter.sendMail(mailOptions);
+        });
+      }
+    } catch (mailError: any) {
+      // Lead is already saved — log the notification failure but don't fail the request.
+      console.error("Inquiry email failed (lead still saved):", {
+        message: mailError?.message,
+        code: mailError?.code,
+        command: mailError?.command,
+      });
+    }
 
     return NextResponse.json({ message: "Success" }, { status: 200 });
-
   } catch (error: any) {
-    // Log detailed error info for debugging in the server console
-    console.error("SMTP Error Details:", {
-      message: error.message,
-      code: error.code,
-      command: error.command,
-    });
-
-    // Do not leak internal error details to the client.
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Contact route error:", { message: error?.message, code: error?.code });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

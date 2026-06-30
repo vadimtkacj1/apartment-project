@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { Layout, Affix } from 'antd';
 import Sidenav from './Sidenav';
@@ -15,72 +15,73 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [sidenavColor, setSidenavColor] = useState('#1890ff');
-  const [sidenavType, setSidenavType] = useState('transparent');
-  const [fixed, setFixed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [fixed] = useState(false);
+  const sidenavColor = '#1C3664';
 
   const pathname = usePathname();
   const page = pathname.replace('/admin/', '').replace('/admin', '');
 
-  const toggleSidebar = () => setCollapsed(!collapsed);
+  // Track viewport: collapse by default on mobile, and only re-sync the
+  // open/closed state when actually crossing the breakpoint (so a manual
+  // collapse isn't undone by every little resize).
+  useEffect(() => {
+    let mobile = window.innerWidth < 992;
+    setIsMobile(mobile);
+    setCollapsed(mobile);
+
+    const onResize = () => {
+      const next = window.innerWidth < 992;
+      setIsMobile(next);
+      if (next !== mobile) {
+        mobile = next;
+        setCollapsed(next);
+      }
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const toggleSidebar = () => setCollapsed((c) => !c);
+  const closeSidebar = () => setCollapsed(true);
 
   return (
     <Layout
-      className={`layout-dashboard ${page === 'rtl' ? 'layout-dashboard-rtl' : ''}`}
+      className={`layout-dashboard ${collapsed ? 'sidebar-collapsed' : 'sidebar-open'} ${
+        page === 'rtl' ? 'layout-dashboard-rtl' : ''
+      }`}
       dir="rtl"
     >
-      {/* Backdrop for mobile */}
-      {!collapsed && (
-        <div
-          className="sidebar-backdrop"
-          onClick={() => setCollapsed(true)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 999,
-          }}
-        />
+      {/* Dim backdrop — only on mobile, where the sidebar overlays content */}
+      {!collapsed && isMobile && (
+        <div className="sidebar-backdrop" onClick={closeSidebar} aria-hidden="true" />
       )}
+
       <Sider
-        breakpoint="lg"
-        collapsed={collapsed}
-        onCollapse={(collapsed) => setCollapsed(collapsed)}
-        collapsedWidth="0"
         trigger={null}
         width={250}
         theme="light"
-        className={`sider-primary ant-layout-sider-primary ${
-          sidenavType === '#fff' ? 'active-route' : ''
-        }`}
-        style={{ background: sidenavType }}
+        className="sider-primary ant-layout-sider-primary"
       >
-        <Sidenav color={sidenavColor} onClose={() => setCollapsed(true)} />
+        <Sidenav color={sidenavColor} onClose={closeSidebar} />
       </Sider>
+
       <Layout>
         {fixed ? (
           <Affix>
-            <AntHeader className={`${fixed ? 'ant-header-fixed' : ''}`}>
-              <Header
-                onPress={toggleSidebar}
-                name={page}
-              />
+            <AntHeader className="ant-header-fixed">
+              <Header onPress={toggleSidebar} collapsed={collapsed} name={page} />
             </AntHeader>
           </Affix>
         ) : (
-          <AntHeader className={`${fixed ? 'ant-header-fixed' : ''}`}>
-            <Header
-              onPress={toggleSidebar}
-              name={page}
-            />
+          <AntHeader>
+            <Header onPress={toggleSidebar} collapsed={collapsed} name={page} />
           </AntHeader>
         )}
         <Content className="content-ant">{children}</Content>
+        <Footer />
       </Layout>
     </Layout>
   );
 }
-

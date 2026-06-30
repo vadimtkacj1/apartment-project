@@ -77,14 +77,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const images = (property.images || []) as string[];
   const firstImage = images[0];
   const { dealTypeLabel, cityName, metaTitle } = buildListingTitles(property);
-  const title = metaTitle;
+  // Admin SEO overrides (set per-property in the editor) take precedence over the
+  // auto-generated title/description/share-image; empty fields fall back to defaults.
+  const title = (property.metaTitle && property.metaTitle.trim()) || metaTitle;
   const rawDesc = (property.description || '').trim();
-  const description = rawDesc.length > 155
+  const autoDescription = rawDesc.length > 155
     ? rawDesc.slice(0, Math.max(rawDesc.lastIndexOf(' ', 155), 120)).trimEnd() + '…'
     : (rawDesc || `דירה ${dealTypeLabel} ב${cityName} · ${property.rooms} חדרים · ${property.area} מ"ר`);
+  const description = (property.metaDescription && property.metaDescription.trim()) || autoDescription;
 
-  const ogImage = firstImage
-    ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
+  const ogSource = (property.ogImage && property.ogImage.trim()) || firstImage;
+  const ogImage = ogSource
+    ? (ogSource.startsWith('http') ? ogSource : `${siteUrl}${ogSource}`)
     : `${siteUrl}/images/hero/main-hero.jpg`;
 
   return {

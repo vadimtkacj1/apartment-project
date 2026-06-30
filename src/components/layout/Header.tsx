@@ -146,6 +146,9 @@ export default function Header() {
                       fontSize: "clamp(17px, 1.35vw, 22px)",
                       fontWeight: 700,
                       color: textColor,
+                      textShadow: shouldBeTransparent
+                        ? "0 0 3px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.7), 0 2px 10px rgba(0,0,0,0.5)"
+                        : "none",
                       display: "flex",
                       alignItems: "center",
                       gap: 5,

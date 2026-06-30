@@ -12,6 +12,7 @@ import {
   FeaturesSection,
   MapSection,
   ImagesSection,
+  SeoSection,
 } from './sections';
 
 const { Title } = Typography;
@@ -48,7 +49,7 @@ export default function PropertyEditPage() {
         </Title>
         <Button
           icon={<ArrowLeftOutlined />}
-          iconPosition="end"
+          iconPlacement="end"
           onClick={() => router.push('/admin/properties')}
           size="large"
           className="w-full sm:w-auto"
@@ -78,6 +79,7 @@ export default function PropertyEditPage() {
           onAddressChange={handleAddressFromMap}
         />
         <ImagesSection formData={formData} handleChange={handleChange} />
+        <SeoSection formData={formData} handleChange={handleChange} />
 
         {/* Submit Buttons */}
         <div

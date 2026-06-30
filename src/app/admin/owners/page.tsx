@@ -9,7 +9,7 @@ import {
   Input,
   Select,
   Modal,
-  message,
+  App,
   Statistic,
   Space,
   Switch,
@@ -24,6 +24,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 interface Owner {
   id: number;
@@ -41,6 +42,7 @@ interface Owner {
 }
 
 export default function OwnersPage() {
+  const { message } = App.useApp();
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -141,16 +143,16 @@ export default function OwnersPage() {
           <Card><Statistic title="סה״כ בעלים" value={stats.total} prefix={<UserOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים פעילים" value={stats.active} valueStyle={{ color: '#3f8600' }} /></Card>
+          <Card><Statistic title="בעלים פעילים" value={stats.active} styles={{ content: { color: '#3f8600' } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} valueStyle={{ color: '#cf1322' }} /></Card>
+          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} styles={{ content: { color: '#cf1322' } }} /></Card>
         </Col>
       </Row>
 
       {/* Filters */}
       <Card className="mb-6">
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           <Input
             placeholder="חפש לפי שם או אימייל..."
             prefix={<SearchOutlined />}
@@ -183,7 +185,7 @@ export default function OwnersPage() {
             showTotal: (total) => `סה״כ ${total} בעלים`,
           }}
           scroll={{ x: 1000 }}
-          locale={{ emptyText: 'לא נמצאו בעלים' }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" /> }}
           columns={[
             {
               title: 'תמונה',
