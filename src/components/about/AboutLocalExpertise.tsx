@@ -1,6 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
+import Image from 'next/image';
 
 export default function AboutLocalExpertise() {
   return (
@@ -39,6 +40,10 @@ export default function AboutLocalExpertise() {
               אם אתם מחפשים דירה למכירה בחולון, דירה להשכרה בחולון או רוצים למכור נכס בעיר – אתם צריכים צוות שמכיר כל רחוב, כל שכונה וכל הזדמנויות.
             </p>
           </m.div>
+
+          <figure className="mt-10">
+            <Image src="/images/about/expertise.jpg" alt="שכונת מגורים בחולון" width={1200} height={675} className="w-full h-auto rounded-2xl shadow-xl shadow-blue-900/10" />
+          </figure>
 
         </div>
       </div>

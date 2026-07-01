@@ -452,5 +452,45 @@
     "basedOn": null,
     "prompt": "Aerial photograph of a Mediterranean coastal old town at golden hour: warm sandstone historic buildings on a green headland beside a turquoise sea, a seaside promenade, upscale and inviting. No text, no letters, no numbers, no watermark, no logo anywhere.",
     "savedAt": "2026-07-01T16:21:50.066Z"
+  },
+  "public/images/about/expertise.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a quiet leafy residential street lined with low modern apartment buildings in a sunny Mediterranean city neighborhood, professional real-estate photograph, photorealistic, warm natural light. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:38:08.912Z"
+  },
+  "public/images/about/services.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "two hands exchanging a set of house keys in front of a modern apartment building, warm daylight, professional real-estate photograph, photorealistic, warm natural light. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:38:12.444Z"
+  },
+  "public/images/about/marketing.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a bright, beautifully styled modern apartment living room with large windows and elegant furniture, professional real-estate photograph, photorealistic, warm natural light. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:38:15.900Z"
+  },
+  "public/images/about/story.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a warm welcoming modern real-estate office interior with a meeting area and soft lighting, no people, professional real-estate photograph, photorealistic, warm natural light. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:38:19.722Z"
   }
 }

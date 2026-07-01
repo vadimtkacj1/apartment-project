@@ -1,6 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
+import Image from 'next/image';
 
 export default function AboutServicesNew() {
   return (
@@ -54,6 +55,10 @@ export default function AboutServicesNew() {
               המטרה שלנו היא להקל על בעלי הנכסים ולחסוך להם זמן, טעויות וכסף. אנחנו מטפלים בכל שלבי התהליך – מצילום ושיווק הנכס, דרך סינון פניות וקביעת פגישות ועד לסגירת עסקה בתנאים הטובים ביותר.
             </p>
           </m.div>
+
+          <figure className="mt-10">
+            <Image src="/images/about/services.jpg" alt="מסירת מפתחות דירה" width={1200} height={675} className="w-full h-auto rounded-2xl shadow-xl shadow-blue-900/10" />
+          </figure>
 
         </div>
       </div>

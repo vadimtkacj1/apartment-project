@@ -1,6 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
+import Image from 'next/image';
 
 export default function AboutMarketing() {
   return (
@@ -54,6 +55,10 @@ export default function AboutMarketing() {
               השילוב בין ניסיון מקומי, שיווק חכם וליווי אישי יוצר תהליך יעיל שמוביל לעסקאות מוצלחות.
             </p>
           </m.div>
+
+          <figure className="mt-10">
+            <Image src="/images/about/marketing.jpg" alt="סלון מעוצב לצילום ושיווק נכס" width={1200} height={675} className="w-full h-auto rounded-2xl shadow-xl shadow-blue-900/10" />
+          </figure>
 
         </div>
       </div>

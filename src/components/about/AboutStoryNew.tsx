@@ -1,6 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
+import Image from 'next/image';
 
 export default function AboutStoryNew() {
   return (
@@ -37,6 +38,10 @@ export default function AboutStoryNew() {
             עם השנים המשרד גדל, הצוות התרחב וכיום רם וחיים שיווק נכסים מלווה עשרות עסקאות של דירות למכירה ודירות להשכרה בחולון מדי שנה.
           </p>
         </m.div>
+
+        <figure className="mt-12 max-w-4xl mx-auto">
+          <Image src="/images/about/story.jpg" alt="משרד רם נכסים חיים ענבי" width={1200} height={675} className="w-full h-auto rounded-2xl shadow-xl shadow-blue-900/10" />
+        </figure>
       </div>
     </section>
   );

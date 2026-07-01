@@ -487,12 +487,42 @@
 }
 
 /* ===== TABLE IMPROVEMENTS ===== */
-.layout-dashboard .ant-table {
-  overflow-x: visible;
+/* Every admin table sets scroll={{ x }} (see each admin page), so antd's own
+   scroll container (.ant-table-content) owns the horizontal scroll and is
+   RTL-aware. Previously forcing overflow-x on .ant-table + .ant-table-wrapper
+   here created a SECOND, mis-aligned RTL scroller that fought antd's — which
+   left a gap on the start (right) edge and clipped the last columns (status /
+   actions) on the end (left) edge with no usable scrollbar. Let antd manage the
+   overflow, and just make the horizontal scrollbar clearly visible so it's
+   obvious the table scrolls. */
+.layout-dashboard .ant-table-wrapper {
+  max-width: 100%;
 }
 
-.layout-dashboard .ant-table-wrapper {
-  overflow-x: auto;
+.layout-dashboard .ant-table-content,
+.layout-dashboard .ant-table-body {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;                 /* Firefox */
+  scrollbar-color: #c1c7d0 #eef0f3;
+}
+
+.layout-dashboard .ant-table-content::-webkit-scrollbar,
+.layout-dashboard .ant-table-body::-webkit-scrollbar {
+  height: 10px;                          /* always-visible horizontal bar (WebKit/Blink) */
+}
+.layout-dashboard .ant-table-content::-webkit-scrollbar-track,
+.layout-dashboard .ant-table-body::-webkit-scrollbar-track {
+  background: #eef0f3;
+  border-radius: 8px;
+}
+.layout-dashboard .ant-table-content::-webkit-scrollbar-thumb,
+.layout-dashboard .ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c7d0;
+  border-radius: 8px;
+}
+.layout-dashboard .ant-table-content::-webkit-scrollbar-thumb:hover,
+.layout-dashboard .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #1c3664;
 }
 
 .layout-dashboard .ant-table-cell {

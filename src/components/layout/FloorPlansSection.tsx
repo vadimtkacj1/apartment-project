@@ -188,7 +188,7 @@ function FloorPlansSection() {
             className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#1c3664] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
-            <span>לפרויקט המלא — <span dir="ltr">ONE THE PARK</span></span>
+            <span dir="ltr">ONE THE PARK</span>
             <ExternalLink className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
           </a>
         </div>

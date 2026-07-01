@@ -11,10 +11,14 @@ function AiterraLogo({ size = 56, color = '#1C3664' }: { size?: number; color?: 
     <svg
       width={size}
       height={size}
-      viewBox="0 0 112 112"
+      // The artwork's bounding box sits high in a plain "0 0 112 112" box
+      // (ink center ≈ y47 vs box center y56), so the mark looked shifted up.
+      // Re-center the viewBox on the actual paths — same 112 side length, so
+      // it only pans the glyph to true center, no scaling/distortion.
+      viewBox="-0.71 -8.66 112 112"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ color }}
+      style={{ color, display: 'block' }}
       role="img"
       aria-label="Aiterra"
     >
@@ -84,7 +88,7 @@ function LoginForm() {
         }}
       >
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ marginBottom: '16px' }}>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
             <AiterraLogo size={56} />
           </div>
           <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
