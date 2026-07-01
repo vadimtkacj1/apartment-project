@@ -1,16 +1,28 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-function createPrismaClient(): PrismaClient {
-  const databaseUrl = process.env.DATABASE_URL ?? 'file:./dev.db'
-  // Adapter internally strips the optional `file:` prefix and opens the DB via better-sqlite3.
-  const adapter = new PrismaBetterSqlite3({ url: databaseUrl })
+function resolveConnectionString(): string {
+  const url = process.env.DATABASE_URL
+  if (url) return url
+  // In production the connection string is mandatory — fail loudly rather than
+  // silently pointing at a wrong database.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('DATABASE_URL is not set — expected a postgresql:// connection string')
+  }
+  // Test/CI/local fallback. The pg Pool is lazy, so this is never actually
+  // opened unless a query runs (route handlers wrap DB writes in try/catch),
+  // which keeps the unit tests import-safe without a live database.
+  return 'postgresql://localhost:5432/postgres'
+}
 
-  // Prisma v7 expects adapter/accelerateUrl; adapter is the correct path for SQLite here.
+function createPrismaClient(): PrismaClient {
+  // Prisma v7 driver adapter for PostgreSQL (node-postgres).
+  const adapter = new PrismaPg({ connectionString: resolveConnectionString() })
+
   return new PrismaClient({ adapter, errorFormat: 'minimal' })
 }
 
