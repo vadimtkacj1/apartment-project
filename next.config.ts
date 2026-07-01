@@ -32,6 +32,10 @@ const nextConfig: NextConfig = {
     // Add domains for image optimization
     domains: [],
     // Image optimization settings
+    // Whitelist the quality levels actually requested by next/image usages.
+    // Next.js defaults this to [75]; FloorPlansSection/AboutSection ask for 85,
+    // which warns (and would 400 in prod) unless listed here.
+    qualities: [75, 85],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512, 640, 768],
