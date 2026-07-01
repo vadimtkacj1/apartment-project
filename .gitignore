@@ -20,9 +20,7 @@ dev.db
 /restored
 # production
 /build
-/.claude/*
-!/.claude/skills/
-!/.claude/skills/**
+/.claude/
 # misc
 .DS_Store
 *.pem
@@ -44,6 +42,8 @@ yarn-error.log*
 *.db.backup*
 *.sqlite
 *.sqlite3
+# local DB safety copies / migration snapshots
+dev.db.*
 
 # vercel
 .vercel
@@ -65,3 +65,17 @@ nul/data
 
 # uploaded files (stored in data directory in production)
 /uploads
+
+# local copies of uploaded photos — served from the server, NOT committed to git
+# (keeps the .gitkeep placeholders so the folders still exist)
+/public/uploads/**/*.jpg
+/public/uploads/**/*.jpeg
+/public/uploads/**/*.png
+/public/uploads/**/*.webp
+/public/uploads/**/*.gif
+/public/uploads/**/*.avif
+
+# archives & editor temp files
+*.zip
+*.tmp.*
+recovered.tar.gz
