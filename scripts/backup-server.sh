@@ -18,7 +18,7 @@ umask 077   # archives contain .env secrets + the DB — never world/group reada
 APP_DIR="${APP_DIR:-/opt/apartment-project}"
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/apartment-project}"
 ENV_FILE="${ENV_FILE:-$APP_DIR/.env}"
-RETENTION_DAYS="${RETENTION_DAYS:-30}"
+RETENTION_DAYS="${RETENTION_DAYS:-14}"   # 14×(4/day)×~236MB ≈ 13GB — safe on the 38GB disk
 
 # Read a KEY=value from .env, stripping surrounding quotes and CR (Windows EOL).
 read_env() {
@@ -102,6 +102,22 @@ if [ -f /etc/apartment/postgres.env ] && command -v pg_dump >/dev/null 2>&1; the
         -f "$TMP/postgres/apartment_prod.sql" \
         || echo "WARNING: pg_dump failed" >&2
     fi )
+fi
+
+# --- image recovery manifest (path + size + sha256 + property links) ---
+# Lets lost/renamed photos be re-identified by hash and mapped back to the right
+# property + original filename. Non-fatal. Also kept as a standing copy next to
+# the DB (outside the app dir, so it survives deploys).
+if command -v node >/dev/null 2>&1 && [ -f "$APP_DIR/scripts/image-manifest.mjs" ]; then
+  mkdir -p "$TMP/manifest"
+  ( [ -f /etc/apartment/postgres.env ] && . /etc/apartment/postgres.env
+    cd "$APP_DIR"
+    UPLOADS_DIR="$UPLOADS_DIR" MANIFEST_OUT="$TMP/manifest/image-manifest" \
+      node scripts/image-manifest.mjs ) || echo "WARNING: image-manifest failed" >&2
+  if [ -f "$TMP/manifest/image-manifest.json" ]; then
+    mkdir -p /var/lib/apartment-project
+    cp -f "$TMP/manifest/image-manifest.json" /var/lib/apartment-project/image-manifest.json 2>/dev/null || true
+  fi
 fi
 
 # --- env (secrets) ---
