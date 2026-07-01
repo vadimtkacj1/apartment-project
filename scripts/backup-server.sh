@@ -96,7 +96,9 @@ if [ -f /etc/apartment/postgres.env ] && command -v pg_dump >/dev/null 2>&1; the
   ( . /etc/apartment/postgres.env
     if [ -n "${DATABASE_URL:-}" ]; then
       mkdir -p "$TMP/postgres"
-      pg_dump "$DATABASE_URL" --no-owner --no-privileges \
+      # pg_dump/libpq rejects Prisma's "?schema=..." query param — strip it
+      # ("\?" makes the ? a literal, not a single-char glob).
+      pg_dump "${DATABASE_URL%%\?*}" --no-owner --no-privileges \
         -f "$TMP/postgres/apartment_prod.sql" \
         || echo "WARNING: pg_dump failed" >&2
     fi )
