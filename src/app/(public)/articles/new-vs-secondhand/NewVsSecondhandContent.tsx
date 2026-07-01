@@ -79,6 +79,9 @@ export default function NewVsSecondhandContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/new-vs-secondhand-a.jpg" alt={getArticle('new-vs-secondhand')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>החסרונות שלא מספרים לכם במשרד המכירות</h2>
               <p>
@@ -120,6 +123,9 @@ export default function NewVsSecondhandContent() {
             </section>
 
             {/* Comparison table */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/new-vs-secondhand-b.jpg" alt={getArticle('new-vs-secondhand')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>טבלת השוואה: דירה מקבלן מול יד שנייה</h2>
               <div className="geo-table-wrap">

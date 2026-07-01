@@ -122,6 +122,9 @@ export default function FirstApartmentContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/first-apartment-guide-a.jpg" alt={getArticle('first-apartment-guide')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלב 2: אישור עקרוני לפני הכול</h2>
               <p>
@@ -153,6 +156,9 @@ export default function FirstApartmentContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/first-apartment-guide-b.jpg" alt={getArticle('first-apartment-guide')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלב 4: הבדיקות שאסור לדלג עליהן</h2>
               <p>

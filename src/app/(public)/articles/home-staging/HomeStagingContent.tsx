@@ -85,6 +85,9 @@ export default function HomeStagingContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/home-staging-a.jpg" alt={getArticle('home-staging')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>כללי הזהב של הצגת דירה</h2>
               <p>
@@ -116,6 +119,9 @@ export default function HomeStagingContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/home-staging-b.jpg" alt={getArticle('home-staging')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>החשבון הסופי: כמה משקיעים וכמה מקבלים</h2>
               <p>

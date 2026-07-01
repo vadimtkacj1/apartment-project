@@ -81,6 +81,9 @@ export default function UrbanRenewalContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/urban-renewal-holon-a.jpg" alt={getArticle('urban-renewal-holon')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>תמ״א 38: השדרוג של הבניין הבודד</h2>
               <p>
@@ -156,6 +159,9 @@ export default function UrbanRenewalContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/urban-renewal-holon-b.jpg" alt={getArticle('urban-renewal-holon')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>מה זה אומר לבעלי דירות — ולמשקיעים?</h2>
               <p>

@@ -72,11 +72,15 @@ describe('POST /api/contact', () => {
     expect(res.status).toBe(200);
   });
 
-  it('returns 500 when email env vars are not configured', async () => {
+  it('still returns 200 (lead already saved) when email env vars are not configured', async () => {
     vi.stubEnv('EMAIL_SERVER_HOST', '');
     const res = await post(validBody);
-    expect(res.status).toBe(500);
-    await expect(res.json()).resolves.toEqual({ error: 'Email service not configured' });
+    // Email is best-effort: the lead is persisted before the send, so an
+    // unconfigured SMTP must NOT fail the request — the send is skipped entirely.
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ message: 'Success' });
+    expect(createTransport).not.toHaveBeenCalled();
+    expect(sendMail).not.toHaveBeenCalled();
   });
 
   it('HTML-escapes user input to prevent markup injection in the email body', async () => {
@@ -94,19 +98,22 @@ describe('POST /api/contact', () => {
     expect(mail.subject).not.toMatch(/[\r\n]/);
   });
 
-  it('returns 500 when SMTP verification fails', async () => {
+  it('still returns 200 when SMTP verification fails (lead already saved; email best-effort)', async () => {
     verify.mockRejectedValue(new Error('connect ECONNREFUSED'));
     const res = await post(validBody);
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(200);
+    // verify() rejects before the send, so sendMail is never reached.
     expect(sendMail).not.toHaveBeenCalled();
   });
 
-  it('returns a generic 500 (no internal leak) when sendMail throws', async () => {
+  it('still returns 200 when sendMail throws, without leaking the internal error', async () => {
     sendMail.mockRejectedValue(new Error('smtp blew up'));
     const res = await post(validBody);
-    expect(res.status).toBe(500);
+    // The lead is already captured; the SMTP failure is logged, not surfaced,
+    // and the internal error string must never reach the client.
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe('Internal Server Error');
+    expect(json).toEqual({ message: 'Success' });
     expect(JSON.stringify(json)).not.toContain('smtp blew up');
   });
 

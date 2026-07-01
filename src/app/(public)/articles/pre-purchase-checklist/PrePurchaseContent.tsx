@@ -74,6 +74,9 @@ export default function PrePurchaseContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/pre-purchase-checklist-a.jpg" alt={getArticle('pre-purchase-checklist')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>2. בדיקות תכנוניות: מה חוקי ומה לא?</h2>
               <ul className="geo-list">
@@ -94,6 +97,9 @@ export default function PrePurchaseContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/pre-purchase-checklist-b.jpg" alt={getArticle('pre-purchase-checklist')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>4. בדיקות כלכליות: כמה זה באמת יעלה?</h2>
               <ul className="geo-list">

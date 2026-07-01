@@ -76,6 +76,9 @@ export default function MortgageGuideContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/mortgage-guide-a.jpg" alt={getArticle('mortgage-guide')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>כמה הון עצמי צריך? המספרים של בנק ישראל</h2>
               <p>
@@ -143,6 +146,9 @@ export default function MortgageGuideContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/mortgage-guide-b.jpg" alt={getArticle('mortgage-guide')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>איך משיגים תנאים טובים יותר?</h2>
               <p>

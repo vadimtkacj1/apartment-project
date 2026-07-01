@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
-import { ChevronLeft, ChevronRight, Eye, Download, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Download, X, ExternalLink } from "lucide-react";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
@@ -19,6 +19,10 @@ interface FloorPlan {
 
 // ONE THE PARK · דוד אלעזר 27, חולון — apartment & commercial plans.
 // Assets are self-hosted under /public/plans/onethepark (image preview + full PDF).
+
+// Official ONE THE PARK project landing page (Shosh Ltd, the developer).
+const ONE_THE_PARK_URL = "https://shosh-ltd.co.il/lp/onethepark";
+
 const PLANS: FloorPlan[] = [
   { title: "דירת 3 חדרים", subtitle: "קומות 1–5", image: "/plans/onethepark/apartment-3-floors-1-5.jpg", pdf: "/plans/onethepark/apartment-3-floors-1-5.pdf" },
   { title: "דירת 4 חדרים", subtitle: "קומות 1–5", image: "/plans/onethepark/apartment-4-floors-1-5.jpg", pdf: "/plans/onethepark/apartment-4-floors-1-5.pdf" },
@@ -173,6 +177,20 @@ function FloorPlansSection() {
           </div>
 
           <div className="plan-pagination flex items-center justify-center gap-2 mt-8" />
+        </div>
+
+        {/* CTA — through to the full ONE THE PARK project page */}
+        <div className="mt-10 md:mt-12 flex justify-center">
+          <a
+            href={ONE_THE_PARK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#1c3664] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
+            style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
+          >
+            <span>לפרויקט המלא — <span dir="ltr">ONE THE PARK</span></span>
+            <ExternalLink className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
+          </a>
         </div>
       </div>
 

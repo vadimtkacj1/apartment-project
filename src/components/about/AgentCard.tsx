@@ -42,9 +42,9 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
     }
   };
 
-  // Photos hidden for now (awaiting real/generated images) — shows a branded
-  // initials avatar instead. Set HIDE_PHOTOS = false to restore real photos.
-  const HIDE_PHOTOS = true;
+  // Real, agency-owned photos of our licensed agents (first-party → copyright-safe).
+  // Set HIDE_PHOTOS = true to fall back to a branded initials avatar.
+  const HIDE_PHOTOS = false;
   const initials = (member.name || '')
     .split(' ')
     .map((w) => w[0])

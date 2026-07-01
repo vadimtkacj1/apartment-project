@@ -110,6 +110,9 @@ export default function SellingAloneContent() {
               </p>
             </section>
 
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/selling-alone-a.jpg" alt={getArticle('selling-alone')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של מוכרים לבד: להיות &quot;מדריך טיולים&quot;</h2>
               <p>כשאתם מפרסמים לבד, אתם הופכים למוקדייה. כל אדם שמשעמם לו בערב מתקשר. <strong>זו טעות קריטית.</strong></p>
@@ -138,6 +141,9 @@ export default function SellingAloneContent() {
               </p>
             </section>
 
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/selling-alone-b.jpg" alt={getArticle('selling-alone')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה דווקא אנחנו?</h2>
               <p>

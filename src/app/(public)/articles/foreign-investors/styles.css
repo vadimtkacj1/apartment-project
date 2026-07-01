@@ -100,6 +100,24 @@
   }
 }
 
+/* Inline images placed between article sections */
+.article-inline-figure {
+  margin: 2.75rem 0;
+}
+.article-inline-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+  box-shadow: 0 10px 26px rgba(28, 54, 100, 0.12);
+}
+@media (max-width: 640px) {
+  .article-inline-figure { margin: 2rem 0; }
+  .article-inline-image { border-radius: 12px; }
+}
+
 .article-section {
   margin-bottom: 3rem;
 }

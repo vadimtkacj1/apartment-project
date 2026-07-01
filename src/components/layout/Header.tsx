@@ -248,28 +248,36 @@ export default function Header() {
             aria-label={isMobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
+            onTouchStart={e => (e.currentTarget.style.transform = "scale(0.9)")}
+            onTouchEnd={e => (e.currentTarget.style.transform = "scale(1)")}
+            onTouchCancel={e => (e.currentTarget.style.transform = "scale(1)")}
             style={{
-              background: shouldBeTransparent
-                ? "rgba(28, 54, 100, 0.85)"
-                : "rgba(28, 54, 100, 0.1)",
-              border: shouldBeTransparent
-                ? "1px solid rgba(255, 255, 255, 0.3)"
-                : "1px solid rgba(28, 54, 100, 0.2)",
-              borderRadius: 10,
-              padding: 8,
+              // Solid, branded navy chip in BOTH states — reads as a deliberate
+              // control instead of the faint ghost box it used to be on the
+              // white (scrolled) header. Gold hairline + soft shadow tie it to
+              // the site's navy↔gold button system.
+              width: 46,
+              height: 46,
+              background: "#1c3664",
+              border: "1px solid rgba(197, 163, 87, 0.6)", // brand gold #c5a357
+              borderRadius: 13,
+              padding: 0,
               cursor: "pointer",
-              color: shouldBeTransparent ? "#ffffff" : "#1c3664",
+              color: "#ffffff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "all 0.3s ease",
+              boxShadow: shouldBeTransparent
+                ? "0 6px 18px rgba(0,0,0,0.4)"
+                : "0 6px 18px rgba(28,54,100,0.3)",
+              transition: "transform 0.15s ease, box-shadow 0.3s ease, background 0.3s ease",
               WebkitTapHighlightColor: "transparent",
               touchAction: "manipulation",
               zIndex: 1050,
               position: "relative",
             }}
           >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            {isMobileMenuOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
           </button>
         )}
       </nav>

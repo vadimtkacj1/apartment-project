@@ -176,7 +176,10 @@ export default async function Home() {
       {/* Content below hero - lazy loaded */}
       <div className="relative bg-warm">
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <FloorPlansSection />
+          <HotPropositions
+            initialProperties={hotProperties}
+            initialTitle={homepageTitles.hotPropositionsTitle}
+          />
         </Suspense>
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
           <NoCommissionSection
@@ -185,10 +188,7 @@ export default async function Home() {
           />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <HotPropositions
-            initialProperties={hotProperties}
-            initialTitle={homepageTitles.hotPropositionsTitle}
-          />
+          <FloorPlansSection />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <AboutSection />

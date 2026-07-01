@@ -79,6 +79,9 @@ export default function HolonNeighborhoodsContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/holon-neighborhoods-a.jpg" alt={getArticle('holon-neighborhoods')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>השכונות המתחדשות: למי שמחפש פוטנציאל</h2>
               <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>ג׳סי כהן</h3>
@@ -100,6 +103,9 @@ export default function HolonNeighborhoodsContent() {
             </section>
 
             {/* Neighborhoods comparison table */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/holon-neighborhoods-b.jpg" alt={getArticle('holon-neighborhoods')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שכונות חולון במבט מהיר</h2>
               <div className="geo-table-wrap">

@@ -31,7 +31,7 @@ export default function AboutPage() {
       <BreadcrumbSchema items={[{ name: 'אודות', path: '/about' }]} />
       <PersonSchema />
       <SecondaryHero
-        img="/7.jpg"
+        img="/images/hero/about-hero.jpg"
         title="אודות"
         centered={true}
       />

@@ -152,5 +152,305 @@
     "basedOn": null,
     "prompt": "Professional photograph of house keys resting on a clean wooden desk, warm soft golden light, shallow depth of field, cozy premium mood. No text, no letters, no numbers, no watermark, no logo anywhere.",
     "savedAt": "2026-07-01T14:49:28.997Z"
+  },
+  "public/images/hero/about-hero.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Professional wide real-estate hero photograph: modern upscale residential apartment buildings in a sunny Mediterranean Israeli city at warm golden hour, clean blue sky, palm trees, inviting and premium. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T15:46:24.794Z"
+  },
+  "public/agent-second.jpg": {
+    "source": "own (agency staff photo)",
+    "license": "Owned by Ram-Haim — first-party staff photo",
+    "author": "Ram-Haim",
+    "requiresAttribution": false,
+    "attribution": "",
+    "note": "Real licensed agent, photographed in-office; no third-party rights.",
+    "subject": "תומר גל",
+    "savedAt": "2026-07-01T15:48:47.051Z"
+  },
+  "public/agent-fisrt.jpg": {
+    "source": "own (agency staff photo)",
+    "license": "Owned by Ram-Haim — first-party staff photo",
+    "author": "Ram-Haim",
+    "requiresAttribution": false,
+    "attribution": "",
+    "note": "Real licensed agent, photographed in-office; no third-party rights.",
+    "subject": "ליאור גמיש",
+    "savedAt": "2026-07-01T15:48:47.051Z"
+  },
+  "public/7.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Wide Mediterranean seaside city hero: a palm-lined beach promenade beside upscale low-rise buildings, warm sunny day, turquoise sea, inviting coastal real-estate mood. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T15:56:35.449Z"
+  },
+  "public/images/hero/sales.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Mediterranean coastal city skyline with modern residential apartment towers along a sandy beach, clear blue sky, sunny, upscale real-estate photograph. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T15:56:39.323Z"
+  },
+  "public/images/articles/inbody/home-staging-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a bright, beautifully staged modern living room with a sofa and green plants, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:05:58.431Z"
+  },
+  "public/images/articles/inbody/home-staging-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a freshly painted tidy cozy bedroom with soft natural light, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:01.949Z"
+  },
+  "public/images/articles/inbody/new-vs-secondhand-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a brand-new modern apartment building under a clear blue sky, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:05.613Z"
+  },
+  "public/images/articles/inbody/new-vs-secondhand-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a charming older residential apartment building with character and greenery, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:09.420Z"
+  },
+  "public/images/articles/inbody/pre-purchase-checklist-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a hand pointing at a wall while inspecting an empty apartment, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:12.942Z"
+  },
+  "public/images/articles/inbody/pre-purchase-checklist-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a set of house keys resting on a clean wooden table, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:17.951Z"
+  },
+  "public/images/articles/inbody/holon-neighborhoods-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a quiet leafy residential street lined with low apartment buildings, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:21.718Z"
+  },
+  "public/images/articles/inbody/holon-neighborhoods-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a green neighborhood park with benches, trees and a playground, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:06:25.823Z"
+  },
+  "public/images/articles/inbody/landlord-guide-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a clean modern furnished rental apartment living room interior, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:03.235Z"
+  },
+  "public/images/articles/inbody/landlord-guide-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "two hands exchanging a set of house keys, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:07.179Z"
+  },
+  "public/images/articles/inbody/mortgage-guide-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern glass bank and finance building facade in daylight, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:10.712Z"
+  },
+  "public/images/articles/inbody/mortgage-guide-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern family house exterior at warm golden hour, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:14.950Z"
+  },
+  "public/images/articles/inbody/first-apartment-guide-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a cozy small first-apartment living room, warm and inviting, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:18.605Z"
+  },
+  "public/images/articles/inbody/first-apartment-guide-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a compact modern kitchen with natural light, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:22.801Z"
+  },
+  "public/images/articles/inbody/apartment-pricing-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern residential apartment building facade with elegant architecture, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:29.671Z"
+  },
+  "public/images/articles/inbody/apartment-pricing-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a sunny balcony view over a residential city neighborhood, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:33.807Z"
+  },
+  "public/images/articles/inbody/urban-renewal-holon-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "construction cranes rising over new residential towers against a blue sky, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:37.580Z"
+  },
+  "public/images/articles/inbody/urban-renewal-holon-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a freshly renovated modern residential building facade, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:44.427Z"
+  },
+  "public/images/articles/inbody/purchase-tax-guide-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "house keys and a small wooden model house on a clean desk, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:47.472Z"
+  },
+  "public/images/articles/inbody/purchase-tax-guide-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern house exterior with warm lit windows at dusk, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:52.171Z"
+  },
+  "public/images/articles/inbody/foreign-investors-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern apartment tower at dusk with warm lit windows, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:07:55.628Z"
+  },
+  "public/images/articles/inbody/foreign-investors-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a Mediterranean seaside city skyline with residential towers, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:08:01.232Z"
+  },
+  "public/images/articles/inbody/selling-alone-a.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a bright modern living room staged and ready for sale, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:08:04.870Z"
+  },
+  "public/images/articles/inbody/selling-alone-b.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "a modern house exterior with a tidy green front garden, warm natural light, professional real-estate photograph, photorealistic. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:08:08.729Z"
+  },
+  "public/images/hero/main-hero.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Aerial photograph of a Mediterranean coastal old town at golden hour: warm sandstone historic buildings on a green headland beside a turquoise sea, a seaside promenade, upscale and inviting. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T16:21:50.066Z"
   }
 }

@@ -82,6 +82,9 @@ export default function ApartmentPricingContent() {
             </section>
 
             {/* Section 2 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/apartment-pricing-a.jpg" alt={getArticle('apartment-pricing')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלושת הכלים להערכת שווי</h2>
               <p>
@@ -153,6 +156,9 @@ export default function ApartmentPricingContent() {
             </section>
 
             {/* Section 4 */}
+            <figure className="article-inline-figure">
+              <Image src="/images/articles/inbody/apartment-pricing-b.jpg" alt={getArticle('apartment-pricing')!.title} width={1200} height={675} className="article-inline-image" />
+            </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>איך אנחנו מתמחרים דירה?</h2>
               <p>

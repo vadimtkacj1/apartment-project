@@ -7,6 +7,8 @@ const { requireAdmin, prismaMock } = vi.hoisted(() => ({
     propertyView: { count: vi.fn(), groupBy: vi.fn(), findMany: vi.fn() },
     clickEvent: { count: vi.fn(), groupBy: vi.fn(), findFirst: vi.fn(), findMany: vi.fn() },
     property: { findUnique: vi.fn() },
+    // The summary handler also aggregates real lead KPIs from the Inquiry table.
+    inquiry: { count: vi.fn(), groupBy: vi.fn() },
   },
 }));
 vi.mock('@/lib/require-admin', () => ({ requireAdmin }));
@@ -29,6 +31,8 @@ beforeEach(() => {
   prismaMock.clickEvent.findFirst.mockResolvedValue({ userAgent: 'UA' });
   prismaMock.propertyView.findMany.mockResolvedValue([{ id: 1 }]);
   prismaMock.clickEvent.findMany.mockResolvedValue([{ id: 2 }]);
+  prismaMock.inquiry.count.mockResolvedValue(0);
+  prismaMock.inquiry.groupBy.mockResolvedValue([]);
 });
 
 describe('GET /api/analytics/track (admin)', () => {
