@@ -1,4 +1,6 @@
 'use client';
+import Image from 'next/image';
+import { getArticle } from '@/data/articles';
 import React from 'react';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
@@ -47,6 +49,14 @@ export default function SellingAloneContent() {
         <article className="article-content">
           <div className="article-body">
             <ArticleByline id="selling-alone" />
+            <Image
+              src={getArticle('selling-alone')!.image}
+              alt={getArticle('selling-alone')!.title}
+              width={1200}
+              height={630}
+              className="article-hero-image"
+              priority
+            />
             <section className="article-section">
               <p className="lead-paragraph">
                 אין תחושה מפתה יותר מזו: החלטתם למכור את הדירה, עשיתם חישוב מהיר במחשבון, ואמרתם לעצמכם: &quot;למה שנשלם 2% למתווך? נעלה מודעה ליד2, נראה את הבית פעמיים בשבוע, והכסף יישאר בכיס שלנו&quot;.

@@ -1,0 +1,156 @@
+{
+  "public/images/about/about-free.jpg": {
+    "source": "openverse",
+    "license": "CC0 1.0",
+    "author": "Amsterdam free photos & pictures of the Dutch city",
+    "sourceUrl": "https://www.flickr.com/photos/104736837@N03/12137130084",
+    "downloadUrl": "https://live.staticflickr.com/5531/12137130084_9eca2dbf4b_b.jpg",
+    "requiresAttribution": false,
+    "attribution": "\"2014.01 - Amsterdam in photo: Modern architecture of the new-built shop area with small streets, called Oosterpoort; a geotagged free urban picture, in public domain / Commons CCO; city photography by Fons Heijnsbroek, The Netherlands\" by Amsterdam free photos & pictures of the Dutch city is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/.",
+    "query": "modern apartment building architecture",
+    "savedAt": "2026-07-01T14:18:42.361Z"
+  },
+  "public/images/about/about-ai.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/about/about-free.jpg",
+      "license": "openverse / CC0 1.0"
+    },
+    "prompt": "Enhance for a real-estate agency About section: warm golden-hour sunlight, clean bright blue sky, slightly richer colors and contrast. Keep the building architecture exactly the same. Photorealistic, professional.",
+    "savedAt": "2026-07-01T14:24:23.091Z"
+  },
+  "public/images/articles/home-staging.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/home-staging.jpg",
+      "license": "openverse / PDM 1.0",
+      "sourceUrl": "https://www.flickr.com/photos/80223459@N05/52067000921",
+      "downloadUrl": "https://live.staticflickr.com/65535/52067000921_3a55e0f0d8_b.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition. The image must contain NO text, letters, numbers, logos, watermarks or graphic overlays anywhere. Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:46:09.994Z"
+  },
+  "public/images/articles/new-vs-secondhand.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/new-vs-secondhand.jpg",
+      "license": "openverse / CC0 1.0",
+      "sourceUrl": "https://www.flickr.com/photos/14674348@N04/14996764996",
+      "downloadUrl": "https://live.staticflickr.com/3902/14996764996_39a7914b96_b.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition — do NOT regenerate the scene. CRITICAL: the image must contain absolutely NO text, letters, words, numbers, captions, signatures, logos, watermarks, brand names or graphic overlays of any kind, anywhere (including corners). Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:44:22.005Z"
+  },
+  "public/images/articles/pre-purchase.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Professional photograph of two hands holding a small wooden model house over a light wooden table, soft warm daylight, shallow depth of field, calm trustworthy mood. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T14:50:40.030Z"
+  },
+  "public/images/articles/holon-neighborhoods.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/holon-neighborhoods.jpg",
+      "license": "openverse / CC0 1.0",
+      "sourceUrl": "https://www.flickr.com/photos/104736837@N03/12137130084",
+      "downloadUrl": "https://live.staticflickr.com/5531/12137130084_9eca2dbf4b_b.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition — do NOT regenerate the scene. CRITICAL: the image must contain absolutely NO text, letters, words, numbers, captions, signatures, logos, watermarks, brand names or graphic overlays of any kind, anywhere (including corners). Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:44:49.790Z"
+  },
+  "public/images/articles/landlord.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/landlord.jpg",
+      "license": "openverse / CC0 1.0",
+      "sourceUrl": "https://www.flickr.com/photos/132795455@N08/21894316762",
+      "downloadUrl": "https://live.staticflickr.com/751/21894316762_453662fd0a_b.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition — do NOT regenerate the scene. CRITICAL: the image must contain absolutely NO text, letters, words, numbers, captions, signatures, logos, watermarks, brand names or graphic overlays of any kind, anywhere (including corners). Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:44:55.599Z"
+  },
+  "public/images/articles/mortgage.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/mortgage.jpg",
+      "license": "openverse / CC0 1.0",
+      "sourceUrl": "https://stocksnap.io/photo/modern-design-APYMC719T1",
+      "downloadUrl": "https://cdn.stocksnap.io/img-thumbs/960w/APYMC719T1.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition — do NOT regenerate the scene. CRITICAL: the image must contain absolutely NO text, letters, words, numbers, captions, signatures, logos, watermarks, brand names or graphic overlays of any kind, anywhere (including corners). Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:47:44.595Z"
+  },
+  "public/images/articles/first-apartment.jpg": {
+    "source": "ai:openrouter (edit)",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-edited from a license-safe base (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": {
+      "file": "public/images/articles/first-apartment.jpg",
+      "license": "openverse / PDM 1.0",
+      "sourceUrl": "https://www.flickr.com/photos/80223459@N05/16970815078",
+      "downloadUrl": "https://live.staticflickr.com/7641/16970815078_1bcbb01b76_b.jpg"
+    },
+    "prompt": "Apply a strong cinematic color grade and relight to this photograph: warm golden-hour tones, richer saturated colors, deeper contrast, luminous highlights, clean inviting atmosphere. Keep the same objects, layout and composition — do NOT regenerate the scene. CRITICAL: the image must contain absolutely NO text, letters, words, numbers, captions, signatures, logos, watermarks, brand names or graphic overlays of any kind, anywhere (including corners). Output a clean photograph only.",
+    "savedAt": "2026-07-01T14:45:09.605Z"
+  },
+  "public/images/articles/apartment-pricing.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Professional real estate photograph of a modern residential apartment building exterior on a bright clear day, elegant contemporary architecture, warm natural sunlight, blue sky. No text, no letters, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T14:49:25.378Z"
+  },
+  "public/images/articles/urban-renewal.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Professional photograph of a modern residential apartment building under construction, tower crane and scaffolding, against a clear blue sky, bright daylight, sense of progress and renewal. No text, no letters, no numbers, no brand names, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T14:52:44.578Z"
+  },
+  "public/images/articles/purchase-tax.jpg": {
+    "source": "ai:openrouter",
+    "model": "google/gemini-3.1-flash-lite-image-20260630",
+    "license": "AI-generated (no third-party rights)",
+    "requiresAttribution": false,
+    "attribution": "",
+    "basedOn": null,
+    "prompt": "Professional photograph of house keys resting on a clean wooden desk, warm soft golden light, shallow depth of field, cozy premium mood. No text, no letters, no numbers, no watermark, no logo anywhere.",
+    "savedAt": "2026-07-01T14:49:28.997Z"
+  }
+}

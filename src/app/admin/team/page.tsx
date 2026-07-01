@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { BRAND } from '@/lib/adminTheme';
 import {
   Row,
   Col,
@@ -9,12 +10,13 @@ import {
   Input,
   Select,
   Modal,
-  message,
+  App,
   Statistic,
   Space,
   Switch,
   Table,
   Image,
+  Skeleton,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +26,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 interface TeamMember {
   id: number;
@@ -42,6 +45,7 @@ interface TeamMember {
 }
 
 export default function TeamPage() {
+  const { message } = App.useApp();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -142,16 +146,16 @@ export default function TeamPage() {
           <Card><Statistic title="סה״כ חברי צוות" value={stats.total} prefix={<TeamOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות פעילים" value={stats.active} valueStyle={{ color: '#3f8600' }} /></Card>
+          <Card><Statistic title="חברי צוות פעילים" value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות לא פעילים" value={stats.inactive} valueStyle={{ color: '#cf1322' }} /></Card>
+          <Card><Statistic title="חברי צוות לא פעילים" value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
         </Col>
       </Row>
 
       {/* Filters */}
       <Card className="mb-6">
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           <Input
             placeholder="חפש לפי שם או אימייל..."
             prefix={<SearchOutlined />}
@@ -172,19 +176,21 @@ export default function TeamPage() {
         </Space>
       </Card>
 
-      {/* Team Members Table */}
+      {/* Team Members Table — desktop */}
+      <div className="admin-only-desktop">
       <Card>
         <Table
           dataSource={filteredMembers}
           loading={loading}
           rowKey="id"
+          size="middle"
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
             showTotal: (total) => `סה״כ ${total} חברי צוות`,
           }}
           scroll={{ x: 1200 }}
-          locale={{ emptyText: 'לא נמצאו חברי צוות' }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו חברי צוות" addHref="/admin/team/new" addLabel="הוספת חבר צוות" /> }}
           columns={[
             {
               title: 'תמונה',
@@ -213,7 +219,7 @@ export default function TeamPage() {
                         width: '60px',
                         height: '60px',
                         borderRadius: '50%',
-                        background: '#f0f0f0',
+                        background: '#E6E8EC',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -308,6 +314,74 @@ export default function TeamPage() {
           ]}
         />
       </Card>
+      </div>
+
+      {/* Team Members — mobile card list */}
+      <div className="admin-only-mobile">
+        {loading ? (
+          <Skeleton active paragraph={{ rows: 6 }} />
+        ) : filteredMembers.length === 0 ? (
+          <AdminEmptyState message="לא נמצאו חברי צוות" addHref="/admin/team/new" addLabel="הוספת חבר צוות" />
+        ) : (
+          <div className="admin-card-list">
+            {filteredMembers.map((member) => (
+              <div key={member.id} className="admin-card">
+                <div className="admin-card__head">
+                  {member.image ? (
+                    <img className="admin-card__thumb" src={member.image} alt={member.name} />
+                  ) : (
+                    <div
+                      className="admin-card__thumb"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#E6E8EC',
+                      }}
+                    >
+                      <TeamOutlined style={{ fontSize: '22px', color: '#bfbfbf' }} />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="admin-card__title">{member.name}</div>
+                    <div className="admin-card__meta">{member.role}</div>
+                  </div>
+                </div>
+                <div className="admin-card__fields">
+                  {member.phone && <span><b>טלפון</b> {member.phone}</span>}
+                  {member.mobile && <span><b>נייד</b> {member.mobile}</span>}
+                  {member.email && <span><b>אימייל</b> {member.email}</span>}
+                  <span><b>סדר</b> {member.order}</span>
+                </div>
+                <div className="admin-card__actions">
+                  <Switch
+                    checked={member.isActive}
+                    onChange={(v) => handleStatusChange(member.id, v)}
+                    checkedChildren="פעיל"
+                    unCheckedChildren="כבוי"
+                  />
+                  <span className="admin-card__grow">
+                    <Link href={`/admin/team/${member.id}`}>
+                      <Button type="primary" icon={<EditOutlined />}>ערוך</Button>
+                    </Link>
+                  </span>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => {
+                      setSelectedMember(member.id);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    מחק
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Delete Confirmation Modal */}
       <Modal

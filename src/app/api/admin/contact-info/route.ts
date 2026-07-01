@@ -5,6 +5,11 @@ import { requireAdmin } from '@/lib/require-admin';
 // GET contact info
 export async function GET(request: NextRequest) {
   try {
+    // Admin view returns all fields (secondary phones/emails, map coords).
+    // Re-check auth independently of the edge middleware.
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const contactInfo = await prisma.contactInfo.findFirst();
 
     if (!contactInfo) {

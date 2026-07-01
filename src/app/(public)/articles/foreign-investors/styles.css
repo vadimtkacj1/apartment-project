@@ -81,6 +81,25 @@
   background: #faf7f2;
 }
 
+/* Featured hero image at the top of each article body */
+.article-hero-image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 630;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  margin: 0.5rem 0 2.5rem;
+  box-shadow: 0 12px 32px rgba(28, 54, 100, 0.14);
+}
+
+@media (max-width: 640px) {
+  .article-hero-image {
+    border-radius: 12px;
+    margin-bottom: 1.75rem;
+  }
+}
+
 .article-section {
   margin-bottom: 3rem;
 }
@@ -332,14 +351,29 @@ em {
    .source-note       → named + dated source attribution under a stat/table
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Standalone definition — a self-contained answer block an AI can quote verbatim */
+/* Standalone definition — styled as a glossary "plaque" from estate stationery:
+   a warm panel with a gold hairline frame and a small navy label tab, instead of
+   the generic coloured-side-bar callout card. */
 .definition-block {
-  background: #ffffff;
-  border-right: 4px solid #1c3664;
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
-  margin: 1.5rem 0 2rem;
-  box-shadow: 0 2px 10px rgba(28, 54, 100, 0.06);
+  position: relative;
+  background: #fbf8f2;
+  border: 1px solid #e7dcc6;
+  border-radius: 3px;
+  padding: 1.9rem 2rem 1.6rem;
+  margin: 2.25rem 0 2.5rem;
+}
+.definition-block::before {
+  content: "הגדרה";
+  position: absolute;
+  top: -0.72rem;
+  right: 1.75rem;
+  background: #1c3664;
+  color: #c5a357;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  padding: 0.3rem 0.9rem;
+  border-radius: 2px;
 }
 .definition-block p {
   margin: 0;
@@ -360,34 +394,38 @@ em {
 .geo-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.05rem;
-  background: #ffffff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(28, 54, 100, 0.06);
+  font-size: 1.08rem;
+  background: transparent;
 }
 .geo-table caption {
   caption-side: top;
   text-align: right;
   font-weight: 700;
   color: #1c3664;
-  font-size: 1.15rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  margin-bottom: 0.9rem;
 }
 .geo-table th,
 .geo-table td {
-  padding: 0.85rem 1.1rem;
+  padding: 0.9rem 1.1rem;
   text-align: right;
-  border-bottom: 1px solid #e5e7eb;
   line-height: 1.6;
 }
 .geo-table thead th {
-  background: #1c3664;
-  color: #ffffff;
-  font-weight: 600;
+  background: transparent;
+  color: #1c3664;
+  font-weight: 700;
+  padding-top: 0.4rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid #c5a357;
 }
-.geo-table tbody tr:nth-child(even) {
-  background: #faf7f2;
+.geo-table tbody td {
+  color: #374151;
+  border-bottom: 1px solid #e7dcc6;
+}
+.geo-table tbody td:first-child {
+  color: #1c3664;
+  font-weight: 600;
 }
 .geo-table tbody tr:last-child td {
   border-bottom: none;
@@ -412,7 +450,7 @@ em {
   position: absolute;
   right: 0;
   top: 0;
-  color: #1c3664;
+  color: #c5a357;
   font-weight: 700;
 }
 .geo-list.ordered {

@@ -54,6 +54,11 @@ function formatProperty(property: any) {
 // GET all properties
 export async function GET(request: NextRequest) {
   try {
+    // Admin-only: returns inactive/sold listings and internal fields. Re-check
+    // auth here so a misconfigured middleware matcher can never leak this.
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const properties = await prisma.property.findMany({
       orderBy: {
         createdAt: 'desc',
@@ -159,6 +164,17 @@ export async function POST(request: NextRequest) {
         images: imagesJson,
         status: body.status || null,
         location: body.location,
+
+        // SEO overrides (optional — fall back to title/description/first image when empty)
+        metaTitle: body.metaTitle || null,
+        metaDescription: body.metaDescription || null,
+        ogImage: body.ogImage || null,
+        imageAlts:
+          body.imageAlts === undefined
+            ? '[]'
+            : typeof body.imageAlts === 'string'
+              ? body.imageAlts
+              : JSON.stringify(body.imageAlts),
 
         // Compatibility fields
         bedrooms: body.bedrooms || body.rooms,

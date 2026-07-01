@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
@@ -37,6 +38,16 @@ export default function ArticlesPage() {
           {articles.map((article, index) => (
             <article key={article.id} className="article-card" style={{ animationDelay: `${index * 0.1}s` }}>
               <div className="card-accent"></div>
+              <Link href={`/articles/${article.id}`} className="article-image" aria-label={article.title}>
+                <Image
+                  src={article.image}
+                  alt={article.title}
+                  width={1200}
+                  height={630}
+                  className="article-image-img"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
+                />
+              </Link>
               <div className="article-content">
                 <span className="category-badge">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="badge-icon">

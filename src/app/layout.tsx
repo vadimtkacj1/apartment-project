@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import React from "react";
 import localFont from "next/font/local";
 import StructuredData from "@/components/SEO/StructuredData";
+import GoogleAnalytics from "@/components/Analytics/GoogleAnalytics";
 import NavigationProgress from "@/components/NavigationProgress";
 import MotionProvider from "@/components/MotionProvider";
 import "./globals.css";
@@ -111,6 +112,7 @@ export default function RootLayout({
         `}} />
       </head>
       <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+        <GoogleAnalytics />
         <NavigationProgress />
         <StructuredData />
         <MotionProvider>{children}</MotionProvider>

@@ -31,6 +31,25 @@ function generateSessionId(ip: string, userAgent: string | null): string {
   return Math.abs(hash).toString(36);
 }
 
+// Fold a raw referer URL into a small set of acquisition buckets. Our own domain
+// (and localhost) is intra-site navigation, not a source; a missing referer = direct.
+function classifyReferer(referer: string | null): string {
+  if (!referer) return 'direct';
+  let host = referer.toLowerCase();
+  try { host = new URL(referer).hostname.toLowerCase(); } catch { /* keep raw */ }
+  if (host.includes('ram-haim') || host.includes('localhost') || host.includes('127.0.0.1')) return 'internal';
+  if (host.includes('google')) return 'google';
+  if (host.includes('facebook') || host.includes('fb.')) return 'facebook';
+  if (host.includes('instagram')) return 'instagram';
+  if (host.includes('yad2')) return 'yad2';
+  if (host.includes('madlan')) return 'madlan';
+  if (host.includes('whatsapp') || host.includes('wa.me')) return 'whatsapp';
+  if (host.includes('bing')) return 'bing';
+  if (host.includes('duckduckgo')) return 'duckduckgo';
+  if (host.includes('t.co') || host.includes('twitter') || host === 'x.com' || host.endsWith('.x.com')) return 'twitter';
+  return 'other';
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Throttle unauthenticated writes so the events tables can't be flooded.
@@ -135,102 +154,127 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('endDate');
 
     if (type === 'summary') {
-      // Get summary statistics
-      const totalViews = await prisma.propertyView.count().catch(() => 0);
-      const totalClicks = await prisma.clickEvent.count().catch(() => 0);
-      
-      const uniqueIPs = await prisma.propertyView.groupBy({
-        by: ['ipAddress'],
-        _count: true,
-      }).catch(() => []);
+      // Real lead/inquiry stats — from the Inquiry table (actual submitted
+      // contact forms), accurate unlike the old clickEvent-derived "פניות".
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      // Sparkline window — was fetched as ≤1000 fully-joined rows PER metric on the
+      // client, then bucketed in JS. Now aggregated server-side (createdAt-only,
+      // date-bounded) so the dashboard needs a single summary call, not three.
+      const WINDOW_DAYS = 14;
+      const windowStart = new Date(startOfToday.getTime() - (WINDOW_DAYS - 1) * 24 * 60 * 60 * 1000);
 
-      const topProperties = await prisma.propertyView.groupBy({
-        by: ['propertyId'],
-        _count: {
-          id: true,
-        },
-        orderBy: {
-          _count: {
-            id: 'desc',
-          },
-        },
-        take: 10,
-      }).catch(() => []);
+      // Phase 1 — every independent query runs concurrently (was ~13 sequential awaits).
+      const [
+        totalViews,
+        totalClicks,
+        uniqueIPs,
+        topProperties,
+        topPropertiesByClicksRaw,
+        clickTypes,
+        topUsersByClicksRaw,
+        totalInquiries,
+        newInquiries,
+        inquiriesToday,
+        inquiriesLast7Days,
+        inquiriesBySourceRaw,
+        inquiriesByStatusRaw,
+        windowViews,
+        windowClicks,
+        trafficRaw,
+      ] = await Promise.all([
+        prisma.propertyView.count().catch(() => 0),
+        prisma.clickEvent.count().catch(() => 0),
+        prisma.propertyView.groupBy({ by: ['ipAddress'], _count: true }).catch(() => []),
+        prisma.propertyView.groupBy({ by: ['propertyId'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, take: 10 }).catch(() => []),
+        prisma.clickEvent.groupBy({ by: ['propertyId'], where: { propertyId: { not: null } }, _count: { id: true }, orderBy: { _count: { id: 'desc' } }, take: 10 }).catch(() => []),
+        prisma.clickEvent.groupBy({ by: ['eventType'], _count: { id: true } }).catch(() => []),
+        prisma.clickEvent.groupBy({ by: ['ipAddress'], _count: { id: true }, orderBy: { _count: { id: 'desc' } }, take: 10 }).catch(() => []),
+        prisma.inquiry.count().catch(() => 0),
+        prisma.inquiry.count({ where: { status: 'new' } }).catch(() => 0),
+        prisma.inquiry.count({ where: { createdAt: { gte: startOfToday } } }).catch(() => 0),
+        prisma.inquiry.count({ where: { createdAt: { gte: sevenDaysAgo } } }).catch(() => 0),
+        prisma.inquiry.groupBy({ by: ['source'], _count: { id: true } }).catch(() => []),
+        prisma.inquiry.groupBy({ by: ['status'], _count: { id: true } }).catch(() => []),
+        prisma.propertyView.findMany({ where: { createdAt: { gte: windowStart } }, select: { createdAt: true } }).catch(() => []),
+        prisma.clickEvent.findMany({ where: { createdAt: { gte: windowStart } }, select: { createdAt: true } }).catch(() => []),
+        prisma.propertyView.groupBy({ by: ['referer'], _count: { id: true } }).catch(() => []),
+      ]);
 
-      // Get top properties by clicks
-      const topPropertiesByClicksRaw = await prisma.clickEvent.groupBy({
-        by: ['propertyId'],
-        where: {
-          propertyId: { not: null },
-        },
-        _count: {
-          id: true,
-        },
-        orderBy: {
-          _count: {
-            id: 'desc',
-          },
-        },
-        take: 10,
-      }).catch(() => []);
+      // Phase 2 — detail lookups that depend on the phase-1 "top" lists (each internally parallel).
+      const [topPropertiesByClicks, topUsersByClicks] = await Promise.all([
+        Promise.all(
+          (Array.isArray(topPropertiesByClicksRaw) ? topPropertiesByClicksRaw : []).map(async (p) => {
+            if (!p.propertyId) return { propertyId: null, clicks: p._count.id };
+            const property = await prisma.property.findUnique({
+              where: { id: p.propertyId },
+              select: { id: true, title: true, location: true },
+            }).catch(() => null);
+            return { propertyId: p.propertyId, clicks: p._count.id, property };
+          })
+        ),
+        Promise.all(
+          (Array.isArray(topUsersByClicksRaw) ? topUsersByClicksRaw : []).map(async (u) => {
+            const clickEvent = await prisma.clickEvent.findFirst({
+              where: { ipAddress: u.ipAddress },
+              select: { userAgent: true },
+              orderBy: { createdAt: 'desc' },
+            }).catch(() => null);
+            return { ipAddress: u.ipAddress, clicks: u._count.id, userAgent: clickEvent?.userAgent || null };
+          })
+        ),
+      ]);
 
-      // Get property details for top clicked properties
-      const topPropertiesByClicks = await Promise.all(
-        (Array.isArray(topPropertiesByClicksRaw) ? topPropertiesByClicksRaw : []).map(async (p) => {
-          if (!p.propertyId) return { propertyId: null, clicks: p._count.id };
-          const property = await prisma.property.findUnique({
-            where: { id: p.propertyId },
-            select: { id: true, title: true, location: true },
-          }).catch(() => null);
-          return {
-            propertyId: p.propertyId,
-            clicks: p._count.id,
-            property: property,
-          };
-        })
-      );
+      // Build the 14-day daily sparkline server-side (oldest → newest), keyed by
+      // server-local day to match the inquiriesToday boundary above.
+      const dayKey = (d: Date | string): string => {
+        const x = new Date(d);
+        return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`;
+      };
+      const buckets = new Map<string, { date: string; views: number; clicks: number }>();
+      for (let i = WINDOW_DAYS - 1; i >= 0; i--) {
+        const key = dayKey(new Date(startOfToday.getTime() - i * 24 * 60 * 60 * 1000));
+        buckets.set(key, { date: key, views: 0, clicks: 0 });
+      }
+      (Array.isArray(windowViews) ? windowViews : []).forEach((v: any) => { const b = buckets.get(dayKey(v.createdAt)); if (b) b.views++; });
+      (Array.isArray(windowClicks) ? windowClicks : []).forEach((c: any) => { const b = buckets.get(dayKey(c.createdAt)); if (b) b.clicks++; });
+      const dailySeries = Array.from(buckets.values());
+      const todayKey = dayKey(startOfToday);
+      const viewsToday = (Array.isArray(windowViews) ? windowViews : []).filter((v: any) => dayKey(v.createdAt) === todayKey).length;
 
-      const clickTypes = await prisma.clickEvent.groupBy({
-        by: ['eventType'],
-        _count: {
-          id: true,
-        },
-      }).catch(() => []);
-
-      // Get top users by clicks (IP addresses with most clicks)
-      const topUsersByClicksRaw = await prisma.clickEvent.groupBy({
-        by: ['ipAddress'],
-        _count: {
-          id: true,
-        },
-        orderBy: {
-          _count: {
-            id: 'desc',
-          },
-        },
-        take: 10,
-      }).catch(() => []);
-
-      // Get user agent for each IP
-      const topUsersByClicks = await Promise.all(
-        (Array.isArray(topUsersByClicksRaw) ? topUsersByClicksRaw : []).map(async (u) => {
-          const clickEvent = await prisma.clickEvent.findFirst({
-            where: { ipAddress: u.ipAddress },
-            select: { userAgent: true },
-            orderBy: { createdAt: 'desc' },
-          }).catch(() => null);
-          return {
-            ipAddress: u.ipAddress,
-            clicks: u._count.id,
-            userAgent: clickEvent?.userAgent || null,
-          };
-        })
-      );
+      // Acquisition sources from the referer header on property views (all-time),
+      // folded into a handful of buckets (Google / Facebook / Yad2 / direct / …).
+      // Internal referers (listing→listing browsing) are NOT acquisition, so they're
+      // dropped — otherwise intra-site navigation would bury the real external sources.
+      const tsMap = new Map<string, number>();
+      (Array.isArray(trafficRaw) ? trafficRaw : []).forEach((r: any) => {
+        const key = classifyReferer(r.referer);
+        if (key === 'internal') return;
+        tsMap.set(key, (tsMap.get(key) || 0) + (r._count?.id || 0));
+      });
+      const trafficSources = Array.from(tsMap.entries())
+        .map(([source, count]) => ({ source, count }))
+        .sort((a, b) => b.count - a.count);
 
       return NextResponse.json({
         totalViews,
         totalClicks,
         uniqueVisitors: Array.isArray(uniqueIPs) ? uniqueIPs.length : 0,
+        // 14-day sparkline + today's views, aggregated server-side.
+        dailySeries,
+        viewsToday,
+        // Lead/inquiry KPIs (real submissions)
+        totalInquiries,
+        newInquiries,
+        inquiriesToday,
+        inquiriesLast7Days,
+        inquiriesBySource: Array.isArray(inquiriesBySourceRaw)
+          ? inquiriesBySourceRaw.map((s) => ({ source: s.source || 'unknown', count: s._count.id }))
+          : [],
+        inquiriesByStatus: Array.isArray(inquiriesByStatusRaw)
+          ? inquiriesByStatusRaw.map((s) => ({ status: s.status, count: s._count.id }))
+          : [],
         topProperties: Array.isArray(topProperties) ? topProperties.map(p => ({
           propertyId: p.propertyId,
           views: p._count.id,
@@ -241,6 +285,7 @@ export async function GET(request: NextRequest) {
           count: c._count.id,
         })) : [],
         topUsersByClicks: topUsersByClicks,
+        trafficSources,
       });
     }
 

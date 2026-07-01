@@ -8,14 +8,12 @@ import {
   Form,
   Input,
   Button,
-  message,
-  Typography,
+  App,
   InputNumber,
 } from 'antd';
-import { SaveOutlined, PhoneOutlined } from '@ant-design/icons';
+import { SaveOutlined } from '@ant-design/icons';
 import LocationPicker from '@/components/admin/LocationPicker';
-
-const { Title } = Typography;
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 
 interface ContactInfoForm {
   phone: string;
@@ -74,10 +72,14 @@ const INITIAL_FORM: ContactInfoForm = {
 };
 
 export default function ContactInfoPage() {
+  const { message } = App.useApp();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number } | null>(null);
+  // Track unsaved edits so we can warn before the user navigates away / closes the tab.
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChangesWarning(dirty);
 
   useEffect(() => {
     fetchContactInfo();
@@ -129,13 +131,6 @@ export default function ContactInfoPage() {
         mapUrl,
       };
 
-      // Log coordinates before saving to debug
-      console.log('Saving contact info with coordinates:', {
-        latitude: values.latitude,
-        longitude: values.longitude,
-        mapPosition: mapPosition
-      });
-
       const response = await fetch('/api/admin/contact-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -143,6 +138,7 @@ export default function ContactInfoPage() {
       });
 
       if (response.ok) {
+        setDirty(false);
         message.success('פרטי ההתקשרות נשמרו בהצלחה');
         fetchContactInfo();
       } else {
@@ -157,17 +153,15 @@ export default function ContactInfoPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-        <PhoneOutlined style={{ fontSize: '24px', marginLeft: '12px' }} />
-        <Title level={2} style={{ margin: 0 }}>
-          ניהול פרטי התקשרות
-        </Title>
+      <div style={{ marginBottom: '16px' }}>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול פרטי התקשרות</h1>
       </div>
 
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
+        onValuesChange={() => setDirty(true)}
         initialValues={INITIAL_FORM}
         disabled={loading}
       >

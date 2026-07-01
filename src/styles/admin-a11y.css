@@ -1,0 +1,59 @@
+/* =========================================================
+ * Admin — accessibility & interaction layer
+ * Loaded after antd-admin.css (admin routes only) so it never
+ * leaks onto the public site. Scoped to the admin shells.
+ * ========================================================= */
+
+/* ---- Visible keyboard focus (WCAG 2.4.7) ----
+ * :focus-visible highlights keyboard / assistive-tech users only — mouse
+ * clicks stay clean. Brand-navy ring with offset so it reads on white cards
+ * and the cream layout background. antd ships subtle focus styles; this makes
+ * them unmistakable for keyboard navigation. */
+.layout-dashboard a:focus-visible,
+.layout-dashboard button:focus-visible,
+.layout-dashboard [role="button"]:focus-visible,
+.layout-dashboard [tabindex]:focus-visible,
+.layout-dashboard .ant-btn:focus-visible,
+.layout-dashboard .ant-input:focus-visible,
+.layout-dashboard .ant-input-affix-wrapper:focus-within,
+.layout-dashboard .ant-input-number:focus-within,
+.layout-dashboard .ant-select-focused .ant-select-selector,
+.layout-dashboard .ant-picker-focused,
+.layout-dashboard .ant-switch:focus-visible,
+.layout-dashboard .ant-checkbox-wrapper:focus-within,
+.layout-dashboard .ant-radio-wrapper:focus-within,
+.layout-dashboard .ant-pagination-item:focus-visible,
+.layout-dashboard .estate-nav-item:focus-visible,
+.layout-dashboard .estate-brand-link:focus-visible,
+.layout-signin a:focus-visible,
+.layout-signin button:focus-visible,
+.layout-signin .ant-btn:focus-visible,
+.layout-signin .ant-input:focus-visible,
+.layout-signin .ant-input-affix-wrapper:focus-within {
+  outline: 2px solid #1c3664 !important;
+  outline-offset: 2px !important;
+  border-radius: 8px;
+}
+
+/* Keep the mouse experience clean — outline only for keyboard focus. */
+.layout-dashboard :focus:not(:focus-visible),
+.layout-signin :focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ---- Reduced motion (WCAG 2.3.3) ----
+ * Honor users prone to motion sickness: neutralize the admin's transitions,
+ * hover lifts, sidenav animations and spinners-as-decoration. */
+@media (prefers-reduced-motion: reduce) {
+  .layout-dashboard *,
+  .layout-dashboard *::before,
+  .layout-dashboard *::after,
+  .layout-signin *,
+  .layout-signin *::before,
+  .layout-signin *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

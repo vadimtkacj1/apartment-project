@@ -5,6 +5,10 @@ import { requireAdmin } from '@/lib/require-admin';
 // GET all team members (including inactive for admin panel)
 export async function GET(request: NextRequest) {
   try {
+    // Admin-only: exposes inactive team members. Re-check independently of middleware.
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const teamMembers = await prisma.teamMember.findMany({
       orderBy: {
         order: 'asc',

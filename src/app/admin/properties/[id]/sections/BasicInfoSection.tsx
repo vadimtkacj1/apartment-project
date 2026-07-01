@@ -37,7 +37,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col xs={12} sm={12} md={4}>
+        <Col xs={24} sm={12} md={4}>
           <Form.Item label="סוג עסקה" name="dealType">
             <Select
               onChange={(value) => handleChange('dealType', value)}
@@ -45,7 +45,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
             />
           </Form.Item>
         </Col>
-        <Col xs={12} sm={12} md={4}>
+        <Col xs={24} sm={12} md={4}>
           <Form.Item label="סטטוס" name="status">
             <Select
               onChange={(value) => handleChange('status', value)}
@@ -98,6 +98,9 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           <Form.Item label="תאריך פינוי" name="vacancyDate">
             <div>
               <Radio.Group
+                className="vacancy-type-segmented"
+                optionType="button"
+                buttonStyle="solid"
                 value={vacancyType}
                 onChange={(e) => {
                   const newType = e.target.value;
@@ -110,12 +113,27 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
                     handleChange('vacancyDate', '');
                   }
                 }}
-                style={{ marginBottom: '8px', width: '100%' }}
-              >
-                <Radio value="date">בחר תאריך</Radio>
-                <Radio value="immediately">מיד</Radio>
-                <Radio value="flexible">גמיש</Radio>
-              </Radio.Group>
+                style={{ marginBottom: '8px', display: 'flex', width: '100%' }}
+                options={[
+                  { label: 'בחר תאריך', value: 'date' },
+                  { label: 'מיד', value: 'immediately' },
+                  { label: 'גמיש', value: 'flexible' },
+                ]}
+              />
+              <style jsx>{`
+                :global(.vacancy-type-segmented) {
+                  display: flex;
+                  width: 100%;
+                }
+                :global(.vacancy-type-segmented .ant-radio-button-wrapper) {
+                  flex: 1;
+                  min-height: 40px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
+                }
+              `}</style>
               {vacancyType === 'date' && (
                 <DatePicker
                   placeholder="בחר תאריך פינוי"
@@ -138,12 +156,12 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
                 />
               )}
               {vacancyType === 'immediately' && (
-                <div style={{ padding: '8px 12px', background: '#f0f0f0', borderRadius: '6px', color: '#666' }}>
+                <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
                   מיד
                 </div>
               )}
               {vacancyType === 'flexible' && (
-                <div style={{ padding: '8px 12px', background: '#f0f0f0', borderRadius: '6px', color: '#666' }}>
+                <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
                   גמיש
                 </div>
               )}

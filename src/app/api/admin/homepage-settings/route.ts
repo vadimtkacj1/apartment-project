@@ -41,6 +41,9 @@ async function writeSettings(settings: HomepageSettings): Promise<void> {
 
 export async function GET() {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const settings = await readSettings();
     return NextResponse.json(settings);
   } catch (error) {

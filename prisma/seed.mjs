@@ -1,16 +1,17 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
+import { PrismaPg } from '@prisma/adapter-pg'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
 
 // Load environment variables
 dotenv.config()
 
-// Use DATABASE_URL from environment, fallback to default
-const databaseUrl = process.env.DATABASE_URL || 'file:./dev.db'
-console.log('📦 Database URL:', databaseUrl)
+// Use DATABASE_URL from environment (PostgreSQL connection string)
+const databaseUrl = process.env.DATABASE_URL
+if (!databaseUrl) throw new Error('DATABASE_URL is not set')
+console.log('📦 Database URL:', databaseUrl.replace(/:[^:@/]+@/, ':****@'))
 
-const adapter = new PrismaBetterSqlite3({ url: databaseUrl })
+const adapter = new PrismaPg({ connectionString: databaseUrl })
 const prisma = new PrismaClient({ adapter })
 
 const username = process.env.ADMIN_USERNAME || 'admin'

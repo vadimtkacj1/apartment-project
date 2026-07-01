@@ -17,10 +17,12 @@ dev.db
 # next.js
 /.next/
 /out/
-
+/restored
 # production
 /build
-/.claude/
+/.claude/*
+!/.claude/skills/
+!/.claude/skills/**
 # misc
 .DS_Store
 *.pem

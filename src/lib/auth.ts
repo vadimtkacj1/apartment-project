@@ -37,6 +37,9 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) return null
 
+        // Deactivated accounts cannot sign in (see /admin/users).
+        if (user.isActive === false) return null
+
         const ok = await bcrypt.compare(password, user.password)
         if (!ok) return null
 
@@ -55,6 +58,15 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as any).role
         token.username = (user as any).username
+      } else if (token.role === undefined && token.sub) {
+        // Backfill claims for sessions minted before roles existed, so an
+        // existing login keeps working after the roles deploy instead of
+        // failing every admin mutation with 401 (requireAdmin needs role).
+        const dbUser = await prisma.user.findUnique({ where: { id: token.sub } })
+        if (dbUser) {
+          token.role = dbUser.role
+          token.username = dbUser.username
+        }
       }
       return token
     },

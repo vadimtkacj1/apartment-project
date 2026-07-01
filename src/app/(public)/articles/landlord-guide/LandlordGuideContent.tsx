@@ -1,4 +1,6 @@
 'use client';
+import Image from 'next/image';
+import { getArticle } from '@/data/articles';
 import React from 'react';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
@@ -37,6 +39,14 @@ export default function LandlordGuideContent() {
         <article className="article-content">
           <div className="article-body">
             <ArticleByline id="landlord-guide" />
+            <Image
+              src={getArticle('landlord-guide')!.image}
+              alt={getArticle('landlord-guide')!.title}
+              width={1200}
+              height={630}
+              className="article-hero-image"
+              priority
+            />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">

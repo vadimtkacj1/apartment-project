@@ -100,6 +100,52 @@ chmod +x scripts/backup-server.sh
 
 ---
 
+### ☁️ backup-bunny-libsql.mjs
+**Назначение**: Резервная копия БД **Bunny libSQL** (цель миграции) в портативный SQL-дамп
+
+**Что делает**:
+- Подключается к Bunny libSQL **read-only токеном** (полный доступ для бэкапа не нужен)
+- Выгружает схему + данные в `.sql`, сжимает в `.sql.gz`, пишет `.sha256`, чистит старые (ретеншн)
+- Дамп восстанавливается где угодно: `sqlite3 new.db < dump.sql` или заливкой в любой libSQL
+- Безопасно отрабатывает на пустой базе (предупреждает, но создаёт валидный дамп)
+
+**Креды — в root-only файле, НЕ в git и НЕ в app .env**:
+```bash
+# На сервере, один раз:
+sudo install -d -m 700 /etc/apartment
+sudo tee /etc/apartment/bunny.env > /dev/null << 'EOF'
+BUNNY_LIBSQL_URL=libsql://<id>-ram-haim.lite.bunnydb.net
+BUNNY_LIBSQL_TOKEN=<READ-ONLY токен из дашборда Bunny>
+EOF
+sudo chmod 600 /etc/apartment/bunny.env
+```
+
+**Ручной запуск / проверка**:
+```bash
+cd /opt/apartment-project
+set -a; . /etc/apartment/bunny.env; set +a
+BUNNY_BACKUP_DIR=/var/backups/apartment-project/bunny node scripts/backup-bunny-libsql.mjs
+```
+
+**Автоматическое включение** (без отдельного cron):
+- [backup-server.sh](backup-server.sh) (локальный бэкап каждые 6 ч) и [backup-offsite.sh](backup-offsite.sh)
+  (restic→B2) **сами** подхватывают `/etc/apartment/bunny.env`, если он есть, и кладут
+  дамп Bunny в тот же архив/снапшот. Нет файла — шаг тихо пропускается.
+- Поэтому отдельно ставить ничего не нужно: создал `/etc/apartment/bunny.env` — и Bunny
+  начинает бэкапиться вместе с остальным.
+
+**Восстановление из дампа**:
+```bash
+gzip -dc bunny-libsql-YYYYMMDD-HHMMSS.sql.gz | sqlite3 restored.db   # → локальный SQLite
+# или залить обратно в libSQL:
+gzip -dc bunny-libsql-*.sql.gz | turso db shell <url>                 # любой sqld-совместимый клиент
+```
+
+> ⚠️ Токены Bunny — это секрет. Если они где-то засветились (чат, скриншот, коммит) —
+> перевыпусти их в дашборде Bunny и обнови `/etc/apartment/bunny.env`.
+
+---
+
 ### 🔄 backup-db.sh
 **Назначение**: Локальное резервное копирование базы данных
 

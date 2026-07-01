@@ -103,6 +103,15 @@ const nextConfig: NextConfig = {
   
   // Headers for caching and security
   async headers() {
+    // NEVER force immutable caching on Next's own asset routes in development.
+    // Turbopack serves its JS chunks from /_next/static/* in dev; an `immutable`
+    // Cache-Control makes the browser pin stale chunks forever, so after an edit
+    // it keeps serving old chunks whose module factories no longer exist —
+    // surfacing as "module factory is not available" (and a hard-reload can't
+    // evict an `immutable` response). Next.js already sets the correct immutable
+    // caching on /_next/static automatically in production, so these custom
+    // rules are prod-only and redundant-but-harmless there.
+    const isProd = process.env.NODE_ENV === 'production';
     return [
       {
         source: '/:path*',
@@ -155,10 +164,10 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'self'",
               "form-action 'self'",
               "img-src 'self' data: blob: https:",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://www.googletagmanager.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' data: https://fonts.gstatic.com",
-              "connect-src 'self' https://nominatim.openstreetmap.org https://maps.googleapis.com https://maps.gstatic.com",
+              "connect-src 'self' https://nominatim.openstreetmap.org https://maps.googleapis.com https://maps.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com",
               "frame-src 'self' https://www.google.com https://maps.google.com",
               "worker-src 'self' blob:",
               "upgrade-insecure-requests",
@@ -231,24 +240,29 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/_next/image',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
+      // Prod-only: in dev these break Turbopack chunk revalidation (see note above).
+      ...(isProd
+        ? [
+            {
+              source: '/_next/static/:path*',
+              headers: [
+                {
+                  key: 'Cache-Control',
+                  value: 'public, max-age=31536000, immutable',
+                },
+              ],
+            },
+            {
+              source: '/_next/image',
+              headers: [
+                {
+                  key: 'Cache-Control',
+                  value: 'public, max-age=31536000, immutable',
+                },
+              ],
+            },
+          ]
+        : []),
     ];
   },
 };

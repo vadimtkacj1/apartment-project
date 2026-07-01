@@ -17,9 +17,9 @@ export function MapSection({ formData, handleChange, onAddressChange }: MapSecti
   return (
     <Card title={<><EnvironmentOutlined /> מיקום על המפה</>} className="mb-4">
       <Alert
-        message="איך לבחור מיקום?"
+        title="איך לבחור מיקום?"
         description={
-          <Space direction="vertical" size="small">
+          <Space vertical size="small">
             <Text>• הזן כתובת בשורת החיפוש למעלה</Text>
             <Text>• לחץ על המפה למיקום מדויק</Text>
             <Text>• גרור את הסמן למיקום הרצוי</Text>
@@ -99,7 +99,7 @@ export function MapSection({ formData, handleChange, onAddressChange }: MapSecti
 
         {hasCoordinates && (
           <Alert
-            message="קואורדינטות נשמרו"
+            title="קואורדינטות נשמרו"
             description={`קו רוחב: ${formData.latitude?.toFixed(6)}, קו אורך: ${formData.longitude?.toFixed(6)}`}
             type="success"
             showIcon

@@ -1,4 +1,6 @@
 'use client';
+import Image from 'next/image';
+import { getArticle } from '@/data/articles';
 import React from 'react';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
@@ -40,6 +42,14 @@ export default function ForeignInvestorsContent() {
           {/* Main Content */}
           <div className="article-body">
             <ArticleByline id="foreign-investors" />
+            <Image
+              src={getArticle('foreign-investors')!.image}
+              alt={getArticle('foreign-investors')!.title}
+              width={1200}
+              height={630}
+              className="article-hero-image"
+              priority
+            />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">

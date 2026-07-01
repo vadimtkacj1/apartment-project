@@ -1,4 +1,6 @@
 'use client';
+import Image from 'next/image';
+import { getArticle } from '@/data/articles';
 import React from 'react';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
@@ -37,6 +39,14 @@ export default function PrePurchaseContent() {
         <article className="article-content">
           <div className="article-body">
             <ArticleByline id="pre-purchase-checklist" />
+            <Image
+              src={getArticle('pre-purchase-checklist')!.image}
+              alt={getArticle('pre-purchase-checklist')!.title}
+              width={1200}
+              height={630}
+              className="article-hero-image"
+              priority
+            />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">

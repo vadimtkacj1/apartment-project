@@ -64,6 +64,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const { id } = await params;
     const property = await prisma.property.findUnique({
       where: {
@@ -189,6 +192,17 @@ export async function PUT(
         images: imagesJson,
         status: body.status || null,
         location: body.location,
+
+        // SEO overrides (optional — fall back to title/description/first image when empty)
+        metaTitle: body.metaTitle || null,
+        metaDescription: body.metaDescription || null,
+        ogImage: body.ogImage || null,
+        imageAlts:
+          body.imageAlts === undefined
+            ? '[]'
+            : typeof body.imageAlts === 'string'
+              ? body.imageAlts
+              : JSON.stringify(body.imageAlts),
 
         // Compatibility fields
         bedrooms: body.bedrooms || body.rooms,

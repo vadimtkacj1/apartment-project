@@ -7,7 +7,7 @@ export default function ContactRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/admin/contact-info');
+    router.replace('/admin/contact/contact-info');
   }, [router]);
 
   return null;

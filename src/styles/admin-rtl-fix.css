@@ -1,54 +1,32 @@
 /* RTL Fixes for Admin Dashboard */
 
-/* Sidebar backdrop - hidden by default (desktop) */
+/* Sidebar backdrop - hidden by default (desktop). Shown on mobile below. */
 .layout-dashboard .sidebar-backdrop {
   display: none;
 }
 
-/* Sidebar position for RTL - fixed to right */
+/* Sidebar position for RTL - fixed to the right edge.
+   NOTE: collapse is driven solely by the `.sidebar-open` / `.sidebar-collapsed`
+   classes on the root .layout-dashboard (see antd-admin.css). MainLayout uses
+   <Sider trigger={null}> with no `collapsed` prop, so antd never adds its own
+   `.ant-layout-sider-collapsed` class — do NOT key collapse rules off it. */
 .layout-dashboard .ant-layout-sider.sider-primary {
   right: 0;
   left: auto;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Smooth transition when collapsed */
-.layout-dashboard .ant-layout-sider.sider-primary.ant-layout-sider-collapsed {
-  right: -250px;
-}
-
-/* Content margin for sidebar in RTL */
-.layout-dashboard .ant-layout {
-  margin-right: 250px;
-  margin-left: 0;
-  transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Remove margin when sidebar is collapsed */
-.layout-dashboard .ant-layout-sider.sider-primary.ant-layout-sider-collapsed ~ .ant-layout {
-  margin-right: 0;
-}
-
-/* Responsive: Mobile behavior */
+/* Responsive: Mobile behavior — the sider overlays content; show the backdrop */
 @media (max-width: 991px) {
-  .layout-dashboard .ant-layout {
-    margin-right: 0;
-  }
-
   .layout-dashboard .ant-layout-sider.sider-primary {
     position: fixed;
-    right: -250px;
     z-index: 1000;
     height: 100vh;
   }
 
-  .layout-dashboard .ant-layout-sider.sider-primary:not(.ant-layout-sider-collapsed) {
-    right: 0;
-  }
-
-  /* Show backdrop on mobile when sidebar is open */
+  /* Show backdrop on mobile when the sidebar is open */
   .layout-dashboard .sidebar-backdrop {
-    display: block !important;
+    display: block;
     animation: fadeIn 0.3s ease;
   }
 }
@@ -66,18 +44,6 @@
 .layout-dashboard {
   text-align: right;
   direction: rtl;
-}
-
-/* Fix brand spacing for RTL */
-.layout-dashboard .ant-layout-sider.sider-primary .brand span {
-  margin-right: 0;
-  margin-left: 0;
-}
-
-/* Fix icon margin for RTL */
-.layout-dashboard .ant-layout-sider.sider-primary .ant-menu-item .icon {
-  margin-left: 12px;
-  margin-right: 0;
 }
 
 /* Ensure proper RTL for Ant Design components */

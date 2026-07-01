@@ -5,6 +5,10 @@ import { requireAdmin } from '@/lib/require-admin';
 // GET all owners (including inactive for admin panel)
 export async function GET(request: NextRequest) {
   try {
+    // Admin-only: exposes inactive owners. Re-check independently of middleware.
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const owners = await prisma.owner.findMany({
       orderBy: {
         order: 'asc',

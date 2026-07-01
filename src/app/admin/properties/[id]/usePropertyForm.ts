@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { message } from 'antd';
+import { App } from 'antd';
 import { FormInstance } from 'antd';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { PropertyForm } from './types';
 import { INITIAL_FORM } from './constants';
 import { getCityLabel, getCitySlug } from '@/data/cities';
@@ -14,9 +15,13 @@ export function usePropertyForm(
   isNew: boolean,
   form: FormInstance
 ) {
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<PropertyForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  // Warn before leaving the page with unsaved edits.
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChangesWarning(dirty);
 
   useEffect(() => {
     if (!isNew) {
@@ -96,6 +101,7 @@ export function usePropertyForm(
   };
 
   const handleChange = (field: keyof PropertyForm, value: any) => {
+    setDirty(true);
     setFormData((prev) => {
       const updated = { ...prev, [field]: value };
       if (field === 'city' || field === 'neighborhood') {
@@ -136,6 +142,7 @@ export function usePropertyForm(
       const responseData = await response.json().catch(() => ({}));
 
       if (response.ok) {
+        setDirty(false);
         message.success('הנכס נשמר בהצלחה');
         if (onSuccess) {
           // Keep saving=true until redirect to prevent double submission

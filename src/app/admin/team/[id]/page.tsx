@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Input, Switch, InputNumber, message, Spin } from 'antd';
+import { Card, Button, Input, Switch, InputNumber, App, Spin } from 'antd';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
@@ -44,9 +45,13 @@ export default function TeamMemberEditPage() {
   const id = params?.id as string;
   const isNew = id === 'new';
 
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<TeamMemberForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  // Warn before leaving with unsaved edits.
+  const [dirty, setDirty] = useState(false);
+  useUnsavedChangesWarning(dirty);
 
   useEffect(() => {
     if (!isNew) {
@@ -86,6 +91,7 @@ export default function TeamMemberEditPage() {
   };
 
   const handleChange = (field: keyof TeamMemberForm, value: any) => {
+    setDirty(true);
     // Форматируем телефонные номера автоматически
     if (field === 'phone' || field === 'mobile' || field === 'whatsapp' || field === 'fax') {
       value = formatPhoneNumber(value);
@@ -141,6 +147,7 @@ export default function TeamMemberEditPage() {
         throw new Error('Failed to save team member');
       }
 
+      setDirty(false);
       message.success(isNew ? 'חבר הצוות נוצר בהצלחה' : 'חבר הצוות עודכן בהצלחה');
       router.push('/admin/team');
     } catch (error) {
@@ -336,7 +343,7 @@ export default function TeamMemberEditPage() {
           bottom: 0,
           background: '#fff',
           padding: '16px 0',
-          borderTop: '1px solid #f0f0f0',
+          borderTop: '1px solid #E6E8EC',
           display: 'flex',
           gap: '12px',
           justifyContent: 'flex-end',

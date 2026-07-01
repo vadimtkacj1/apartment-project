@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Layout, Affix } from 'antd';
+import { Layout } from 'antd';
 import Sidenav from './Sidenav';
 import Header from './Header';
 import Footer from './Footer';
@@ -14,73 +14,79 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [sidenavColor, setSidenavColor] = useState('#1890ff');
-  const [sidenavType, setSidenavType] = useState('transparent');
-  const [fixed, setFixed] = useState(false);
+  // Mobile-first defaults: SSR / first paint render the CLOSED, mobile state so
+  // a phone never flashes the open sidebar (and its 250px content margin) before
+  // JS runs. The matchMedia effect promotes to the open desktop state on mount.
+  const [collapsed, setCollapsed] = useState(true);
+  const [isMobile, setIsMobile] = useState(true);
+  const sidenavColor = '#1C3664';
 
   const pathname = usePathname();
   const page = pathname.replace('/admin/', '').replace('/admin', '');
 
-  const toggleSidebar = () => setCollapsed(!collapsed);
+  // Single source of truth for "are we in overlay (mobile) mode": one matchMedia
+  // query, which also fires reliably on orientationchange. Crossing the 992px
+  // breakpoint re-syncs the default (desktop = open, mobile = closed); it does
+  // not fire on every resize tick, so a manual toggle within a range is kept.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 991px)');
+    const apply = (matches: boolean) => {
+      setIsMobile(matches);
+      setCollapsed(matches);
+    };
+    apply(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // On phones, auto-close the overlay after a navigation so tapping a nav item
+  // doesn't leave the menu + backdrop covering the new page. The permanent
+  // desktop sider is untouched (guarded by isMobile).
+  useEffect(() => {
+    if (isMobile) setCollapsed(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  // Lock body scroll while the overlay sidebar is open on mobile, so the page
+  // behind the dim backdrop can't scroll under the finger.
+  useEffect(() => {
+    const lock = !collapsed && isMobile;
+    document.body.style.overflow = lock ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [collapsed, isMobile]);
+
+  const toggleSidebar = () => setCollapsed((c) => !c);
+  const closeSidebar = () => setCollapsed(true);
 
   return (
     <Layout
-      className={`layout-dashboard ${page === 'rtl' ? 'layout-dashboard-rtl' : ''}`}
+      className={`layout-dashboard ${collapsed ? 'sidebar-collapsed' : 'sidebar-open'}`}
       dir="rtl"
     >
-      {/* Backdrop for mobile */}
-      {!collapsed && (
-        <div
-          className="sidebar-backdrop"
-          onClick={() => setCollapsed(true)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 999,
-          }}
-        />
+      {/* Dim backdrop — only on mobile, where the sidebar overlays content */}
+      {!collapsed && isMobile && (
+        <div className="sidebar-backdrop" onClick={closeSidebar} aria-hidden="true" />
       )}
+
       <Sider
-        breakpoint="lg"
-        collapsed={collapsed}
-        onCollapse={(collapsed) => setCollapsed(collapsed)}
-        collapsedWidth="0"
         trigger={null}
         width={250}
         theme="light"
-        className={`sider-primary ant-layout-sider-primary ${
-          sidenavType === '#fff' ? 'active-route' : ''
-        }`}
-        style={{ background: sidenavType }}
+        className="sider-primary ant-layout-sider-primary"
       >
-        <Sidenav color={sidenavColor} onClose={() => setCollapsed(true)} />
+        <Sidenav color={sidenavColor} onClose={closeSidebar} />
       </Sider>
+
       <Layout>
-        {fixed ? (
-          <Affix>
-            <AntHeader className={`${fixed ? 'ant-header-fixed' : ''}`}>
-              <Header
-                onPress={toggleSidebar}
-                name={page}
-              />
-            </AntHeader>
-          </Affix>
-        ) : (
-          <AntHeader className={`${fixed ? 'ant-header-fixed' : ''}`}>
-            <Header
-              onPress={toggleSidebar}
-              name={page}
-            />
-          </AntHeader>
-        )}
+        <AntHeader>
+          <Header onPress={toggleSidebar} collapsed={collapsed} name={page} />
+        </AntHeader>
         <Content className="content-ant">{children}</Content>
+        <Footer />
       </Layout>
     </Layout>
   );
 }
-

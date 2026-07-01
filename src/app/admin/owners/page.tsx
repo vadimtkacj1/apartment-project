@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { BRAND } from '@/lib/adminTheme';
 import {
   Row,
   Col,
@@ -9,12 +10,13 @@ import {
   Input,
   Select,
   Modal,
-  message,
+  App,
   Statistic,
   Space,
   Switch,
   Table,
   Image,
+  Skeleton,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +26,7 @@ import {
   SearchOutlined,
 } from '@ant-design/icons';
 import Link from 'next/link';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 interface Owner {
   id: number;
@@ -41,6 +44,7 @@ interface Owner {
 }
 
 export default function OwnersPage() {
+  const { message } = App.useApp();
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -141,16 +145,16 @@ export default function OwnersPage() {
           <Card><Statistic title="סה״כ בעלים" value={stats.total} prefix={<UserOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים פעילים" value={stats.active} valueStyle={{ color: '#3f8600' }} /></Card>
+          <Card><Statistic title="בעלים פעילים" value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} valueStyle={{ color: '#cf1322' }} /></Card>
+          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
         </Col>
       </Row>
 
       {/* Filters */}
       <Card className="mb-6">
-        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+        <Space vertical style={{ width: '100%' }} size="middle">
           <Input
             placeholder="חפש לפי שם או אימייל..."
             prefix={<SearchOutlined />}
@@ -171,19 +175,21 @@ export default function OwnersPage() {
         </Space>
       </Card>
 
-      {/* Owners Table */}
+      {/* Owners Table — desktop */}
+      <div className="admin-only-desktop">
       <Card>
         <Table
           dataSource={filteredOwners}
           loading={loading}
           rowKey="id"
+          size="middle"
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
             showTotal: (total) => `סה״כ ${total} בעלים`,
           }}
           scroll={{ x: 1000 }}
-          locale={{ emptyText: 'לא נמצאו בעלים' }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" /> }}
           columns={[
             {
               title: 'תמונה',
@@ -307,6 +313,74 @@ export default function OwnersPage() {
           ]}
         />
       </Card>
+      </div>
+
+      {/* Owners — mobile card list */}
+      <div className="admin-only-mobile">
+        {loading ? (
+          <Skeleton active paragraph={{ rows: 6 }} />
+        ) : filteredOwners.length === 0 ? (
+          <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" />
+        ) : (
+          <div className="admin-card-list">
+            {filteredOwners.map((owner) => (
+              <div key={owner.id} className="admin-card">
+                <div className="admin-card__head">
+                  {owner.image ? (
+                    <img className="admin-card__thumb" src={owner.image} alt={owner.name} />
+                  ) : (
+                    <div
+                      className="admin-card__thumb"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#f0f0f0',
+                      }}
+                    >
+                      <UserOutlined style={{ fontSize: '22px', color: '#bfbfbf' }} />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="admin-card__title">{owner.name}</div>
+                    <div className="admin-card__meta">{owner.title}</div>
+                  </div>
+                </div>
+                <div className="admin-card__fields">
+                  {owner.phone && <span><b>טלפון</b> {owner.phone}</span>}
+                  {owner.whatsapp && <span><b>WhatsApp</b> {owner.whatsapp}</span>}
+                  {owner.email && <span><b>אימייל</b> {owner.email}</span>}
+                  <span><b>סדר</b> {owner.order}</span>
+                </div>
+                <div className="admin-card__actions">
+                  <Switch
+                    checked={owner.isActive}
+                    onChange={(v) => handleStatusChange(owner.id, v)}
+                    checkedChildren="פעיל"
+                    unCheckedChildren="כבוי"
+                  />
+                  <span className="admin-card__grow">
+                    <Link href={`/admin/owners/${owner.id}`}>
+                      <Button type="primary" icon={<EditOutlined />}>ערוך</Button>
+                    </Link>
+                  </span>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => {
+                      setSelectedOwner(owner.id);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    מחק
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Delete Confirmation Modal */}
       <Modal

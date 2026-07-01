@@ -40,11 +40,12 @@ export function FeaturesSection({ formData, handleChange }: PropertyFormSectionP
           const IconComponent = feature.icon;
           return (
             <Col xs={12} sm={8} md={6} key={feature.key}>
-              <Form.Item name={feature.key} valuePropName="checked">
+              <Form.Item name={feature.key} valuePropName="checked" style={{ marginBottom: 0 }}>
                 <Checkbox
                   onChange={(e) =>
                     handleChange(feature.key as keyof PropertyForm, e.target.checked)
                   }
+                  style={{ display: 'flex', alignItems: 'center', minHeight: 44 }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
                     <IconComponent size={16} />
