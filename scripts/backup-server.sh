@@ -110,7 +110,7 @@ fi
 # the DB (outside the app dir, so it survives deploys).
 if command -v node >/dev/null 2>&1 && [ -f "$APP_DIR/scripts/image-manifest.mjs" ]; then
   mkdir -p "$TMP/manifest"
-  ( [ -f /etc/apartment/postgres.env ] && . /etc/apartment/postgres.env
+  ( [ -f /etc/apartment/postgres.env ] && { set -a; . /etc/apartment/postgres.env; set +a; }
     cd "$APP_DIR"
     UPLOADS_DIR="$UPLOADS_DIR" MANIFEST_OUT="$TMP/manifest/image-manifest" \
       node scripts/image-manifest.mjs ) || echo "WARNING: image-manifest failed" >&2
