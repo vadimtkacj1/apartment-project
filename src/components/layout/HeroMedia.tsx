@@ -32,9 +32,9 @@ const HeroMedia: React.FC = () => {
     // the fallback (e.g. client-side navigation, where the script doesn't run).
     if (!video.src) {
       // One clip for all viewports (object-fit: cover crops it to fill); there's
-      // no separate mobile source. Versioned filename (hero-v4) so the 1-year
+      // no separate mobile source. Versioned filename (hero-v3) so the 1-year
       // immutable cache on /:path*.mp4 serves the new video instead of a stale one.
-      video.src = '/hero-v4.mp4';
+      video.src = '/hero-v3.mp4';
       video.load();
     }
     // Play as soon as the first frame is decodable (loadeddata / readyState 2),
@@ -60,7 +60,7 @@ const HeroMedia: React.FC = () => {
         muted
         playsInline
         preload="none"
-        poster="/hero-poster-v2.jpg"
+        poster="/hero-poster.jpg"
         style={{
           width: '100%',
           height: '100%',
@@ -74,7 +74,7 @@ const HeroMedia: React.FC = () => {
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src='/hero-v4.mp4';v.load();})();",
+            "(function(){var v=document.getElementById('hero-bg-video');if(!v||v.src)return;v.src='/hero-v3.mp4';v.load();})();",
         }}
       />
     </div>

@@ -56,7 +56,7 @@ function resolveDealType(dealType: string, category?: string | null): string {
 export default async function Home() {
   // Hero poster is referenced via <video poster> (low browser priority) —
   // preload it here, scoped to the homepage only, so it paints at FCP.
-  preload('/hero-poster-v2.jpg', { as: 'image', fetchPriority: 'high' });
+  preload('/hero-poster.jpg', { as: 'image', fetchPriority: 'high' });
 
   // Fetch all homepage section data in parallel — eliminates client-side waterfall
   const HomepageSettings = (prisma as any).homepageSettings;
