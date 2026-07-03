@@ -104,16 +104,6 @@ const Hero: React.FC = () => {
         .btn-primary:hover {
           box-shadow: 0 0 30px 4px rgba(212,168,67,0.5), 0 4px 20px rgba(0,0,0,0.4);
         }
-        .btn-green:hover .btn-shine {
-          animation: shineSwipe 0.5s ease forwards;
-        }
-        .btn-green {
-          box-shadow: 0 0 20px 2px rgba(34,197,94,0.3), 0 4px 16px rgba(0,0,0,0.4);
-          transition: box-shadow 0.3s ease;
-        }
-        .btn-green:hover {
-          box-shadow: 0 0 30px 4px rgba(34,197,94,0.5), 0 4px 20px rgba(0,0,0,0.4);
-        }
         .btn-secondary {
           transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
@@ -207,38 +197,6 @@ const Hero: React.FC = () => {
 
         {/* BOTTOM: CTA buttons */}
         <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
-          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
-            <Link
-              href="#onethepark"
-              className="btn-green group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
-              style={{
-                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
-                background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',
-                color: '#ffffff',
-                textAlign: 'center',
-                letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span
-                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                  transform: 'translateX(-200%) skewX(-20deg)',
-                }}
-              />
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                <span dir="ltr">One The Park</span>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ flexShrink: 0 }}>
-                  <path d="M12 5v14M19 12l-7 7-7-7" />
-                </svg>
-              </span>
-            </Link>
-          </div>
-
           <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
               href="/apartments?dealType=rent"

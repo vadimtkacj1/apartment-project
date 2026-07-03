@@ -10,10 +10,6 @@ import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } f
 export const revalidate = 60;
 
 // Lazy load heavy components below the fold
-const FloorPlansSection = dynamic(() => import('@/components/layout/FloorPlansSection'), {
-  loading: () => <div className="h-96 bg-warm animate-pulse" />,
-});
-
 const NoCommissionSection = dynamic(() => import('@/components/layout/NoCommissionSection'), {
   loading: () => <div className="h-64 bg-warm animate-pulse" />,
 });
@@ -186,9 +182,6 @@ export default async function Home() {
             initialProperty={noCommProperty}
             initialTitle={homepageTitles.noCommissionTitle}
           />
-        </Suspense>
-        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <FloorPlansSection />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <AboutSection />
