@@ -2,6 +2,8 @@
 
 import { Card, Form, Select } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
 import { useState, useEffect } from 'react';
 
@@ -23,6 +25,7 @@ interface Owner {
 }
 
 export function AgentSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [owners, setOwners] = useState<Owner[]>([]);
 
@@ -43,17 +46,17 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
   // Combine owners and team members into one list with prefixes
   const options = [
     {
-      label: 'בעלים',
+      label: t.agent.ownersGroup,
       options: owners.map((o) => ({
         value: `owner-${o.id}`,
         label: `👤 ${o.name}${o.phone ? ` — ${o.phone}` : ''}`,
       })),
     },
     {
-      label: 'סוכנים',
-      options: teamMembers.map((t) => ({
-        value: `team-${t.id}`,
-        label: `👔 ${t.name}${t.mobile || t.phone ? ` — ${t.mobile || t.phone}` : ''}`,
+      label: t.agent.agentsGroup,
+      options: teamMembers.map((member) => ({
+        value: `team-${member.id}`,
+        label: `👔 ${member.name}${member.mobile || member.phone ? ` — ${member.mobile || member.phone}` : ''}`,
       })),
     },
   ];
@@ -62,32 +65,32 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
     <Card
       title={
         <>
-          <UserOutlined style={{ marginLeft: '8px' }} />
-          סוכן נדל״ן (חובה)
+          <UserOutlined style={{ marginInlineEnd: '8px' }} />
+          {t.agent.cardTitle}
         </>
       }
       className="mb-4"
     >
       <Form.Item
-        label="בחר לפחות סוכן אחד לנכס"
+        label={t.agent.selectLabel}
         name="agentIds"
         rules={[
           {
             required: true,
             type: 'array',
             min: 1,
-            message: 'יש לבחור לפחות סוכן אחד',
+            message: t.agent.required,
           },
         ]}
       >
         <Select
           mode="multiple"
-          placeholder="בחר סוכן/ים"
+          placeholder={t.agent.placeholder}
           options={options}
           value={formData.agentIds}
           onChange={(ids) => handleChange('agentIds', ids)}
           disabled={teamMembers.length === 0 && owners.length === 0}
-          notFoundContent={teamMembers.length === 0 && owners.length === 0 ? 'אין סוכנים או בעלים פעילים' : 'לא נמצא'}
+          notFoundContent={teamMembers.length === 0 && owners.length === 0 ? t.agent.noneActive : t.agent.notFound}
         />
       </Form.Item>
     </Card>

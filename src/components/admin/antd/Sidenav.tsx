@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { sectionsForRole } from '@/config/adminSections';
+import { useAdminI18n, useAdminMessages } from '@/lib/adminI18n';
+import { navMessages } from '@/lib/adminI18n/messages/nav';
 
 interface SidenavProps {
   color: string;
@@ -14,6 +16,8 @@ interface SidenavProps {
 
 export default function Sidenav({ onClose }: SidenavProps) {
   const pathname = usePathname();
+  const { locale } = useAdminI18n();
+  const t = useAdminMessages(navMessages);
   const { data: session } = useSession();
   const user = session?.user as
     | { name?: string; email?: string; username?: string; role?: string }
@@ -25,13 +29,13 @@ export default function Sidenav({ onClose }: SidenavProps) {
   const navItems = sectionsForRole(role).map((s) => ({
     key: s.key,
     href: s.href,
-    label: s.label,
+    label: s.label[locale],
     icon: s.icon,
     isActive: s.isActive(pathname),
   }));
 
   return (
-    <nav className="estate-sidenav" aria-label="ניווט ניהול">
+    <nav className="estate-sidenav" aria-label={t.adminNavAria}>
       {/* Brand */}
       <div className="estate-brand">
         <Link href="/admin" className="estate-brand-link" onClick={onClose}>
@@ -43,15 +47,15 @@ export default function Sidenav({ onClose }: SidenavProps) {
           </span>
           <span className="estate-brand-text">
             <span className="estate-brand-title">Aiterra</span>
-            <span className="estate-brand-sub">לוח ניהול</span>
+            <span className="estate-brand-sub">{t.adminPanel}</span>
           </span>
         </Link>
-        <Tooltip title="סגור תפריט" placement="left">
+        <Tooltip title={t.closeMenu} placement={locale === 'he' ? 'left' : 'right'}>
           <Button
             type="text"
             icon={<CloseOutlined />}
             onClick={onClose}
-            aria-label="סגור תפריט"
+            aria-label={t.closeMenu}
             className="estate-close-btn"
           />
         </Tooltip>
@@ -81,7 +85,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
           className="estate-logout"
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
         >
-          התנתק
+          {t.signOut}
         </Button>
       </div>
 
@@ -159,7 +163,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         }
         .estate-close-btn {
           position: absolute;
-          left: 10px;
+          inset-inline-end: 10px;
           top: 12px;
           color: #94a3b8 !important;
           border-radius: 8px;

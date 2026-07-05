@@ -1,6 +1,8 @@
 import { Card, Alert, Row, Col, Form, InputNumber, Typography, Space } from 'antd';
 import { EnvironmentOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import LocationPicker from '@/components/admin/LocationPicker';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyForm } from '../types';
 
 const { Text } = Typography;
@@ -12,18 +14,19 @@ interface MapSectionProps {
 }
 
 export function MapSection({ formData, handleChange, onAddressChange }: MapSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   const hasCoordinates = formData.latitude && formData.longitude;
 
   return (
-    <Card title={<><EnvironmentOutlined /> מיקום על המפה</>} className="mb-4">
+    <Card title={<><EnvironmentOutlined /> {t.map.cardTitle}</>} className="mb-4">
       <Alert
-        title="איך לבחור מיקום?"
+        title={t.map.helpTitle}
         description={
           <Space vertical size="small">
-            <Text>• הזן כתובת בשורת החיפוש למעלה</Text>
-            <Text>• לחץ על המפה למיקום מדויק</Text>
-            <Text>• גרור את הסמן למיקום הרצוי</Text>
-            <Text>• או הזן קואורדינטות ידנית למטה</Text>
+            <Text>{t.map.helpEnterAddress}</Text>
+            <Text>{t.map.helpClickMap}</Text>
+            <Text>{t.map.helpDragMarker}</Text>
+            <Text>{t.map.helpManualEntry}</Text>
           </Space>
         }
         type="info"
@@ -48,14 +51,14 @@ export function MapSection({ formData, handleChange, onAddressChange }: MapSecti
       {/* Manual Coordinate Input */}
       <div style={{ marginTop: '24px' }}>
         <Typography.Title level={5} style={{ marginBottom: '16px' }}>
-          הזנת קואורדינטות ידנית
+          {t.map.manualTitle}
         </Typography.Title>
         <Row gutter={16}>
           <Col md={12}>
             <Form.Item
-              label="קו רוחב (Latitude)"
+              label={t.map.latitudeLabel}
               name="latitude"
-              tooltip="ערכים תקינים לישראל: בין 29 ל-33"
+              tooltip={t.map.latitudeTooltip}
             >
               <InputNumber
                 style={{ width: '100%' }}
@@ -75,9 +78,9 @@ export function MapSection({ formData, handleChange, onAddressChange }: MapSecti
           </Col>
           <Col md={12}>
             <Form.Item
-              label="קו אורך (Longitude)"
+              label={t.map.longitudeLabel}
               name="longitude"
-              tooltip="ערכים תקינים לישראל: בין 34 ל-36"
+              tooltip={t.map.longitudeTooltip}
             >
               <InputNumber
                 style={{ width: '100%' }}
@@ -99,8 +102,11 @@ export function MapSection({ formData, handleChange, onAddressChange }: MapSecti
 
         {hasCoordinates && (
           <Alert
-            title="קואורדינטות נשמרו"
-            description={`קו רוחב: ${formData.latitude?.toFixed(6)}, קו אורך: ${formData.longitude?.toFixed(6)}`}
+            title={t.map.savedTitle}
+            description={t.map.savedDescription(
+              formData.latitude?.toFixed(6) ?? '',
+              formData.longitude?.toFixed(6) ?? ''
+            )}
             type="success"
             showIcon
             style={{ marginTop: '12px' }}

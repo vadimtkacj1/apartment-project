@@ -6,6 +6,8 @@ import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { ownersMessages } from '@/lib/adminI18n/messages/owners';
 
 const { TextArea } = Input;
 
@@ -42,6 +44,7 @@ export default function OwnerEditPage() {
   const isNew = id === 'new';
 
   const { message } = App.useApp();
+  const t = useAdminMessages(ownersMessages);
   const [formData, setFormData] = useState<OwnerForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -63,7 +66,7 @@ export default function OwnerEditPage() {
       setFormData(data);
     } catch (error) {
       console.error('Error fetching owner:', error);
-      message.error('שגיאה בטעינת הבעלים');
+      message.error(t.loadOneError);
     } finally {
       setLoading(false);
     }
@@ -93,25 +96,25 @@ export default function OwnerEditPage() {
 
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {
-      message.error('שם הוא שדה חובה');
+      message.error(t.nameRequired);
       return false;
     }
     if (!formData.title.trim()) {
-      message.error('תפקיד הוא שדה חובה');
+      message.error(t.roleRequired);
       return false;
     }
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      message.error('כתובת אימייל לא תקינה');
+      message.error(t.emailInvalid);
       return false;
     }
     // Проверка формата телефона (опционально)
     const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
     if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
-      message.error('טלפון לא תקין. פורמט: 050-123-4567');
+      message.error(t.phoneInvalid);
       return false;
     }
     if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
-      message.error('WhatsApp לא תקין. פורמט: 050-123-4567');
+      message.error(t.whatsappInvalid);
       return false;
     }
     return true;
@@ -136,11 +139,11 @@ export default function OwnerEditPage() {
       }
 
       setDirty(false);
-      message.success(isNew ? 'הבעלים נוצר בהצלחה' : 'הבעלים עודכן בהצלחה');
+      message.success(isNew ? t.createSuccess : t.updateSuccess);
       router.push('/admin/owners');
     } catch (error) {
       console.error('Error saving owner:', error);
-      message.error('שגיאה בשמירת הבעלים');
+      message.error(t.saveError);
     } finally {
       setSaving(false);
     }
@@ -163,57 +166,57 @@ export default function OwnerEditPage() {
           onClick={() => router.push('/admin/owners')}
           style={{ marginBottom: '16px' }}
         >
-          חזרה לרשימה
+          {t.backToList}
         </Button>
         <h1 className="text-4xl font-bold" style={{ margin: 0 }}>
-          {isNew ? 'הוסף בעלים חדש' : 'ערוך בעלים'}
+          {isNew ? t.addNew : t.editTitle}
         </h1>
       </div>
 
       {/* Basic Information */}
-      <Card title="מידע בסיסי" style={{ marginBottom: '24px' }}>
+      <Card title={t.basicInfoCard} style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              שם <span style={{ color: 'red' }}>*</span>
+              {t.fieldName} <span style={{ color: 'red' }}>*</span>
             </label>
             <Input
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="הכנס שם"
+              placeholder={t.namePlaceholder}
               size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              תפקיד <span style={{ color: 'red' }}>*</span>
+              {t.fieldRole} <span style={{ color: 'red' }}>*</span>
             </label>
             <Input
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
-              placeholder='לדוגמה: מייסד ומתווך נדל"ן'
+              placeholder={t.rolePlaceholder}
               size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              מספר רישיון
+              {t.licenceNumberLabel}
             </label>
             <Input
               value={formData.licenceNumber}
               onChange={(e) => handleChange('licenceNumber', e.target.value)}
-              placeholder="הכנס מספר רישיון"
+              placeholder={t.licencePlaceholder}
               size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              תיאור
+              {t.descriptionLabel}
             </label>
             <TextArea
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
-              placeholder="הכנס תיאור"
+              placeholder={t.descriptionPlaceholder}
               rows={4}
               size="large"
             />
@@ -222,7 +225,7 @@ export default function OwnerEditPage() {
       </Card>
 
       {/* Profile Photo */}
-      <Card title="תמונת פרופיל" style={{ marginBottom: '24px' }}>
+      <Card title={t.profilePhotoCard} style={{ marginBottom: '24px' }}>
         <ProfileImageUploader
           image={formData.image}
           onImageChange={(image) => handleChange('image', image)}
@@ -231,11 +234,11 @@ export default function OwnerEditPage() {
       </Card>
 
       {/* Contact Information */}
-      <Card title="פרטי התקשרות" style={{ marginBottom: '24px' }}>
+      <Card title={t.contactInfoCard} style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              טלפון
+              {t.fieldPhone}
             </label>
             <Input
               value={formData.phone}
@@ -246,7 +249,7 @@ export default function OwnerEditPage() {
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              אימייל
+              {t.fieldEmail}
             </label>
             <Input
               type="email"
@@ -271,11 +274,11 @@ export default function OwnerEditPage() {
       </Card>
 
       {/* Display Settings */}
-      <Card title="הגדרות תצוגה" style={{ marginBottom: '24px' }}>
+      <Card title={t.displaySettingsCard} style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              סדר תצוגה
+              {t.displayOrderLabel}
             </label>
             <InputNumber
               value={formData.order}
@@ -285,18 +288,18 @@ export default function OwnerEditPage() {
               style={{ width: '100%' }}
             />
             <div style={{ color: '#8c8c8c', fontSize: '12px', marginTop: '4px' }}>
-              מספר נמוך יותר = מופיע ראשון
+              {t.orderHint}
             </div>
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              סטטוס
+              {t.fieldStatus}
             </label>
             <Switch
               checked={formData.isActive}
               onChange={(value) => handleChange('isActive', value)}
-              checkedChildren="פעיל"
-              unCheckedChildren="לא פעיל"
+              checkedChildren={t.statusActive}
+              unCheckedChildren={t.statusInactive}
             />
           </div>
         </div>
@@ -317,10 +320,10 @@ export default function OwnerEditPage() {
         }}
       >
         <Button size="large" onClick={() => router.push('/admin/owners')}>
-          ביטול
+          {t.cancel}
         </Button>
         <Button type="primary" size="large" loading={saving} onClick={handleSave}>
-          שמור
+          {t.save}
         </Button>
       </div>
     </div>

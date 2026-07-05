@@ -14,6 +14,8 @@ import {
 import { SaveOutlined } from '@ant-design/icons';
 import LocationPicker from '@/components/admin/LocationPicker';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { contactMessages } from '@/lib/adminI18n/messages/contact';
 
 interface ContactInfoForm {
   phone: string;
@@ -43,7 +45,7 @@ interface ContactInfoForm {
   linkedin: string;
 }
 
-const INITIAL_FORM: ContactInfoForm = {
+const INITIAL_FORM: Omit<ContactInfoForm, 'weekdayHours' | 'fridayHours'> = {
   phone: '',
   phoneName: '',
   phone2: '',
@@ -58,8 +60,6 @@ const INITIAL_FORM: ContactInfoForm = {
   city: '',
   latitude: null,
   longitude: null,
-  weekdayHours: 'ראשון - חמישי: 9:00 - 18:00',
-  fridayHours: 'שישי: 9:00 - 13:00',
   facebook: '',
   facebookName: '',
   facebook2: '',
@@ -73,6 +73,7 @@ const INITIAL_FORM: ContactInfoForm = {
 
 export default function ContactInfoPage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(contactMessages);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -100,7 +101,7 @@ export default function ContactInfoPage() {
       }
     } catch (err) {
       console.error('Error fetching contact info:', err);
-      message.error('שגיאה בטעינת פרטי ההתקשרות');
+      message.error(t.loadError);
     } finally {
       setLoading(false);
     }
@@ -139,13 +140,13 @@ export default function ContactInfoPage() {
 
       if (response.ok) {
         setDirty(false);
-        message.success('פרטי ההתקשרות נשמרו בהצלחה');
+        message.success(t.saveSuccess);
         fetchContactInfo();
       } else {
-        message.error('שגיאה בשמירת פרטי ההתקשרות');
+        message.error(t.saveError);
       }
     } catch (err) {
-      message.error('שגיאה בשמירת פרטי ההתקשרות');
+      message.error(t.saveError);
     } finally {
       setSaving(false);
     }
@@ -154,7 +155,7 @@ export default function ContactInfoPage() {
   return (
     <div>
       <div style={{ marginBottom: '16px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול פרטי התקשרות</h1>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
       </div>
 
       <Form
@@ -162,39 +163,43 @@ export default function ContactInfoPage() {
         layout="vertical"
         onFinish={handleSubmit}
         onValuesChange={() => setDirty(true)}
-        initialValues={INITIAL_FORM}
+        initialValues={{
+          ...INITIAL_FORM,
+          weekdayHours: t.weekdayHoursExample,
+          fridayHours: t.fridayHoursExample,
+        }}
         disabled={loading}
       >
         {/* Contact Details */}
-        <Card className="mb-4" title="פרטי יצירת קשר - מספר 1">
+        <Card className="mb-4" title={t.contactCard1}>
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="טלפון 1"
+                label={t.phone1Label}
                 name="phone"
-                rules={[{ required: true, message: 'אנא הכנס מספר טלפון' }]}
+                rules={[{ required: true, message: t.phoneRequired }]}
               >
                 <Input placeholder="03-1234567" />
               </Form.Item>
             </Col>
             <Col md={12}>
               <Form.Item
-                label="שם לטלפון 1"
+                label={t.phoneName1Label}
                 name="phoneName"
-                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'יוסי כהן')"
+                tooltip={t.phoneName1Tooltip}
               >
-                <Input placeholder="יוסי כהן" />
+                <Input placeholder={t.personPlaceholder1} />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="אימייל 1"
+                label={t.email1Label}
                 name="email"
                 rules={[
-                  { required: true, message: 'אנא הכנס אימייל' },
-                  { type: 'email', message: 'אנא הכנס אימייל תקין' },
+                  { required: true, message: t.emailRequired },
+                  { type: 'email', message: t.emailInvalid },
                 ]}
               >
                 <Input type="email" placeholder="info@example.com" />
@@ -206,29 +211,29 @@ export default function ContactInfoPage() {
               <Form.Item
                 label="WhatsApp 1"
                 name="whatsapp"
-                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972501234567)"
+                tooltip={t.whatsapp1Tooltip}
               >
                 <Input placeholder="972501234567" />
               </Form.Item>
             </Col>
             <Col md={12}>
               <Form.Item
-                label="שם ל-WhatsApp 1"
+                label={t.whatsappName1Label}
                 name="whatsappName"
-                tooltip="שם שיופיע בחלון הבחירה"
+                tooltip={t.whatsappNameTooltip}
               >
-                <Input placeholder="יוסי כהן" />
+                <Input placeholder={t.personPlaceholder1} />
               </Form.Item>
             </Col>
           </Row>
         </Card>
 
         {/* Second Contact Details */}
-        <Card className="mb-4" title="פרטי יצירת קשר - מספר 2 (אופציונלי)">
+        <Card className="mb-4" title={t.contactCard2}>
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="טלפון 2"
+                label={t.phone2Label}
                 name="phone2"
               >
                 <Input placeholder="03-7654321" />
@@ -236,21 +241,21 @@ export default function ContactInfoPage() {
             </Col>
             <Col md={12}>
               <Form.Item
-                label="שם לטלפון 2"
+                label={t.phoneName2Label}
                 name="phoneName2"
-                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'דוד לוי')"
+                tooltip={t.phoneName2Tooltip}
               >
-                <Input placeholder="דוד לוי" />
+                <Input placeholder={t.personPlaceholder2} />
               </Form.Item>
             </Col>
           </Row>
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="אימייל 2"
+                label={t.email2Label}
                 name="email2"
                 rules={[
-                  { type: 'email', message: 'אנא הכנס אימייל תקין' },
+                  { type: 'email', message: t.emailInvalid },
                 ]}
               >
                 <Input type="email" placeholder="info2@example.com" />
@@ -262,42 +267,42 @@ export default function ContactInfoPage() {
               <Form.Item
                 label="WhatsApp 2"
                 name="whatsapp2"
-                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972507654321)"
+                tooltip={t.whatsapp2Tooltip}
               >
                 <Input placeholder="972507654321" />
               </Form.Item>
             </Col>
             <Col md={12}>
               <Form.Item
-                label="שם ל-WhatsApp 2"
+                label={t.whatsappName2Label}
                 name="whatsappName2"
-                tooltip="שם שיופיע בחלון הבחירה"
+                tooltip={t.whatsappNameTooltip}
               >
-                <Input placeholder="דוד לוי" />
+                <Input placeholder={t.personPlaceholder2} />
               </Form.Item>
             </Col>
           </Row>
         </Card>
 
         {/* Address */}
-        <Card className="mb-4" title="כתובת ומיקום">
+        <Card className="mb-4" title={t.addressCard}>
           <Row gutter={16}>
             <Col md={16}>
               <Form.Item
-                label="כתובת"
+                label={t.addressLabel}
                 name="address"
-                rules={[{ required: true, message: 'אנא הכנס כתובת' }]}
+                rules={[{ required: true, message: t.addressRequired }]}
               >
-                <Input placeholder="רחוב 123" />
+                <Input placeholder={t.addressPlaceholder} />
               </Form.Item>
             </Col>
             <Col md={8}>
               <Form.Item
-                label="עיר"
+                label={t.cityLabel}
                 name="city"
-                rules={[{ required: true, message: 'אנא הכנס עיר' }]}
+                rules={[{ required: true, message: t.cityRequired }]}
               >
-                <Input placeholder="תל אביב" />
+                <Input placeholder={t.cityPlaceholder} />
               </Form.Item>
             </Col>
           </Row>
@@ -305,7 +310,7 @@ export default function ContactInfoPage() {
           {/* Map Location Picker */}
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="מיקום על המפה (לחץ על המפה לבחירה)">
+              <Form.Item label={t.mapLabel}>
                 <LocationPicker
                   position={mapPosition}
                   onPositionChange={(coords: { lat: number; lng: number }) => {
@@ -323,7 +328,7 @@ export default function ContactInfoPage() {
           {/* Coordinates Display */}
           <Row gutter={16}>
             <Col md={12}>
-              <Form.Item label="קו רוחב (Latitude)" name="latitude">
+              <Form.Item label={t.latitudeLabel} name="latitude">
                 <InputNumber
                   style={{ width: '100%' }}
                   placeholder="32.0853"
@@ -338,7 +343,7 @@ export default function ContactInfoPage() {
               </Form.Item>
             </Col>
             <Col md={12}>
-              <Form.Item label="קו אורך (Longitude)" name="longitude">
+              <Form.Item label={t.longitudeLabel} name="longitude">
                 <InputNumber
                   style={{ width: '100%' }}
                   placeholder="34.7818"
@@ -357,31 +362,31 @@ export default function ContactInfoPage() {
         </Card>
 
         {/* Working Hours */}
-        <Card className="mb-4" title="שעות פעילות">
+        <Card className="mb-4" title={t.hoursCard}>
           <Row gutter={16}>
             <Col md={12}>
               <Form.Item
-                label="ימים א׳-ה׳"
+                label={t.weekdayHoursLabel}
                 name="weekdayHours"
-                rules={[{ required: true, message: 'אנא הכנס שעות פעילות' }]}
+                rules={[{ required: true, message: t.hoursRequired }]}
               >
-                <Input placeholder="ראשון - חמישי: 9:00 - 18:00" />
+                <Input placeholder={t.weekdayHoursExample} />
               </Form.Item>
             </Col>
             <Col md={12}>
               <Form.Item
-                label="יום שישי"
+                label={t.fridayHoursLabel}
                 name="fridayHours"
-                rules={[{ required: true, message: 'אנא הכנס שעות פעילות' }]}
+                rules={[{ required: true, message: t.hoursRequired }]}
               >
-                <Input placeholder="שישי: 9:00 - 13:00" />
+                <Input placeholder={t.fridayHoursExample} />
               </Form.Item>
             </Col>
           </Row>
         </Card>
 
         {/* Social Media */}
-        <Card className="mb-4" title="רשתות חברתיות - מספר 1">
+        <Card className="mb-4" title={t.socialCard1}>
           <Row gutter={16}>
             <Col md={8}>
               <Form.Item label="Facebook 1 URL" name="facebook">
@@ -389,8 +394,8 @@ export default function ContactInfoPage() {
               </Form.Item>
             </Col>
             <Col md={8}>
-              <Form.Item label="שם Facebook 1" name="facebookName">
-                <Input placeholder="יוסי כהן" />
+              <Form.Item label={t.facebookName1Label} name="facebookName">
+                <Input placeholder={t.personPlaceholder1} />
               </Form.Item>
             </Col>
           </Row>
@@ -401,8 +406,8 @@ export default function ContactInfoPage() {
               </Form.Item>
             </Col>
             <Col md={8}>
-              <Form.Item label="שם Instagram 1" name="instagramName">
-                <Input placeholder="יוסי כהן" />
+              <Form.Item label={t.instagramName1Label} name="instagramName">
+                <Input placeholder={t.personPlaceholder1} />
               </Form.Item>
             </Col>
           </Row>
@@ -416,7 +421,7 @@ export default function ContactInfoPage() {
         </Card>
 
         {/* Second Social Media */}
-        <Card className="mb-4" title="רשתות חברתיות - מספר 2 (אופציונלי)">
+        <Card className="mb-4" title={t.socialCard2}>
           <Row gutter={16}>
             <Col md={8}>
               <Form.Item label="Facebook 2 URL" name="facebook2">
@@ -424,8 +429,8 @@ export default function ContactInfoPage() {
               </Form.Item>
             </Col>
             <Col md={8}>
-              <Form.Item label="שם Facebook 2" name="facebookName2">
-                <Input placeholder="דוד לוי" />
+              <Form.Item label={t.facebookName2Label} name="facebookName2">
+                <Input placeholder={t.personPlaceholder2} />
               </Form.Item>
             </Col>
           </Row>
@@ -436,8 +441,8 @@ export default function ContactInfoPage() {
               </Form.Item>
             </Col>
             <Col md={8}>
-              <Form.Item label="שם Instagram 2" name="instagramName2">
-                <Input placeholder="דוד לוי" />
+              <Form.Item label={t.instagramName2Label} name="instagramName2">
+                <Input placeholder={t.personPlaceholder2} />
               </Form.Item>
             </Col>
           </Row>
@@ -452,7 +457,7 @@ export default function ContactInfoPage() {
             loading={saving}
             icon={<SaveOutlined />}
           >
-            שמור שינויים
+            {t.saveButton}
           </Button>
         </div>
       </Form>

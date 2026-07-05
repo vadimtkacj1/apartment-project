@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button, App, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, Statistic, RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
 
 const { Title, Text } = Typography;
 
@@ -58,6 +60,7 @@ interface Property {
 
 export default function HomepagePage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(homepageMessages);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [allProperties, setAllProperties] = useState<Property[]>([]);
@@ -71,7 +74,8 @@ export default function HomepagePage() {
   const [hotPropositionsMode, setHotPropositionsMode] = useState<'manual' | 'price'>('manual');
   const [hotPropositionsMaxPrice, setHotPropositionsMaxPrice] = useState<number>(3000000);
 
-  // Section titles
+  // Section titles — default CONTENT values for the public (Hebrew-only) site;
+  // intentionally not localized, they are data rather than admin UI strings.
   const [sectionTitles, setSectionTitles] = useState({
     hotPropositionsTitle: 'הצעות חמות',
     featuredPropertiesTitle: 'נכסים באיזור המרכז',
@@ -162,11 +166,11 @@ export default function HomepagePage() {
         setSectionTitles(data);
         titlesForm.setFieldsValue(data);
       }
-      message.success('הכותרות נשמרו בהצלחה!');
+      message.success(t.titlesSaved);
     } catch (error) {
       console.error('Error saving titles:', error);
-      const errorMessage = error instanceof Error ? error.message : 'שגיאה לא ידועה';
-      message.error(`שגיאה בשמירת הכותרות: ${errorMessage}`);
+      const errorMessage = error instanceof Error ? error.message : t.unknownError;
+      message.error(t.titlesSaveError(errorMessage));
     } finally {
       setTitlesSaving(false);
     }
@@ -184,7 +188,7 @@ export default function HomepagePage() {
       setNoCommissionProperties(data.filter(p => p.isNoCommission));
     } catch (error) {
       console.error('Error fetching properties:', error);
-      message.error('שגיאה בטעינת הנכסים');
+      message.error(t.propertiesLoadError);
     } finally {
       setLoading(false);
     }
@@ -215,16 +219,16 @@ export default function HomepagePage() {
     const selectedProperties = allProperties.filter(p => selectedIds.includes(p.id));
 
     if (modalType === 'noCommission' && selectedProperties.length > 1) {
-      message.warning('ניתן לבחור רק נכס אחד לדירות ללא עמלה');
+      message.warning(t.onlyOneNoCommissionWarning);
       return;
     }
 
     if (modalType === 'hot') {
       setHotProperties(selectedProperties);
-      message.success('הנכסים נבחרו בהצלחה');
+      message.success(t.propertiesSelected);
     } else {
       setNoCommissionProperties(selectedProperties);
-      message.success('הנכס נבחר בהצלחה');
+      message.success(t.propertySelected);
     }
 
     setIsModalVisible(false);
@@ -281,11 +285,11 @@ export default function HomepagePage() {
 
       await Promise.all(noCommissionPromises);
 
-      message.success('כל השינויים נשמרו בהצלחה!');
+      message.success(t.allChangesSaved);
       fetchProperties();
     } catch (error) {
       console.error('Error saving:', error);
-      message.error('שגיאה בשמירת השינויים');
+      message.error(t.changesSaveError);
     } finally {
       setSaving(false);
     }
@@ -311,7 +315,7 @@ export default function HomepagePage() {
 
   const tableColumns = (type: 'hot' | 'noCommission') => [
     {
-      title: 'תמונה',
+      title: t.colImage,
       dataIndex: 'images',
       key: 'image',
       width: 100,
@@ -326,7 +330,7 @@ export default function HomepagePage() {
         }}>
           <Image
             src={images[0] || '/images/hero/sales.jpg'}
-            alt="נכס"
+            alt={t.propertyAlt}
             width={80}
             height={80}
             preview={false}
@@ -343,7 +347,7 @@ export default function HomepagePage() {
       ),
     },
     {
-      title: 'כותרת',
+      title: t.colTitle,
       dataIndex: 'title',
       key: 'title',
       width: 250,
@@ -356,19 +360,19 @@ export default function HomepagePage() {
           maxWidth: '230px'
         }}>
           {text}
-          {record.isSold && <Tag color="error" style={{ marginRight: '8px' }}>{record.dealType === 'rent' ? 'מושכר' : 'נמכר'}</Tag>}
+          {record.isSold && <Tag color="error" style={{ marginInlineStart: '8px' }}>{record.dealType === 'rent' ? t.rented : t.sold}</Tag>}
         </div>
       ),
     },
     {
-      title: 'מיקום',
+      title: t.colLocation,
       dataIndex: 'location',
       key: 'location',
       width: 150,
       ellipsis: true,
     },
     {
-      title: 'מחיר',
+      title: t.colPrice,
       dataIndex: 'price',
       key: 'price',
       width: 120,
@@ -382,22 +386,22 @@ export default function HomepagePage() {
       },
     },
     {
-      title: 'חדרים',
+      title: t.colRooms,
       dataIndex: 'rooms',
       key: 'rooms',
       width: 80,
       align: 'center' as const,
     },
     {
-      title: 'שטח',
+      title: t.colArea,
       dataIndex: 'area',
       key: 'area',
       width: 80,
       align: 'center' as const,
-      render: (area: number) => `${area} מ"ר`,
+      render: (area: number) => t.areaSqm(area),
     },
     {
-      title: 'פעולות',
+      title: t.colActions,
       key: 'actions',
       width: 150,
       render: (_: any, record: Property) => (
@@ -408,7 +412,7 @@ export default function HomepagePage() {
           icon={<DeleteOutlined />}
           onClick={() => handleRemove(record.id, type)}
         >
-          הסר
+          {t.remove}
         </Button>
       ),
     },
@@ -436,7 +440,7 @@ export default function HomepagePage() {
                 {property.title}
                 {property.isSold && (
                   <Tag color="error" style={{ marginInlineStart: '8px' }}>
-                    {property.dealType === 'rent' ? 'מושכר' : 'נמכר'}
+                    {property.dealType === 'rent' ? t.rented : t.sold}
                   </Tag>
                 )}
               </div>
@@ -447,8 +451,8 @@ export default function HomepagePage() {
             </span>
           </div>
           <div className="admin-card__fields">
-            <span><b>חדרים</b> {property.rooms}</span>
-            <span><b>שטח</b> {property.area} מ&quot;ר</span>
+            <span><b>{t.colRooms}</b> {property.rooms}</span>
+            <span><b>{t.colArea}</b> {t.areaSqm(property.area)}</span>
           </div>
           <div className="admin-card__actions">
             <Button
@@ -457,7 +461,7 @@ export default function HomepagePage() {
               icon={<DeleteOutlined />}
               onClick={() => handleRemove(property.id, type)}
             >
-              הסר
+              {t.remove}
             </Button>
           </div>
         </div>
@@ -477,13 +481,13 @@ export default function HomepagePage() {
     <div className="px-2 sm:px-4 md:px-0">
         {/* Header */}
         <div style={{ marginBottom: '16px' }}>
-          <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול עמוד הבית</h1>
-          <Text type="secondary">ערוך כותרות וניהול נכסים מוצגים בדף הבית</Text>
+          <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.pageTitle}</h1>
+          <Text type="secondary">{t.pageSubtitle}</Text>
         </div>
 
         {/* Section Titles Editor */}
         <Card
-          title="עריכת כותרות סעיפים"
+          title={t.sectionTitlesCard}
           className="rounded-lg"
           style={{ marginBottom: '24px' }}
           loading={titlesLoading}
@@ -497,40 +501,40 @@ export default function HomepagePage() {
               items={[
                 {
                   key: 'main',
-                  label: 'סעיפים ראשיים',
+                  label: t.tabMain,
                   children: (
                     <Space vertical className="w-full" size="large">
-                      <Form.Item label="כותרת: הצעות חמות" name="hotPropositionsTitle">
-                        <Input placeholder="הצעות חמות" disabled={titlesLoading} />
+                      <Form.Item label={t.labelHotTitle} name="hotPropositionsTitle">
+                        <Input placeholder={t.phHotTitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="כותרת: נכסים נבחרים" name="featuredPropertiesTitle">
-                        <Input placeholder="נכסים באיזור המרכז" disabled={titlesLoading} />
+                      <Form.Item label={t.labelFeaturedTitle} name="featuredPropertiesTitle">
+                        <Input placeholder={t.phFeaturedTitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="תת-כותרת: נכסים נבחרים" name="featuredPropertiesSubtitle">
-                        <Input placeholder="מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז" disabled={titlesLoading} />
+                      <Form.Item label={t.labelFeaturedSubtitle} name="featuredPropertiesSubtitle">
+                        <Input placeholder={t.phFeaturedSubtitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="כותרת: למה לבחור בנו?" name="valuesSectionTitle">
-                        <Input placeholder="למה לבחור בנו?" disabled={titlesLoading} />
+                      <Form.Item label={t.labelValuesTitle} name="valuesSectionTitle">
+                        <Input placeholder={t.phValuesTitle} disabled={titlesLoading} />
                       </Form.Item>
                     </Space>
                   ),
                 },
                 {
                   key: 'secondary',
-                  label: 'סעיפים נוספים',
+                  label: t.tabSecondary,
                   children: (
                     <Space vertical className="w-full" size="large">
-                      <Form.Item label="כותרת: אודות" name="aboutSectionTitle">
-                        <Input placeholder="אודות" disabled={titlesLoading} />
+                      <Form.Item label={t.labelAboutTitle} name="aboutSectionTitle">
+                        <Input placeholder={t.phAboutTitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="כותרת: מה חשוב לדעת" name="processSectionTitle">
-                        <Input placeholder="מה חשוב לדעת כשקונים נכס?" disabled={titlesLoading} />
+                      <Form.Item label={t.labelProcessTitle} name="processSectionTitle">
+                        <Input placeholder={t.phProcessTitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="כותרת: מה הלקוחות אומרים" name="testimonialsTitle">
-                        <Input placeholder="מה הלקוחות שלנו אומרים" disabled={titlesLoading} />
+                      <Form.Item label={t.labelTestimonialsTitle} name="testimonialsTitle">
+                        <Input placeholder={t.phTestimonialsTitle} disabled={titlesLoading} />
                       </Form.Item>
-                      <Form.Item label="כותרת: דירה ללא עמלה" name="noCommissionTitle">
-                        <Input placeholder="דירה ללא עמלת תיווך" disabled={titlesLoading} />
+                      <Form.Item label={t.labelNoCommissionTitle} name="noCommissionTitle">
+                        <Input placeholder={t.phNoCommissionTitle} disabled={titlesLoading} />
                       </Form.Item>
                     </Space>
                   ),
@@ -538,7 +542,7 @@ export default function HomepagePage() {
               ]}
             />
 
-            <div style={{ marginTop: '24px', textAlign: 'right' }}>
+            <div style={{ marginTop: '24px', textAlign: 'start' }}>
               <Button
                 type="primary"
                 size="large"
@@ -547,7 +551,7 @@ export default function HomepagePage() {
                 icon={<EditOutlined />}
                 style={{ minWidth: '150px' }}
               >
-                שמור כותרות
+                {t.saveTitles}
               </Button>
             </div>
           </Form>
@@ -556,8 +560,8 @@ export default function HomepagePage() {
         {/* Properties Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ marginTop: '24px', marginBottom: '16px' }}>
           <div>
-            <Title level={3} style={{ margin: 0, marginBottom: '4px' }}>ניהול נכסים מוצגים</Title>
-            <Text type="secondary">בחר נכסים להצגה בסעיפים שונים בדף הבית</Text>
+            <Title level={3} style={{ margin: 0, marginBottom: '4px' }}>{t.managePropertiesTitle}</Title>
+            <Text type="secondary">{t.managePropertiesSubtitle}</Text>
           </div>
           <Button
             type="primary"
@@ -566,7 +570,7 @@ export default function HomepagePage() {
             onClick={handleSaveAll}
             style={{ width: '100%', maxWidth: '180px' }}
           >
-            שמור בחירת נכסים
+            {t.savePropertySelection}
           </Button>
         </div>
 
@@ -574,12 +578,12 @@ export default function HomepagePage() {
         <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
           <Col xs={24} sm={12}>
             <Card>
-              <Statistic title="הצעות חמות" value={hotProperties.length} suffix="נכסים" />
+              <Statistic title={t.hotDeals} value={hotProperties.length} suffix={t.statPropertiesSuffix} />
             </Card>
           </Col>
           <Col xs={24} sm={12}>
             <Card>
-              <Statistic title="דירות ללא עמלה (מקסימום 1)" value={`${noCommissionProperties.length}/1`} suffix="נכס" />
+              <Statistic title={t.statNoCommissionTitle} value={`${noCommissionProperties.length}/1`} suffix={t.statPropertySuffix} />
             </Card>
           </Col>
         </Row>
@@ -590,7 +594,7 @@ export default function HomepagePage() {
           <Card
             title={
               <div className="flex items-center gap-2">
-                <span style={{ fontSize: '18px', fontWeight: 600 }}>הצעות חמות</span>
+                <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.hotDeals}</span>
               </div>
             }
             extra={
@@ -601,7 +605,7 @@ export default function HomepagePage() {
                 size="middle"
                 style={{ borderRadius: '8px', fontWeight: 500 }}
               >
-                הוסף נכסים
+                {t.addProperties}
               </Button>
             }
           >
@@ -612,8 +616,8 @@ export default function HomepagePage() {
                 onChange={(e) => setHotPropositionsMode(e.target.value)}
                 style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px' }}
               >
-                <Radio value="manual">בחירה ידנית</Radio>
-                <Radio value="price">סינון לפי מחיר</Radio>
+                <Radio value="manual">{t.manualSelection}</Radio>
+                <Radio value="price">{t.priceFilter}</Radio>
               </Radio.Group>
 
               {hotPropositionsMode === 'price' && (
@@ -626,7 +630,7 @@ export default function HomepagePage() {
                     style={{ width: '100%' }}
                     min={0}
                     step={100000}
-                    placeholder="מחיר מקסימלי"
+                    placeholder={t.maxPricePlaceholder}
                   />
                 </div>
               )}
@@ -634,14 +638,14 @@ export default function HomepagePage() {
 
             {hotProperties.length === 0 ? (
               <div className="text-center py-8">
-                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>אין נכסים מוצגים</Text>
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>{t.noPropertiesShown}</Text>
                 <Button
                   type="primary"
                   size="small"
                   icon={<PlusOutlined />}
                   onClick={() => openModal('hot')}
                 >
-                  הוסף נכסים
+                  {t.addProperties}
                 </Button>
               </div>
             ) : (
@@ -669,10 +673,10 @@ export default function HomepagePage() {
             title={
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span style={{ fontSize: '18px', fontWeight: 600 }}>דירות ללא עמלה</span>
+                  <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.noCommissionSection}</span>
                 </div>
                 <div style={{ fontSize: '12px', fontWeight: 'normal', color: '#999' }}>
-                  ניתן לבחור נכס אחד בלבד
+                  {t.onlyOneNote}
                 </div>
               </div>
             }
@@ -685,20 +689,20 @@ export default function HomepagePage() {
                 size="middle"
                 style={{ borderRadius: '8px', fontWeight: 500 }}
               >
-                {noCommissionProperties.length >= 1 ? 'נבחר נכס' : 'בחר נכס'}
+                {noCommissionProperties.length >= 1 ? t.propertyChosen : t.chooseProperty}
               </Button>
             }
           >
             {noCommissionProperties.length === 0 ? (
               <div className="text-center py-8">
-                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>לא נבחר נכס</Text>
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>{t.noPropertyChosen}</Text>
                 <Button
                   type="primary"
                   size="small"
                   icon={<PlusOutlined />}
                   onClick={() => openModal('noCommission')}
                 >
-                  בחר נכס
+                  {t.chooseProperty}
                 </Button>
               </div>
             ) : (
@@ -727,11 +731,11 @@ export default function HomepagePage() {
           title={
             <div style={{ padding: '8px 0' }}>
               <div style={{ fontSize: '20px', fontWeight: 600, marginBottom: '4px' }}>
-                {modalType === 'hot' ? 'בחר נכסים להצעות חמות' : 'בחר נכס אחד ללא עמלה'}
+                {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
               </div>
               {modalType === 'noCommission' && (
                 <div style={{ fontSize: '13px', fontWeight: 'normal', color: '#999', marginTop: '4px' }}>
-                  שים לב: ניתן לבחור רק נכס אחד
+                  {t.modalNoteOnlyOne}
                 </div>
               )}
             </div>
@@ -741,8 +745,8 @@ export default function HomepagePage() {
           onCancel={() => setIsModalVisible(false)}
           width="min(900px, 96vw)"
           styles={{ body: { maxHeight: '70vh', overflowY: 'auto' } }}
-          okText="אישור"
-          cancelText="ביטול"
+          okText={t.ok}
+          cancelText={t.cancel}
           okButtonProps={{
             size: 'large',
             style: { borderRadius: '8px', fontWeight: 500 }
@@ -760,7 +764,7 @@ export default function HomepagePage() {
                   indeterminate={selectedIds.length > 0 && selectedIds.length < availableProperties.length}
                   onChange={handleSelectAll}
                 >
-                  <strong>בחר הכל ({selectedIds.length}/{availableProperties.length})</strong>
+                  <strong>{t.selectAll(selectedIds.length, availableProperties.length)}</strong>
                 </Checkbox>
               </div>
             )}

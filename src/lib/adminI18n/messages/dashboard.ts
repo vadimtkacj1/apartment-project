@@ -1,0 +1,164 @@
+import { defineMessages } from '@/lib/adminI18n';
+
+/** Admin dashboard (/admin): masthead, traffic KPIs, portfolio composition, attention queue, recent listings. */
+export const dashboardMessages = defineMessages({
+  he: {
+    pageTitle: 'לוח בקרה',
+    mastheadTitle: 'רם נכסים · לוח בקרה',
+    /** Long date, e.g. "1 ביולי 2026" / "1 July 2026" (day-first). monthIndex is 0-based; self-contained month names (no dayjs locale dependency). */
+    longDate: (day: number, monthIndex: number, year: number) =>
+      `${day} ב${['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'][monthIndex]} ${year}`,
+
+    // Masthead stat line + detail
+    portfolioValue: 'שווי תיק',
+    activeProperties: 'נכסים פעילים',
+    forSaleLower: 'למכירה',
+    forRentLower: 'להשכרה',
+    newInquiries: 'פניות חדשות',
+    mostExpensive: 'יקר ביותר',
+    averageLabel: 'ממוצע',
+    addedThisWeek: 'נוספו השבוע',
+
+    // Traffic card
+    siteTraffic: 'תנועת האתר',
+    fullAnalytics: 'לאנליטיקה המלאה',
+    kpiUniqueVisitors: 'מבקרים ייחודיים',
+    kpiViews: 'צפיות',
+    kpiInteractions: 'אינטראקציות',
+    kpiInquiries: 'פניות',
+    noTrafficData: 'אין עדיין נתוני תנועה',
+    chartViews: 'צפיות',
+    chartInteractions: 'אינטראקציות',
+    conversionRate: 'יחס המרה',
+    engagement: 'מעורבות',
+    lastDays: (days: number) => `${days} הימים האחרונים`,
+    todayLabel: 'היום',
+    viewsLower: 'צפיות',
+    inquiriesLower: 'פניות',
+
+    // Portfolio composition card
+    portfolioComposition: 'הרכב התיק',
+    noPropertiesInSystem: 'אין עדיין נכסים במערכת',
+    splitBarAria: 'חלוקה למכירה והשכרה',
+    byPropertyType: 'לפי סוג נכס',
+    topCities: 'ערים מובילות',
+    propertyTypes: {
+      apartment: 'דירה',
+      'garden-apartment': 'דירת גן',
+      cottage: 'קוטג׳',
+      house: 'בית פרטי',
+      duplex: 'דופלקס',
+      penthouse: 'פנטהאוז',
+      'mini-penthouse': 'מיני פנטהאוז',
+      'roof-apartment': 'דירת גג',
+      'housing-unit': 'יחידת דיור',
+      studio: 'סטודיו',
+      'basement-apartment': 'דירת מרתף',
+      villa: 'וילה',
+    },
+
+    // Attention queue card
+    needsAttention: 'דורש טיפול',
+    priceDrops: 'ירידות מחיר',
+    propertiesWithoutPhotos: 'נכסים ללא תמונות',
+    hiddenProperties: 'נכסים מוסתרים',
+    soldProperties: 'נכסים שנמכרו',
+    hotOffers: 'הצעות חמות',
+    pinnedProperties: 'נכסים מוצמדים',
+    allClear: 'הכל תקין ✓',
+    view: 'צפה',
+
+    // Recent listings card
+    recentlyAdded: 'נכסים שנוספו לאחרונה',
+    viewAll: 'צפה בהכל',
+    noProperties: 'אין עדיין נכסים',
+    roomsAbbr: 'חד׳',
+    sqmAbbr: 'מ״ר',
+    dealSale: 'למכירה',
+    dealRent: 'להשכרה',
+    addedToday: 'נוסף היום',
+    addedYesterday: 'נוסף אתמול',
+    daysAgo: (days: number) => `לפני ${days} ימים`,
+    weekAgo: 'לפני שבוע',
+    weeksAgo: (weeks: number) => `לפני ${weeks} שבועות`,
+  },
+  en: {
+    pageTitle: 'Dashboard',
+    mastheadTitle: 'Ram Nechasim · Dashboard',
+    longDate: (day: number, monthIndex: number, year: number) =>
+      `${day} ${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][monthIndex]} ${year}`,
+
+    // Masthead stat line + detail
+    portfolioValue: 'Portfolio value',
+    activeProperties: 'active properties',
+    forSaleLower: 'for sale',
+    forRentLower: 'for rent',
+    newInquiries: 'new inquiries',
+    mostExpensive: 'Most expensive',
+    averageLabel: 'average',
+    addedThisWeek: 'added this week',
+
+    // Traffic card
+    siteTraffic: 'Site Traffic',
+    fullAnalytics: 'Full analytics',
+    kpiUniqueVisitors: 'Unique Visitors',
+    kpiViews: 'Views',
+    kpiInteractions: 'Interactions',
+    kpiInquiries: 'Inquiries',
+    noTrafficData: 'No traffic data yet',
+    chartViews: 'Views',
+    chartInteractions: 'Interactions',
+    conversionRate: 'Conversion rate',
+    engagement: 'Engagement',
+    lastDays: (days: number) => `Last ${days} days`,
+    todayLabel: 'Today',
+    viewsLower: 'views',
+    inquiriesLower: 'inquiries',
+
+    // Portfolio composition card
+    portfolioComposition: 'Portfolio Composition',
+    noPropertiesInSystem: 'No properties in the system yet',
+    splitBarAria: 'Breakdown of sale and rental listings',
+    byPropertyType: 'By property type',
+    topCities: 'Top cities',
+    propertyTypes: {
+      apartment: 'Apartment',
+      'garden-apartment': 'Garden Apartment',
+      cottage: 'Cottage',
+      house: 'Private House',
+      duplex: 'Duplex',
+      penthouse: 'Penthouse',
+      'mini-penthouse': 'Mini Penthouse',
+      'roof-apartment': 'Rooftop Apartment',
+      'housing-unit': 'Housing Unit',
+      studio: 'Studio',
+      'basement-apartment': 'Basement Apartment',
+      villa: 'Villa',
+    },
+
+    // Attention queue card
+    needsAttention: 'Needs Attention',
+    priceDrops: 'Price drops',
+    propertiesWithoutPhotos: 'Properties without photos',
+    hiddenProperties: 'Hidden properties',
+    soldProperties: 'Sold properties',
+    hotOffers: 'Hot offers',
+    pinnedProperties: 'Pinned properties',
+    allClear: 'All clear ✓',
+    view: 'View',
+
+    // Recent listings card
+    recentlyAdded: 'Recently Added Properties',
+    viewAll: 'View all',
+    noProperties: 'No properties yet',
+    roomsAbbr: 'rooms',
+    sqmAbbr: 'sqm',
+    dealSale: 'For Sale',
+    dealRent: 'For Rent',
+    addedToday: 'Added today',
+    addedYesterday: 'Added yesterday',
+    daysAgo: (days: number) => `${days} days ago`,
+    weekAgo: 'A week ago',
+    weeksAgo: (weeks: number) => `${weeks} weeks ago`,
+  },
+});

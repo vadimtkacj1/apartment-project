@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Upload, Button, App, Typography } from 'antd';
 import { InboxOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -20,6 +22,7 @@ export default function ProfileImageUploader({
   uploadPath = 'owners',
 }: ProfileImageUploaderProps) {
   const { message } = App.useApp();
+  const t = useAdminMessages(uploadersMessages);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -43,7 +46,7 @@ export default function ProfileImageUploader({
         console.error('❌ [FRONTEND] Error parsing JSON error response (profile):', jsonError);
 
         if (response.status === 413) {
-          errorMessage = 'התמונה גדולה מדי עבור השרת. נסה להקטין את התמונה ולהעלות שוב.';
+          errorMessage = t.imageTooLargeForServer;
         } else {
           const text = await response.text().catch(() => null);
           console.error('❌ [FRONTEND] Non-JSON error response body (profile):', text);
@@ -58,7 +61,7 @@ export default function ProfileImageUploader({
       return data.url;
     } catch (parseError) {
       console.error('❌ [FRONTEND] Failed to parse success response as JSON (profile):', parseError);
-      throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
+      throw new Error(t.unexpectedServerResponse);
     }
   };
 
@@ -68,10 +71,10 @@ export default function ProfileImageUploader({
     try {
       const url = await uploadImage(file as File);
       onImageChange(url);
-      message.success('התמונה הועלתה בהצלחה');
+      message.success(t.uploadSuccess);
       onSuccess?.(url);
     } catch (err: any) {
-      message.error(err.message || 'שגיאה בהעלאת התמונה');
+      message.error(err.message || t.uploadError);
       onError?.(err);
     } finally {
       setUploading(false);
@@ -81,13 +84,13 @@ export default function ProfileImageUploader({
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('רק קבצי תמונה מותרים');
+      message.error(t.onlyImageFiles);
       return false;
     }
 
     const isLt50M = file.size / 1024 / 1024 < 50;
     if (!isLt50M) {
-      message.error('התמונה חייבת להיות קטנה מ-50MB');
+      message.error(t.imageMaxSize);
       return false;
     }
 
@@ -96,7 +99,7 @@ export default function ProfileImageUploader({
 
   const removeImage = () => {
     onImageChange(null);
-    message.success('התמונה נמחקה');
+    message.success(t.imageDeleted);
   };
 
   // If image exists, show preview with edit/delete buttons
@@ -138,11 +141,11 @@ export default function ProfileImageUploader({
             disabled={uploading}
           >
             <Button icon={<EditOutlined />} loading={uploading}>
-              שנה תמונה
+              {t.changeImage}
             </Button>
           </Upload>
           <Button danger icon={<DeleteOutlined />} onClick={removeImage}>
-            מחק
+            {t.delete}
           </Button>
         </div>
 
@@ -201,14 +204,14 @@ export default function ProfileImageUploader({
           <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
-          גרור תמונה לכאן או לחץ להעלאה
+          {t.dragImageHint}
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          JPG, PNG, GIF - מקסימום 50MB
+          {t.profileUploadHint}
         </p>
         {uploading && (
           <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
-            מעלה...
+            {t.uploading}
           </Text>
         )}
       </Dragger>

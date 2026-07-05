@@ -27,6 +27,8 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { ownersMessages } from '@/lib/adminI18n/messages/owners';
 
 interface Owner {
   id: number;
@@ -45,6 +47,7 @@ interface Owner {
 
 export default function OwnersPage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(ownersMessages);
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -65,7 +68,7 @@ export default function OwnersPage() {
     } catch (error) {
       console.error('Error fetching owners:', error);
       setOwners([]);
-      message.error('שגיאה בטעינת הבעלים');
+      message.error(t.loadListError);
     } finally {
       setLoading(false);
     }
@@ -99,10 +102,10 @@ export default function OwnersPage() {
       setDeleteModal(false);
       setSelectedOwner(null);
       fetchOwners();
-      message.success('הבעלים נמחק בהצלחה');
+      message.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting owner:', error);
-      message.error('שגיאה במחיקת הבעלים. נסה שוב.');
+      message.error(t.deleteError);
     }
   };
 
@@ -120,10 +123,10 @@ export default function OwnersPage() {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       fetchOwners();
-      message.success(value ? 'הבעלים הופעל' : 'הבעלים הושבת');
+      message.success(value ? t.activatedSuccess : t.deactivatedSuccess);
     } catch (error) {
       console.error('Error updating status:', error);
-      message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
+      message.error(t.statusUpdateError);
     }
   };
 
@@ -131,10 +134,10 @@ export default function OwnersPage() {
     <div className="px-2 sm:px-4 md:px-0">
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול בעלים</h1>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
         <Link href="/admin/owners/new" className="w-full sm:w-auto">
           <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-            הוסף בעלים חדש
+            {t.addNew}
           </Button>
         </Link>
       </div>
@@ -142,13 +145,13 @@ export default function OwnersPage() {
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="סה״כ בעלים" value={stats.total} prefix={<UserOutlined />} /></Card>
+          <Card><Statistic title={t.statTotal} value={stats.total} prefix={<UserOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים פעילים" value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
+          <Card><Statistic title={t.statActive} value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
+          <Card><Statistic title={t.statInactive} value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
         </Col>
       </Row>
 
@@ -156,7 +159,7 @@ export default function OwnersPage() {
       <Card className="mb-6">
         <Space vertical style={{ width: '100%' }} size="middle">
           <Input
-            placeholder="חפש לפי שם או אימייל..."
+            placeholder={t.searchPlaceholder}
             prefix={<SearchOutlined />}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -168,9 +171,9 @@ export default function OwnersPage() {
             style={{ minWidth: 120, width: '100%', maxWidth: '200px' }}
             size="large"
           >
-            <Select.Option value="all">כל הסטטוסים</Select.Option>
-            <Select.Option value="active">פעיל</Select.Option>
-            <Select.Option value="inactive">לא פעיל</Select.Option>
+            <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
+            <Select.Option value="active">{t.statusActive}</Select.Option>
+            <Select.Option value="inactive">{t.statusInactive}</Select.Option>
           </Select>
         </Space>
       </Card>
@@ -186,13 +189,13 @@ export default function OwnersPage() {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `סה״כ ${total} בעלים`,
+            showTotal: (total) => t.paginationTotal(total),
           }}
           scroll={{ x: 1000 }}
-          locale={{ emptyText: <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" /> }}
+          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} /> }}
           columns={[
             {
-              title: 'תמונה',
+              title: t.colImage,
               dataIndex: 'image',
               key: 'image',
               width: 80,
@@ -231,26 +234,26 @@ export default function OwnersPage() {
               ),
             },
             {
-              title: 'שם',
+              title: t.fieldName,
               dataIndex: 'name',
               key: 'name',
               width: 150,
             },
             {
-              title: 'תפקיד',
+              title: t.fieldRole,
               dataIndex: 'title',
               key: 'title',
               width: 200,
             },
             {
-              title: 'אימייל',
+              title: t.fieldEmail,
               dataIndex: 'email',
               key: 'email',
               width: 200,
               render: (email: string | null) => email || '-',
             },
             {
-              title: 'טלפון',
+              title: t.fieldPhone,
               dataIndex: 'phone',
               key: 'phone',
               width: 120,
@@ -264,14 +267,14 @@ export default function OwnersPage() {
               render: (whatsapp: string | null) => whatsapp || '-',
             },
             {
-              title: 'סדר',
+              title: t.fieldOrder,
               dataIndex: 'order',
               key: 'order',
               width: 80,
               align: 'center',
             },
             {
-              title: 'סטטוס',
+              title: t.fieldStatus,
               key: 'status',
               width: 100,
               align: 'center',
@@ -279,20 +282,20 @@ export default function OwnersPage() {
                 <Switch
                   checked={record.isActive}
                   onChange={(v) => handleStatusChange(record.id, v)}
-                  checkedChildren="פעיל"
-                  unCheckedChildren="כבוי"
+                  checkedChildren={t.statusActive}
+                  unCheckedChildren={t.switchOff}
                 />
               ),
             },
             {
-              title: 'פעולות',
+              title: t.colActions,
               key: 'actions',
               width: 150,
               render: (_, record: Owner) => (
                 <Space size={4}>
                   <Link href={`/admin/owners/${record.id}`}>
                     <Button type="primary" icon={<EditOutlined />} size="small">
-                      ערוך
+                      {t.edit}
                     </Button>
                   </Link>
                   <Button
@@ -305,7 +308,7 @@ export default function OwnersPage() {
                       setDeleteModal(true);
                     }}
                   >
-                    מחק
+                    {t.delete}
                   </Button>
                 </Space>
               ),
@@ -320,7 +323,7 @@ export default function OwnersPage() {
         {loading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredOwners.length === 0 ? (
-          <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" />
+          <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} />
         ) : (
           <div className="admin-card-list">
             {filteredOwners.map((owner) => (
@@ -347,21 +350,21 @@ export default function OwnersPage() {
                   </div>
                 </div>
                 <div className="admin-card__fields">
-                  {owner.phone && <span><b>טלפון</b> {owner.phone}</span>}
-                  {owner.whatsapp && <span><b>WhatsApp</b> {owner.whatsapp}</span>}
-                  {owner.email && <span><b>אימייל</b> {owner.email}</span>}
-                  <span><b>סדר</b> {owner.order}</span>
+                  {owner.phone && <span><b>{t.fieldPhone}</b> <span dir="ltr">{owner.phone}</span></span>}
+                  {owner.whatsapp && <span><b>WhatsApp</b> <span dir="ltr">{owner.whatsapp}</span></span>}
+                  {owner.email && <span><b>{t.fieldEmail}</b> <span dir="ltr">{owner.email}</span></span>}
+                  <span><b>{t.fieldOrder}</b> {owner.order}</span>
                 </div>
                 <div className="admin-card__actions">
                   <Switch
                     checked={owner.isActive}
                     onChange={(v) => handleStatusChange(owner.id, v)}
-                    checkedChildren="פעיל"
-                    unCheckedChildren="כבוי"
+                    checkedChildren={t.statusActive}
+                    unCheckedChildren={t.switchOff}
                   />
                   <span className="admin-card__grow">
                     <Link href={`/admin/owners/${owner.id}`}>
-                      <Button type="primary" icon={<EditOutlined />}>ערוך</Button>
+                      <Button type="primary" icon={<EditOutlined />}>{t.edit}</Button>
                     </Link>
                   </span>
                   <Button
@@ -373,7 +376,7 @@ export default function OwnersPage() {
                       setDeleteModal(true);
                     }}
                   >
-                    מחק
+                    {t.delete}
                   </Button>
                 </div>
               </div>
@@ -384,18 +387,18 @@ export default function OwnersPage() {
 
       {/* Delete Confirmation Modal */}
       <Modal
-        title="אישור מחיקה"
+        title={t.deleteConfirmTitle}
         open={deleteModal}
         onOk={handleDelete}
         onCancel={() => {
           setDeleteModal(false);
           setSelectedOwner(null);
         }}
-        okText="מחק"
-        cancelText="ביטול"
+        okText={t.delete}
+        cancelText={t.cancel}
         okButtonProps={{ danger: true }}
       >
-        <p>האם אתה בטוח שברצונך למחוק בעלים זה?</p>
+        <p>{t.deleteConfirmBody}</p>
       </Modal>
     </div>
   );

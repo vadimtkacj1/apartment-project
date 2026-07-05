@@ -5,6 +5,8 @@ import { Upload, Button, App, Alert, Typography } from 'antd';
 import { InboxOutlined, DeleteOutlined, LeftOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
+import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -21,6 +23,8 @@ export default function ImageUploader({
   maxImages = 25,
 }: ImageUploaderProps) {
   const { message } = App.useApp();
+  const t = useAdminMessages(uploadersMessages);
+  const { dir } = useAdminI18n();
   const isMobile = useIsMobile();
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -63,7 +67,7 @@ export default function ImageUploader({
 
         if (response.status === 413) {
           // Payload Too Large – сервер отверг файл ещё до обработки нашим бэкендом
-          errorMessage = 'התמונה גדולה מדי עבור השרת. נסה להקטין את התמונה ולהעלות שוב.';
+          errorMessage = t.imageTooLargeForServer;
         } else {
           const text = await response.text().catch(() => null);
           console.error('❌ [FRONTEND] Non-JSON error response body:', text);
@@ -80,7 +84,7 @@ export default function ImageUploader({
       return data.url;
     } catch (parseError) {
       console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
-      throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
+      throw new Error(t.unexpectedServerResponse);
     }
   };
 
@@ -93,11 +97,11 @@ export default function ImageUploader({
       console.log('💾 [FRONTEND] Adding URL to images list:', url);
       onImagesChange([...images, url]);
       console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
-      message.success('התמונה הועלתה בהצלחה');
+      message.success(t.uploadSuccess);
       onSuccess?.(url);
     } catch (err: any) {
       console.error('❌ [FRONTEND] Upload error:', err);
-      message.error(err.message || 'שגיאה בהעלאת התמונה');
+      message.error(err.message || t.uploadError);
       onError?.(err);
     } finally {
       setUploading(false);
@@ -108,18 +112,18 @@ export default function ImageUploader({
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
-      message.error('רק קבצי תמונה מותרים');
+      message.error(t.onlyImageFiles);
       return false;
     }
 
     const isLt50M = file.size / 1024 / 1024 < 50;
     if (!isLt50M) {
-      message.error('התמונה חייבת להיות קטנה מ-50MB');
+      message.error(t.imageMaxSize);
       return false;
     }
 
     if (images.length >= maxImages) {
-      message.error(`ניתן להעלות עד ${maxImages} תמונות`);
+      message.error(t.maxImagesLimit(maxImages));
       return false;
     }
 
@@ -129,7 +133,7 @@ export default function ImageUploader({
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
-    message.success('התמונה נמחקה');
+    message.success(t.imageDeleted);
   };
 
   const moveImage = (fromIndex: number, toIndex: number) => {
@@ -162,14 +166,14 @@ export default function ImageUploader({
           <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
-          גרור תמונות לכאן או לחץ להעלאה
+          {t.dragImagesHint}
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 50MB לכל תמונה
+          {t.galleryUploadHint(maxImages)}
         </p>
         {uploading && (
           <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
-            מעלה...
+            {t.uploading}
           </Text>
         )}
       </Dragger>
@@ -178,8 +182,8 @@ export default function ImageUploader({
       {images.length > 0 && (
         <div>
           <Alert
-            title={`תמונות שהועלו (${images.length})`}
-            description="התמונה הראשונה תוצג כתמונה ראשית"
+            title={t.uploadedImagesTitle(images.length)}
+            description={t.firstImageIsMain}
             type="info"
             showIcon
             style={{ marginBottom: '16px' }}
@@ -219,7 +223,7 @@ export default function ImageUploader({
                       zIndex: 2,
                     }}
                   >
-                    ראשית
+                    {t.mainImageBadge}
                   </div>
                 )}
 
@@ -274,7 +278,7 @@ export default function ImageUploader({
                   {index > 0 && (
                     <Button
                       size="small"
-                      icon={<RightOutlined />}
+                      icon={dir === 'rtl' ? <RightOutlined /> : <LeftOutlined />}
                       onClick={() => moveImage(index, index - 1)}
                       style={{ flex: 1 }}
                     />
@@ -282,7 +286,7 @@ export default function ImageUploader({
                   {index < images.length - 1 && (
                     <Button
                       size="small"
-                      icon={<LeftOutlined />}
+                      icon={dir === 'rtl' ? <LeftOutlined /> : <RightOutlined />}
                       onClick={() => moveImage(index, index + 1)}
                       style={{ flex: 1 }}
                     />

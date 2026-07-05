@@ -1,19 +1,27 @@
 import { Card, Row, Col, Form, Input, Select, Switch, DatePicker, Radio } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
-import { DEAL_TYPE_OPTIONS, STATUS_OPTIONS } from '../constants';
+import { buildDealTypeOptions, buildStatusOptions } from '../constants';
 import dayjs from 'dayjs';
 import { useState, useEffect } from 'react';
 
 const { TextArea } = Input;
 
+// Persisted vacancy-date sentinel values (stored in the DB and matched by the
+// public site) — data values, not UI labels; they stay Hebrew in both locales.
+const VACANCY_IMMEDIATE = 'מיד';
+const VACANCY_FLEXIBLE = 'גמיש';
+
 export function BasicInfoSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   const [vacancyType, setVacancyType] = useState<'date' | 'immediately' | 'flexible'>('date');
 
   // Sync vacancyType with formData
   useEffect(() => {
-    if (formData.vacancyDate === 'מיד' || formData.vacancyDate === 'immediately') {
+    if (formData.vacancyDate === VACANCY_IMMEDIATE || formData.vacancyDate === 'immediately') {
       setVacancyType('immediately');
-    } else if (formData.vacancyDate === 'גמיש' || formData.vacancyDate === 'flexible') {
+    } else if (formData.vacancyDate === VACANCY_FLEXIBLE || formData.vacancyDate === 'flexible') {
       setVacancyType('flexible');
     } else if (formData.vacancyDate && typeof formData.vacancyDate === 'string' && formData.vacancyDate.trim() !== '') {
       setVacancyType('date');
@@ -23,33 +31,33 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
   }, [formData.vacancyDate]);
 
   return (
-    <Card title="מידע בסיסי" className="mb-4">
+    <Card title={t.basicInfo.cardTitle} className="mb-4">
       <Row gutter={16}>
         <Col xs={24} sm={24} md={16}>
           <Form.Item
-            label="כותרת"
+            label={t.basicInfo.titleLabel}
             name="title"
-            rules={[{ required: true, message: 'כותרת היא שדה חובה' }]}
+            rules={[{ required: true, message: t.basicInfo.titleRequired }]}
           >
             <Input
-              placeholder="לדוגמה: דירת 3 חדרים מרווחת ברמת אפעל"
+              placeholder={t.basicInfo.titlePlaceholder}
               onChange={(e) => handleChange('title', e.target.value)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={4}>
-          <Form.Item label="סוג עסקה" name="dealType">
+          <Form.Item label={t.basicInfo.dealTypeLabel} name="dealType">
             <Select
               onChange={(value) => handleChange('dealType', value)}
-              options={DEAL_TYPE_OPTIONS}
+              options={buildDealTypeOptions(t)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={4}>
-          <Form.Item label="סטטוס" name="status">
+          <Form.Item label={t.basicInfo.statusLabel} name="status">
             <Select
               onChange={(value) => handleChange('status', value)}
-              options={STATUS_OPTIONS}
+              options={buildStatusOptions(t)}
             />
           </Form.Item>
         </Col>
@@ -58,13 +66,13 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item
-            label="תיאור"
+            label={t.basicInfo.descriptionLabel}
             name="description"
-            rules={[{ required: true, message: 'תיאור הוא שדה חובה' }]}
+            rules={[{ required: true, message: t.basicInfo.descriptionRequired }]}
           >
             <TextArea
               rows={6}
-              placeholder="תאר את הנכס בפירוט..."
+              placeholder={t.basicInfo.descriptionPlaceholder}
               onChange={(e) => handleChange('description', e.target.value)}
             />
           </Form.Item>
@@ -74,9 +82,9 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
       <Row gutter={16}>
         <Col xs={24} sm={12} md={8}>
           <Form.Item
-            label="מחיר"
+            label={t.basicInfo.priceLabel}
             name="price"
-            rules={[{ required: true, message: 'מחיר הוא שדה חובה' }]}
+            rules={[{ required: true, message: t.basicInfo.priceRequired }]}
           >
             <Input
               placeholder="1,200,000"
@@ -86,7 +94,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Form.Item label="מחיר מקורי (אופציונלי)" name="originalPrice">
+          <Form.Item label={t.basicInfo.originalPriceLabel} name="originalPrice">
             <Input
               placeholder="1,500,000"
               suffix="₪"
@@ -95,7 +103,7 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           </Form.Item>
         </Col>
         <Col xs={24} sm={24} md={8}>
-          <Form.Item label="תאריך פינוי" name="vacancyDate">
+          <Form.Item label={t.basicInfo.vacancyDateLabel} name="vacancyDate">
             <div>
               <Radio.Group
                 className="vacancy-type-segmented"
@@ -106,18 +114,18 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
                   const newType = e.target.value;
                   setVacancyType(newType);
                   if (newType === 'immediately') {
-                    handleChange('vacancyDate', 'מיד');
+                    handleChange('vacancyDate', VACANCY_IMMEDIATE);
                   } else if (newType === 'flexible') {
-                    handleChange('vacancyDate', 'גמיש');
+                    handleChange('vacancyDate', VACANCY_FLEXIBLE);
                   } else {
                     handleChange('vacancyDate', '');
                   }
                 }}
                 style={{ marginBottom: '8px', display: 'flex', width: '100%' }}
                 options={[
-                  { label: 'בחר תאריך', value: 'date' },
-                  { label: 'מיד', value: 'immediately' },
-                  { label: 'גמיש', value: 'flexible' },
+                  { label: t.basicInfo.vacancyPickDate, value: 'date' },
+                  { label: t.basicInfo.vacancyImmediate, value: 'immediately' },
+                  { label: t.basicInfo.vacancyFlexible, value: 'flexible' },
                 ]}
               />
               <style jsx>{`
@@ -136,10 +144,10 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               `}</style>
               {vacancyType === 'date' && (
                 <DatePicker
-                  placeholder="בחר תאריך פינוי"
+                  placeholder={t.basicInfo.vacancyDatePlaceholder}
                   format="DD/MM/YYYY"
                   style={{ width: '100%' }}
-                  value={formData.vacancyDate && formData.vacancyDate !== 'מיד' && formData.vacancyDate !== 'immediately' && formData.vacancyDate !== 'גמיש' && formData.vacancyDate !== 'flexible'
+                  value={formData.vacancyDate && formData.vacancyDate !== VACANCY_IMMEDIATE && formData.vacancyDate !== 'immediately' && formData.vacancyDate !== VACANCY_FLEXIBLE && formData.vacancyDate !== 'flexible'
                     ? (typeof formData.vacancyDate === 'string'
                         ? (dayjs(formData.vacancyDate, 'DD/MM/YYYY', true).isValid()
                             ? dayjs(formData.vacancyDate, 'DD/MM/YYYY')
@@ -157,12 +165,12 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
               )}
               {vacancyType === 'immediately' && (
                 <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
-                  מיד
+                  {t.basicInfo.vacancyImmediate}
                 </div>
               )}
               {vacancyType === 'flexible' && (
                 <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
-                  גמיש
+                  {t.basicInfo.vacancyFlexible}
                 </div>
               )}
             </div>
@@ -175,33 +183,33 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
           <Form.Item name="isActive" valuePropName="checked">
             <Switch
               checked={formData.isActive}
-              checkedChildren="פעיל"
-              unCheckedChildren="לא פעיל"
+              checkedChildren={t.basicInfo.activeOn}
+              unCheckedChildren={t.basicInfo.activeOff}
               onChange={(checked) => handleChange('isActive', checked)}
             />
-            <span style={{ marginRight: '8px' }}>נכס פעיל (יוצג באתר)</span>
+            <span style={{ marginInlineStart: '8px' }}>{t.basicInfo.activeCaption}</span>
           </Form.Item>
         </Col>
         <Col xs={24} sm={8}>
           <Form.Item name="isSold" valuePropName="checked">
             <Switch
               checked={formData.isSold}
-              checkedChildren={formData.dealType === 'rent' ? 'מושכר' : 'נמכר'}
-              unCheckedChildren={formData.dealType === 'rent' ? 'לא מושכר' : 'לא נמכר'}
+              checkedChildren={formData.dealType === 'rent' ? t.basicInfo.rentedOn : t.basicInfo.soldOn}
+              unCheckedChildren={formData.dealType === 'rent' ? t.basicInfo.rentedOff : t.basicInfo.soldOff}
               onChange={(checked) => handleChange('isSold', checked)}
             />
-            <span style={{ marginRight: '8px' }}>אקטואלי</span>
+            <span style={{ marginInlineStart: '8px' }}>{t.basicInfo.soldCaption}</span>
           </Form.Item>
         </Col>
         <Col xs={24} sm={8}>
           <Form.Item name="isPinned" valuePropName="checked">
             <Switch
               checked={formData.isPinned}
-              checkedChildren="נצמד"
-              unCheckedChildren="לא נצמד"
+              checkedChildren={t.basicInfo.pinnedOn}
+              unCheckedChildren={t.basicInfo.pinnedOff}
               onChange={(checked) => handleChange('isPinned', checked)}
             />
-            <span style={{ marginRight: '8px' }}>הצמד לעמוד הבית</span>
+            <span style={{ marginInlineStart: '8px' }}>{t.basicInfo.pinnedCaption}</span>
           </Form.Item>
         </Col>
       </Row>

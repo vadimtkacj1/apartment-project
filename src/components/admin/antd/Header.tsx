@@ -5,6 +5,9 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 // Breadcrumbs derive from the single source of truth (src/config/adminSections.tsx).
 import { buildAdminCrumbs } from '@/config/adminSections';
+import { useAdminI18n, useAdminMessages } from '@/lib/adminI18n';
+import { navMessages } from '@/lib/adminI18n/messages/nav';
+import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 
 const FONT = "var(--font-assistant), Arial, Helvetica, sans-serif";
 
@@ -15,7 +18,9 @@ interface HeaderProps {
 }
 
 export default function Header({ onPress, name, collapsed = false }: HeaderProps) {
-  const crumbs = buildAdminCrumbs(name);
+  const { locale } = useAdminI18n();
+  const t = useAdminMessages(navMessages);
+  const crumbs = buildAdminCrumbs(name, locale);
 
   return (
     <Row
@@ -27,17 +32,18 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
     >
       {/* Single, clear control: collapse / expand the sidebar.
           (User identity + logout live in the sidebar footer.) */}
-      <Col flex="none">
-        <Tooltip title={collapsed ? 'פתח תפריט' : 'כווץ תפריט'} placement="bottom">
+      <Col flex="none" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Tooltip title={collapsed ? t.openMenu : t.collapseMenu} placement="bottom">
           <Button
             type="text"
             className="sidebar-toggler"
             onClick={onPress}
-            aria-label={collapsed ? 'פתח תפריט' : 'כווץ תפריט'}
+            aria-label={collapsed ? t.openMenu : t.collapseMenu}
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             style={{ color: '#595959', fontSize: '18px', minWidth: 44, minHeight: 44 }}
           />
         </Tooltip>
+        <LanguageSwitcher />
       </Col>
 
       {/* Breadcrumb: allowed to shrink/truncate so a deep Hebrew trail can't

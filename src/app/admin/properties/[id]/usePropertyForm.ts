@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { App } from 'antd';
 import { FormInstance } from 'antd';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyForm } from './types';
 import { INITIAL_FORM } from './constants';
 import { getCityLabel, getCitySlug } from '@/data/cities';
@@ -16,6 +18,7 @@ export function usePropertyForm(
   form: FormInstance
 ) {
   const { message } = App.useApp();
+  const t = useAdminMessages(propertyFormMessages);
   const [formData, setFormData] = useState<PropertyForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -94,7 +97,7 @@ export function usePropertyForm(
         form.setFieldsValue(formValues);
       }
     } catch (err) {
-      message.error('שגיאה בטעינת הנכס');
+      message.error(t.feedback.loadError);
     } finally {
       setLoading(false);
     }
@@ -143,7 +146,7 @@ export function usePropertyForm(
 
       if (response.ok) {
         setDirty(false);
-        message.success('הנכס נשמר בהצלחה');
+        message.success(t.feedback.saveSuccess);
         if (onSuccess) {
           // Keep saving=true until redirect to prevent double submission
           setTimeout(onSuccess, 1500);
@@ -152,12 +155,12 @@ export function usePropertyForm(
         setSaving(false);
       } else {
         const errorMessage =
-          responseData.error || responseData.message || 'שגיאה בשמירת הנכס';
+          responseData.error || responseData.message || t.feedback.saveError;
         message.error(errorMessage);
         setSaving(false);
       }
     } catch (err: any) {
-      message.error(err.message || 'שגיאה בשמירת הנכס');
+      message.error(err.message || t.feedback.saveError);
       setSaving(false);
     }
   };

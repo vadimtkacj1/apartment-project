@@ -1,52 +1,55 @@
 import { Card, Row, Col, Form, Input } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
 
 const { TextArea } = Input;
 
 export function SeoSection({ handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   return (
-    <Card title="SEO — קידום במנועי חיפוש (אופציונלי)" className="mb-4">
+    <Card title={t.seo.cardTitle} className="mb-4">
       <p style={{ color: '#8c8c8c', marginTop: 0, marginBottom: 16 }}>
-        השאר ריק כדי להשתמש בכותרת, בתיאור ובתמונה הראשית של הנכס כברירת מחדל.
+        {t.seo.helpText}
       </p>
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item
-            label="כותרת SEO (Meta Title)"
+            label={t.seo.metaTitleLabel}
             name="metaTitle"
-            tooltip="עד ~60 תווים — מוצג בלשונית הדפדפן ובתוצאות גוגל"
+            tooltip={t.seo.metaTitleTooltip}
           >
             <Input
               maxLength={70}
               showCount
-              placeholder="לדוגמה: דירת 4 חדרים למכירה בחולון — רם נכסים"
+              placeholder={t.seo.metaTitlePlaceholder}
               onChange={(e) => handleChange('metaTitle', e.target.value)}
             />
           </Form.Item>
         </Col>
         <Col span={24}>
           <Form.Item
-            label="תיאור SEO (Meta Description)"
+            label={t.seo.metaDescriptionLabel}
             name="metaDescription"
-            tooltip="עד ~160 תווים — הסניפט שמופיע מתחת לכותרת בגוגל"
+            tooltip={t.seo.metaDescriptionTooltip}
           >
             <TextArea
               rows={3}
               maxLength={170}
               showCount
-              placeholder="תיאור קצר ומושך שיופיע בתוצאות החיפוש..."
+              placeholder={t.seo.metaDescriptionPlaceholder}
               onChange={(e) => handleChange('metaDescription', e.target.value)}
             />
           </Form.Item>
         </Col>
         <Col span={24}>
           <Form.Item
-            label="תמונת שיתוף (OG Image)"
+            label={t.seo.ogImageLabel}
             name="ogImage"
-            tooltip="כתובת תמונה לשיתוף ברשתות חברתיות; ריק = התמונה הראשית של הנכס"
+            tooltip={t.seo.ogImageTooltip}
           >
             <Input
-              placeholder="/uploads/... או https://..."
+              placeholder={t.seo.ogImagePlaceholder}
               onChange={(e) => handleChange('ogImage', e.target.value)}
             />
           </Form.Item>

@@ -1,0 +1,32 @@
+import { defineMessages } from '@/lib/adminI18n';
+
+export const loginMessages = defineMessages({
+  he: {
+    title: 'לוח ניהול',
+    subtitle: 'התחבר למערכת',
+    username: 'שם משתמש',
+    usernameRequired: 'אנא הכנס שם משתמש!',
+    usernamePlaceholder: 'הכנס שם משתמש',
+    password: 'סיסמה',
+    passwordRequired: 'אנא הכנס סיסמה!',
+    passwordPlaceholder: 'הכנס סיסמה',
+    submit: 'התחבר',
+    invalidCredentials: 'שם משתמש או סיסמה שגויים',
+    loginError: 'שגיאה בהתחברות',
+    loading: 'טוען...',
+  },
+  en: {
+    title: 'Admin Panel',
+    subtitle: 'Sign in to the system',
+    username: 'Username',
+    usernameRequired: 'Please enter a username!',
+    usernamePlaceholder: 'Enter username',
+    password: 'Password',
+    passwordRequired: 'Please enter a password!',
+    passwordPlaceholder: 'Enter password',
+    submit: 'Sign In',
+    invalidCredentials: 'Incorrect username or password',
+    loginError: 'Sign-in error',
+    loading: 'Loading...',
+  },
+});

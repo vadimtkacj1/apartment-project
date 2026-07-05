@@ -1,48 +1,51 @@
 import { Card, Row, Col, Form, Select, InputNumber, Checkbox } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
 import {
-  PROPERTY_TYPE_OPTIONS,
-  POSITION_OPTIONS,
-  FURNITURE_OPTIONS,
-  KITCHEN_OPTIONS,
-  PARKING_OPTIONS,
-  DIRECTION_OPTIONS,
+  buildPropertyTypeOptions,
+  buildPositionOptions,
+  buildFurnitureOptions,
+  buildKitchenOptions,
+  buildParkingOptions,
+  buildDirectionOptions,
   ROOMS_OPTIONS,
 } from '../constants';
 
 export function PropertyDetailsSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   return (
-    <Card title="פרטי הנכס" className="mb-4">
+    <Card title={t.details.cardTitle} className="mb-4">
       <Row gutter={16}>
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="סוג נכס" name="propertyType">
+          <Form.Item label={t.details.propertyTypeLabel} name="propertyType">
             <Select
               onChange={(value) => handleChange('propertyType', value)}
-              options={PROPERTY_TYPE_OPTIONS}
+              options={buildPropertyTypeOptions(t)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="מיקום בבניין" name="position">
+          <Form.Item label={t.details.positionLabel} name="position">
             <Select
               onChange={(value) => handleChange('position', value)}
-              options={POSITION_OPTIONS}
+              options={buildPositionOptions(t)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="ריהוט" name="furniture">
+          <Form.Item label={t.details.furnitureLabel} name="furniture">
             <Select
               onChange={(value) => handleChange('furniture', value)}
-              options={FURNITURE_OPTIONS}
+              options={buildFurnitureOptions(t)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Form.Item label="מטבח" name="kitchen">
+          <Form.Item label={t.details.kitchenLabel} name="kitchen">
             <Select
               onChange={(value) => handleChange('kitchen', value)}
-              options={KITCHEN_OPTIONS}
+              options={buildKitchenOptions(t)}
             />
           </Form.Item>
         </Col>
@@ -50,7 +53,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
 
       <Row gutter={16}>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="קומה" name="floor">
+          <Form.Item label={t.details.floorLabel} name="floor">
             <InputNumber
               style={{ width: '100%' }}
               onChange={(value) => handleChange('floor', value || 0)}
@@ -58,7 +61,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="סה״כ קומות" name="totalFloors">
+          <Form.Item label={t.details.totalFloorsLabel} name="totalFloors">
             <InputNumber
               style={{ width: '100%' }}
               onChange={(value) => handleChange('totalFloors', value || 0)}
@@ -66,18 +69,18 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="חניה" name="parking">
+          <Form.Item label={t.details.parkingLabel} name="parking">
             <Select
               onChange={(value) => handleChange('parking', value)}
-              options={PARKING_OPTIONS}
+              options={buildParkingOptions(t)}
             />
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
           <Form.Item
-            label="חדרים"
+            label={t.details.roomsLabel}
             name="rooms"
-            rules={[{ required: true, message: 'חדרים הוא שדה חובה' }]}
+            rules={[{ required: true, message: t.details.roomsRequired }]}
           >
             <Select
               onChange={(value) => {
@@ -89,7 +92,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="חדרי רחצה" name="bathrooms">
+          <Form.Item label={t.details.bathroomsLabel} name="bathrooms">
             <InputNumber
               style={{ width: '100%' }}
               min={1}
@@ -99,9 +102,9 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
         </Col>
         <Col xs={24} sm={8} md={4}>
           <Form.Item
-            label="שטח (מ״ר)"
+            label={t.details.areaLabel}
             name="area"
-            rules={[{ required: true, message: 'שטח הוא שדה חובה' }]}
+            rules={[{ required: true, message: t.details.areaRequired }]}
           >
             <InputNumber
               style={{ width: '100%' }}
@@ -111,7 +114,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="שטח בנוי" name="builtArea">
+          <Form.Item label={t.details.builtAreaLabel} name="builtArea">
             <InputNumber
               style={{ width: '100%' }}
               min={0}
@@ -120,7 +123,7 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
           </Form.Item>
         </Col>
         <Col xs={24} sm={8} md={4}>
-          <Form.Item label="גודל מרפסת שמש (מ״ר)" name="balconySize">
+          <Form.Item label={t.details.balconySizeLabel} name="balconySize">
             <InputNumber
               style={{ width: '100%' }}
               min={0}
@@ -132,9 +135,9 @@ export function PropertyDetailsSection({ formData, handleChange }: PropertyFormS
 
       <Row>
         <Col span={24}>
-          <Form.Item label="כיווני אוויר" name="directions">
+          <Form.Item label={t.details.directionsLabel} name="directions">
             <Checkbox.Group
-              options={DIRECTION_OPTIONS}
+              options={buildDirectionOptions(t)}
               onChange={(values) => handleChange('directions', values)}
             />
           </Form.Item>

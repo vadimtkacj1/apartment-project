@@ -27,6 +27,8 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { teamMessages } from '@/lib/adminI18n/messages/team';
 
 interface TeamMember {
   id: number;
@@ -45,6 +47,7 @@ interface TeamMember {
 }
 
 export default function TeamPage() {
+  const t = useAdminMessages(teamMessages);
   const { message } = App.useApp();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +69,7 @@ export default function TeamPage() {
     } catch (error) {
       console.error('Error fetching team members:', error);
       setTeamMembers([]);
-      message.error('שגיאה בטעינת חברי הצוות');
+      message.error(t.loadListError);
     } finally {
       setLoading(false);
     }
@@ -100,10 +103,10 @@ export default function TeamPage() {
       setDeleteModal(false);
       setSelectedMember(null);
       fetchTeamMembers();
-      message.success('חבר הצוות נמחק בהצלחה');
+      message.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting team member:', error);
-      message.error('שגיאה במחיקת חבר הצוות. נסה שוב.');
+      message.error(t.deleteError);
     }
   };
 
@@ -121,10 +124,10 @@ export default function TeamPage() {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       fetchTeamMembers();
-      message.success(value ? 'חבר הצוות הופעל' : 'חבר הצוות הושבת');
+      message.success(value ? t.activatedSuccess : t.deactivatedSuccess);
     } catch (error) {
       console.error('Error updating status:', error);
-      message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
+      message.error(t.statusUpdateError);
     }
   };
 
@@ -132,10 +135,10 @@ export default function TeamPage() {
     <div className="px-2 sm:px-4 md:px-0">
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול צוות</h1>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
         <Link href="/admin/team/new" className="w-full sm:w-auto">
           <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-            הוסף חבר צוות חדש
+            {t.addNew}
           </Button>
         </Link>
       </div>
@@ -143,13 +146,13 @@ export default function TeamPage() {
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="סה״כ חברי צוות" value={stats.total} prefix={<TeamOutlined />} /></Card>
+          <Card><Statistic title={t.statTotal} value={stats.total} prefix={<TeamOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות פעילים" value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
+          <Card><Statistic title={t.statActive} value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title="חברי צוות לא פעילים" value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
+          <Card><Statistic title={t.statInactive} value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
         </Col>
       </Row>
 
@@ -157,7 +160,7 @@ export default function TeamPage() {
       <Card className="mb-6">
         <Space vertical style={{ width: '100%' }} size="middle">
           <Input
-            placeholder="חפש לפי שם או אימייל..."
+            placeholder={t.searchPlaceholder}
             prefix={<SearchOutlined />}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -169,9 +172,9 @@ export default function TeamPage() {
             style={{ minWidth: 120, width: '100%', maxWidth: '200px' }}
             size="large"
           >
-            <Select.Option value="all">כל הסטטוסים</Select.Option>
-            <Select.Option value="active">פעיל</Select.Option>
-            <Select.Option value="inactive">לא פעיל</Select.Option>
+            <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
+            <Select.Option value="active">{t.statusActive}</Select.Option>
+            <Select.Option value="inactive">{t.statusInactive}</Select.Option>
           </Select>
         </Space>
       </Card>
@@ -187,13 +190,13 @@ export default function TeamPage() {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `סה״כ ${total} חברי צוות`,
+            showTotal: (total) => t.paginationTotal(total),
           }}
           scroll={{ x: 1200 }}
-          locale={{ emptyText: <AdminEmptyState message="לא נמצאו חברי צוות" addHref="/admin/team/new" addLabel="הוספת חבר צוות" /> }}
+          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} /> }}
           columns={[
             {
-              title: 'תמונה',
+              title: t.colImage,
               dataIndex: 'image',
               key: 'image',
               width: 80,
@@ -232,47 +235,47 @@ export default function TeamPage() {
               ),
             },
             {
-              title: 'שם',
+              title: t.fieldName,
               dataIndex: 'name',
               key: 'name',
               width: 150,
             },
             {
-              title: 'תפקיד',
+              title: t.fieldRole,
               dataIndex: 'role',
               key: 'role',
               width: 150,
             },
             {
-              title: 'אימייל',
+              title: t.fieldEmail,
               dataIndex: 'email',
               key: 'email',
               width: 200,
               render: (email: string | null) => email || '-',
             },
             {
-              title: 'טלפון',
+              title: t.fieldPhone,
               dataIndex: 'phone',
               key: 'phone',
               width: 120,
               render: (phone: string | null) => phone || '-',
             },
             {
-              title: 'נייד',
+              title: t.fieldMobile,
               dataIndex: 'mobile',
               key: 'mobile',
               width: 120,
               render: (mobile: string | null) => mobile || '-',
             },
             {
-              title: 'סדר',
+              title: t.fieldOrder,
               dataIndex: 'order',
               key: 'order',
               width: 80,
               align: 'center',
             },
             {
-              title: 'סטטוס',
+              title: t.fieldStatus,
               key: 'status',
               width: 100,
               align: 'center',
@@ -280,20 +283,20 @@ export default function TeamPage() {
                 <Switch
                   checked={record.isActive}
                   onChange={(v) => handleStatusChange(record.id, v)}
-                  checkedChildren="פעיל"
-                  unCheckedChildren="כבוי"
+                  checkedChildren={t.statusActive}
+                  unCheckedChildren={t.switchOff}
                 />
               ),
             },
             {
-              title: 'פעולות',
+              title: t.colActions,
               key: 'actions',
               width: 150,
               render: (_, record: TeamMember) => (
                 <Space size={4}>
                   <Link href={`/admin/team/${record.id}`}>
                     <Button type="primary" icon={<EditOutlined />} size="small">
-                      ערוך
+                      {t.edit}
                     </Button>
                   </Link>
                   <Button
@@ -306,7 +309,7 @@ export default function TeamPage() {
                       setDeleteModal(true);
                     }}
                   >
-                    מחק
+                    {t.delete}
                   </Button>
                 </Space>
               ),
@@ -321,7 +324,7 @@ export default function TeamPage() {
         {loading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredMembers.length === 0 ? (
-          <AdminEmptyState message="לא נמצאו חברי צוות" addHref="/admin/team/new" addLabel="הוספת חבר צוות" />
+          <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} />
         ) : (
           <div className="admin-card-list">
             {filteredMembers.map((member) => (
@@ -348,21 +351,21 @@ export default function TeamPage() {
                   </div>
                 </div>
                 <div className="admin-card__fields">
-                  {member.phone && <span><b>טלפון</b> {member.phone}</span>}
-                  {member.mobile && <span><b>נייד</b> {member.mobile}</span>}
-                  {member.email && <span><b>אימייל</b> {member.email}</span>}
-                  <span><b>סדר</b> {member.order}</span>
+                  {member.phone && <span><b>{t.fieldPhone}</b> <span dir="ltr">{member.phone}</span></span>}
+                  {member.mobile && <span><b>{t.fieldMobile}</b> <span dir="ltr">{member.mobile}</span></span>}
+                  {member.email && <span><b>{t.fieldEmail}</b> <span dir="ltr">{member.email}</span></span>}
+                  <span><b>{t.fieldOrder}</b> {member.order}</span>
                 </div>
                 <div className="admin-card__actions">
                   <Switch
                     checked={member.isActive}
                     onChange={(v) => handleStatusChange(member.id, v)}
-                    checkedChildren="פעיל"
-                    unCheckedChildren="כבוי"
+                    checkedChildren={t.statusActive}
+                    unCheckedChildren={t.switchOff}
                   />
                   <span className="admin-card__grow">
                     <Link href={`/admin/team/${member.id}`}>
-                      <Button type="primary" icon={<EditOutlined />}>ערוך</Button>
+                      <Button type="primary" icon={<EditOutlined />}>{t.edit}</Button>
                     </Link>
                   </span>
                   <Button
@@ -374,7 +377,7 @@ export default function TeamPage() {
                       setDeleteModal(true);
                     }}
                   >
-                    מחק
+                    {t.delete}
                   </Button>
                 </div>
               </div>
@@ -385,18 +388,18 @@ export default function TeamPage() {
 
       {/* Delete Confirmation Modal */}
       <Modal
-        title="אישור מחיקה"
+        title={t.deleteConfirmTitle}
         open={deleteModal}
         onOk={handleDelete}
         onCancel={() => {
           setDeleteModal(false);
           setSelectedMember(null);
         }}
-        okText="מחק"
-        cancelText="ביטול"
+        okText={t.delete}
+        cancelText={t.cancel}
         okButtonProps={{ danger: true }}
       >
-        <p>האם אתה בטוח שברצונך למחוק חבר צוות זה?</p>
+        <p>{t.deleteConfirmBody}</p>
       </Modal>
     </div>
   );

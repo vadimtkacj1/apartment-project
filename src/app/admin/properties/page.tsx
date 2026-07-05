@@ -29,6 +29,8 @@ import {
 } from '@ant-design/icons';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertiesMessages } from '@/lib/adminI18n/messages/properties';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 import type { ColumnsType } from 'antd/es/table';
 import { getCityLabel } from '@/data/cities';
@@ -91,6 +93,7 @@ function formatPropertyPrice(price: string): string {
 
 export default function PropertiesPage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(propertiesMessages);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -147,7 +150,7 @@ export default function PropertiesPage() {
     } catch (error) {
       console.error('Error fetching properties:', error);
       setProperties([]);
-      message.error('שגיאה בטעינת הנכסים');
+      message.error(t.loadError);
     } finally {
       setLoading(false);
     }
@@ -197,10 +200,10 @@ export default function PropertiesPage() {
       setDeleteModal(false);
       setSelectedProperty(null);
       fetchProperties();
-      message.success('הנכס נמחק בהצלחה');
+      message.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting property:', error);
-      message.error('שגיאה במחיקת הנכס. נסה שוב.');
+      message.error(t.deleteError);
     }
   };
 
@@ -230,17 +233,17 @@ export default function PropertiesPage() {
 
       // Get the property to check dealType for proper messaging
       const property = properties.find((p) => p.id === propertyId);
-      const soldText = property?.dealType === 'rent' ? 'מושכר' : 'נמכר';
+      const soldText = property?.dealType === 'rent' ? t.statusRented : t.statusSold;
 
       const msgs: Record<string, string> = {
-        isSold: value ? `הנכס סומן כ${soldText}` : `הנכס בוטל מסומן כ${soldText}`,
-        isPinned: value ? 'הנכס נצמד לעמוד הבית' : 'הנכס בוטל מהצמדה',
-        isActive: value ? 'הנכס הופעל' : 'הנכס הושבת',
+        isSold: value ? t.markedAs(soldText) : t.unmarkedAs(soldText),
+        isPinned: value ? t.pinnedToHome : t.unpinnedFromHome,
+        isActive: value ? t.activated : t.deactivated,
       };
       message.success(msgs[field]);
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
-      message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
+      message.error(t.statusUpdateError);
       // Revert optimistic update on error
       setProperties((prev) =>
         prev.map((property) =>
@@ -254,10 +257,10 @@ export default function PropertiesPage() {
     <div className="px-2 sm:px-4 md:px-0">
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול נכסים</h1>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.pageTitle}</h1>
         <Link href="/admin/properties/new" className="w-full sm:w-auto">
           <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-            הוסף נכס חדש
+            {t.addNewProperty}
           </Button>
         </Link>
       </div>
@@ -265,11 +268,11 @@ export default function PropertiesPage() {
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         {[
-          { title: 'סה״כ נכסים', value: stats.total, prefix: <HomeOutlined /> },
-          { title: 'נכסים למכירה', value: stats.forSale, color: BRAND.success },
-          { title: 'נכסים להשכרה', value: stats.forRent, color: BRAND.navy },
-          { title: 'נכסים פעילים', value: stats.active, color: BRAND.goldText },
-          { title: 'נכסים שנמכרו', value: stats.sold, color: BRAND.danger },
+          { title: t.statTotal, value: stats.total, prefix: <HomeOutlined /> },
+          { title: t.statForSale, value: stats.forSale, color: BRAND.success },
+          { title: t.statForRent, value: stats.forRent, color: BRAND.navy },
+          { title: t.statActive, value: stats.active, color: BRAND.goldText },
+          { title: t.statSold, value: stats.sold, color: BRAND.danger },
         ].map((s) => (
           <Col key={s.title} flex="1 1 180px">
             <Card>
@@ -288,7 +291,7 @@ export default function PropertiesPage() {
       <Card className="mb-6">
         <Space vertical style={{ width: '100%' }} size="middle">
           <Input
-            placeholder="חפש לפי כותרת, מיקום או עיר..."
+            placeholder={t.searchPlaceholder}
             prefix={<SearchOutlined />}
             value={searchTerm}
             onChange={(e) => {
@@ -307,9 +310,9 @@ export default function PropertiesPage() {
               style={{ minWidth: 150 }}
               size="large"
             >
-              <Select.Option value="all">כל סוגי העסקאות</Select.Option>
-              <Select.Option value="sale">מכירה</Select.Option>
-              <Select.Option value="rent">השכרה</Select.Option>
+              <Select.Option value="all">{t.filterAllDealTypes}</Select.Option>
+              <Select.Option value="sale">{t.dealSale}</Select.Option>
+              <Select.Option value="rent">{t.dealRent}</Select.Option>
             </Select>
             <Select
               value={filterStatus}
@@ -320,11 +323,11 @@ export default function PropertiesPage() {
               style={{ minWidth: 120 }}
               size="large"
             >
-              <Select.Option value="all">כל הסטטוסים</Select.Option>
-              <Select.Option value="active">פעיל</Select.Option>
-              <Select.Option value="inactive">לא פעיל</Select.Option>
-              <Select.Option value="sold">נמכר</Select.Option>
-              <Select.Option value="available">זמין</Select.Option>
+              <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
+              <Select.Option value="active">{t.statusActive}</Select.Option>
+              <Select.Option value="inactive">{t.statusInactive}</Select.Option>
+              <Select.Option value="sold">{t.statusSold}</Select.Option>
+              <Select.Option value="available">{t.statusAvailable}</Select.Option>
             </Select>
           </Space>
         </Space>
@@ -342,18 +345,18 @@ export default function PropertiesPage() {
             current: currentPage,
             pageSize,
             showSizeChanger: true,
-            showTotal: (total) => `סה״כ ${total} נכסים`,
+            showTotal: (total) => t.tableTotal(total),
             onChange: (page, size) => {
               setCurrentPage(page);
               setPageSize(size);
             },
           }}
           scroll={{ x: 'max-content' }}
-          locale={{ emptyText: <AdminEmptyState message="לא נמצאו נכסים" addHref="/admin/properties/new" addLabel="הוספת נכס" /> }}
+          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} /> }}
           rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
           columns={[
             {
-              title: 'תמונה',
+              title: t.colImage,
               dataIndex: 'images',
               key: 'image',
               width: 72,
@@ -376,7 +379,7 @@ export default function PropertiesPage() {
               ),
             },
             {
-              title: 'כותרת',
+              title: t.colTitle,
               dataIndex: 'title',
               key: 'title',
               width: 250,
@@ -385,32 +388,32 @@ export default function PropertiesPage() {
               },
             },
             {
-              title: 'מיקום',
+              title: t.colLocation,
               dataIndex: 'location',
               key: 'location',
               width: 150,
               ellipsis: true,
             },
             {
-              title: 'עיר',
+              title: t.colCity,
               dataIndex: 'city',
               key: 'city',
               width: 100,
               render: (city: string) => getCityLabel(city) || city,
             },
             {
-              title: 'סוג עסקה',
+              title: t.colDealType,
               dataIndex: 'dealType',
               key: 'dealType',
               width: 100,
               render: (dealType: string) => (
                 <Tag color={dealType === 'sale' ? 'green' : '#1C3664'}>
-                  {dealType === 'sale' ? 'מכירה' : 'השכרה'}
+                  {dealType === 'sale' ? t.dealSale : t.dealRent}
                 </Tag>
               ),
             },
             {
-              title: 'מחיר',
+              title: t.colPrice,
               dataIndex: 'price',
               key: 'price',
               width: 120,
@@ -421,22 +424,22 @@ export default function PropertiesPage() {
               ),
             },
             {
-              title: 'חדרים',
+              title: t.colRooms,
               dataIndex: 'rooms',
               key: 'rooms',
               width: 80,
               align: 'center',
             },
             {
-              title: 'שטח',
+              title: t.colArea,
               dataIndex: 'area',
               key: 'area',
               width: 80,
               align: 'center',
-              render: (area: number) => `${area} מ"ר`,
+              render: (area: number) => t.sqm(area),
             },
             {
-              title: 'קומה',
+              title: t.colFloor,
               key: 'floor',
               width: 80,
               align: 'center',
@@ -446,7 +449,7 @@ export default function PropertiesPage() {
                   : record.floor || '-',
             },
             {
-              title: 'סטטוס',
+              title: t.colStatus,
               key: 'status',
               width: 120,
               render: (_, record: Property) => (
@@ -455,28 +458,28 @@ export default function PropertiesPage() {
                     size="small"
                     checked={record.isActive}
                     onChange={(v) => handleStatusChange(record.id, 'isActive', v)}
-                    checkedChildren="פעיל"
-                    unCheckedChildren="כבוי"
+                    checkedChildren={t.statusActive}
+                    unCheckedChildren={t.switchOff}
                   />
                   <Switch
                     size="small"
                     checked={record.isSold}
                     onChange={(v) => handleStatusChange(record.id, 'isSold', v)}
-                    checkedChildren={record.dealType === 'rent' ? 'מושכר' : 'נמכר'}
-                    unCheckedChildren="פנוי"
+                    checkedChildren={record.dealType === 'rent' ? t.statusRented : t.statusSold}
+                    unCheckedChildren={t.switchVacant}
                   />
                 </Space>
               ),
             },
             {
-              title: 'פעולות',
+              title: t.colActions,
               key: 'actions',
               width: 150,
               render: (_, record: Property) => (
                 <Space size={4}>
                   <Link href={`/admin/properties/${record.id}`}>
                     <Button type="primary" icon={<EditOutlined />} size="small">
-                      ערוך
+                      {t.edit}
                     </Button>
                   </Link>
                   <Button
@@ -489,7 +492,7 @@ export default function PropertiesPage() {
                       setDeleteModal(true);
                     }}
                   >
-                    מחק
+                    {t.delete}
                   </Button>
                 </Space>
               ),
@@ -504,21 +507,21 @@ export default function PropertiesPage() {
         {loading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredProperties.length === 0 ? (
-          <AdminEmptyState message="לא נמצאו נכסים" addHref="/admin/properties/new" addLabel="הוספת נכס" />
+          <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} />
         ) : (
           <div className="admin-card-list">
             {filteredProperties.map((property) => {
               const cityLabel = getCityLabel(property.city) || property.city;
               const metaParts = [
                 cityLabel || property.location,
-                `${property.rooms} חד׳`,
-                `${property.area} מ"ר`,
+                t.roomsShort(property.rooms),
+                t.sqm(property.area),
               ];
               if (property.floor) {
                 metaParts.push(
                   property.totalFloors
-                    ? `קומה ${property.floor}/${property.totalFloors}`
-                    : `קומה ${property.floor}`
+                    ? t.floorOf(property.floor, property.totalFloors)
+                    : t.floorOnly(property.floor)
                 );
               }
               return (
@@ -539,7 +542,7 @@ export default function PropertiesPage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
                       <Tag color={property.dealType === 'sale' ? 'green' : '#1C3664'} style={{ marginInlineEnd: 0 }}>
-                        {property.dealType === 'sale' ? 'מכירה' : 'השכרה'}
+                        {property.dealType === 'sale' ? t.dealSale : t.dealRent}
                       </Tag>
                       <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', fontWeight: 600, color: '#1C3664' }}>
                         {formatPropertyPrice(property.price)}
@@ -547,10 +550,10 @@ export default function PropertiesPage() {
                     </div>
                   </div>
                   <div className="admin-card__fields">
-                    <span><b>חדרים</b> {property.rooms}</span>
-                    <span><b>שטח</b> {property.area} מ&quot;ר</span>
+                    <span><b>{t.colRooms}</b> {property.rooms}</span>
+                    <span><b>{t.colArea}</b> {t.sqm(property.area)}</span>
                     <span>
-                      <b>קומה</b>{' '}
+                      <b>{t.colFloor}</b>{' '}
                       {property.floor && property.totalFloors
                         ? `${property.floor}/${property.totalFloors}`
                         : property.floor || '-'}
@@ -560,19 +563,19 @@ export default function PropertiesPage() {
                     <Switch
                       checked={property.isActive}
                       onChange={(v) => handleStatusChange(property.id, 'isActive', v)}
-                      checkedChildren="פעיל"
-                      unCheckedChildren="כבוי"
+                      checkedChildren={t.statusActive}
+                      unCheckedChildren={t.switchOff}
                     />
                     <Switch
                       checked={property.isSold}
                       onChange={(v) => handleStatusChange(property.id, 'isSold', v)}
-                      checkedChildren={property.dealType === 'rent' ? 'מושכר' : 'נמכר'}
-                      unCheckedChildren="פנוי"
+                      checkedChildren={property.dealType === 'rent' ? t.statusRented : t.statusSold}
+                      unCheckedChildren={t.switchVacant}
                     />
                     <span className="admin-card__grow" style={{ display: 'flex', gap: 8 }}>
                       <Link href={`/admin/properties/${property.id}`} style={{ flex: 1 }}>
                         <Button type="primary" icon={<EditOutlined />} block>
-                          ערוך
+                          {t.edit}
                         </Button>
                       </Link>
                       <Button
@@ -585,7 +588,7 @@ export default function PropertiesPage() {
                           setDeleteModal(true);
                         }}
                       >
-                        מחק
+                        {t.delete}
                       </Button>
                     </span>
                   </div>
@@ -598,18 +601,18 @@ export default function PropertiesPage() {
 
       {/* Delete Confirmation Modal */}
       <Modal
-        title="אישור מחיקה"
+        title={t.deleteModalTitle}
         open={deleteModal}
         onOk={handleDelete}
         onCancel={() => {
           setDeleteModal(false);
           setSelectedProperty(null);
         }}
-        okText="מחק"
-        cancelText="ביטול"
+        okText={t.delete}
+        cancelText={t.cancel}
         okButtonProps={{ danger: true }}
       >
-        <p>האם אתה בטוח שברצונך למחוק נכס זה?</p>
+        <p>{t.deleteModalContent}</p>
       </Modal>
     </div>
   );

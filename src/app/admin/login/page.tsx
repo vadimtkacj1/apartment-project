@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { Form, Input, Button, Alert } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { useAdminI18n, useAdminMessages, DEFAULT_ADMIN_LOCALE, dirOf } from '@/lib/adminI18n';
+import { loginMessages } from '@/lib/adminI18n/messages/login';
+import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 
 function AiterraLogo({ size = 56, color = '#1C3664' }: { size?: number; color?: string }) {
   return (
@@ -31,6 +34,8 @@ function AiterraLogo({ size = 56, color = '#1C3664' }: { size?: number; color?: 
 function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
+  const { dir } = useAdminI18n();
+  const t = useAdminMessages(loginMessages);
 
   const nextUrl = useMemo(() => search.get('next') || '/admin', [search]);
 
@@ -49,7 +54,7 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('שם משתמש או סיסמה שגויים');
+        setError(t.invalidCredentials);
         return;
       }
 
@@ -59,7 +64,7 @@ function LoginForm() {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('שגיאה בהתחברות');
+      setError(t.loginError);
     } finally {
       setLoading(false);
     }
@@ -67,7 +72,7 @@ function LoginForm() {
 
   return (
     <div
-      dir="rtl"
+      dir={dir}
       style={{
         minHeight: '100vh',
         display: 'flex',
@@ -87,15 +92,19 @@ function LoginForm() {
           border: '1px solid #E6E8EC',
         }}
       >
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+          <LanguageSwitcher compact />
+        </div>
+
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
             <AiterraLogo size={56} />
           </div>
           <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
-            לוח ניהול
+            {t.title}
           </h1>
           <p style={{ color: '#8c8c8c', marginTop: '8px' }}>
-            התחבר למערכת
+            {t.subtitle}
           </p>
         </div>
 
@@ -114,13 +123,13 @@ function LoginForm() {
           size="large"
         >
           <Form.Item
-            label="שם משתמש"
+            label={t.username}
             name="username"
-            rules={[{ required: true, message: 'אנא הכנס שם משתמש!' }]}
+            rules={[{ required: true, message: t.usernameRequired }]}
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="הכנס שם משתמש"
+              placeholder={t.usernamePlaceholder}
               disabled={loading}
               dir="ltr"
               style={{ textAlign: 'left' }}
@@ -128,14 +137,14 @@ function LoginForm() {
           </Form.Item>
 
           <Form.Item
-            label="סיסמה"
+            label={t.password}
             name="password"
-            rules={[{ required: true, message: 'אנא הכנס סיסמה!' }]}
+            rules={[{ required: true, message: t.passwordRequired }]}
           >
             <div dir="ltr">
               <Input.Password
                 prefix={<LockOutlined />}
-                placeholder="הכנס סיסמה"
+                placeholder={t.passwordPlaceholder}
                 disabled={loading}
                 style={{ textAlign: 'left' }}
               />
@@ -149,7 +158,7 @@ function LoginForm() {
               loading={loading}
               block
             >
-              התחבר
+              {t.submit}
             </Button>
           </Form.Item>
         </Form>
@@ -162,7 +171,7 @@ export default function AdminLoginPage() {
   return (
     <Suspense fallback={
       <div
-        dir="rtl"
+        dir={dirOf(DEFAULT_ADMIN_LOCALE)}
         style={{
           minHeight: '100vh',
           display: 'flex',
@@ -171,7 +180,9 @@ export default function AdminLoginPage() {
           background: '#ffffff',
         }}
       >
-        <div style={{ fontSize: '18px' }}>טוען...</div>
+        <div style={{ fontSize: '18px' }}>
+          {loginMessages[DEFAULT_ADMIN_LOCALE].loading}
+        </div>
       </div>
     }>
       <LoginForm />

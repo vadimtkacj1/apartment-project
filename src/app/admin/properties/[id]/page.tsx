@@ -3,6 +3,8 @@
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Form, Spin, Typography } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { usePropertyForm } from './usePropertyForm';
 import {
   BasicInfoSection,
@@ -21,6 +23,7 @@ export default function PropertyEditPage() {
   const params = useParams();
   const router = useRouter();
   const [form] = Form.useForm();
+  const t = useAdminMessages(propertyFormMessages);
   const isNew = params.id === 'new';
 
   const {
@@ -44,8 +47,8 @@ export default function PropertyEditPage() {
     <div className="px-2 sm:px-4 md:px-0">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <Title level={2} style={{ margin: 0, fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>
-          <HomeOutlined style={{ marginLeft: '8px' }} />
-          {isNew ? 'הוסף נכס חדש' : 'ערוך נכס'}
+          <HomeOutlined style={{ marginInlineEnd: '8px' }} />
+          {isNew ? t.page.addTitle : t.page.editTitle}
         </Title>
         <Button
           icon={<ArrowLeftOutlined />}
@@ -54,7 +57,7 @@ export default function PropertyEditPage() {
           size="large"
           className="w-full sm:w-auto"
         >
-          חזרה לרשימה
+          {t.page.backToList}
         </Button>
       </div>
 
@@ -99,7 +102,7 @@ export default function PropertyEditPage() {
               onClick={() => router.push('/admin/properties')}
               className="w-full sm:w-auto order-2 sm:order-1"
             >
-              ביטול
+              {t.page.cancel}
             </Button>
             <Button
               type="primary"
@@ -109,7 +112,7 @@ export default function PropertyEditPage() {
               icon={<SaveOutlined />}
               className="w-full sm:w-auto order-1 sm:order-2"
             >
-              שמור נכס
+              {t.page.save}
             </Button>
           </div>
         </div>

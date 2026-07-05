@@ -14,6 +14,8 @@ import {
 import Link from 'next/link';
 import dayjs from 'dayjs';
 import { getCityLabel } from '@/data/cities';
+import { useAdminI18n, useAdminMessages, type MessagesShape } from '@/lib/adminI18n';
+import { dashboardMessages } from '@/lib/adminI18n/messages/dashboard';
 
 /* ===== palette (matches src/lib/adminTheme.ts) — Clean Slate: navy · gold · cool-neutral ===== */
 const NAVY = '#1C3664';
@@ -26,20 +28,8 @@ const HOVER_BG = '#F4F6F8'; // slate page tint
 
 const WINDOW_DAYS = 14; // sparkline window; the full, filterable trend lives on /admin/analytics
 
-const PROPERTY_TYPE_HE: Record<string, string> = {
-  apartment: 'דירה',
-  'garden-apartment': 'דירת גן',
-  cottage: 'קוטג׳',
-  house: 'בית פרטי',
-  duplex: 'דופלקס',
-  penthouse: 'פנטהאוז',
-  'mini-penthouse': 'מיני פנטהאוז',
-  'roof-apartment': 'דירת גג',
-  'housing-unit': 'יחידת דיור',
-  studio: 'סטודיו',
-  'basement-apartment': 'דירת מרתף',
-  villa: 'וילה',
-};
+/** Resolved dashboard message record for the active locale. */
+type DashboardT = MessagesShape<(typeof dashboardMessages)['he']>;
 
 /* ===== types ===== */
 interface PropertyRow {
@@ -84,18 +74,17 @@ const parseMoney = (s: string | null | undefined): number =>
 
 const ils = (n: number): string => '₪' + n.toLocaleString('en-US');
 
-/** Self-contained Hebrew long date (no dayjs locale dependency): "1 ביולי 2026". */
-const HE_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
-const formatHeDate = (d: ReturnType<typeof dayjs>): string => `${d.date()} ב${HE_MONTHS[d.month()]} ${d.year()}`;
+/** Self-contained long date (no dayjs locale dependency): "1 ביולי 2026" / "1 July 2026". */
+const formatLongDate = (d: ReturnType<typeof dayjs>, t: DashboardT): string => t.longDate(d.date(), d.month(), d.year());
 
 /** Human relative age for a listing — keeps recent rows feeling live, not template-y. */
-const relDaysLabel = (iso: string): string => {
+const relDaysLabel = (iso: string, t: DashboardT): string => {
   const days = dayjs().startOf('day').diff(dayjs(iso).startOf('day'), 'day');
-  if (days <= 0) return 'נוסף היום';
-  if (days === 1) return 'נוסף אתמול';
-  if (days < 7) return `לפני ${days} ימים`;
-  if (days < 14) return 'לפני שבוע';
-  return `לפני ${Math.floor(days / 7)} שבועות`;
+  if (days <= 0) return t.addedToday;
+  if (days === 1) return t.addedYesterday;
+  if (days < 7) return t.daysAgo(days);
+  if (days < 14) return t.weekAgo;
+  return t.weeksAgo(Math.floor(days / 7));
 };
 
 /** Bidi-isolated, tabular-numeral wrapper so ₪/%/commas/digits never reorder in RTL. */
@@ -118,6 +107,8 @@ const cardBody: { body: React.CSSProperties } = { body: { padding: 22 } };
 
 /* ===== page ===== */
 export default function AdminDashboard() {
+  const t = useAdminMessages(dashboardMessages);
+  const { dir } = useAdminI18n();
   const [props, setProps] = useState<PropertyRow[] | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [propsLoading, setPropsLoading] = useState(true);
@@ -171,10 +162,11 @@ export default function AdminDashboard() {
     const pinnedCount = p.filter((x) => x.isPinned).length;
     const hotCount = p.filter((x) => x.isHotProposition).length;
 
+    const typeLabels: Record<string, string> = t.propertyTypes;
     const typeMap = new Map<string, number>();
     p.forEach((x) => typeMap.set(x.propertyType, (typeMap.get(x.propertyType) || 0) + 1));
     const typeCounts = Array.from(typeMap.entries())
-      .map(([type, count]) => ({ type, count, label: PROPERTY_TYPE_HE[type] || type }))
+      .map(([type, count]) => ({ type, count, label: typeLabels[type] || type }))
       .sort((a, b) => b.count - a.count);
 
     const cityMap = new Map<string, number>();
@@ -193,7 +185,7 @@ export default function AdminDashboard() {
       newThisWeek, priceDrops, noPhotos, hidden, soldCount, pinnedCount, hotCount,
       typeCounts, cityCounts, recentListings,
     };
-  }, [p]);
+  }, [p, t]);
 
   const totalViews = summary?.totalViews ?? 0;
   const totalClicks = summary?.totalClicks ?? 0;
@@ -220,14 +212,14 @@ export default function AdminDashboard() {
   /* ===== render ===== */
   return (
     <div className="px-2 sm:px-4 md:px-0 estate-console">
-      <h1 className="ec-sr-only">לוח בקרה</h1>
+      <h1 className="ec-sr-only">{t.pageTitle}</h1>
 
       {/* ── Masthead — a slim navy bar (brand + date, one honest stat line, thin detail),
               with the new-leads CTA folded in. No billboard number, no separate strip. ── */}
       <div className="ec-masthead">
         <div className="ec-mast-top">
-          <span className="ec-mast-title">רם נכסים · לוח בקרה</span>
-          <span className="ec-mast-date">{formatHeDate(dayjs())}</span>
+          <span className="ec-mast-title">{t.mastheadTitle}</span>
+          <span className="ec-mast-date">{formatLongDate(dayjs(), t)}</span>
         </div>
 
         {propsLoading ? (
@@ -237,26 +229,26 @@ export default function AdminDashboard() {
             <div className="ec-mast-line">
               <span className="ec-mast-stat">
                 <Num style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{ils(portfolio.portfolioValue)}</Num>
-                <span className="ec-mast-cap">שווי תיק</span>
+                <span className="ec-mast-cap">{t.portfolioValue}</span>
               </span>
               <span className="ec-mast-sep">·</span>
-              <span className="ec-mast-stat"><Num style={{ fontWeight: 700 }}>{portfolio.activeCount}</Num> נכסים פעילים</span>
+              <span className="ec-mast-stat"><Num style={{ fontWeight: 700 }}>{portfolio.activeCount}</Num> {t.activeProperties}</span>
               <span className="ec-mast-sep">·</span>
               <span className="ec-mast-stat">
-                <Num style={{ fontWeight: 700 }}>{portfolio.saleCount}</Num> למכירה · <Num style={{ fontWeight: 700 }}>{portfolio.rentCount}</Num> להשכרה
+                <Num style={{ fontWeight: 700 }}>{portfolio.saleCount}</Num> {t.forSaleLower} · <Num style={{ fontWeight: 700 }}>{portfolio.rentCount}</Num> {t.forRentLower}
               </span>
 
               {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
                 <Link href="/admin/inquiries" className="ec-mast-cta">
-                  <Num style={{ fontWeight: 700 }}>{summary?.newInquiries}</Num> פניות חדשות
+                  <Num style={{ fontWeight: 700 }}>{summary?.newInquiries}</Num> {t.newInquiries}
                   <ArrowLeftOutlined style={{ fontSize: 11 }} />
                 </Link>
               )}
             </div>
 
             <div className="ec-mast-detail">
-              יקר ביותר <Num>{ils(portfolio.maxPrice)}</Num> · ממוצע <Num>{ils(portfolio.avgPrice)}</Num>
-              {portfolio.newThisWeek > 0 && <> · נוספו השבוע <Num>{portfolio.newThisWeek}</Num></>}
+              {t.mostExpensive} <Num>{ils(portfolio.maxPrice)}</Num> · {t.averageLabel} <Num>{ils(portfolio.avgPrice)}</Num>
+              {portfolio.newThisWeek > 0 && <> · {t.addedThisWeek} <Num>{portfolio.newThisWeek}</Num></>}
             </div>
           </>
         )}
@@ -266,10 +258,10 @@ export default function AdminDashboard() {
       <Card
         styles={cardBody}
         style={{ marginBottom: 24 }}
-        title={<SectionTitle>תנועת האתר</SectionTitle>}
+        title={<SectionTitle>{t.siteTraffic}</SectionTitle>}
         extra={
           <Link href="/admin/analytics" className="ec-viewall">
-            לאנליטיקה המלאה <ArrowLeftOutlined style={{ fontSize: 11 }} />
+            {t.fullAnalytics} <ArrowLeftOutlined style={{ fontSize: 11 }} />
           </Link>
         }
       >
@@ -280,15 +272,15 @@ export default function AdminDashboard() {
             {/* Funnel order (visitors → views → interactions → leads) reads like a story,
                 not an even grid of interchangeable numbers. Rates live in the foot, honest. */}
             <div className="ec-kpis">
-              <Kpi label="מבקרים ייחודיים" value={uniqueVisitors} />
-              <Kpi label="צפיות" value={totalViews} />
-              <Kpi label="אינטראקציות" value={totalClicks} />
-              <Kpi label="פניות" value={leadSignals} accent />
+              <Kpi label={t.kpiUniqueVisitors} value={uniqueVisitors} />
+              <Kpi label={t.kpiViews} value={totalViews} />
+              <Kpi label={t.kpiInteractions} value={totalClicks} />
+              <Kpi label={t.kpiInquiries} value={leadSignals} accent />
             </div>
 
             <div className="ec-spark">
               {trendEmpty ? (
-                <EmptyBlock height={72} text="אין עדיין נתוני תנועה" />
+                <EmptyBlock height={72} text={t.noTrafficData} />
               ) : (
                 <ResponsiveContainer width="100%" height={72}>
                   <AreaChart data={series} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
@@ -302,21 +294,21 @@ export default function AdminDashboard() {
                         <stop offset="95%" stopColor={GOLD} stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="date" reversed hide />
+                    <XAxis dataKey="date" reversed={dir === 'rtl'} hide />
                     <YAxis hide />
                     <Tooltip
-                      contentStyle={{ borderRadius: 10, border: `1px solid ${HAIRLINE}`, direction: 'rtl', textAlign: 'right', boxShadow: '0 6px 18px rgba(0,0,0,.06)', fontSize: 12 }}
+                      contentStyle={{ borderRadius: 10, border: `1px solid ${HAIRLINE}`, direction: dir, textAlign: 'start', boxShadow: '0 6px 18px rgba(0,0,0,.06)', fontSize: 12 }}
                       labelStyle={{ fontWeight: 700, marginBottom: 4, color: NAVY }}
                     />
-                    <Area type="monotone" dataKey="views" name="צפיות" stroke={NAVY} strokeWidth={2} fill="url(#ecSparkViews)" activeDot={{ r: 4 }} />
-                    <Area type="monotone" dataKey="clicks" name="אינטראקציות" stroke={GOLD} strokeWidth={2} fill="url(#ecSparkClicks)" activeDot={{ r: 4 }} />
+                    <Area type="monotone" dataKey="views" name={t.chartViews} stroke={NAVY} strokeWidth={2} fill="url(#ecSparkViews)" activeDot={{ r: 4 }} />
+                    <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={GOLD} strokeWidth={2} fill="url(#ecSparkClicks)" activeDot={{ r: 4 }} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
               <div className="ec-spark-foot">
-                יחס המרה <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{conversion}%</Num> · מעורבות <Num style={{ color: INK, fontWeight: 600 }}>{engagement}%</Num>
+                {t.conversionRate} <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: INK, fontWeight: 600 }}>{engagement}%</Num>
                 <br />
-                {WINDOW_DAYS} הימים האחרונים · היום <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> צפיות · <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{leadsToday}</Num> פניות
+                {t.lastDays(WINDOW_DAYS)} · {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
               </div>
             </div>
           </div>
@@ -326,29 +318,29 @@ export default function AdminDashboard() {
       {/* ── Composition + Attention queue ── */}
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }} align="stretch">
         <Col xs={24} lg={13}>
-          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>הרכב התיק</SectionTitle>}>
+          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>{t.portfolioComposition}</SectionTitle>}>
             {propsLoading ? (
               <Skeleton active paragraph={{ rows: 5 }} />
             ) : portfolio.total === 0 ? (
-              <EmptyBlock height={160} text="אין עדיין נכסים במערכת" />
+              <EmptyBlock height={160} text={t.noPropertiesInSystem} />
             ) : (
               <>
-                <div className="ec-splitbar" role="img" aria-label="חלוקה למכירה והשכרה">
+                <div className="ec-splitbar" role="img" aria-label={t.splitBarAria}>
                   {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ width: `${portfolio.salePct}%`, background: NAVY }} />}
                   {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ width: `${100 - portfolio.salePct}%`, background: GOLD }} />}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 13 }}>
                   <span style={{ color: NAVY, fontWeight: 600 }}>
                     <span className="ec-dot" style={{ background: NAVY }} />
-                    <Num>{portfolio.salePct}%</Num> · <Num>{portfolio.saleCount}</Num> למכירה
+                    <Num>{portfolio.salePct}%</Num> · <Num>{portfolio.saleCount}</Num> {t.forSaleLower}
                   </span>
                   <span style={{ color: GOLD_TEXT, fontWeight: 600 }}>
                     <span className="ec-dot" style={{ background: GOLD }} />
-                    <Num>{100 - portfolio.salePct}%</Num> · <Num>{portfolio.rentCount}</Num> להשכרה
+                    <Num>{100 - portfolio.salePct}%</Num> · <Num>{portfolio.rentCount}</Num> {t.forRentLower}
                   </span>
                 </div>
 
-                <Label style={{ marginTop: 22, marginBottom: 8 }}>לפי סוג נכס</Label>
+                <Label style={{ marginTop: 22, marginBottom: 8 }}>{t.byPropertyType}</Label>
                 <div>
                   {portfolio.typeCounts.map((t) => (
                     <div key={t.type} className="ec-typerow">
@@ -360,7 +352,7 @@ export default function AdminDashboard() {
 
                 {portfolio.cityCounts.length > 0 && (
                   <>
-                    <Label style={{ marginTop: 18, marginBottom: 10 }}>ערים מובילות</Label>
+                    <Label style={{ marginTop: 18, marginBottom: 10 }}>{t.topCities}</Label>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {portfolio.cityCounts.map((c) => (
                         <span key={c.label} className="ec-citychip">
@@ -376,17 +368,17 @@ export default function AdminDashboard() {
         </Col>
 
         <Col xs={24} lg={11}>
-          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>דורש טיפול</SectionTitle>}>
+          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>{t.needsAttention}</SectionTitle>}>
             {propsLoading ? (
               <Skeleton active paragraph={{ rows: 4 }} />
             ) : (
               <div>
-                <AttentionRow label="ירידות מחיר" count={portfolio.priceDrops} />
-                <AttentionRow label="נכסים ללא תמונות" count={portfolio.noPhotos} />
-                <AttentionRow label="נכסים מוסתרים" count={portfolio.hidden} />
-                <AttentionRow label="נכסים שנמכרו" count={portfolio.soldCount} muted />
-                {portfolio.hotCount > 0 && <AttentionRow label="הצעות חמות" count={portfolio.hotCount} muted />}
-                {portfolio.pinnedCount > 0 && <AttentionRow label="נכסים מוצמדים" count={portfolio.pinnedCount} muted />}
+                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} />
+                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} />
+                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} />
+                <AttentionRow label={t.soldProperties} count={portfolio.soldCount} muted />
+                {portfolio.hotCount > 0 && <AttentionRow label={t.hotOffers} count={portfolio.hotCount} muted />}
+                {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} muted />}
               </div>
             )}
           </Card>
@@ -394,11 +386,11 @@ export default function AdminDashboard() {
       </Row>
 
       {/* ── Recent listings ── */}
-      <Card styles={cardBody} title={<SectionTitle>נכסים שנוספו לאחרונה</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">צפה בהכל <ArrowLeftOutlined style={{ fontSize: 11 }} /></Link>}>
+      <Card styles={cardBody} title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <ArrowLeftOutlined style={{ fontSize: 11 }} /></Link>}>
         {propsLoading ? (
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : portfolio.recentListings.length === 0 ? (
-          <EmptyBlock height={120} text="אין עדיין נכסים" />
+          <EmptyBlock height={120} text={t.noProperties} />
         ) : (
           <div>
             {portfolio.recentListings.map((x) => (
@@ -414,12 +406,12 @@ export default function AdminDashboard() {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, color: NAVY, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.title}</div>
                   <div style={{ fontSize: 12.5, color: MUTED }}>
-                    {getCityLabel(x.city) || x.location} · <Num>{x.rooms}</Num> חד׳ · <Num>{x.area}</Num> מ״ר · {relDaysLabel(x.createdAt)}
+                    {getCityLabel(x.city) || x.location} · <Num>{x.rooms}</Num> {t.roomsAbbr} · <Num>{x.area}</Num> {t.sqmAbbr} · {relDaysLabel(x.createdAt, t)}
                   </div>
                 </div>
                 <Num style={{ fontWeight: 700, color: INK, fontSize: 14 }}>{ils(parseMoney(x.price))}</Num>
                 <span className={`ec-dealpill ${x.dealType === 'sale' ? 'sale' : 'rent'}`}>
-                  {x.dealType === 'sale' ? 'למכירה' : 'להשכרה'}
+                  {x.dealType === 'sale' ? t.dealSale : t.dealRent}
                 </span>
               </Link>
             ))}
@@ -445,17 +437,18 @@ function Kpi({ label, value, text, accent }: { label: string; value?: number; te
 }
 
 function AttentionRow({ label, count, muted }: { label: string; count: number; muted?: boolean }) {
+  const t = useAdminMessages(dashboardMessages);
   const ok = count === 0;
   return (
     <Link href="/admin/properties" className="ec-row ec-attrow">
       <span className="ec-attdot" style={{ background: ok ? '#DAD5CB' : muted ? '#C9CDD6' : GOLD }} />
       <span style={{ flex: 1, color: ok ? '#9AA0AA' : INK, fontSize: 14 }}>{label}</span>
       {ok ? (
-        <span style={{ color: '#9AA0AA', fontSize: 13 }}>הכל תקין ✓</span>
+        <span style={{ color: '#9AA0AA', fontSize: 13 }}>{t.allClear}</span>
       ) : (
         <>
           <Num style={{ fontWeight: 700, color: muted ? '#6B7280' : NAVY, fontSize: 15, marginInlineEnd: 10 }}>{count}</Num>
-          <span className="ec-att-cta">צפה <ArrowLeftOutlined style={{ fontSize: 10 }} /></span>
+          <span className="ec-att-cta">{t.view} <ArrowLeftOutlined style={{ fontSize: 10 }} /></span>
         </>
       )}
     </Link>

@@ -5,6 +5,8 @@ import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-map
 import { Input, Button, Space, App } from 'antd';
 import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
 
 interface Position {
   lat: number;
@@ -53,6 +55,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onAddressChange,
 }) => {
   const { message } = App.useApp();
+  const t = useAdminMessages(uploadersMessages);
   const [searchAddress, setSearchAddress] = useState('');
   const [searching, setSearching] = useState(false);
   const [markerPosition, setMarkerPosition] = useState<Position | null>(position);
@@ -166,16 +169,16 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           onAddressChange(addressData);
         }
 
-        message.success(`נמצא: ${result.formatted || result.city || term}`);
+        message.success(t.foundResult(result.formatted || result.city || term));
       } else {
         console.log('No results found for term:', term, 'Response:', data);
-        const errorMsg = data.error || 'לא נמצאו תוצאות. בדוק את המיקוד או הכתובת';
+        const errorMsg = data.error || t.noResults;
         message.error(errorMsg);
       }
     } catch (error: any) {
       console.error('Search error:', error);
-      const errorMessage = error.message || 'שגיאה בחיפוש';
-      message.error(`שגיאה בחיפוש: ${errorMessage}`);
+      const errorMessage = error.message || t.searchError;
+      message.error(t.searchErrorWith(errorMessage));
     } finally {
       setSearching(false);
     }
@@ -262,7 +265,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           <Space.Compact style={{ width: '100%' }}>
             <Input
               size="large"
-              placeholder="הזן מיקוד או כתובת"
+              placeholder={t.searchPlaceholder}
               value={searchAddress}
               onChange={(e) => setSearchAddress(e.target.value)}
               onPressEnter={searchAddressOnMap}
@@ -277,7 +280,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
               loading={true}
               disabled
             >
-              חפש
+              {t.search}
             </Button>
           </Space.Compact>
         </div>
@@ -291,7 +294,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           justifyContent: 'center',
           background: '#F1F3F5'
         }}>
-          <p>טוען מפה...</p>
+          <p>{t.loadingMap}</p>
         </div>
       </div>
     );
@@ -303,7 +306,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
         <Space.Compact style={{ width: '100%' }}>
           <Input
             size="large"
-            placeholder="הזן מיקוד או כתובת"
+            placeholder={t.searchPlaceholder}
             value={searchAddress}
             onChange={(e) => setSearchAddress(e.target.value)}
             onPressEnter={searchAddressOnMap}
@@ -316,7 +319,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
             onClick={searchAddressOnMap}
             loading={searching}
           >
-            חפש
+            {t.search}
           </Button>
         </Space.Compact>
       </div>

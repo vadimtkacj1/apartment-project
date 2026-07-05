@@ -29,6 +29,8 @@ import {
 import Link from 'next/link';
 import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
+import { inquiriesMessages } from '@/lib/adminI18n/messages/inquiries';
 
 interface Inquiry {
   id: number;
@@ -50,16 +52,24 @@ interface TeamOption {
   name: string;
 }
 
-const STATUS_META: Record<Inquiry['status'], { label: string; color: string }> = {
-  new: { label: 'חדשה', color: 'gold' },
-  in_progress: { label: 'בטיפול', color: 'blue' },
-  closed: { label: 'סגורה', color: 'green' },
+const STATUS_COLORS: Record<Inquiry['status'], string> = {
+  new: 'gold',
+  in_progress: 'blue',
+  closed: 'green',
 };
 
 const { TextArea } = Input;
 
 export default function InquiriesPage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(inquiriesMessages);
+  const { locale } = useAdminI18n();
+  const dateLocale = locale === 'he' ? 'he-IL' : 'en-GB';
+  const statusLabels: Record<Inquiry['status'], string> = {
+    new: t.statusNew,
+    in_progress: t.statusInProgress,
+    closed: t.statusClosed,
+  };
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [team, setTeam] = useState<TeamOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +92,7 @@ export default function InquiriesPage() {
       if (!res.ok) throw new Error('failed');
       setInquiries(await res.json());
     } catch {
-      message.error('שגיאה בטעינת הפניות');
+      message.error(t.loadError);
       setInquiries([]);
     } finally {
       setLoading(false);
@@ -117,7 +127,7 @@ export default function InquiriesPage() {
     try {
       await patchInquiry(id, { status });
     } catch {
-      message.error('שגיאה בעדכון הסטטוס');
+      message.error(t.statusUpdateError);
       fetchInquiries();
     }
   };
@@ -137,10 +147,10 @@ export default function InquiriesPage() {
         agentId: draftAgent ?? null,
       });
       setInquiries((prev) => prev.map((i) => (i.id === active.id ? { ...i, ...updated } : i)));
-      message.success('הפנייה עודכנה');
+      message.success(t.updated);
       setActive(null);
     } catch {
-      message.error('שגיאה בשמירה');
+      message.error(t.saveError);
     } finally {
       setSaving(false);
     }
@@ -151,9 +161,9 @@ export default function InquiriesPage() {
       const res = await fetch(`/api/admin/inquiries/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('failed');
       setInquiries((prev) => prev.filter((i) => i.id !== id));
-      message.success('הפנייה נמחקה');
+      message.success(t.deleted);
     } catch {
-      message.error('שגיאה במחיקה');
+      message.error(t.deleteError);
     }
   };
 
@@ -175,7 +185,7 @@ export default function InquiriesPage() {
 
   const columns: ColumnsType<Inquiry> = [
     {
-      title: 'סטטוס',
+      title: t.colStatus,
       dataIndex: 'status',
       key: 'status',
       width: 130,
@@ -185,15 +195,15 @@ export default function InquiriesPage() {
           size="small"
           style={{ width: 110 }}
           onChange={(v) => changeStatus(rec.id, v)}
-          options={(Object.keys(STATUS_META) as Inquiry['status'][]).map((s) => ({
+          options={(Object.keys(STATUS_COLORS) as Inquiry['status'][]).map((s) => ({
             value: s,
-            label: <Tag color={STATUS_META[s].color} style={{ marginInlineEnd: 0 }}>{STATUS_META[s].label}</Tag>,
+            label: <Tag color={STATUS_COLORS[s]} style={{ marginInlineEnd: 0 }}>{statusLabels[s]}</Tag>,
           }))}
         />
       ),
     },
     {
-      title: 'לקוח',
+      title: t.colClient,
       key: 'client',
       render: (_, r) => (
         <div>
@@ -214,7 +224,7 @@ export default function InquiriesPage() {
       ),
     },
     {
-      title: 'הודעה',
+      title: t.colMessage,
       dataIndex: 'message',
       key: 'message',
       ellipsis: true,
@@ -222,7 +232,7 @@ export default function InquiriesPage() {
         m ? <Tooltip title={m}><span>{m}</span></Tooltip> : <span style={{ color: '#bfbfbf' }}>—</span>,
     },
     {
-      title: 'נכס',
+      title: t.colProperty,
       key: 'property',
       width: 150,
       render: (_, r) =>
@@ -235,18 +245,18 @@ export default function InquiriesPage() {
         ),
     },
     {
-      title: 'סוכן',
+      title: t.colAgent,
       key: 'agent',
       width: 110,
       render: (_, r) =>
         agentName(r.agentId) || <span style={{ color: '#bfbfbf' }}>—</span>,
     },
     {
-      title: 'תאריך',
+      title: t.colDate,
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 120,
-      render: (d: string) => new Date(d).toLocaleDateString('he-IL'),
+      render: (d: string) => new Date(d).toLocaleDateString(dateLocale),
     },
     {
       title: '',
@@ -254,13 +264,13 @@ export default function InquiriesPage() {
       width: 100,
       render: (_, r) => (
         <div style={{ display: 'flex', gap: 4 }}>
-          <Tooltip title="פרטים והערות">
+          <Tooltip title={t.detailsTooltip}>
             <Button type="text" icon={<EyeOutlined />} onClick={() => openDetails(r)} />
           </Tooltip>
           <Popconfirm
-            title="למחוק את הפנייה?"
-            okText="מחק"
-            cancelText="ביטול"
+            title={t.deleteConfirm}
+            okText={t.deleteOk}
+            cancelText={t.cancel}
             okButtonProps={{ danger: true }}
             onConfirm={() => deleteInquiry(r.id)}
           >
@@ -273,13 +283,13 @@ export default function InquiriesPage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold" style={{ marginBottom: 16 }}>פניות לקוחות</h1>
+      <h1 className="text-4xl font-bold" style={{ marginBottom: 16 }}>{t.title}</h1>
 
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={12} lg={6}><Card><Statistic title="סה״כ" value={stats.total} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title="חדשות" value={stats.new} styles={{ content: { color: BRAND.goldText } }} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title="בטיפול" value={stats.in_progress} styles={{ content: { color: BRAND.navy } }} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title="סגורות" value={stats.closed} styles={{ content: { color: BRAND.success } }} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title={t.statTotal} value={stats.total} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title={t.statNew} value={stats.new} styles={{ content: { color: BRAND.goldText } }} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title={t.statInProgress} value={stats.in_progress} styles={{ content: { color: BRAND.navy } }} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title={t.statClosed} value={stats.closed} styles={{ content: { color: BRAND.success } }} /></Card></Col>
       </Row>
 
       <Card>
@@ -288,10 +298,10 @@ export default function InquiriesPage() {
             value={filter}
             onChange={(v) => setFilter(v as typeof filter)}
             options={[
-              { label: `הכל (${stats.total})`, value: 'all' },
-              { label: `חדשות (${stats.new})`, value: 'new' },
-              { label: `בטיפול (${stats.in_progress})`, value: 'in_progress' },
-              { label: `סגורות (${stats.closed})`, value: 'closed' },
+              { label: t.filterAll(stats.total), value: 'all' },
+              { label: t.filterNew(stats.new), value: 'new' },
+              { label: t.filterInProgress(stats.in_progress), value: 'in_progress' },
+              { label: t.filterClosed(stats.closed), value: 'closed' },
             ]}
           />
         </div>
@@ -303,7 +313,7 @@ export default function InquiriesPage() {
             loading={loading}
             pagination={{ pageSize: 20, showSizeChanger: true }}
             scroll={{ x: 800 }}
-            locale={{ emptyText: <AdminEmptyState message="אין עדיין פניות" /> }}
+            locale={{ emptyText: <AdminEmptyState message={t.empty} /> }}
           />
         </div>
 
@@ -311,7 +321,7 @@ export default function InquiriesPage() {
           {loading ? (
             <Skeleton active paragraph={{ rows: 6 }} />
           ) : filtered.length === 0 ? (
-            <AdminEmptyState message="אין עדיין פניות" />
+            <AdminEmptyState message={t.empty} />
           ) : (
             <div className="admin-card-list">
               {filtered.map((r) => (
@@ -320,18 +330,18 @@ export default function InquiriesPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="admin-card__title">{r.name}</div>
                       <div className="admin-card__meta">
-                        {new Date(r.createdAt).toLocaleDateString('he-IL')}
+                        {new Date(r.createdAt).toLocaleDateString(dateLocale)}
                       </div>
                     </div>
                     <Select
                       value={r.status}
                       style={{ width: 120 }}
                       onChange={(v) => changeStatus(r.id, v)}
-                      options={(Object.keys(STATUS_META) as Inquiry['status'][]).map((s) => ({
+                      options={(Object.keys(STATUS_COLORS) as Inquiry['status'][]).map((s) => ({
                         value: s,
                         label: (
-                          <Tag color={STATUS_META[s].color} style={{ marginInlineEnd: 0 }}>
-                            {STATUS_META[s].label}
+                          <Tag color={STATUS_COLORS[s]} style={{ marginInlineEnd: 0 }}>
+                            {statusLabels[s]}
                           </Tag>
                         ),
                       }))}
@@ -341,7 +351,7 @@ export default function InquiriesPage() {
                   <div className="admin-card__fields">
                     {r.phone && (
                       <span>
-                        <b>טלפון</b>{' '}
+                        <b>{t.fieldPhone}</b>{' '}
                         <a href={`tel:${r.phone}`} style={{ color: '#1C3664' }}>
                           {r.phone}
                         </a>
@@ -349,7 +359,7 @@ export default function InquiriesPage() {
                     )}
                     {r.email && (
                       <span>
-                        <b>אימייל</b>{' '}
+                        <b>{t.fieldEmail}</b>{' '}
                         <a href={`mailto:${r.email}`} style={{ color: '#1C3664' }}>
                           {r.email}
                         </a>
@@ -357,7 +367,7 @@ export default function InquiriesPage() {
                     )}
                     {r.property && (
                       <span>
-                        <b>נכס</b>{' '}
+                        <b>{t.fieldProperty}</b>{' '}
                         <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#1C3664' }}>
                           {r.property.title}
                         </Link>
@@ -365,24 +375,24 @@ export default function InquiriesPage() {
                     )}
                     {agentName(r.agentId) && (
                       <span>
-                        <b>סוכן</b> {agentName(r.agentId)}
+                        <b>{t.fieldAgent}</b> {agentName(r.agentId)}
                       </span>
                     )}
                   </div>
 
                   <div className="admin-card__actions">
                     <Button icon={<EyeOutlined />} onClick={() => openDetails(r)}>
-                      פרטים
+                      {t.detailsButton}
                     </Button>
                     <Popconfirm
-                      title="למחוק את הפנייה?"
-                      okText="מחק"
-                      cancelText="ביטול"
+                      title={t.deleteConfirm}
+                      okText={t.deleteOk}
+                      cancelText={t.cancel}
                       okButtonProps={{ danger: true }}
                       onConfirm={() => deleteInquiry(r.id)}
                     >
                       <Button danger icon={<DeleteOutlined />}>
-                        מחיקה
+                        {t.deleteButton}
                       </Button>
                     </Popconfirm>
                   </div>
@@ -395,11 +405,11 @@ export default function InquiriesPage() {
 
       <Modal
         open={!!active}
-        title={active ? `פנייה — ${active.name}` : ''}
+        title={active ? t.modalTitle(active.name) : ''}
         onCancel={() => setActive(null)}
         onOk={saveDetails}
-        okText="שמירה"
-        cancelText="סגירה"
+        okText={t.save}
+        cancelText={t.close}
         confirmLoading={saving}
         destroyOnHidden
       >
@@ -407,7 +417,7 @@ export default function InquiriesPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {active.message && (
               <div>
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>הודעה</div>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.messageLabel}</div>
                 <div style={{ background: '#F1F3F5', padding: 12, borderRadius: 8, whiteSpace: 'pre-wrap' }}>
                   {active.message}
                 </div>
@@ -416,13 +426,13 @@ export default function InquiriesPage() {
             <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14 }}>
               {active.phone && <a href={`tel:${active.phone}`} style={{ color: '#1C3664' }}><PhoneOutlined /> {active.phone}</a>}
               {active.email && <a href={`mailto:${active.email}`} style={{ color: '#1C3664' }}><MailOutlined /> {active.email}</a>}
-              {active.source && <span style={{ color: '#8c8c8c' }}>מקור: {active.source}</span>}
+              {active.source && <span style={{ color: '#8c8c8c' }}>{t.sourceLabel(active.source)}</span>}
             </div>
             <div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>סוכן מטפל</div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.assignedAgent}</div>
               <Select
                 allowClear
-                placeholder="שייך סוכן"
+                placeholder={t.assignAgentPlaceholder}
                 style={{ width: '100%' }}
                 value={draftAgent}
                 onChange={setDraftAgent}
@@ -430,8 +440,8 @@ export default function InquiriesPage() {
               />
             </div>
             <div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>הערות פנימיות</div>
-              <TextArea rows={4} value={draftNotes} onChange={(e) => setDraftNotes(e.target.value)} placeholder="הערות לצוות..." />
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.internalNotes}</div>
+              <TextArea rows={4} value={draftNotes} onChange={(e) => setDraftNotes(e.target.value)} placeholder={t.notesPlaceholder} />
             </div>
           </div>
         )}

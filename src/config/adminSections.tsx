@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { AdminLocale } from '@/lib/adminI18n';
 
 /**
  * SINGLE SOURCE OF TRUTH for admin sections.
@@ -9,13 +10,17 @@ import type { ReactNode } from 'react';
  *
  * Nav, active-state and breadcrumbs all follow automatically — nothing else to touch.
  */
+
+/** A label in both admin languages; resolve with `label[locale]`. */
+export type LocalizedText = Record<AdminLocale, string>;
+
 export interface AdminSection {
   /** Stable key (antd Menu key / React key). */
   key: string;
   /** First path segment after /admin/ ('' = dashboard). Used for breadcrumbs. */
   segment: string;
-  /** Hebrew label shown in the sidebar and breadcrumb. */
-  label: string;
+  /** Label shown in the sidebar and breadcrumb (Hebrew base + English). */
+  label: LocalizedText;
   /** Canonical route for this section's main page. */
   href: string;
   /** Sidebar icon (20×20, fill=currentColor). */
@@ -26,7 +31,7 @@ export interface AdminSection {
   roles?: string[];
   /** Route + label for the "add new" page (sections with a create/edit form). */
   addHref?: string;
-  addLabel?: string;
+  addLabel?: LocalizedText;
 }
 
 /** Sections the given role is allowed to see (sections without `roles` are public to all). */
@@ -38,7 +43,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'dashboard',
     segment: '',
-    label: 'לוח בקרה',
+    label: { he: 'לוח בקרה', en: 'Dashboard' },
     href: '/admin',
     isActive: (p) => p === '/admin' || p === '/admin/',
     icon: (
@@ -52,7 +57,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'inquiries',
     segment: 'inquiries',
-    label: 'פניות',
+    label: { he: 'פניות', en: 'Inquiries' },
     href: '/admin/inquiries',
     isActive: (p) => p.includes('/inquiries'),
     icon: (
@@ -64,11 +69,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'properties',
     segment: 'properties',
-    label: 'נכסים',
+    label: { he: 'נכסים', en: 'Properties' },
     href: '/admin/properties',
     isActive: (p) => p.includes('/properties'),
     addHref: '/admin/properties/new',
-    addLabel: 'הוספת נכס',
+    addLabel: { he: 'הוספת נכס', en: 'Add Property' },
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path
@@ -82,11 +87,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'owners',
     segment: 'owners',
-    label: 'בעלים',
+    label: { he: 'בעלים', en: 'Owners' },
     href: '/admin/owners',
     isActive: (p) => p.includes('/owners'),
     addHref: '/admin/owners/new',
-    addLabel: 'הוספת בעלים',
+    addLabel: { he: 'הוספת בעלים', en: 'Add Owner' },
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9Z" />
@@ -97,11 +102,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'team',
     segment: 'team',
-    label: 'צוות',
+    label: { he: 'צוות', en: 'Team' },
     href: '/admin/team',
     isActive: (p) => p.includes('/team'),
     addHref: '/admin/team/new',
-    addLabel: 'הוספת חבר צוות',
+    addLabel: { he: 'הוספת חבר צוות', en: 'Add Team Member' },
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M13 6C13 7.65685 11.6569 9 10 9C8.34315 9 7 7.65685 7 6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6Z" />
@@ -116,7 +121,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'homepage',
     segment: 'homepage',
-    label: 'עמוד הבית',
+    label: { he: 'עמוד הבית', en: 'Homepage' },
     href: '/admin/homepage',
     isActive: (p) => p.includes('/homepage'),
     icon: (
@@ -128,7 +133,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'analytics',
     segment: 'analytics',
-    label: 'אנליטיקה',
+    label: { he: 'אנליטיקה', en: 'Analytics' },
     href: '/admin/analytics',
     isActive: (p) => p.includes('/analytics'),
     icon: (
@@ -140,7 +145,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'contact',
     segment: 'contact',
-    label: 'פרטי התקשרות',
+    label: { he: 'פרטי התקשרות', en: 'Contact Info' },
     href: '/admin/contact/contact-info',
     isActive: (p) => p.includes('/contact'),
     icon: (
@@ -152,7 +157,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'users',
     segment: 'users',
-    label: 'משתמשים',
+    label: { he: 'משתמשים', en: 'Users' },
     href: '/admin/users',
     isActive: (p) => p.includes('/users'),
     roles: ['admin'], // only admins manage system users
@@ -168,14 +173,20 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   },
 ];
 
-/** Build a Hebrew breadcrumb trail from the current page path (never leaks raw slugs). */
+/** Build a breadcrumb trail from the current page path (never leaks raw slugs). */
 export interface Crumb {
   title: string;
   href?: string;
 }
 
-export function buildAdminCrumbs(name: string): Crumb[] {
-  const root: Crumb = { title: 'ניהול', href: '/admin' };
+const CRUMB_FALLBACKS: Record<AdminLocale, { root: string; add: string; edit: string }> = {
+  he: { root: 'ניהול', add: 'הוספה', edit: 'עריכה' },
+  en: { root: 'Admin', add: 'Add', edit: 'Edit' },
+};
+
+export function buildAdminCrumbs(name: string, locale: AdminLocale = 'he'): Crumb[] {
+  const f = CRUMB_FALLBACKS[locale];
+  const root: Crumb = { title: f.root, href: '/admin' };
   const base = name.split('/')[0]; // '' for the dashboard root
   const section = ADMIN_SECTIONS.find((s) => s.segment === base);
 
@@ -184,11 +195,11 @@ export function buildAdminCrumbs(name: string): Crumb[] {
   // The section's own main page (dashboard, a list, or contact-info).
   const fullPath = name ? `/admin/${name}` : '/admin';
   if (fullPath === section.href) {
-    return [root, { title: section.label }];
+    return [root, { title: section.label[locale] }];
   }
 
   // Detail / new page, e.g. "properties/123" or "team/new".
   const sub = name.split('/').slice(1).join('/');
-  const lastLabel = sub === 'new' ? section.addLabel || 'הוספה' : 'עריכה';
-  return [root, { title: section.label, href: section.href }, { title: lastLabel }];
+  const lastLabel = sub === 'new' ? section.addLabel?.[locale] || f.add : f.edit;
+  return [root, { title: section.label[locale], href: section.href }, { title: lastLabel }];
 }

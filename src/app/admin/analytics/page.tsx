@@ -21,6 +21,8 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
 import {
   BarChart,
   Bar,
@@ -106,31 +108,24 @@ const HAIRLINE = '#E6E8EC';
 // Categorical sequence kept within the navy/gold family + neutrals
 const COLORS = ['#1C3664', '#C5A357', '#2A4A8A', '#8A6D2F', '#5B6B8C', '#B8A98A', '#9AA0AA', '#C9CDD6'];
 
-// Referer buckets → Hebrew labels (keys come from classifyReferer in the API).
-const TRAFFIC_LABELS: Record<string, string> = {
-  direct: 'כניסה ישירה', internal: 'ניווט באתר', google: 'Google', facebook: 'Facebook',
-  instagram: 'Instagram', yad2: 'Yad2', madlan: 'Madlan', whatsapp: 'WhatsApp',
-  bing: 'Bing', duckduckgo: 'DuckDuckGo', twitter: 'X/Twitter', other: 'אחר',
-};
-// Inquiry.source raw keys → Hebrew labels (fallback to the raw key when unknown).
-const LEAD_SOURCE_LABELS: Record<string, string> = {
-  contact_form: 'טופס יצירת קשר', property_page: 'עמוד נכס', property: 'עמוד נכס',
-  whatsapp: 'וואטסאפ', phone: 'טלפון', email: 'אימייל', footer: 'פוטר', unknown: 'לא ידוע',
-};
+// Referer buckets / Inquiry.source labels moved into analyticsMessages
+// (t.trafficLabels / t.leadSourceLabels) — resolved per locale in the component.
 // Matches STATUS_META in /admin/inquiries, tinted to the estate palette.
-const LEAD_STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  new: { label: 'חדשה', color: GOLD_TEXT, bg: 'rgba(197,163,87,.14)' },
-  in_progress: { label: 'בטיפול', color: NAVY, bg: 'rgba(28,54,100,.08)' },
-  closed: { label: 'סגורה', color: '#3F7D4F', bg: 'rgba(63,125,79,.10)' },
+// Labels live in analyticsMessages (t.statusLabels).
+const LEAD_STATUS_STYLES: Record<string, { color: string; bg: string }> = {
+  new: { color: GOLD_TEXT, bg: 'rgba(197,163,87,.14)' },
+  in_progress: { color: NAVY, bg: 'rgba(28,54,100,.08)' },
+  closed: { color: '#3F7D4F', bg: 'rgba(63,125,79,.10)' },
 };
 
 // Compact ranked bar list — used for both traffic sources and lead sources.
 // One hairline-separated row per bucket: label · count · share, with a proportional
 // bar (top bucket in gold). Deliberately not another pie chart.
 function SourceBars({ items, labels }: { items?: Array<{ source: string; count: number }>; labels: Record<string, string> }) {
+  const t = useAdminMessages(analyticsMessages);
   const data = (items || []).slice(0, 8);
   const total = data.reduce((s, d) => s + d.count, 0);
-  if (!total) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="אין נתונים בטווח" style={{ margin: '16px 0' }} />;
+  if (!total) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t.noDataInRange} style={{ margin: '16px 0' }} />;
   return (
     <div>
       {data.map((d, i) => {
@@ -153,6 +148,7 @@ function SourceBars({ items, labels }: { items?: Array<{ source: string; count: 
 
 export default function AnalyticsPage() {
   const { message } = App.useApp();
+  const t = useAdminMessages(analyticsMessages);
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
@@ -235,7 +231,7 @@ export default function AnalyticsPage() {
 
     } catch (error) {
       console.error('Error fetching analytics:', error);
-      message.error('שגיאה בטעינת הנתונים');
+      message.error(t.loadError);
     } finally {
       setLoading(false);
     }
@@ -296,32 +292,24 @@ export default function AnalyticsPage() {
       });
 
       if (response.ok) {
-        message.success('האנליטיקה נמחקה בהצלחה');
+        message.success(t.deleteSuccess);
         fetchAnalytics();
       } else {
-        message.error('שגיאה במחיקת האנליטיקה');
+        message.error(t.deleteError);
       }
     } catch (error) {
       console.error('Error deleting analytics:', error);
-      message.error('שגיאה במחיקת האנליטיקה');
+      message.error(t.deleteError);
     }
   };
 
   const getVisitorNumber = (ipAddress: string): string => {
     const visitorNum = ipToVisitorMap.get(ipAddress);
-    return visitorNum ? `מבקר #${visitorNum}` : 'מבקר #?';
+    return visitorNum ? t.visitor(visitorNum) : t.visitor('?');
   };
 
   const getEventTypeLabel = (eventType: string) => {
-    const labels: Record<string, string> = {
-      'property_view': 'צפייה בנכס',
-      'click_property': 'לחיצה על נכס',
-      'click_phone': 'לחיצה על טלפון',
-      'click_email': 'לחיצה על אימייל',
-      'click_whatsapp': 'לחיצה על וואטסאפ',
-      'contact_form': 'שליחת טופס',
-      'click_button': 'לחיצה על כפתור',
-    };
+    const labels = t.eventTypes as Record<string, string>;
     return labels[eventType] || eventType;
   };
 
@@ -353,7 +341,7 @@ export default function AnalyticsPage() {
 
   const viewsColumns: ColumnsType<PropertyView> = [
     {
-      title: 'נכס',
+      title: t.colProperty,
       dataIndex: 'property',
       key: 'property',
       width: '35%',
@@ -363,10 +351,10 @@ export default function AnalyticsPage() {
           <div>{property.title}</div>
           <div style={{color: '#999', fontSize: '0.85em', marginTop: '2px'}}>{property.location}</div>
         </div>
-      ) : <span style={{color: '#ccc'}}>לא זמין</span>,
+      ) : <span style={{color: '#ccc'}}>{t.notAvailable}</span>,
     },
     {
-      title: 'מזהה מבקר',
+      title: t.colVisitorId,
       dataIndex: 'ipAddress',
       key: 'ipAddress',
       width: '20%',
@@ -377,7 +365,7 @@ export default function AnalyticsPage() {
       ),
     },
     {
-      title: 'דפדפן',
+      title: t.colBrowser,
       dataIndex: 'userAgent',
       key: 'userAgent',
       width: '20%',
@@ -395,7 +383,7 @@ export default function AnalyticsPage() {
       },
     },
     {
-      title: 'תאריך',
+      title: t.colDate,
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: '25%',
@@ -406,7 +394,7 @@ export default function AnalyticsPage() {
 
   const clicksColumns: ColumnsType<ClickEvent> = [
     {
-      title: 'נכס',
+      title: t.colProperty,
       dataIndex: 'property',
       key: 'property',
       width: '25%',
@@ -419,7 +407,7 @@ export default function AnalyticsPage() {
       ) : record.propertyId ? <Tag>#{record.propertyId}</Tag> : '-',
     },
     {
-      title: 'פעולה',
+      title: t.colAction,
       dataIndex: 'eventType',
       key: 'eventType',
       width: '15%',
@@ -430,7 +418,7 @@ export default function AnalyticsPage() {
       ),
     },
     {
-      title: 'מזהה מבקר',
+      title: t.colVisitorId,
       dataIndex: 'ipAddress',
       key: 'ipAddress',
       width: '18%',
@@ -441,7 +429,7 @@ export default function AnalyticsPage() {
       ),
     },
     {
-      title: 'דפדפן',
+      title: t.colBrowser,
       dataIndex: 'userAgent',
       key: 'userAgent',
       width: '17%',
@@ -460,7 +448,7 @@ export default function AnalyticsPage() {
       },
     },
     {
-      title: 'תאריך',
+      title: t.colDate,
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: '25%',
@@ -472,7 +460,7 @@ export default function AnalyticsPage() {
   if (loading && !summary) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-        <Spin size="large" description="טוען נתונים..." />
+        <Spin size="large" description={t.loadingData} />
       </div>
     );
   }
@@ -492,7 +480,7 @@ export default function AnalyticsPage() {
   const barChartData = (summary?.topPropertiesByClicks || [])
     .slice(0, 8)
     .map(p => ({
-      name: p.property ? (p.property.title.length > chartMaxChars ? p.property.title.substring(0, chartMaxChars) + '...' : p.property.title) : `נכס #${p.propertyId}`,
+      name: p.property ? (p.property.title.length > chartMaxChars ? p.property.title.substring(0, chartMaxChars) + '...' : p.property.title) : t.propertyFallback(p.propertyId),
       clicks: p.clicks,
       fullTitle: p.property?.title || '',
       propertyId: p.propertyId,
@@ -503,24 +491,24 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 className="text-4xl font-bold" style={{ margin: 0, color: '#1C3664' }}>דשבורד אנליטיקה</h1>
-          <div style={{ color: '#8c8c8c', marginTop: '4px' }}>צפה בביצועי האתר והנכסים שלך בזמן אמת</div>
+          <h1 className="text-4xl font-bold" style={{ margin: 0, color: '#1C3664' }}>{t.title}</h1>
+          <div style={{ color: '#8c8c8c', marginTop: '4px' }}>{t.subtitle}</div>
         </div>
         
         <div style={{ display: 'flex', gap: '12px' }}>
             <Button icon={<ReloadOutlined />} onClick={fetchAnalytics} loading={loading}>
-                רענן
+                {t.refresh}
             </Button>
             <Popconfirm
-            title="מחיקת נתונים"
-            description="האם אתה בטוח שברצונך למחוק את כל ההיסטוריה? פעולה זו אינה הפיכה."
+            title={t.deleteConfirmTitle}
+            description={t.deleteConfirmDescription}
             onConfirm={() => handleDeleteAnalytics('all')}
-            okText="מחק הכל"
-            cancelText="ביטול"
+            okText={t.deleteAll}
+            cancelText={t.cancel}
             okButtonProps={{ danger: true }}
             >
             <Button danger icon={<DeleteOutlined />}>
-                איפוס נתונים
+                {t.resetData}
             </Button>
             </Popconfirm>
         </div>
@@ -530,50 +518,50 @@ export default function AnalyticsPage() {
       <Card className="mb-6">
         <Row gutter={24} align="middle">
           <Col xs={24} md={12} lg={8}>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>טווח תאריכים:</div>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.dateRangeLabel}</div>
             <RangePicker
               style={{ width: '100%' }}
               onChange={(dates) => setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs] | null)}
               format="DD/MM/YYYY"
-              placeholder={['מתאריך', 'עד תאריך']}
+              placeholder={[t.fromDate, t.toDate]}
             />
           </Col>
           <Col xs={24} md={12} lg={8}>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי נכס:</div>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.filterByProperty}</div>
             <Select
               style={{ width: '100%' }}
               value={selectedProperty}
               onChange={setSelectedProperty}
-              placeholder="בחר נכס"
+              placeholder={t.selectProperty}
               showSearch={{
                 filterOption: (input, option) =>
                   (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
               }}
             >
-              <Select.Option value="all">הצג הכל</Select.Option>
+              <Select.Option value="all">{t.showAll}</Select.Option>
               {(summary?.topProperties || []).map((p) => (
                 <Select.Option key={p.propertyId} value={p.propertyId.toString()}>
-                  נכס #{p.propertyId} ({p.views} צפיות)
+                  {t.propertyOption(p.propertyId, p.views)}
                 </Select.Option>
               ))}
             </Select>
           </Col>
           <Col xs={24} md={12} lg={8}>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי מבקר:</div>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.filterByVisitor}</div>
             <Select
               style={{ width: '100%' }}
               value={selectedIP}
               onChange={setSelectedIP}
-              placeholder="בחר מבקר"
+              placeholder={t.selectVisitor}
               showSearch={{
                 filterOption: (input, option) =>
                   (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
               }}
             >
-              <Select.Option value="all">הצג הכל</Select.Option>
+              <Select.Option value="all">{t.showAll}</Select.Option>
               {(summary?.topUsersByClicks || []).map((user) => (
                 <Select.Option key={user.ipAddress} value={user.ipAddress}>
-                  {getVisitorNumber(user.ipAddress)} ({user.clicks} לחיצות)
+                  {getVisitorNumber(user.ipAddress)} ({t.clicksCount(user.clicks)})
                 </Select.Option>
               ))}
             </Select>
@@ -590,12 +578,12 @@ export default function AnalyticsPage() {
             </Col>
             <Col xs={24} flex="auto">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                פעילות משתמש: <span style={{ fontWeight: 700, color: '#1C3664' }}>{getVisitorNumber(selectedIP)}</span>
+                {t.userActivity} <span style={{ fontWeight: 700, color: '#1C3664' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
               <div style={{ color: '#666' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
                   <>
-                    {summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks} לחיצות סה״כ
+                    {t.totalClicksOf(summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks)}
                   </>
                 )}
               </div>
@@ -606,7 +594,7 @@ export default function AnalyticsPage() {
                 onClick={() => setSelectedIP('all')}
                 icon={<ReloadOutlined />}
               >
-                נקה סינון
+                {t.clearFilter}
               </Button>
             </Col>
           </Row>
@@ -618,7 +606,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={24} md={12} lg={6}>
             <Card style={{ height: '100%' }}>
             <Statistic
-                title="סה״כ צפיות"
+                title={t.totalViews}
                 value={summary?.totalViews || 0}
                 prefix={<EyeOutlined style={{ color: '#1C3664' }} />}
                 styles={{ content: { fontWeight: 'bold', color: '#1C3664' } }}
@@ -629,7 +617,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={24} md={12} lg={6}>
             <Card style={{ height: '100%' }}>
             <Statistic
-                title="סה״כ לחיצות (פעולות)"
+                title={t.totalClicks}
                 value={summary?.totalClicks || 0}
                 prefix={<AppstoreOutlined style={{ color: NAVY }} />}
                 styles={{ content: { fontWeight: 'bold', color: NAVY } }}
@@ -640,7 +628,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={24} md={12} lg={6}>
             <Card style={{ height: '100%' }}>
             <Statistic
-                title="מעורבות"
+                title={t.engagement}
                 value={engagementRate}
                 suffix="%"
                 prefix={<RiseOutlined style={{ color: GOLD }} />}
@@ -653,7 +641,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={24} md={12} lg={6}>
             <Card style={{ height: '100%' }}>
             <Statistic
-                title="משתמשים ייחודיים"
+                title={t.uniqueUsers}
                 value={summary?.uniqueVisitors || 0}
                 prefix={<UserOutlined style={{ color: NAVY }} />}
                 styles={{ content: { fontWeight: 'bold', color: NAVY } }}
@@ -664,50 +652,50 @@ export default function AnalyticsPage() {
 
       {/* Leads (Inquiry table) — the money metric — plus where traffic and leads come
           from. All values are computed server-side in /api/analytics/track (summary). */}
-      <div style={{ fontWeight: 700, color: NAVY, fontSize: 18, margin: '4px 4px 12px' }}>פניות (לידים)</div>
+      <div style={{ fontWeight: 700, color: NAVY, fontSize: 18, margin: '4px 4px 12px' }}>{t.inquiriesSection}</div>
       <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: '100%' }}>
-            <Statistic title="סה״כ פניות" value={summary?.totalInquiries || 0} prefix={<MessageOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+            <Statistic title={t.totalInquiries} value={summary?.totalInquiries || 0} prefix={<MessageOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: '100%' }}>
-            <Statistic title="פניות חדשות" value={summary?.newInquiries || 0} prefix={<RiseOutlined style={{ color: GOLD }} />} styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }} />
+            <Statistic title={t.newInquiries} value={summary?.newInquiries || 0} prefix={<RiseOutlined style={{ color: GOLD }} />} styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: '100%' }}>
-            <Statistic title="פניות היום" value={summary?.inquiriesToday || 0} prefix={<PhoneOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+            <Statistic title={t.inquiriesToday} value={summary?.inquiriesToday || 0} prefix={<PhoneOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
           <Card style={{ height: '100%' }}>
-            <Statistic title="פניות ב-7 ימים" value={summary?.inquiriesLast7Days || 0} prefix={<MailOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+            <Statistic title={t.inquiriesLast7Days} value={summary?.inquiriesLast7Days || 0} prefix={<MailOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
           </Card>
         </Col>
       </Row>
 
       <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
         <Col xs={24} lg={8}>
-          <Card title={<span style={{ fontWeight: 600 }}>מקורות תנועה</span>} style={{ height: '100%' }}>
-            <SourceBars items={summary?.trafficSources} labels={TRAFFIC_LABELS} />
+          <Card title={<span style={{ fontWeight: 600 }}>{t.trafficSources}</span>} style={{ height: '100%' }}>
+            <SourceBars items={summary?.trafficSources} labels={t.trafficLabels} />
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <Card title={<span style={{ fontWeight: 600 }}>פניות לפי מקור</span>} style={{ height: '100%' }}>
-            <SourceBars items={summary?.inquiriesBySource} labels={LEAD_SOURCE_LABELS} />
+          <Card title={<span style={{ fontWeight: 600 }}>{t.inquiriesBySource}</span>} style={{ height: '100%' }}>
+            <SourceBars items={summary?.inquiriesBySource} labels={t.leadSourceLabels} />
           </Card>
         </Col>
         <Col xs={24} lg={8}>
-          <Card title={<span style={{ fontWeight: 600 }}>פניות לפי סטטוס</span>} style={{ height: '100%' }}>
+          <Card title={<span style={{ fontWeight: 600 }}>{t.inquiriesByStatus}</span>} style={{ height: '100%' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {(['new', 'in_progress', 'closed'] as const).map((st) => {
-                const meta = LEAD_STATUS_META[st];
+                const meta = LEAD_STATUS_STYLES[st];
                 const count = summary?.inquiriesByStatus?.find((s) => s.status === st)?.count || 0;
                 return (
                   <div key={st} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 8, background: meta.bg }}>
-                    <span style={{ fontWeight: 600, color: meta.color }}>{meta.label}</span>
+                    <span style={{ fontWeight: 600, color: meta.color }}>{t.statusLabels[st]}</span>
                     <span style={{ fontWeight: 700, fontSize: 18, color: meta.color }}>{count}</span>
                   </div>
                 );
@@ -722,7 +710,7 @@ export default function AnalyticsPage() {
         {/* Line Chart */}
         <Col xs={24} lg={16}>
           <Card
-            title={<span style={{ fontWeight: 600 }}>מגמות לאורך זמן</span>}
+            title={<span style={{ fontWeight: 600 }}>{t.trendsOverTime}</span>}
             style={{ height: '100%' }}
           >
             <ResponsiveContainer width="100%" height={350}>
@@ -751,8 +739,8 @@ export default function AnalyticsPage() {
                   labelStyle={{ fontWeight: 'bold', marginBottom: '5px' }}
                 />
                 <Legend verticalAlign="top" height={36} />
-                <Area type="monotone" dataKey="views" stroke="#1C3664" fillOpacity={1} fill="url(#colorViews)" name="צפיות" activeDot={{ r: 6 }} />
-                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name="לחיצות" activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="views" stroke="#1C3664" fillOpacity={1} fill="url(#colorViews)" name={t.viewsLegend} activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} />
               </AreaChart>
             </ResponsiveContainer>
           </Card>
@@ -761,7 +749,7 @@ export default function AnalyticsPage() {
         {/* Pie Chart */}
         <Col xs={24} lg={8}>
           <Card
-            title={<span style={{ fontWeight: 600 }}>התפלגות פעולות</span>}
+            title={<span style={{ fontWeight: 600 }}>{t.actionsDistribution}</span>}
             style={{ height: '100%' }}
           >
             <ResponsiveContainer width="100%" height={350}>
@@ -794,7 +782,7 @@ export default function AnalyticsPage() {
         {barChartData.length > 0 && (
           <Col xs={24} lg={12}>
             <Card
-              title={<span style={{ fontWeight: 600 }}>נכסים מובילים (לפי פעולות)</span>}
+              title={<span style={{ fontWeight: 600 }}>{t.topProperties}</span>}
               style={{ height: '100%' }}
             >
               <ResponsiveContainer width="100%" height={300}>
@@ -815,14 +803,14 @@ export default function AnalyticsPage() {
                             return (
                                 <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
                                     <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
-                                    <p style={{ margin: 0, color: GOLD_TEXT }}>{data.clicks} לחיצות</p>
+                                    <p style={{ margin: 0, color: GOLD_TEXT }}>{t.clicksCount(data.clicks)}</p>
                                 </div>
                             );
                         }
                         return null;
                     }}
                   />
-                  <Bar dataKey="clicks" name="לחיצות" radius={[0, 4, 4, 0]} barSize={24}>
+                  <Bar dataKey="clicks" name={t.clicksLegend} radius={[0, 4, 4, 0]} barSize={24}>
                     {barChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={index === 0 ? GOLD : NAVY} />
                     ))}
@@ -837,7 +825,7 @@ export default function AnalyticsPage() {
         {summary?.topUsersByClicks && summary.topUsersByClicks.length > 0 && (
           <Col xs={24} lg={barChartData.length > 0 ? 12 : 24}>
             <Card
-              title={<span style={{ fontWeight: 600 }}>מבקרים פעילים</span>}
+              title={<span style={{ fontWeight: 600 }}>{t.activeVisitors}</span>}
               style={{ height: '100%' }}
             >
               <div style={{ maxHeight: 300, overflowY: 'auto' }}>
@@ -869,7 +857,7 @@ export default function AnalyticsPage() {
                             {getVisitorNumber(user.ipAddress)}
                           </span>
                           {isSelected && (
-                            <Tag color="gold">מסונן</Tag>
+                            <Tag color="gold">{t.filteredTag}</Tag>
                           )}
                         </div>
                         <div style={{ fontSize: '0.85em', color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -885,7 +873,7 @@ export default function AnalyticsPage() {
                         textAlign: 'center',
                       }}>
                         {user.clicks}
-                        <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>לחיצות</div>
+                        <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>{t.clicksLegend}</div>
                       </div>
                     </div>
                   );
@@ -900,7 +888,7 @@ export default function AnalyticsPage() {
           5-column clicks table has room (side-by-side clipped the date column). */}
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={24} xl={12}>
-            <Card title="פעולות אחרונות">
+            <Card title={t.recentActions}>
                 <Table
                 columns={clicksColumns}
                 dataSource={Array.isArray(clicks) ? clicks.slice(0, 10) : []}
@@ -912,7 +900,7 @@ export default function AnalyticsPage() {
         </Col>
 
         <Col xs={24} lg={24} xl={12}>
-            <Card title="צפיות אחרונות">
+            <Card title={t.recentViews}>
                 <Table
                 columns={viewsColumns}
                 dataSource={Array.isArray(views) ? views.slice(0, 10) : []}

@@ -1,9 +1,12 @@
 'use client';
 
 import { Layout } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { navMessages } from '@/lib/adminI18n/messages/nav';
 
 export default function Footer() {
   const { Footer: AntFooter } = Layout;
+  const t = useAdminMessages(navMessages);
   const year = new Date().getFullYear();
 
   return (
@@ -19,8 +22,8 @@ export default function Footer() {
           fontSize: 12.5,
         }}
       >
-        <span>© {year} רם נכסים · כל הזכויות שמורות</span>
-        <span style={{ color: '#b08642', fontWeight: 600 }}>מערכת ניהול נכסים</span>
+        <span>{t.footerRights(year)}</span>
+        <span style={{ color: '#b08642', fontWeight: 600 }}>{t.footerSystem}</span>
       </div>
     </AntFooter>
   );

@@ -10,8 +10,8 @@
 /* ===== LAYOUT ===== */
 .layout-dashboard {
   background: #F4F6F8;
-  text-align: right;
-  direction: rtl;
+  text-align: start;
+  /* direction comes from the dynamic dir attribute on this element (rtl/ltr) */
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
@@ -38,17 +38,17 @@
 .layout-dashboard .ant-layout-sider.sider-primary {
   width: 250px;
   position: fixed;
-  right: 0;
-  left: auto;
+  inset-inline-start: 0; /* reading-start edge: right in RTL, left in LTR */
+  inset-inline-end: auto;
   z-index: 99;
   height: 100vh;
   overflow: hidden;
   margin: 0;
   padding: 0;
   background: #fff !important;
-  border-left: 1px solid #E6E8EC;
+  border-inline-end: 1px solid #E6E8EC; /* edge facing the content */
   box-shadow: none;
-  transition: right 0.3s ease, box-shadow 0.3s ease;
+  transition: inset-inline-start 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Let the Sidenav own a full-height flex column (brand · scrolling nav · footer) */
@@ -66,11 +66,11 @@
   min-height: 100vh;
   width: 100%;
   flex-shrink: 0;
-  margin-right: 250px;
-  margin-left: 0;
+  margin-inline-start: 250px; /* clears the sidebar at the reading-start edge */
+  margin-inline-end: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  transition: margin-right 0.3s ease;
+  transition: margin-inline-start 0.3s ease;
 }
 
 /* ===== HEADER ===== */
@@ -107,6 +107,9 @@
 
 .layout-dashboard .header-control {
   display: flex;
+  /* row-reverse is direction-relative (reverses DOM order along the inline
+     axis), so it mirrors automatically with dir — no conversion needed.
+     Note: legacy Muse-template class, not referenced by current markup. */
   flex-direction: row-reverse;
   align-items: center;
   margin-top: 0;
@@ -321,9 +324,9 @@
 }
 
 /* ===== SIDEBAR COLLAPSE / BACKDROP ===== */
-/* Slide the sidebar off the right edge when collapsed (all breakpoints) */
+/* Slide the sidebar off the reading-start edge when collapsed (all breakpoints) */
 .layout-dashboard.sidebar-collapsed .ant-layout-sider.sider-primary {
-  right: -250px;
+  inset-inline-start: -250px;
   box-shadow: none;
 }
 
@@ -361,13 +364,13 @@
 
   /* Open: reserve room for the sidebar. Collapsed: content reclaims the space. */
   .layout-dashboard.sidebar-open .ant-layout {
-    margin-right: 250px;
-    margin-left: 0;
+    margin-inline-start: 250px;
+    margin-inline-end: 0;
   }
 
   .layout-dashboard.sidebar-collapsed .ant-layout {
-    margin-right: 0;
-    margin-left: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 }
 
@@ -384,7 +387,7 @@
 @media (max-width: 991px) {
   /* Sidebar overlays the content on mobile; never reserve space for it. */
   .layout-dashboard .ant-layout {
-    margin-right: 0;
+    margin-inline-start: 0;
   }
 }
 
@@ -435,7 +438,7 @@
 
 .drawer-sidebar .ant-drawer-body .ant-layout-sider.sider-primary {
   position: relative;
-  right: 0;
+  inset-inline-start: 0;
   margin: 0;
   height: 100%;
 }
@@ -472,7 +475,7 @@
 
 /* ===== MODAL ===== */
 .layout-dashboard .ant-modal-header {
-  text-align: right;
+  text-align: start;
 }
 
 /* ===== SELECT ===== */
@@ -491,8 +494,8 @@
    scroll container (.ant-table-content) owns the horizontal scroll and is
    RTL-aware. Previously forcing overflow-x on .ant-table + .ant-table-wrapper
    here created a SECOND, mis-aligned RTL scroller that fought antd's — which
-   left a gap on the start (right) edge and clipped the last columns (status /
-   actions) on the end (left) edge with no usable scrollbar. Let antd manage the
+   left a gap on the start edge (right in RTL) and clipped the last columns
+   (status / actions) on the end edge with no usable scrollbar. Let antd manage the
    overflow, and just make the horizontal scrollbar clearly visible so it's
    obvious the table scrolls. */
 .layout-dashboard .ant-table-wrapper {
@@ -589,11 +592,12 @@
     margin: 0 !important;
   }
 
-  /* Cards full width with no border radius */
+  /* Cards full width with no border radius (both side borders removed —
+     symmetric, expressed logically for consistency) */
   .layout-dashboard .ant-card {
     border-radius: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
+    border-inline-start: none !important;
+    border-inline-end: none !important;
   }
 
   /* Card body padding adjustment */

@@ -1,19 +1,20 @@
-/* RTL Fixes for Admin Dashboard */
+/* Direction fixes for Admin Dashboard (direction-neutral: follows the dir
+   attribute on .layout-dashboard — RTL for Hebrew, LTR for English) */
 
 /* Sidebar backdrop - hidden by default (desktop). Shown on mobile below. */
 .layout-dashboard .sidebar-backdrop {
   display: none;
 }
 
-/* Sidebar position for RTL - fixed to the right edge.
+/* Sidebar position - fixed to the reading-start edge (right in RTL, left in LTR).
    NOTE: collapse is driven solely by the `.sidebar-open` / `.sidebar-collapsed`
    classes on the root .layout-dashboard (see antd-admin.css). MainLayout uses
    <Sider trigger={null}> with no `collapsed` prop, so antd never adds its own
    `.ant-layout-sider-collapsed` class — do NOT key collapse rules off it. */
 .layout-dashboard .ant-layout-sider.sider-primary {
-  right: 0;
-  left: auto;
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  transition: inset-inline-start 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Responsive: Mobile behavior — the sider overlays content; show the backdrop */
@@ -40,31 +41,23 @@
   }
 }
 
-/* RTL text alignment */
+/* Direction-aware text alignment.
+   direction itself comes from the dynamic dir attribute on .layout-dashboard
+   (and antd's ConfigProvider direction), so no hardcoded `direction` here —
+   .ant-table / .ant-breadcrumb inherit it and antd handles component internals. */
 .layout-dashboard {
-  text-align: right;
-  direction: rtl;
+  text-align: start;
 }
 
-/* Ensure proper RTL for Ant Design components */
 .layout-dashboard .ant-card {
-  text-align: right;
+  text-align: start;
 }
 
 .layout-dashboard .ant-form-item-label {
-  text-align: right;
-}
-
-.layout-dashboard .ant-table {
-  direction: rtl;
+  text-align: start;
 }
 
 /* Footer */
 .layout-dashboard .ant-layout-footer {
   text-align: center;
-}
-
-/* Header breadcrumb */
-.layout-dashboard .ant-breadcrumb {
-  direction: rtl;
 }

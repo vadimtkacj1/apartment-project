@@ -6,6 +6,7 @@ import { Layout } from 'antd';
 import Sidenav from './Sidenav';
 import Header from './Header';
 import Footer from './Footer';
+import { useAdminI18n } from '@/lib/adminI18n';
 
 const { Header: AntHeader, Content, Sider } = Layout;
 
@@ -20,6 +21,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(true);
   const sidenavColor = '#1C3664';
+  const { dir } = useAdminI18n();
 
   const pathname = usePathname();
   const page = pathname.replace('/admin/', '').replace('/admin', '');
@@ -64,7 +66,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   return (
     <Layout
       className={`layout-dashboard ${collapsed ? 'sidebar-collapsed' : 'sidebar-open'}`}
-      dir="rtl"
+      dir={dir}
     >
       {/* Dim backdrop — only on mobile, where the sidebar overlays content */}
       {!collapsed && isMobile && (
