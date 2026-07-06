@@ -21,6 +21,7 @@ const routeNames: Record<string, string> = {
   'buying-apartment': 'קונים דירה',
   'links': 'קישורים שימושיים',
   'privacy-policy': 'מדיניות פרטיות',
+  'terms-of-use': 'תקנון ותנאי שימוש',
   'accessibility': 'נגישות',
 };
 

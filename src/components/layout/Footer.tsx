@@ -210,6 +210,10 @@ export default async function Footer() {
               מדיניות פרטיות
             </Link>
             <span className="text-gray-600">|</span>
+            <Link href="/terms-of-use" className="hover:text-[#c5a357] transition-colors font-medium">
+              תקנון ותנאי שימוש
+            </Link>
+            <span className="text-gray-600">|</span>
             <Link href="/accessibility" className="hover:text-[#c5a357] transition-colors font-medium">
               נגישות
             </Link>
