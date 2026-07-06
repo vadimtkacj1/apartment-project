@@ -79,3 +79,7 @@ nul/data
 *.zip
 *.tmp.*
 recovered.tar.gz
+
+lh-*.json
+lh-*.png
+lh-*.jpg
