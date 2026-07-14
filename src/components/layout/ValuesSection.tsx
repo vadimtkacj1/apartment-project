@@ -117,7 +117,7 @@ const ValuesSection: React.FC = () => {
         }
       `}</style>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-20 max-w-[1400px] 2xl:max-w-[1800px] relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-20 max-w-[87.5rem] 2xl:max-w-[112.5rem] relative z-10">
 
         {/* Section Header */}
         <m.div

@@ -42,10 +42,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   // On phones, auto-close the overlay after a navigation so tapping a nav item
   // doesn't leave the menu + backdrop covering the new page. The permanent
-  // desktop sider is untouched (guarded by isMobile).
+  // desktop sider is untouched.
+  //
+  // Query matchMedia directly instead of reading `isMobile`: on mount this effect
+  // runs with the FIRST render's closure, where isMobile is still its `true`
+  // default — so it re-collapsed the sider on desktop right after the matchMedia
+  // effect had opened it, and the sidebar never showed until you hit the burger.
   useEffect(() => {
-    if (isMobile) setCollapsed(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (window.matchMedia('(max-width: 991px)').matches) setCollapsed(true);
   }, [pathname]);
 
   // Lock body scroll while the overlay sidebar is open on mobile, so the page

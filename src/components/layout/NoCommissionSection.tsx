@@ -124,7 +124,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         dir="rtl"
         style={{ background: 'rgb(42, 74, 138)' }}
       >
-        <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1200px' }}>
+        <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '75rem' }}>
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
             <p className="text-white mt-4 text-lg">טוען...</p>
@@ -201,7 +201,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
 
       <div
         className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10"
-        style={{ maxWidth: '1200px' }}
+        style={{ maxWidth: '75rem' }}
       >
         {/* Header */}
         <div className="text-center mb-4 md:mb-6">

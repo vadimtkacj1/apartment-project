@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
@@ -39,6 +40,9 @@ const PLANS: FloorPlan[] = [
 function FloorPlansSection() {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [active, setActive] = useState<FloorPlan | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   // Close the lightbox on Escape and lock body scroll while it is open.
   useEffect(() => {
@@ -59,7 +63,7 @@ function FloorPlansSection() {
 
   return (
     <section id="onethepark" className="relative w-full py-16 md:py-20 overflow-hidden bg-warm scroll-mt-24" dir="rtl">
-      <div className="relative z-10 max-w-[1300px] mx-auto px-4 sm:px-6">
+      <div className="relative z-10 max-w-[81.25rem] mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-block mb-4">
@@ -194,34 +198,42 @@ function FloorPlansSection() {
         </div>
       </div>
 
-      {/* Lightbox */}
-      {active && (
+      {/* Lightbox — portalled to <body>: nested inside this section (which is
+          `overflow-hidden`) iOS Safari paints the fixed overlay but routes taps
+          past it, so the close button was dead on phones. The overlay also drops
+          backdrop-filter below md for the same reason.
+          z-index must clear the Sienna a11y widget (1000001), or its launcher
+          floats above the overlay and covers the PDF button. */}
+      {mounted && active && createPortal(
         <div
-          className="fixed inset-0 z-[3000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8"
+          className="fixed inset-0 z-1000002 flex flex-col items-center justify-center bg-black/90 md:bg-black/80 md:backdrop-blur-sm p-4 md:p-8"
           dir="rtl"
           role="dialog"
           aria-modal="true"
           aria-label={`תוכנית ${active.title}`}
           onClick={closeLightbox}
+          style={{ WebkitTapHighlightColor: "transparent" }}
         >
           <button
             type="button"
             onClick={closeLightbox}
+            onPointerUp={closeLightbox}
             aria-label="סגירה"
-            className="absolute top-4 left-4 w-11 h-11 rounded-full bg-white/90 text-[#1c3664] flex items-center justify-center shadow-lg hover:bg-[#c5a357] transition-colors"
+            className="absolute top-4 left-4 z-10 w-12 h-12 rounded-full bg-white/95 text-[#1c3664] flex items-center justify-center shadow-lg hover:bg-[#c5a357] transition-colors"
+            style={{ touchAction: "manipulation" }}
           >
-            <X size={24} />
+            <X size={24} aria-hidden="true" />
           </button>
 
-          <div
-            className="relative w-full max-w-5xl max-h-[78vh] flex-1 flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* The wrapper fills the viewport, so it must stay click-through:
+              only the image itself swallows the tap, everything around it closes. */}
+          <div className="relative w-full max-w-5xl max-h-[78vh] flex-1 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={active.image}
               alt={`תוכנית ${active.title}, ${active.subtitle} — ONE THE PARK חולון`}
               className="max-w-full max-h-[78vh] object-contain rounded-lg bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
 
@@ -237,12 +249,14 @@ function FloorPlansSection() {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#c5a357] text-[#1c3664] font-bold text-sm hover:bg-white transition-colors"
+              style={{ touchAction: "manipulation" }}
             >
               <Download className="w-4 h-4" />
               הורדה / פתיחה (PDF באיכות מלאה)
             </a>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <style jsx global>{`

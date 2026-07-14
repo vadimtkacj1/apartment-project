@@ -15,7 +15,7 @@ const Hero: React.FC = () => {
   return (
     <section
       dir="rtl"
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden md:flex md:items-center"
       style={{ height: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
@@ -57,6 +57,36 @@ const Hero: React.FC = () => {
         }
         .amp-pop {
           animation: ampPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.85s both;
+        }
+        /* Scrim over the video: it is bright (pale façade, sky) and text-shadow
+           alone doesn't carry the subtitle. A full-bleed gradient rather than a
+           blob behind the text — an ellipse sized to the text box shows its own
+           edge as a dark smudge once the box is smaller than the hero (desktop).
+           Phones: a horizontal band through the centred content.
+           md+ (RTL, text on the right): fades in from the right edge. */
+        .hero-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 10;
+          pointer-events: none;
+          background: linear-gradient(
+            180deg,
+            rgba(0,0,0,0.12) 0%,
+            rgba(0,0,0,0.55) 28%,
+            rgba(0,0,0,0.55) 64%,
+            rgba(0,0,0,0.15) 100%
+          );
+        }
+        @media (min-width: 768px) {
+          .hero-scrim {
+            background: linear-gradient(
+              to left,
+              rgba(0,0,0,0.72) 0%,
+              rgba(0,0,0,0.5) 28%,
+              rgba(0,0,0,0.18) 52%,
+              rgba(0,0,0,0) 75%
+            );
+          }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(30px); }
@@ -135,18 +165,21 @@ const Hero: React.FC = () => {
       {/* ── Video / poster ── */}
       <HeroMedia />
 
+      {/* Readability scrim, between the video (z-0) and the content (z-20) */}
+      <div className="hero-scrim" aria-hidden="true" />
+
       {/* ── Content ── */}
       <div
         className="
-          relative z-20 h-full w-full
+          relative z-20 h-full md:h-auto w-full
           px-6 md:px-16 xl:px-20 2xl:px-24
           flex flex-col
           items-center md:items-start
-          justify-center md:justify-between
-          gap-6 md:gap-0
-          py-8 md:pt-44 md:pb-20
+          justify-center
+          gap-6 md:gap-10 xl:gap-14
+          py-8 md:py-24
         "
-        style={{ maxWidth: '2400px', margin: '0 auto' }}
+        style={{ maxWidth: '3200px', margin: '0 auto' }}
       >
 
         {/* TOP: heading + subtitle */}
@@ -156,7 +189,7 @@ const Hero: React.FC = () => {
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
+                fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
                 WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
                 paintOrder: 'stroke',
@@ -169,7 +202,7 @@ const Hero: React.FC = () => {
 
             <span
               className="amp-pop relative shrink-0 inline-block"
-              style={{ width: 'clamp(1.6rem, 5vw, 4.5rem)', height: 'clamp(1.6rem, 5vw, 4.5rem)' }}
+              style={{ width: 'clamp(1.6rem, 5vw, 9.75rem)', height: 'clamp(1.6rem, 5vw, 9.75rem)' }}
             >
               <Image
                 src="/images/and.png"
@@ -184,7 +217,7 @@ const Hero: React.FC = () => {
             <h1
               className="font-black text-white leading-none"
               style={{
-                fontSize: 'clamp(1.8rem, 7.5vw, 6rem)',
+                fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
                 WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
                 paintOrder: 'stroke',
@@ -198,8 +231,8 @@ const Hero: React.FC = () => {
           </div>
 
           <p
-            className="hero-fade-1 text-white font-medium max-w-2xl leading-relaxed text-center md:text-start"
-            style={{ fontSize: 'clamp(0.82rem, 1.5vw, 1.2rem)', textShadow: '0 1px 2px rgba(0,0,0,0.7), 0 1px 10px rgba(0,0,0,0.55)', WebkitTextStroke: '0.5px rgba(0,0,0,0.3)', paintOrder: 'stroke' }}
+            className="hero-fade-1 text-white font-medium max-w-2xl xl:max-w-4xl 2xl:max-w-[80rem] leading-relaxed text-center md:text-start"
+            style={{ fontSize: 'clamp(0.82rem, 1.5vw, 2.6rem)', textShadow: '0 1px 2px rgba(0,0,0,0.7), 0 1px 10px rgba(0,0,0,0.55)', WebkitTextStroke: '0.5px rgba(0,0,0,0.3)', paintOrder: 'stroke' }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </p>
@@ -209,15 +242,15 @@ const Hero: React.FC = () => {
         <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
           <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
-              href="#onethepark"
-              className="btn-green group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
+              href="/apartments?dealType=sale"
+              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
-                background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',
-                color: '#ffffff',
+                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
+                background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
+                color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
+                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
@@ -229,11 +262,11 @@ const Hero: React.FC = () => {
                 }}
               />
               <span className="relative z-10 flex items-center justify-center gap-2">
-                <span dir="ltr">One The Park</span>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                נכסים למכירה
+                <svg viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ flexShrink: 0 }}>
-                  <path d="M12 5v14M19 12l-7 7-7-7" />
+                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
+                  <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>
             </Link>
@@ -242,14 +275,14 @@ const Hero: React.FC = () => {
           <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
               href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold"
+              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
+                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                 color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
+                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
@@ -262,9 +295,9 @@ const Hero: React.FC = () => {
               />
               <span className="relative z-10 flex items-center justify-center gap-2">
                 נכסים להשכרה
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                <svg viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
+                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>
@@ -273,27 +306,30 @@ const Hero: React.FC = () => {
 
           <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
             <Link
-              href="/apartments?dealType=sale"
-              className="btn-secondary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 rounded-2xl font-bold border-2"
+              href="#onethepark"
+              className="btn-green group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 1.6rem) clamp(1rem, 3.2vw, 4rem)',
-                borderColor: 'rgba(255,255,255,0.4)',
-                background: 'rgba(255,255,255,0.07)',
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
+                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
+                background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',
                 color: '#ffffff',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-                fontSize: 'clamp(0.88rem, 1.4vw, 1.3rem)',
+                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
+              <span
+                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
+                  transform: 'translateX(-200%) skewX(-20deg)',
+                }}
+              />
               <span className="relative z-10 flex items-center justify-center gap-2">
-                נכסים למכירה
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"
+                <span dir="ltr">One The Park</span>
+                <svg viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ transform: 'scaleX(-1)', flexShrink: 0 }}>
+                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>

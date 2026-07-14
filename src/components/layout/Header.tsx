@@ -94,7 +94,7 @@ export default function Header() {
           margin: "0 auto",
           /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
           padding: isMobile ? "0 1rem" : "0 3rem",
-          height: 70,
+          height: isMobile ? 70 : "clamp(70px, 3.4vw, 104px)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -108,12 +108,12 @@ export default function Header() {
           >
             <Image src="/favicon-rm.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain" priority
-              style={{ transition: "filter 0.35s ease" }}
+              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 92px)", height: "auto" }}
             />
           </Link>
           <Image src="/images/second-and.svg" alt="" width={36} height={36}
             className="object-contain"
-            style={{ transition: "filter 0.35s ease", marginBottom: "8px" }}
+            style={{ transition: "filter 0.35s ease", marginBottom: "8px", width: "clamp(36px, 1.8vw, 54px)", height: "auto" }}
           />
           <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
@@ -121,7 +121,7 @@ export default function Header() {
           >
             <Image src="/favicon-ha.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain"
-              style={{ transition: "filter 0.35s ease" }}
+              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 92px)", height: "auto" }}
             />
           </Link>
         </div>
@@ -143,7 +143,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(17px, 1.35vw, 22px)",
+                      fontSize: "clamp(17px, 1.35vw, 30px)",
                       fontWeight: 700,
                       color: textColor,
                       textShadow: shouldBeTransparent

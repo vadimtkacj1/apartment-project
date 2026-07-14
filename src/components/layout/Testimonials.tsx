@@ -71,7 +71,7 @@ const Testimonials: React.FC = () => {
 
   return (
     <section className="relative w-full py-16 md:py-20 overflow-hidden bg-warm" dir="rtl">
-      <div className="relative z-10 max-w-[1300px] mx-auto px-4">
+      <div className="relative z-10 max-w-[81.25rem] mx-auto px-4">
         
         <div className="text-center mb-16">
           <div className="inline-block mb-4">

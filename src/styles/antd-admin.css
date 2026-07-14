@@ -769,3 +769,33 @@
   font-size: clamp(1.5rem, 5vw, 2.25rem);
   line-height: 1.2;
 }
+
+/* ===== LARGE SCREENS =====
+   On a 1920/2560 monitor the panel read as a postage stamp: antd's base font is
+   14px and its controls 32px at every width, and the dashboard's own numbers are
+   inline px — none of it grew with the screen — while the cards stretched edge to
+   edge (2472px wide on a 2560 screen), so a row's label sat at one end and its
+   value at the other.
+
+   `zoom` scales the working column as a whole (antd components AND the inline-px
+   dashboard widgets alike, which a font-size override cannot reach), and because
+   zoom also shrinks the column's CSS width, the cards stop over-stretching. The
+   max-width then caps what's left. Scoped to Content, so the fixed 250px sider
+   keeps its own geometry. */
+@media (min-width: 1600px) {
+  /* width:100% is load-bearing — Content is a flex item, and an auto inline
+     margin cancels the default stretch, collapsing it to shrink-to-fit. */
+  .layout-dashboard .content-ant {
+    zoom: 1.1;
+    width: 100%;
+    max-width: 1460px;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 2100px) {
+  .layout-dashboard .content-ant {
+    zoom: 1.22;
+    max-width: 1480px;
+  }
+}

@@ -123,6 +123,22 @@ const MarqueeRow = ({
   );
 };
 
+/** Heading above each marquee, doubling as a link to the matching listing page. */
+const MarqueeTitle = ({ children, href }: { children: React.ReactNode; href: string }) => (
+  <div className="px-4 md:px-6 mb-2 flex items-center justify-center gap-3">
+    <span className="h-px w-8 md:w-14 bg-[#c5a357]" aria-hidden="true" />
+    <h3
+      className="text-3xl md:text-4xl font-black text-[#1c3664] tracking-tight"
+      style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
+    >
+      <a href={href} className="hover:text-[#c5a357] transition-colors">
+        {children}
+      </a>
+    </h3>
+    <span className="h-px w-8 md:w-14 bg-[#c5a357]" aria-hidden="true" />
+  </div>
+);
+
 interface HotPropositionsProps {
   initialProperties?: Property[];
   initialTitle?: string;
@@ -204,6 +220,12 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // One marquee per deal type: sale first, rent second. `dealType` is already
+  // resolved upstream (SSR maps category -> dealType), so trust it and treat
+  // anything non-rent as a sale.
+  const forSale = properties.filter((p) => p.dealType !== 'rent');
+  const forRent = properties.filter((p) => p.dealType === 'rent');
+
   if (loading) {
     return (
       <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
@@ -246,14 +268,32 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
           </h2>
         </m.div>
 
-        {/* Scrolling Rows */}
-        <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">
-          <MarqueeRow
-            items={properties}
-            direction="left"
-            duration={60}
-            isMobile={isMobile}
-          />
+        {/* Scrolling Rows — one per deal type. A group with no properties is
+            skipped entirely (title included) rather than left as an empty strip. */}
+        <div className="flex flex-col gap-10 md:gap-14 w-full">
+          {forSale.length > 0 && (
+            <div className="w-full">
+              <MarqueeTitle href="/apartments?dealType=sale">נכסים למכירה</MarqueeTitle>
+              <MarqueeRow
+                items={forSale}
+                direction="left"
+                duration={60}
+                isMobile={isMobile}
+              />
+            </div>
+          )}
+
+          {forRent.length > 0 && (
+            <div className="w-full">
+              <MarqueeTitle href="/apartments?dealType=rent">נכסים להשכרה</MarqueeTitle>
+              <MarqueeRow
+                items={forRent}
+                direction="right"
+                duration={60}
+                isMobile={isMobile}
+              />
+            </div>
+          )}
         </div>
       </div>
     </section>
