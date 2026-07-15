@@ -62,9 +62,16 @@ export default async function Home() {
   const HomepageSettings = (prisma as any).homepageSettings;
 
   const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings] = await Promise.all([
+    // The "נכסים למכירה" / "נכסים להשכרה" carousels are labelled by deal type,
+    // so they should show properties of that deal type — not ONLY the handful
+    // flagged `isHotProposition`. With just 1 hot sale flagged the carousel had a
+    // single card and no arrows (nothing to scroll). Fetch all active, unsold
+    // listings and surface the hot/pinned ones first, so each carousel is always
+    // populated; HotPropositions still caps each group at MAX_PER_GROUP.
     prisma.property.findMany({
-      where: { isActive: true, isHotProposition: true, isSold: false },
-      take: 12,
+      where: { isActive: true, isSold: false },
+      orderBy: [{ isHotProposition: 'desc' }, { isPinned: 'desc' }, { createdAt: 'desc' }],
+      take: 24,
       select: {
         id: true, title: true, price: true, rooms: true, bathrooms: true, area: true,
         location: true, images: true, status: true, isSold: true, floor: true,

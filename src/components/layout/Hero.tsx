@@ -13,10 +13,14 @@ const Hero: React.FC = () => {
   const line2 = 'חיים ענבי';
 
   return (
+    // minHeight (below), not a fixed height: on a SHORT viewport a fixed 100dvh
+    // forces the centred content to overflow upward under the fixed navbar (the
+    // heading landed on the logo). min-height lets the hero grow to fit its
+    // content + top padding instead, so the content always clears the navbar.
     <section
       dir="rtl"
       className="relative w-full overflow-hidden md:flex md:items-center"
-      style={{ height: '100dvh', maxWidth: '100vw' }}
+      style={{ minHeight: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
         .hero-video-wrap {
@@ -176,13 +180,13 @@ const Hero: React.FC = () => {
           the same axis at each breakpoint so nothing staircases. */}
       <div
         className="
-          relative z-20 h-full md:h-auto w-full
+          relative z-20 min-h-[100dvh] md:min-h-0 md:h-auto w-full
           px-6 md:px-16 xl:px-20 2xl:px-24
           flex flex-col
           items-center md:items-start
           justify-center
           gap-6 md:gap-10 xl:gap-14
-          py-8 md:py-24
+          pt-24 pb-10 md:py-24
         "
         style={{ maxWidth: '3200px', margin: '0 auto' }}
       >
@@ -194,7 +198,7 @@ const Hero: React.FC = () => {
             <h1
               className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
-                fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
+                fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
                 WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
                 paintOrder: 'stroke',
@@ -207,7 +211,7 @@ const Hero: React.FC = () => {
 
             <span
               className="amp-pop relative shrink-0 inline-block"
-              style={{ width: 'clamp(1.6rem, 5vw, 9.75rem)', height: 'clamp(1.6rem, 5vw, 9.75rem)' }}
+              style={{ width: 'clamp(1.3rem, 3.7vw, 5.75rem)', height: 'clamp(1.3rem, 3.7vw, 5.75rem)' }}
             >
               <Image
                 src="/images/and.png"
@@ -222,7 +226,7 @@ const Hero: React.FC = () => {
             <h1
               className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
-                fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
+                fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
                 WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
                 paintOrder: 'stroke',
