@@ -115,41 +115,56 @@ header {
 }
 
 
-/* Ultra-wide screens (1440p+ / 4K).
+/* Ultra-wide screens (1440p / QHD / 4K).
    Tailwind sizes everything in rem, so lifting the root font size scales the whole
    public site — type, spacing, rounded corners — instead of leaving a 16px page
-   marooned in the middle of a 4000px monitor. Breakpoints are px-based, so they
-   are unaffected. (The admin panel is antd/px and scales via zoom in
-   antd-admin.css — this rule doesn't reach it.) */
-@media (min-width: 2400px) {
+   marooned in the middle of a 2560–3840px monitor.
+
+   The ramp is keyed on the CSS viewport width, which is what the browser actually
+   sees AFTER Windows display scaling — so it self-corrects for the monitor's OS
+   scaling. A 4K panel lands at 3840px CSS at 100% scaling, 2560px at 150% (the
+   Windows default for 4K), or 1920px at 200%, and each gets the right amount:
+
+     1600px → 16.0px (1.00×, ramp just begins — no hard jump)
+     1920px → 18.7px (1.17×)
+     2560px → 24.0px (1.50×)   ← 4K @ 150%
+     3200px → 29.3px (1.83×)
+     3520px → 32.0px (2.00×, cap)
+     3840px → 32.0px (2.00×)   ← 4K @ 100%
+
+   Capped at 32px (2×) so a 5K/8K panel doesn't turn into a billboard. Starts at
+   1600 rather than 1920 so a 4K@200% (1920px CSS) still gets a bump and there is
+   no dead zone where a "big screen" renders at the same 16px as a laptop.
+
+   Safe to do: rem inside a media query always resolves against the browser's
+   initial 16px, never against this value, so Tailwind's breakpoints don't move.
+   (The admin panel is antd/px and scales via zoom in antd-admin.css — the root
+   font size doesn't reach it.) */
+@media (min-width: 1600px) {
   html {
-    font-size: 18px;
+    font-size: clamp(16px, calc(16px + (100vw - 1600px) * 0.00833), 32px);
   }
 }
 
-@media (min-width: 3200px) {
-  html {
-    font-size: 20.5px;
-  }
-}
-
-/* Large screen optimizations (1920px and above) */
-@media (min-width: 1920px) {
-  /* Increase container max-widths for better use of space */
+/* Large screen optimizations (1600px and above) */
+@media (min-width: 1600px) {
+  /* Wider containers — in rem, NOT px, so they grow with the root font size above.
+     A px cap here would keep the column at 1600px while the text inside it got
+     bigger, which reads as cramped; in rem the column and its type scale together. */
   .container {
-    max-width: 1800px !important;
+    max-width: 112.5rem !important; /* 1800px at 16px root */
   }
-  
+
   /* Better spacing on large screens */
   body {
     font-size: 1.05rem;
   }
-  
+
   /* Ensure content doesn't stretch too wide */
   .max-w-7xl {
-    max-width: 1600px !important;
+    max-width: 100rem !important; /* 1600px at 16px root */
   }
-  
+
   /* Better padding on large screens */
   .px-4 {
     padding-left: 2rem;
@@ -177,16 +192,10 @@ header {
   }
 }
 
-/* Extra large screens (2560px and above) */
-@media (min-width: 2560px) {
-  .container {
-    max-width: 2400px !important;
-  }
-
-  .max-w-7xl {
-    max-width: 2200px !important;
-  }
-}
+/* No separate 2560px+ container rule: the rem caps above already widen with the
+   root font size (max-w-7xl = 100rem ≈ 2400px at 2560, 3200px at 3840), so the
+   column keeps the same proportions as at 1080p while using the extra width,
+   instead of being stretched independently. */
 
 /* Admin panel - sold properties styling */
 .sold-property-row {

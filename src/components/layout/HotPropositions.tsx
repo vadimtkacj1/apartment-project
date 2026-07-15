@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, memo, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { m } from "framer-motion";
-import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
@@ -36,96 +35,53 @@ interface Property {
   features?: any;
 }
 
+/** How many cards to show per deal-type group. The heading links to the full
+    listing, so this stays a curated preview rather than an endless list. */
+const MAX_PER_GROUP = 8;
+
 /**
- * Marquee Row Component utilizing Framer Motion for high-performance looping.
- */
-const MarqueeRow = ({
-  items,
-  direction = "left",
-  duration = 40,
-  isMobile = false
-}: {
-  items: Property[],
-  direction?: "left" | "right",
-  duration?: number,
-  isMobile?: boolean
-}) => {
-  const duplicatedItems = useMemo(() => {
-    // Guarantee smooth infinite carousel even when there are few items
-    if (items.length === 1) {
-      // One item – duplicate more times to avoid big empty gaps
-      return [...items, ...items, ...items, ...items];
-    }
-    if (items.length === 2) {
-      // Two items – 3 cycles give good density
-      return [...items, ...items, ...items];
-    }
+ * Centered, wrapping row of property cards. Replaces the old infinite auto-
+ * scrolling marquee (the user did not want an endless scroll).
+ *
+ * Card width is `22rem` — a REM basis, not a fixed px — so it grows with the
+ * screen: on a large monitor the root font-size ramp in globals.css lifts 1rem
+ * from 16px toward 32px, so each card widens from ~352px to ~700px instead of
+ * staying a tiny 360px strip. `flex-wrap` + `justify-center` keeps it tidy for
+ * any count: a group with 1–2 properties centers instead of leaving three empty
+ * grid columns, while 4+ wrap into rows. `grow-0` stops a lone card stretching
+ * across the whole row. */
+const PropertyGrid = ({ items }: { items: Property[] }) => (
+  <div className="flex flex-wrap justify-center gap-6 md:gap-8">
+    {items.map((item: Property, i: number) => {
+      const cardProps = {
+        ...item,
+        propertyType: item.propertyType as PropertyType | undefined,
+        index: i,
+        // The <a> wrapper handles navigation, so the card's own click is disabled
+        // to avoid a double push.
+        disableClick: true,
+      };
+      return (
+        <a
+          key={`hot-proposition-card-${item.id}-${i}`}
+          href={`/apartments/${item.id}`}
+          onClick={() => {
+            if (!item.isSold) {
+              analytics.trackPropertyClick(item.id, 'hot-proposition');
+            }
+          }}
+          className="block basis-[22rem] max-w-full shrink-0 grow-0"
+        >
+          <PropertyCard {...cardProps} />
+        </a>
+      );
+    })}
+  </div>
+);
 
-    // 3+ items – standard behavior
-    return isMobile ? [...items, ...items] : [...items, ...items, ...items];
-  }, [items, isMobile]);
-
-  const animationDuration = isMobile ? duration * 0.8 : duration;
-
-  const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
-  const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
-
-  return (
-    <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
-      <m.div
-        key={`hot-propositions-marquee-${direction}-${animationDuration}`}
-        className="flex gap-4 md:gap-6 py-4 md:py-6"
-        style={{
-          willChange: 'transform',
-          pointerEvents: 'auto'
-        }}
-        initial={{ x: xInitial }}
-        animate={{ x: xAnimate }}
-        transition={{
-          duration: animationDuration,
-          ease: "linear",
-          repeat: Infinity,
-        }}
-        onMouseDown={(e) => {
-          // Allow clicks to pass through to links
-          const target = e.target as HTMLElement;
-          if (target.closest('a')) {
-            e.stopPropagation();
-          }
-        }}
-      >
-        {duplicatedItems.map((item: Property, i: number) => {
-          const cardProps = {
-            ...item,
-            propertyType: item.propertyType as PropertyType | undefined,
-            index: i,
-            disableClick: true
-          };
-          return (
-            <a
-              key={`hot-proposition-card-${direction}-${i}`}
-              href={`/apartments/${item.id}`}
-              onClick={(e) => {
-                if (!item.isSold) {
-                  analytics.trackPropertyClick(item.id, 'hot-proposition');
-                }
-              }}
-              draggable={false}
-              className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block select-none"
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }}
-            >
-              <PropertyCard {...cardProps} />
-            </a>
-          );
-        })}
-      </m.div>
-    </div>
-  );
-};
-
-/** Heading above each marquee, doubling as a link to the matching listing page. */
-const MarqueeTitle = ({ children, href }: { children: React.ReactNode; href: string }) => (
-  <div className="px-4 md:px-6 mb-2 flex items-center justify-center gap-3">
+/** Heading above each grid, doubling as a link to the matching listing page. */
+const RowTitle = ({ children, href }: { children: React.ReactNode; href: string }) => (
+  <div className="mb-6 md:mb-8 flex items-center justify-center gap-3">
     <span className="h-px w-8 md:w-14 bg-[#c5a357]" aria-hidden="true" />
     <h3
       className="text-3xl md:text-4xl font-black text-[#1c3664] tracking-tight"
@@ -145,7 +101,6 @@ interface HotPropositionsProps {
 }
 
 function HotPropositions({ initialProperties, initialTitle }: HotPropositionsProps = {}) {
-  const { isMobile } = usePerformanceSettings();
   const [properties, setProperties] = useState<Property[]>(initialProperties ?? []);
   const [loading, setLoading] = useState(initialProperties === undefined);
   const [title, setTitle] = useState(initialTitle ?? 'הצעות חמות');
@@ -268,30 +223,22 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
           </h2>
         </m.div>
 
-        {/* Scrolling Rows — one per deal type. A group with no properties is
-            skipped entirely (title included) rather than left as an empty strip. */}
-        <div className="flex flex-col gap-10 md:gap-14 w-full">
+        {/* Grid rows — one per deal type. A group with no properties is skipped
+            entirely (title included) rather than left as an empty strip. Centered
+            in a rem container so it uses the extra width on large screens without
+            stretching edge-to-edge. */}
+        <div className="flex flex-col gap-14 md:gap-20 w-full max-w-7xl mx-auto px-4 md:px-6">
           {forSale.length > 0 && (
             <div className="w-full">
-              <MarqueeTitle href="/apartments?dealType=sale">נכסים למכירה</MarqueeTitle>
-              <MarqueeRow
-                items={forSale}
-                direction="left"
-                duration={60}
-                isMobile={isMobile}
-              />
+              <RowTitle href="/apartments?dealType=sale">נכסים למכירה</RowTitle>
+              <PropertyGrid items={forSale.slice(0, MAX_PER_GROUP)} />
             </div>
           )}
 
           {forRent.length > 0 && (
             <div className="w-full">
-              <MarqueeTitle href="/apartments?dealType=rent">נכסים להשכרה</MarqueeTitle>
-              <MarqueeRow
-                items={forRent}
-                direction="right"
-                duration={60}
-                isMobile={isMobile}
-              />
+              <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
+              <PropertyGrid items={forRent.slice(0, MAX_PER_GROUP)} />
             </div>
           )}
         </div>

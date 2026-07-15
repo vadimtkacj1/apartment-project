@@ -79,7 +79,7 @@ export default async function Footer() {
           {/* For Renters Section */}
           <div>
             <div className="text-xl font-bold mb-4 text-white">עבור שוכרים</div>
-            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: '1.0625rem' }}>
               <li><Link href="/apartments" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">דירות להשכרה</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">שאלות ותשובות</Link></li>
               <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
@@ -89,7 +89,7 @@ export default async function Footer() {
           {/* For Owners Section */}
           <div>
             <div className="text-xl font-bold mb-4 text-white">קונים ומוכרים</div>
-            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: '1.0625rem' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
             </ul>
@@ -98,7 +98,7 @@ export default async function Footer() {
           {/* Resources Section */}
           <div>
             <div className="text-xl font-bold mb-4 text-white">משאבים</div>
-            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: '1.0625rem' }}>
               <li><Link href="/articles" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מאמרים</Link></li>
               <li><Link href="/articles/mortgage-guide" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מדריך משכנתא</Link></li>
               <li><Link href="/articles/purchase-tax-guide" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מס רכישה</Link></li>
@@ -113,7 +113,7 @@ export default async function Footer() {
           {/* Company Section */}
           <div>
             <div className="text-xl font-bold mb-4 text-white">החברה</div>
-            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+            <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: '1.0625rem' }}>
               <li><Link href="/about" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">אודותינו</Link></li>
             </ul>
           </div>
@@ -122,7 +122,7 @@ export default async function Footer() {
           <div className="col-span-2 lg:col-span-1 flex flex-col gap-4">
             <div>
               <div className="text-xl font-bold mb-2 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>צור קשר</div>
-              <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: 'clamp(13px, 1vw, 17px)' }}>
+              <div className="space-y-2 text-gray-400 font-medium" style={{ fontSize: '1.0625rem' }}>
                 {owners.map((owner) => (
                   <div key={owner.id} className="space-y-1">
                     <p className="text-white font-semibold">{owner.name}</p>
@@ -201,11 +201,11 @@ export default async function Footer() {
             תוכן משפטי
           </div>
 
-          <p className="text-gray-400 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
+          <p className="text-gray-400 font-medium mb-3" style={{ fontSize: '0.9375rem' }}>
             © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.
           </p>
 
-          <div className="flex items-center justify-center gap-3 text-gray-400 flex-wrap" style={{ fontSize: 'clamp(12px, 0.85vw, 14px)' }}>
+          <div className="flex items-center justify-center gap-3 text-gray-400 flex-wrap" style={{ fontSize: '0.875rem' }}>
             <Link href="/privacy-policy" className="hover:text-[#c5a357] transition-colors font-medium">
               מדיניות פרטיות
             </Link>
@@ -223,7 +223,7 @@ export default async function Footer() {
             </Link>
           </div>
 
-          <p className="text-gray-400 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
+          <p className="text-gray-400 font-medium mt-4" style={{ fontSize: '0.8125rem' }}>
             נבנה על ידי <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#c5a357] transition-colors">Aiterra</a>
           </p>
         </div>

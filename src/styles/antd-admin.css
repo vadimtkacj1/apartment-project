@@ -771,31 +771,109 @@
 }
 
 /* ===== LARGE SCREENS =====
-   On a 1920/2560 monitor the panel read as a postage stamp: antd's base font is
+   On a 1920/2560/3K monitor the panel read as a postage stamp: antd's base font is
    14px and its controls 32px at every width, and the dashboard's own numbers are
    inline px — none of it grew with the screen — while the cards stretched edge to
-   edge (2472px wide on a 2560 screen), so a row's label sat at one end and its
-   value at the other.
+   edge, so a row's label sat at one end and its value at the other.
 
-   `zoom` scales the working column as a whole (antd components AND the inline-px
-   dashboard widgets alike, which a font-size override cannot reach), and because
-   zoom also shrinks the column's CSS width, the cards stop over-stretching. The
-   max-width then caps what's left. Scoped to Content, so the fixed 250px sider
-   keeps its own geometry. */
+   `zoom` scales a subtree as a whole (antd components AND the inline-px dashboard
+   widgets alike, which a font-size override cannot reach), and because zoom also
+   shrinks the subtree's CSS width, the cards stop over-stretching; the max-width
+   then caps what's left. The factor is near-proportional to the screen: a 4K panel
+   shows the same panel as 1080p, drawn up to 2× bigger.
+
+   It is applied to the sidebar AND the header/content/footer column — the two
+   flex children — rather than to .layout-dashboard itself, because zoom does not
+   divide viewport units: a zoomed ancestor would make every `100vh` child 1.5
+   viewports tall. For the same reason each vh-derived height below is divided by
+   the factor, so it lands back on one real viewport.
+
+   Popups (Select/DatePicker/Dropdown/tooltip) are portaled to <body>, outside the
+   zoom, and must NOT be zoomed: rc-trigger writes their position into inline px,
+   which zoom would scale too, and they'd drift off their trigger. They get a font
+   bump instead — the popup's own width already tracks its (zoomed) trigger. Modal
+   and Drawer are centered/edge-anchored rather than px-positioned, so they can be
+   zoomed outright. */
+:root {
+  --admin-zoom: 1;
+}
+
+/* Ladder tuned to roughly match the public site's rem ramp so both surfaces feel
+   the same size on a given monitor: ~1.5× at 2560px CSS (4K @ 150%, the Windows
+   default) and ~2.0× at 3840px CSS (4K @ 100%). Keyed on CSS width, so it self-
+   corrects for the monitor's OS scaling the same way the public ramp does. */
 @media (min-width: 1600px) {
-  /* width:100% is load-bearing — Content is a flex item, and an auto inline
-     margin cancels the default stretch, collapsing it to shrink-to-fit. */
-  .layout-dashboard .content-ant {
-    zoom: 1.1;
-    width: 100%;
-    max-width: 1460px;
-    margin-inline: auto;
+  :root {
+    --admin-zoom: 1.15;
+  }
+}
+@media (min-width: 1920px) {
+  :root {
+    --admin-zoom: 1.3;
+  }
+}
+@media (min-width: 2100px) {
+  :root {
+    --admin-zoom: 1.4;
+  }
+}
+@media (min-width: 2560px) {
+  :root {
+    --admin-zoom: 1.55;
+  }
+}
+@media (min-width: 2880px) {
+  :root {
+    --admin-zoom: 1.7;
+  }
+}
+@media (min-width: 3400px) {
+  :root {
+    --admin-zoom: 1.9;
+  }
+}
+@media (min-width: 3840px) {
+  :root {
+    --admin-zoom: 2;
   }
 }
 
-@media (min-width: 2100px) {
+@media (min-width: 1600px) {
+  /* Sidebar: scales with the rest, and its 250px width / -250px collapsed offset
+     scale together, so the reserved margin on the column still matches it. */
+  .layout-dashboard .ant-layout-sider.sider-primary {
+    zoom: var(--admin-zoom);
+    height: calc(100vh / var(--admin-zoom));
+  }
+
+  /* Header + content + footer column. */
+  .layout-dashboard > .ant-layout {
+    zoom: var(--admin-zoom);
+    min-height: calc(100vh / var(--admin-zoom));
+  }
+
+  /* width:100% is load-bearing — Content is a flex item, and an auto inline
+     margin cancels the default stretch, collapsing it to shrink-to-fit. */
   .layout-dashboard .content-ant {
-    zoom: 1.22;
-    max-width: 1480px;
+    width: 100%;
+    max-width: 1500px;
+    margin-inline: auto;
+    min-height: calc((100vh / var(--admin-zoom)) - 140px);
+  }
+
+  .ant-modal,
+  .ant-drawer {
+    zoom: var(--admin-zoom);
+  }
+
+  .ant-select-dropdown,
+  .ant-dropdown,
+  .ant-dropdown-menu,
+  .ant-picker-dropdown,
+  .ant-tooltip,
+  .ant-message,
+  .ant-notification,
+  .ant-popover {
+    font-size: calc(14px * var(--admin-zoom));
   }
 }
