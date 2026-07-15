@@ -1,10 +1,16 @@
 "use client";
 
-import { memo, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { m } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { A11y, Keyboard } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Swiper as SwiperType } from "swiper";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
+
+import "swiper/css";
 
 // Type for apartment data
 interface Property {
@@ -40,44 +46,107 @@ interface Property {
 const MAX_PER_GROUP = 8;
 
 /**
- * Centered, wrapping row of property cards. Replaces the old infinite auto-
- * scrolling marquee (the user did not want an endless scroll).
+ * A manually-driven carousel of property cards — arrows on desktop, swipe on
+ * touch. It deliberately does NOT auto-scroll (the user rejected the old endless
+ * marquee); the user only ever moves it by their own action.
  *
- * Card width is `22rem` — a REM basis, not a fixed px — so it grows with the
- * screen: on a large monitor the root font-size ramp in globals.css lifts 1rem
- * from 16px toward 32px, so each card widens from ~352px to ~700px instead of
- * staying a tiny 360px strip. `flex-wrap` + `justify-center` keeps it tidy for
- * any count: a group with 1–2 properties centers instead of leaving three empty
- * grid columns, while 4+ wrap into rows. `grow-0` stops a lone card stretching
- * across the whole row. */
-const PropertyGrid = ({ items }: { items: Property[] }) => (
-  <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-    {items.map((item: Property, i: number) => {
-      const cardProps = {
-        ...item,
-        propertyType: item.propertyType as PropertyType | undefined,
-        index: i,
-        // The <a> wrapper handles navigation, so the card's own click is disabled
-        // to avoid a double push.
-        disableClick: true,
-      };
-      return (
-        <a
-          key={`hot-proposition-card-${item.id}-${i}`}
-          href={`/apartments/${item.id}`}
-          onClick={() => {
-            if (!item.isSold) {
-              analytics.trackPropertyClick(item.id, 'hot-proposition');
-            }
-          }}
-          className="block basis-[22rem] max-w-full shrink-0 grow-0"
-        >
-          <PropertyCard {...cardProps} />
-        </a>
-      );
-    })}
-  </div>
-);
+ * Behaviour notes:
+ * - `slidesPerView` is fractional on mobile so the next card peeks in, hinting
+ *   the row is swipeable, and steps up to 3 on desktop.
+ * - Arrows hide themselves when every card already fits (`isLocked`) — so a
+ *   group with 1–2 properties shows a tidy centered row, not dead controls.
+ * - `centerInsufficientSlides` centers those 1–2 lone cards instead of pinning
+ *   them to the (RTL) right edge.
+ * - RTL: reading runs right→left, so the ChevronLeft (←) advances forward
+ *   (`slideNext`) and ChevronRight (→) goes back (`slidePrev`). Each disables at
+ *   its respective end.
+ */
+const PropertyCarousel = ({ items }: { items: Property[] }) => {
+  const [swiper, setSwiper] = useState<SwiperType | null>(null);
+  const [nav, setNav] = useState({ isBeginning: true, isEnd: false, locked: false });
+
+  const sync = useCallback((s: SwiperType) => {
+    setNav({ isBeginning: s.isBeginning, isEnd: s.isEnd, locked: s.isLocked });
+  }, []);
+
+  const arrowBase =
+    "pointer-events-auto w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl transition-all hover:bg-[#c5a357] hover:text-[#1c3664] disabled:opacity-0 disabled:pointer-events-none";
+
+  return (
+    <div className="relative">
+      <Swiper
+        modules={[A11y, Keyboard]}
+        spaceBetween={24}
+        slidesPerView={1.1}
+        grabCursor
+        watchOverflow
+        centerInsufficientSlides
+        keyboard={{ enabled: true }}
+        onSwiper={(s) => { setSwiper(s); sync(s); }}
+        onSlideChange={sync}
+        onResize={sync}
+        onBreakpoint={sync}
+        breakpoints={{
+          640: { slidesPerView: 2 },
+          1024: { slidesPerView: 3 },
+        }}
+        className="!px-1 !py-1"
+      >
+        {items.map((item: Property, i: number) => {
+          const cardProps = {
+            ...item,
+            propertyType: item.propertyType as PropertyType | undefined,
+            index: i,
+            // The <a> wrapper handles navigation, so the card's own click is
+            // disabled to avoid a double push.
+            disableClick: true,
+          };
+          return (
+            <SwiperSlide key={`hot-proposition-card-${item.id}-${i}`} className="!h-auto">
+              <a
+                href={`/apartments/${item.id}`}
+                onClick={() => {
+                  if (!item.isSold) {
+                    analytics.trackPropertyClick(item.id, 'hot-proposition');
+                  }
+                }}
+                className="block h-full"
+              >
+                <PropertyCard {...cardProps} />
+              </a>
+            </SwiperSlide>
+          );
+        })}
+      </Swiper>
+
+      {/* Arrows — hidden entirely when the cards already fit (nav.locked). Kept
+          inside the container so the section's overflow-hidden never clips them.
+          Vertically centered on the card image (aspect-4/3 → ~38% of card). */}
+      {!nav.locked && (
+        <div className="hidden sm:block">
+          <button
+            type="button"
+            onClick={() => swiper?.slidePrev()}
+            disabled={nav.isBeginning}
+            aria-label="הנכס הקודם"
+            className={`absolute right-0 top-[38%] -translate-y-1/2 z-30 ${arrowBase}`}
+          >
+            <ChevronRight size={26} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => swiper?.slideNext()}
+            disabled={nav.isEnd}
+            aria-label="הנכס הבא"
+            className={`absolute left-0 top-[38%] -translate-y-1/2 z-30 ${arrowBase}`}
+          >
+            <ChevronLeft size={26} aria-hidden="true" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 /** Heading above each grid, doubling as a link to the matching listing page. */
 const RowTitle = ({ children, href }: { children: React.ReactNode; href: string }) => (
@@ -175,7 +244,7 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // One marquee per deal type: sale first, rent second. `dealType` is already
+  // One carousel per deal type: sale first, rent second. `dealType` is already
   // resolved upstream (SSR maps category -> dealType), so trust it and treat
   // anything non-rent as a sale.
   const forSale = properties.filter((p) => p.dealType !== 'rent');
@@ -223,22 +292,22 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
           </h2>
         </m.div>
 
-        {/* Grid rows — one per deal type. A group with no properties is skipped
-            entirely (title included) rather than left as an empty strip. Centered
-            in a rem container so it uses the extra width on large screens without
-            stretching edge-to-edge. */}
+        {/* Carousel rows — one per deal type. A group with no properties is
+            skipped entirely (title included) rather than left as an empty strip.
+            Centered in a rem container so it uses the extra width on large
+            screens without stretching edge-to-edge. */}
         <div className="flex flex-col gap-14 md:gap-20 w-full max-w-7xl mx-auto px-4 md:px-6">
           {forSale.length > 0 && (
             <div className="w-full">
               <RowTitle href="/apartments?dealType=sale">נכסים למכירה</RowTitle>
-              <PropertyGrid items={forSale.slice(0, MAX_PER_GROUP)} />
+              <PropertyCarousel items={forSale.slice(0, MAX_PER_GROUP)} />
             </div>
           )}
 
           {forRent.length > 0 && (
             <div className="w-full">
               <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
-              <PropertyGrid items={forRent.slice(0, MAX_PER_GROUP)} />
+              <PropertyCarousel items={forRent.slice(0, MAX_PER_GROUP)} />
             </div>
           )}
         </div>

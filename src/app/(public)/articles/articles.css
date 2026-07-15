@@ -7,17 +7,21 @@
 }
 
 .articles-container {
-  max-width: 1200px;
+  max-width: 75rem; /* 1200px at 16px root */
   margin: 0 auto;
   padding: 2rem 2rem 4rem;
   position: relative;
   z-index: 1;
 }
 
-/* Large screens (1920px and above) */
-@media (min-width: 1920px) {
+/* Large screens — matches the site's rem ramp (globals.css starts at 1600px).
+   max-width is in REM, not px, so it grows with the root font size instead of
+   marooning the listing in a fixed 1800px column with huge dead margins on a
+   2560/4K screen. 100rem ≈ 1600px at base, ~2400px at 2560, ~3200px at 3840 —
+   the same 100rem cap as the site's .max-w-7xl, so the page stays consistent. */
+@media (min-width: 1600px) {
   .articles-container {
-    max-width: 1800px;
+    max-width: 100rem;
     padding: 3rem 4rem 6rem;
   }
 }
@@ -123,10 +127,14 @@
   box-shadow: 0 4px 12px rgba(28, 54, 100, 0.2);
 }
 
-/* Articles Grid */
+/* Articles Grid.
+   Column min in REM (not the old 350px) so cards scale with the root ramp and the
+   grid keeps sensible column counts as the container widens: ~3 cols at 1536, 4 at
+   2560/3840 with cards growing ~350px → ~680px, filling the width instead of
+   leaving fat gaps. 1fr stretches columns to fill the row edge-to-edge. */
 .articles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
   gap: 2.5rem;
   margin: 3rem 0;
 }
