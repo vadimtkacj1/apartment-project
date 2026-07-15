@@ -251,7 +251,7 @@ const Hero: React.FC = () => {
             md up, matching the heading/subtitle above. Full-width only on true
             phones (<sm); a fixed 340px block from sm up so they never sprawl. */}
         <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
-          <div className="btn-lift w-full sm:w-auto">
+          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="/apartments?dealType=sale"
               className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
@@ -283,7 +283,7 @@ const Hero: React.FC = () => {
             </Link>
           </div>
 
-          <div className="btn-lift w-full sm:w-auto">
+          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="/apartments?dealType=rent"
               className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
@@ -315,7 +315,7 @@ const Hero: React.FC = () => {
             </Link>
           </div>
 
-          <div className="btn-lift w-full sm:w-auto">
+          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="#onethepark"
               className="btn-green group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
