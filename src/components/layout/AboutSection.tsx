@@ -60,7 +60,12 @@ const AboutSection: React.FC = memo(() => {
           className="w-full h-full bg-white"
           style={{
             backgroundImage: logoPattern,
-            backgroundSize: '160px',
+            // rem, not px: the big-screen root font-size ramp (globals.css) scales
+            // rem but freezes px, so a px tile stays 160px on a 4K panel while the
+            // rest of the section grows 1.5–2×, making the watermark read as tiny
+            // and over-dense. 10rem === 160px at the base root, so nothing changes
+            // below 1600px.
+            backgroundSize: '10rem',
             backgroundRepeat: 'repeat',
             backgroundPosition: 'center',
           }}
@@ -137,7 +142,12 @@ const AboutSection: React.FC = memo(() => {
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 lg:col-span-2 flex justify-center"
           >
-            <div className="relative w-full max-w-[420px] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            {/* max-w in rem, not px: on the big-screen ramp its 2/5 grid column
+                widens to ~960px at 2560 / ~1280px at 3840, but a px-capped image
+                stays 420px and looks marooned. 26.25rem === 420px at the base
+                root (identical ≤1600px) and scales to ~630/840px above, keeping
+                the photo proportional to the text column beside it. */}
+            <div className="relative w-full max-w-[26.25rem] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
               <Image
                 src="/6.png"
                 alt="אודות המשרד"

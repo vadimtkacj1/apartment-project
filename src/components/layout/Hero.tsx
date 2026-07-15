@@ -169,6 +169,11 @@ const Hero: React.FC = () => {
       <div className="hero-scrim" aria-hidden="true" />
 
       {/* ── Content ── */}
+      {/* One shared container for ALL hero content. Best-practice responsive
+          hero: content is CENTERED on narrow screens (phones/tablets read best
+          centered) and flips to the RTL start edge (right) from md up, where a
+          side-anchored text block over the video reads better. Elements share
+          the same axis at each breakpoint so nothing staircases. */}
       <div
         className="
           relative z-20 h-full md:h-auto w-full
@@ -185,9 +190,9 @@ const Hero: React.FC = () => {
         {/* TOP: heading + subtitle */}
         <div className="flex flex-col items-center md:items-start w-full">
 
-          <div className="flex items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
             <h1
-              className="font-black text-white leading-none"
+              className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
                 fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
@@ -215,7 +220,7 @@ const Hero: React.FC = () => {
             </span>
 
             <h1
-              className="font-black text-white leading-none"
+              className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
                 fontSize: 'clamp(1.8rem, 7.5vw, 13rem)',
                 textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
@@ -238,12 +243,14 @@ const Hero: React.FC = () => {
           </p>
         </div>
 
-        {/* BOTTOM: CTA buttons */}
+        {/* BOTTOM: CTA buttons — centered on narrow screens, right-aligned from
+            md up, matching the heading/subtitle above. Full-width only on true
+            phones (<sm); a fixed 340px block from sm up so they never sprawl. */}
         <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
-          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
+          <div className="btn-lift w-full sm:w-auto">
             <Link
               href="/apartments?dealType=sale"
-              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
@@ -272,10 +279,10 @@ const Hero: React.FC = () => {
             </Link>
           </div>
 
-          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
+          <div className="btn-lift w-full sm:w-auto">
             <Link
               href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
@@ -304,10 +311,10 @@ const Hero: React.FC = () => {
             </Link>
           </div>
 
-          <div className="btn-lift w-[70%] sm:w-[55%] md:w-auto">
+          <div className="btn-lift w-full sm:w-auto">
             <Link
               href="#onethepark"
-              className="btn-green group relative block overflow-hidden w-full md:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-green group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
               style={{
                 padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
                 background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',

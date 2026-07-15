@@ -94,7 +94,12 @@ export default function Header() {
           margin: "0 auto",
           /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
           padding: isMobile ? "0 1rem" : "0 3rem",
-          height: isMobile ? 70 : "clamp(70px, 3.4vw, 104px)",
+          /* Cap in rem, not px: the big-screen root font-size ramp (globals.css)
+             scales rem but freezes px. A px cap here (104px) froze the bar while
+             the ramped content below grew to 2× on a 4K panel, so the navbar read
+             as too small. 6.5rem === 104px at the base root, so ≤1600px is
+             identical; above 1600px the cap rides the ramp with the rest of the site. */
+          height: isMobile ? 70 : "clamp(70px, 3.4vw, 6.5rem)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -108,12 +113,12 @@ export default function Header() {
           >
             <Image src="/favicon-rm.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain" priority
-              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 92px)", height: "auto" }}
+              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 5.75rem)", height: "auto" }}
             />
           </Link>
           <Image src="/images/second-and.svg" alt="" width={36} height={36}
             className="object-contain"
-            style={{ transition: "filter 0.35s ease", marginBottom: "8px", width: "clamp(36px, 1.8vw, 54px)", height: "auto" }}
+            style={{ transition: "filter 0.35s ease", marginBottom: "8px", width: "clamp(36px, 1.8vw, 3.375rem)", height: "auto" }}
           />
           <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
@@ -121,7 +126,7 @@ export default function Header() {
           >
             <Image src="/favicon-ha.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
               className="object-contain"
-              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 92px)", height: "auto" }}
+              style={{ transition: "filter 0.35s ease", width: "clamp(60px, 3vw, 5.75rem)", height: "auto" }}
             />
           </Link>
         </div>
@@ -143,7 +148,10 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(17px, 1.35vw, 30px)",
+                      // rem cap (1.875rem === 30px base) so the link size rides
+                      // the big-screen ramp instead of freezing at 30px while the
+                      // page content scales up.
+                      fontSize: "clamp(17px, 1.35vw, 1.875rem)",
                       fontWeight: 700,
                       color: textColor,
                       textShadow: shouldBeTransparent
@@ -198,7 +206,7 @@ export default function Header() {
                         position: "absolute",
                         top: "calc(100% + 10px)",
                         right: 0,
-                        width: 230, 
+                        width: "14.375rem", // 230px base; rem so it scales with the ramp
                         background: "#ffffff",
                         borderRadius: 14,
                         boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
@@ -218,8 +226,8 @@ export default function Header() {
                           onClick={() => setActiveDesktopSubmenu(null)}
                           style={{
                             display: "block",
-                            padding: "14px 20px", 
-                            fontSize: 17, 
+                            padding: "0.875rem 1.25rem", // 14px 20px base; rem rides the ramp
+                            fontSize: "1.0625rem", // 17px base
                             fontWeight: 600,
                             color: "#1c3664",
                             textDecoration: "none",

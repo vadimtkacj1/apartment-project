@@ -69,9 +69,14 @@ export default function WhatsAppFloatingButton() {
   return (
     <>
       {/* Floating Button */}
+      {/* Sits as a tidy vertical stack directly above the accessibility launcher
+          (Sienna `.asw-menu-btn`, fixed at left:20px/bottom:20px, 42×42). Centred
+          over it (its center-x is 41px; this 56px button → left 13px) with a 12px
+          gap, so the two floating controls line up instead of reading as a crooked
+          pair with mismatched left edges. */}
       <m.button
         onClick={() => setIsOpen(true)}
-        className="fixed left-6 bottom-32 z-50 bg-[#25D366] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-[#20BA5A] transition-colors duration-300"
+        className="fixed left-[13px] bottom-[74px] z-50 bg-[#25D366] text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:bg-[#20BA5A] transition-colors duration-300"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         aria-label="WhatsApp"
