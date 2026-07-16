@@ -44,31 +44,33 @@ interface Property {
 const MAX_PER_GROUP = 8;
 
 /**
- * Infinite, self-scrolling carousel (marquee) of property cards. It advances on
- * its own, continuously and seamlessly — Swiper `loop` + zero-delay autoplay with
- * a linear timing function turn the slide-to-slide animation into constant-speed
- * motion — and pauses while the pointer is over it so a visitor can read a card.
- * Cards stay draggable/swipeable, and interacting never stops the auto-scroll.
+ * Infinite, self-advancing property carousel. It scrolls on its own — Swiper
+ * `loop` + autoplay steps ONE card forward every few seconds — and pauses while
+ * the pointer is over it so a visitor can read a card; cards stay draggable.
  *
- * A group needs more cards than fit (desktop shows 3) to loop smoothly; with 3
- * or fewer it falls back to a static, centered row rather than a stuttering,
- * half-empty marquee.
+ * Stepped (not a continuous marquee) on purpose: it settles on WHOLE cards
+ * between steps instead of leaving cards cropped mid-flow at the edges, and moves
+ * at a relaxed pace (`delay` 4.5s, smooth 0.9s transition). Integer
+ * `slidesPerView` at every breakpoint keeps cards whole — no fractional peek.
+ *
+ * Auto-scroll only engages when a group has more cards than fit (desktop shows
+ * 3); a smaller group is a static, centered row.
  */
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
-  const marquee = items.length > 3;
+  const autoScroll = items.length > 3;
 
   return (
-    <div className="relative property-marquee">
+    <div className="relative">
       <Swiper
         modules={[A11y, Autoplay]}
         spaceBetween={24}
-        slidesPerView={1.1}
+        slidesPerView={1}
         grabCursor
-        loop={marquee}
-        autoplay={marquee ? { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
-        speed={marquee ? 4000 : 400}
+        loop={autoScroll}
+        autoplay={autoScroll ? { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+        speed={900}
         watchOverflow
-        centerInsufficientSlides={!marquee}
+        centerInsufficientSlides={!autoScroll}
         breakpoints={{
           640: { slidesPerView: 2 },
           1024: { slidesPerView: 3 },
@@ -101,15 +103,6 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
           );
         })}
       </Swiper>
-
-      {/* Constant-speed motion: Swiper animates each slide→slide step over the
-          `speed` above; a linear timing function turns those steps into a smooth
-          marquee instead of ease-in-out hops. */}
-      <style jsx global>{`
-        .property-marquee .swiper-wrapper {
-          transition-timing-function: linear !important;
-        }
-      `}</style>
     </div>
   );
 };
