@@ -178,17 +178,21 @@ const Hero: React.FC = () => {
           centered) and flips to the RTL start edge (right) from md up, where a
           side-anchored text block over the video reads better. Elements share
           the same axis at each breakpoint so nothing staircases. */}
+      {/* Same container as the navbar and the content sections below —
+          `max-w-7xl mx-auto px-4 md:px-6` — so the hero heading/buttons line up
+          with the logo above and the sections beneath on every width, instead of
+          sitting in their own wider 3200px box. */}
       <div
         className="
           relative z-20 min-h-[100dvh] md:min-h-0 md:h-auto w-full
-          px-6 md:px-16 xl:px-20 2xl:px-24
+          max-w-7xl mx-auto
+          px-4 md:px-6
           flex flex-col
           items-center md:items-start
           justify-center
           gap-6 md:gap-10 xl:gap-14
           pt-24 pb-10 md:py-24
         "
-        style={{ maxWidth: '3200px', margin: '0 auto' }}
       >
 
         {/* TOP: heading + subtitle */}

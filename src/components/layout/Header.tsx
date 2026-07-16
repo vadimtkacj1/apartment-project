@@ -87,18 +87,16 @@ export default function Header() {
           : "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.15)",
       }}
     >
+      {/* Same container as the page content sections — `max-w-7xl mx-auto px-4
+          md:px-6` — so the logo lines up with the section content edge on EVERY
+          width. The old fixed `maxWidth: 2400px` + `3rem` padding diverged from
+          the content's rem-scaled `max-w-7xl` container (100rem at ≥1600), so the
+          logo sat left of the content on laptops and right of it on 4K. Height
+          cap stays in rem to ride the big-screen ramp. */}
       <nav
         dir="ltr"
+        className="max-w-7xl mx-auto px-4 md:px-6"
         style={{
-          maxWidth: 2400,
-          margin: "0 auto",
-          /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
-          padding: isMobile ? "0 1rem" : "0 3rem",
-          /* Cap in rem, not px: the big-screen root font-size ramp (globals.css)
-             scales rem but freezes px. A px cap here (104px) froze the bar while
-             the ramped content below grew to 2× on a 4K panel, so the navbar read
-             as too small. 6.5rem === 104px at the base root, so ≤1600px is
-             identical; above 1600px the cap rides the ramp with the rest of the site. */
           height: isMobile ? 70 : "clamp(70px, 3.4vw, 6.5rem)",
           display: "flex",
           alignItems: "center",
