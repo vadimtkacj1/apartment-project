@@ -1,11 +1,9 @@
 "use client";
 
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { m } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Keyboard } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Swiper as SwiperType } from "swiper";
+import { A11y, Autoplay } from "swiper/modules";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
@@ -46,46 +44,31 @@ interface Property {
 const MAX_PER_GROUP = 8;
 
 /**
- * A manually-driven carousel of property cards — arrows on desktop, swipe on
- * touch. It deliberately does NOT auto-scroll (the user rejected the old endless
- * marquee); the user only ever moves it by their own action.
+ * Infinite, self-scrolling carousel (marquee) of property cards. It advances on
+ * its own, continuously and seamlessly — Swiper `loop` + zero-delay autoplay with
+ * a linear timing function turn the slide-to-slide animation into constant-speed
+ * motion — and pauses while the pointer is over it so a visitor can read a card.
+ * Cards stay draggable/swipeable, and interacting never stops the auto-scroll.
  *
- * Behaviour notes:
- * - `slidesPerView` is fractional on mobile so the next card peeks in, hinting
- *   the row is swipeable, and steps up to 3 on desktop.
- * - Arrows hide themselves when every card already fits (`isLocked`) — so a
- *   group with 1–2 properties shows a tidy centered row, not dead controls.
- * - `centerInsufficientSlides` centers those 1–2 lone cards instead of pinning
- *   them to the (RTL) right edge.
- * - RTL: reading runs right→left, so the ChevronLeft (←) advances forward
- *   (`slideNext`) and ChevronRight (→) goes back (`slidePrev`). Each disables at
- *   its respective end.
+ * A group needs more cards than fit (desktop shows 3) to loop smoothly; with 3
+ * or fewer it falls back to a static, centered row rather than a stuttering,
+ * half-empty marquee.
  */
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
-  const [swiper, setSwiper] = useState<SwiperType | null>(null);
-  const [nav, setNav] = useState({ isBeginning: true, isEnd: false, locked: false });
-
-  const sync = useCallback((s: SwiperType) => {
-    setNav({ isBeginning: s.isBeginning, isEnd: s.isEnd, locked: s.isLocked });
-  }, []);
-
-  const arrowBase =
-    "pointer-events-auto w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl transition-all hover:bg-[#c5a357] hover:text-[#1c3664] disabled:opacity-0 disabled:pointer-events-none";
+  const marquee = items.length > 3;
 
   return (
-    <div className="relative">
+    <div className="relative property-marquee">
       <Swiper
-        modules={[A11y, Keyboard]}
+        modules={[A11y, Autoplay]}
         spaceBetween={24}
         slidesPerView={1.1}
         grabCursor
+        loop={marquee}
+        autoplay={marquee ? { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+        speed={marquee ? 4000 : 400}
         watchOverflow
-        centerInsufficientSlides
-        keyboard={{ enabled: true }}
-        onSwiper={(s) => { setSwiper(s); sync(s); }}
-        onSlideChange={sync}
-        onResize={sync}
-        onBreakpoint={sync}
+        centerInsufficientSlides={!marquee}
         breakpoints={{
           640: { slidesPerView: 2 },
           1024: { slidesPerView: 3 },
@@ -119,31 +102,14 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
         })}
       </Swiper>
 
-      {/* Arrows — hidden entirely when the cards already fit (nav.locked). Kept
-          inside the container so the section's overflow-hidden never clips them.
-          Vertically centered on the card image (aspect-4/3 → ~38% of card). */}
-      {!nav.locked && (
-        <div className="hidden sm:block">
-          <button
-            type="button"
-            onClick={() => swiper?.slidePrev()}
-            disabled={nav.isBeginning}
-            aria-label="הנכס הקודם"
-            className={`absolute right-0 top-[38%] -translate-y-1/2 z-30 ${arrowBase}`}
-          >
-            <ChevronRight size={26} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            onClick={() => swiper?.slideNext()}
-            disabled={nav.isEnd}
-            aria-label="הנכס הבא"
-            className={`absolute left-0 top-[38%] -translate-y-1/2 z-30 ${arrowBase}`}
-          >
-            <ChevronLeft size={26} aria-hidden="true" />
-          </button>
-        </div>
-      )}
+      {/* Constant-speed motion: Swiper animates each slide→slide step over the
+          `speed` above; a linear timing function turns those steps into a smooth
+          marquee instead of ease-in-out hops. */}
+      <style jsx global>{`
+        .property-marquee .swiper-wrapper {
+          transition-timing-function: linear !important;
+        }
+      `}</style>
     </div>
   );
 };
