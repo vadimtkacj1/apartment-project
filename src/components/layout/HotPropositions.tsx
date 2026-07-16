@@ -224,7 +224,10 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
   }
 
   return (
-    <section className="relative py-16 md:py-20 overflow-hidden w-full" dir="rtl">
+    // `bg-white` overrides the page-wide `bg-warm` (#faf7f2) cream that otherwise
+    // shows through behind the carousel — the user wanted that beige removed from
+    // under this section.
+    <section className="relative py-16 md:py-20 overflow-hidden w-full bg-white" dir="rtl">
       <div className="relative z-10 w-full">
         {/* Section Header */}
         <m.div
