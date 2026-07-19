@@ -115,7 +115,7 @@ const ProcessSection: React.FC = () => {
                   <div className="relative z-10 p-8 lg:p-10 h-full flex flex-col">
 
                     {/* Number Badge */}
-                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-[#354AC4] to-[#051150] rounded-full flex items-center justify-center shadow-2xl border-4 border-white group-hover:scale-110 transition-transform duration-500">
+                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-[#354AC4] to-[#051150] rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                       <span className="text-3xl font-black text-white">
                         {step.number}
                       </span>

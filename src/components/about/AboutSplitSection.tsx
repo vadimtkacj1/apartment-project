@@ -69,7 +69,7 @@ export default function AboutSplitSection() {
             <div className="pt-8">
               <button
                 onClick={scrollToNextSection}
-                className="group inline-flex items-center gap-3 bg-[#354AC4] hover:bg-[#4A5FD6] text-white px-8 py-4 rounded-xl font-bold text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                className="group inline-flex items-center gap-3 bg-[#354AC4] hover:bg-[#28389B] text-white px-8 py-4 rounded-xl font-bold text-base lg:text-lg transition-colors duration-200"
               >
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span>קרא עוד על המשרד</span>

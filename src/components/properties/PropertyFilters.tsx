@@ -371,7 +371,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
         </button>
         <button
           onClick={onApply}
-          className="px-8 py-3 bg-gradient-to-l from-[#354AC4] to-[#4A5FD6] text-white font-black text-base rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+          className="px-8 py-3 bg-[#354AC4] hover:bg-[#28389B] text-white font-black text-base rounded-xl transition-colors duration-200"
         >
           החל פילטרים
         </button>

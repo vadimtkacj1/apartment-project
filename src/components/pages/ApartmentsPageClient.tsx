@@ -460,7 +460,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   onClick={handleReset}
-                  className="px-6 py-3 rounded-2xl font-black text-white bg-gradient-to-l from-[#354AC4] to-[#4A5FD6] shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="px-6 py-3 rounded-xl font-black text-white bg-[#354AC4] hover:bg-[#28389B] transition-colors duration-200"
                 >
                   אפס סינון
                 </button>

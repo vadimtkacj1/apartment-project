@@ -63,7 +63,7 @@ const FAQ: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
             >
               <button
                 onClick={() => toggleFAQ(item.id)}
@@ -124,7 +124,7 @@ const FAQ: React.FC = () => {
             </p>
             <a
               href="/#contact"
-              className="inline-block bg-white text-[#354ac4] font-bold text-lg px-8 py-4 rounded-full hover:scale-105 hover:shadow-lg transition-all duration-300"
+              className="inline-block bg-white text-[#354ac4] font-bold text-lg px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors duration-200"
               style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
             >
               צור קשר

@@ -194,14 +194,14 @@ const Testimonials: React.FC = () => {
             <button
               onClick={() => swiperInstance?.slideNext()} // במצב RTL, Next זה שמאלה
               aria-label="חוות הדעת הבאה"
-              className="pointer-events-auto w-14 h-14 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
+              className="pointer-events-auto w-14 h-14 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-md hover:bg-[#28389b] transition-colors"
             >
               <ChevronRight size={32} aria-hidden="true" />
             </button>
             <button
               onClick={() => swiperInstance?.slidePrev()} // במצב RTL, Prev זה ימינה
               aria-label="חוות הדעת הקודמת"
-              className="pointer-events-auto w-14 h-14 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:scale-110 transition-all"
+              className="pointer-events-auto w-14 h-14 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-md hover:bg-[#28389b] transition-colors"
             >
               <ChevronLeft size={32} aria-hidden="true" />
             </button>

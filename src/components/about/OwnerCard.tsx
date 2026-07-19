@@ -116,7 +116,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.phone && (
             <a
               href={`tel:${owner.phone}`}
-              className="flex items-center gap-2 px-8 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-2 px-8 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-colors"
             >
               <Phone size={18} />
               <span dir="ltr" className="font-medium">{owner.phone}</span>
@@ -126,7 +126,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.email && (
             <button
               onClick={handleCopyEmail}
-              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#354AC4] text-[#354AC4] rounded-full hover:bg-blue-50 transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#354AC4] text-[#354AC4] rounded-full hover:bg-blue-50 transition-colors"
               title="לחצו להעתקת האימייל"
             >
               {copied ? (
@@ -148,7 +148,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
               href={`https://wa.me/${owner.whatsapp.replace(/[^0-9]/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-colors"
             >
               <FaWhatsapp size={20} />
               <span className="font-medium">WhatsApp</span>

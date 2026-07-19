@@ -60,7 +60,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
           isSold
             ? 'bg-gray-50 border-2 border-gray-200 opacity-70'
-            : 'bg-white border border-gray-100 shadow-lg hover:shadow-xl'
+            : 'bg-white border border-gray-100 shadow-md hover:shadow-lg'
         }`}
         style={{
           boxShadow: isSold
@@ -172,7 +172,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               </div>
             ) : (
               <button className="w-full group/btn">
-                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#354AC4] to-[#4A5FD6] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-[#354AC4] hover:bg-[#28389B] text-white font-bold rounded-xl text-base transition-colors duration-200">
                   <span>לפרטים נוספים</span>
                   <ArrowLeft size={18} className="transition-transform duration-300 group-hover/btn:-translate-x-1" />
                 </div>

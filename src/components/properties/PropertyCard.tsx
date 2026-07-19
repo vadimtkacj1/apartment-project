@@ -100,6 +100,25 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const dealTypeLabel = actualDealType === 'rent' ? 'להשכרה' : 'למכירה';
   const soldLabel = actualDealType === 'rent' ? 'מושכר' : 'נמכר';
   const displayRooms = rooms || bedrooms || 0;
+  const propertyTypeLabel = propertyType ? (PROPERTY_TYPE_LABELS[propertyType] || propertyType) : '';
+  // Declutter: show at most the 4 most-relevant amenities on the card (the full
+  // list lives on the detail page) — Trulia-style minimal card.
+  const featureChips = (features
+    ? [
+        { on: features.hasAirConditioning, icon: Wind, label: 'מיזוג' },
+        { on: features.hasElevator, icon: ArrowUpDown, label: 'מעלית' },
+        { on: features.hasStorage, icon: Warehouse, label: 'מחסן' },
+        { on: features.hasSafeRoom, icon: Shield, label: 'ממ״ד' },
+        { on: features.hasSunBalcony, icon: Sun, label: 'מ. שמש' },
+        { on: features.hasBoiler, icon: Droplet, label: 'דוד' },
+        { on: features.hasMamak, icon: ShieldCheck, label: 'ממ״ק' },
+        { on: features.hasBars, icon: GripVertical, label: 'סורגים' },
+        { on: features.hasPets, icon: Dog, label: 'חיות מחמד' },
+        { on: features.hasHousingUnit, icon: Building2, label: 'יחידת דיור' },
+        { on: features.hasShelter, icon: Home, label: 'מקלט בבניין' },
+      ].filter((f) => f.on)
+    : []
+  ).slice(0, 4);
 
   const handleImageError = () => {
     if (imageSrc !== DEFAULT_IMAGE && !imageError) {
@@ -220,20 +239,12 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <StatBox isSold={isSold} icon={Maximize} label={`${area} מ״ר`} />
           </div>
 
-          {/* Особенности */}
-          {features && (
+          {/* Amenities — top 4 only (declutter; the full list lives on the detail page) */}
+          {featureChips.length > 0 && (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-              {features.hasAirConditioning && <FeatureTag icon={Wind} label="מיזוג" />}
-              {features.hasElevator && <FeatureTag icon={ArrowUpDown} label="מעלית" />}
-              {features.hasStorage && <FeatureTag icon={Warehouse} label="מחסן" />}
-              {features.hasSafeRoom && <FeatureTag icon={Shield} label="ממ״ד" />}
-              {features.hasSunBalcony && <FeatureTag icon={Sun} label="מ. שמש" />}
-              {features.hasBoiler && <FeatureTag icon={Droplet} label="דוד" />}
-              {features.hasMamak && <FeatureTag icon={ShieldCheck} label="ממ״ק" />}
-              {features.hasBars && <FeatureTag icon={GripVertical} label="סורגים" />}
-              {features.hasPets && <FeatureTag icon={Dog} label="חיות מחמד" />}
-              {features.hasHousingUnit && <FeatureTag icon={Building2} label="יחידת דיור" />}
-              {features.hasShelter && <FeatureTag icon={Home} label="מקלט בבניין" />}
+              {featureChips.map((f, i) => (
+                <FeatureTag key={i} icon={f.icon} label={f.label} />
+              ))}
             </div>
           )}
 
@@ -258,7 +269,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
                 <CheckCircle2 size={18} />
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#354AC4] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#28389B] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center whitespace-nowrap">
+              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#354AC4] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#28389B] transition-colors w-full sm:w-auto justify-center whitespace-nowrap">
                 <span>לפרטים נוספים</span>
                 <ArrowLeft size={18} className="hidden sm:block" />
                 <ArrowLeft size={16} className="sm:hidden" />

@@ -210,7 +210,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         >
           <Link
             href="/apartments"
-            className="inline-flex items-center gap-3 px-12 py-5 bg-[#354ac4] text-white font-black text-xl rounded-2xl shadow-2xl hover:bg-[#28389b] transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
+            className="inline-flex items-center gap-3 px-10 py-4 bg-[#354ac4] text-white font-bold text-lg rounded-xl hover:bg-[#28389b] transition-colors duration-200 group"
             style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
           >
             <span>כל הנכסים</span>
