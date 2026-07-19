@@ -26,7 +26,7 @@ import {
   CheckCircleOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import MetricCard from '@/components/admin/MetricCard';
+import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
@@ -151,17 +151,13 @@ export default function TeamPage() {
       />
 
       {/* Statistics */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} md={8}>
-          <MetricCard icon={<TeamOutlined />} label={t.statTotal} value={stats.total} accent="#354AC4" />
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <MetricCard icon={<CheckCircleOutlined />} label={t.statActive} value={stats.active} accent="#2A69C4" />
-        </Col>
-        <Col xs={24} sm={12} md={8}>
-          <MetricCard icon={<StopOutlined />} label={t.statInactive} value={stats.inactive} accent="#64748B" />
-        </Col>
-      </Row>
+      <MetricCardGrid
+        items={[
+          { icon: <TeamOutlined />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <CheckCircleOutlined />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
+          { icon: <StopOutlined />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
+        ]}
+      />
 
       {/* Filters */}
       <Card className="mb-6">

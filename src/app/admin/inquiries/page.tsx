@@ -29,7 +29,7 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons';
-import MetricCard from '@/components/admin/MetricCard';
+import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import Link from 'next/link';
 import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
@@ -304,12 +304,14 @@ export default function InquiriesPage() {
     <div>
       <AdminPageHeader title={t.title} />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={12} lg={6}><MetricCard icon={<InboxOutlined />} label={t.statTotal} value={stats.total} accent="#354AC4" /></Col>
-        <Col xs={12} lg={6}><MetricCard icon={<StarOutlined />} label={t.statNew} value={stats.new} accent="#5594F1" /></Col>
-        <Col xs={12} lg={6}><MetricCard icon={<ClockCircleOutlined />} label={t.statInProgress} value={stats.in_progress} accent="#354AC4" /></Col>
-        <Col xs={12} lg={6}><MetricCard icon={<CheckCircleOutlined />} label={t.statClosed} value={stats.closed} accent="#2A69C4" /></Col>
-      </Row>
+      <MetricCardGrid
+        items={[
+          { icon: <InboxOutlined />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <StarOutlined />, label: t.statNew, value: stats.new, accent: '#5594F1' },
+          { icon: <ClockCircleOutlined />, label: t.statInProgress, value: stats.in_progress, accent: '#354AC4' },
+          { icon: <CheckCircleOutlined />, label: t.statClosed, value: stats.closed, accent: '#2A69C4' },
+        ]}
+      />
 
       <Card>
         <div style={{ marginBottom: 16 }}>

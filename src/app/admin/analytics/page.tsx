@@ -25,7 +25,8 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import MetricCard from '@/components/admin/MetricCard';
+import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import SectionHeading from '@/components/admin/SectionHeading';
 import {
   BarChart,
   Bar,
@@ -149,16 +150,6 @@ function SourceBars({ items, labels }: { items?: Array<{ source: string; count: 
   );
 }
 
-/* Section heading (matches AdminPageHeader). Top margin separates it from the
-   previous section (24px row margin + 16px = 40px break); the smaller bottom
-   margin keeps it visually attached to its own cards. */
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ margin: '16px 2px 16px' }}>
-      <div style={{ fontWeight: 700, color: '#051150', fontSize: 18, letterSpacing: '-0.01em' }}>{children}</div>
-    </div>
-  );
-}
 
 export default function AnalyticsPage() {
   const { message } = App.useApp();
@@ -504,7 +495,7 @@ export default function AnalyticsPage() {
     }));
 
   return (
-    <div className="analytics-console" style={{ maxWidth: 1440, marginInline: 'auto' }}>
+    <div className="analytics-console">
       {/* Header */}
       <AdminPageHeader
         title={t.title}
@@ -531,7 +522,7 @@ export default function AnalyticsPage() {
       />
 
       {/* Filters Bar */}
-      <Card className="mb-6">
+      <Card style={{ marginBottom: 28 }}>
         <Row gutter={[24, 16]} align="middle">
           <Col xs={24} md={12} lg={8}>
             <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.dateRangeLabel}</div>
@@ -587,7 +578,7 @@ export default function AnalyticsPage() {
 
       {/* Selected User Info */}
       {selectedIP !== 'all' && (
-        <Card className="mb-6">
+        <Card style={{ marginBottom: 28 }}>
           <Row align="middle" gutter={16}>
             <Col>
               <UserOutlined style={{ fontSize: '32px', color: '#354AC4' }} />
@@ -618,40 +609,28 @@ export default function AnalyticsPage() {
       )}
 
       {/* Key Metrics Cards */}
-      <Row gutter={[20, 20]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<EyeOutlined />} label={t.totalViews} value={summary?.totalViews || 0} accent={NAVY} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<AppstoreOutlined />} label={t.totalClicks} value={summary?.totalClicks || 0} accent={NAVY} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<RiseOutlined />} label={t.engagement} value={Number(engagementRate || 0).toFixed(1)} suffix="%" accent={GOLD} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<UserOutlined />} label={t.uniqueUsers} value={summary?.uniqueVisitors || 0} accent={NAVY} />
-        </Col>
-      </Row>
+      <MetricCardGrid
+        items={[
+          { icon: <EyeOutlined />, label: t.totalViews, value: summary?.totalViews || 0, accent: NAVY },
+          { icon: <AppstoreOutlined />, label: t.totalClicks, value: summary?.totalClicks || 0, accent: NAVY },
+          { icon: <RiseOutlined />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: GOLD },
+          { icon: <UserOutlined />, label: t.uniqueUsers, value: summary?.uniqueVisitors || 0, accent: NAVY },
+        ]}
+      />
 
       {/* Leads (Inquiry table) — the money metric — plus where traffic and leads come
           from. All values are computed server-side in /api/analytics/track (summary). */}
       <SectionHeading>{t.inquiriesSection}</SectionHeading>
-      <Row gutter={[20, 20]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<MessageOutlined />} label={t.totalInquiries} value={summary?.totalInquiries || 0} accent={NAVY} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<RiseOutlined />} label={t.newInquiries} value={summary?.newInquiries || 0} accent={GOLD} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<PhoneOutlined />} label={t.inquiriesToday} value={summary?.inquiriesToday || 0} accent={NAVY} />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <MetricCard icon={<MailOutlined />} label={t.inquiriesLast7Days} value={summary?.inquiriesLast7Days || 0} accent={NAVY} />
-        </Col>
-      </Row>
+      <MetricCardGrid
+        items={[
+          { icon: <MessageOutlined />, label: t.totalInquiries, value: summary?.totalInquiries || 0, accent: NAVY },
+          { icon: <RiseOutlined />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: GOLD },
+          { icon: <PhoneOutlined />, label: t.inquiriesToday, value: summary?.inquiriesToday || 0, accent: NAVY },
+          { icon: <MailOutlined />, label: t.inquiriesLast7Days, value: summary?.inquiriesLast7Days || 0, accent: NAVY },
+        ]}
+      />
 
-      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[24, 24]} style={{ marginBottom: '28px' }}>
         <Col xs={24} lg={8}>
           <Card title={<span style={{ fontWeight: 600 }}>{t.trafficSources}</span>} style={{ height: '100%' }}>
             <SourceBars items={summary?.trafficSources} labels={t.trafficLabels} />
@@ -681,7 +660,7 @@ export default function AnalyticsPage() {
       </Row>
 
       {/* Main Charts Row */}
-      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[24, 24]} style={{ marginBottom: '28px' }}>
         {/* Line Chart */}
         <Col xs={24} lg={16}>
           <Card
@@ -762,7 +741,7 @@ export default function AnalyticsPage() {
       </Row>
 
       {/* Charts Row - Properties & Users */}
-      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+      <Row gutter={[24, 24]} style={{ marginBottom: '28px' }}>
         {/* Bar Chart - Popular Properties */}
         {barChartData.length > 0 && (
           <Col xs={24} lg={12}>

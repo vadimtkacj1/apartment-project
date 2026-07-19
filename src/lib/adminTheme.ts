@@ -100,7 +100,11 @@ export const adminTheme: ThemeConfig = {
     Button: {
       borderRadius: 10,
       fontWeight: 600,
-      primaryShadow: '0 4px 12px rgba(53, 74, 196, 0.22)', // soft blue lift on primary actions
+      // Flat buttons (Fernand/shadcn discipline) — depth belongs to overlays,
+      // not controls. The brand gradient fill stays; only the glow goes.
+      primaryShadow: 'none',
+      defaultShadow: 'none',
+      dangerShadow: 'none',
     },
     Input: { borderRadius: 10 },
     InputNumber: { borderRadius: 10 },
@@ -121,6 +125,9 @@ export const adminTheme: ThemeConfig = {
       headerColor: BRAND.textMuted,
       rowHoverBg: BRAND.bg,
       borderColor: BRAND.hairline,
+      // Quieter data tables: no vertical header splits, a touch more row air.
+      headerSplitColor: 'transparent',
+      cellPaddingBlock: 14,
     },
   },
 };

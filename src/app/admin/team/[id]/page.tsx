@@ -7,6 +7,7 @@ import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import AdminFormActions from '@/components/admin/AdminFormActions';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { teamMessages } from '@/lib/adminI18n/messages/team';
 
@@ -338,22 +339,13 @@ export default function TeamMemberEditPage() {
         </div>
       </Card>
 
-      {/* Actions — start-aligned with the form fields (right in RTL), primary first */}
-      <div
-        style={{
-          padding: '16px 0',
-          display: 'flex',
-          gap: '12px',
-          justifyContent: 'flex-start',
-        }}
-      >
-        <Button type="primary" size="large" loading={saving} onClick={handleSave}>
-          {t.save}
-        </Button>
-        <Button size="large" onClick={() => router.push('/admin/team')}>
-          {t.cancel}
-        </Button>
-      </div>
+      <AdminFormActions
+        saveLabel={t.save}
+        cancelLabel={t.cancel}
+        saving={saving}
+        onSave={handleSave}
+        onCancel={() => router.push('/admin/team')}
+      />
     </div>
   );
 }

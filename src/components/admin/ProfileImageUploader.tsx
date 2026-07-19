@@ -7,6 +7,7 @@ import { CameraOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
+import { uploadAdminImage, validateImageFile } from './adminUpload';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -27,50 +28,11 @@ export default function ProfileImageUploader({
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch(`/api/admin/upload?folder=${uploadPath}`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to upload image';
-
-      try {
-        const error = await response.json();
-        console.error('❌ [FRONTEND] Profile upload error from server (JSON):', error);
-        errorMessage = error.error || errorMessage;
-      } catch (jsonError) {
-        console.error('❌ [FRONTEND] Error parsing JSON error response (profile):', jsonError);
-
-        if (response.status === 413) {
-          errorMessage = t.imageTooLargeForServer;
-        } else {
-          const text = await response.text().catch(() => null);
-          console.error('❌ [FRONTEND] Non-JSON error response body (profile):', text);
-        }
-      }
-
-      throw new Error(errorMessage);
-    }
-
-    try {
-      const data = await response.json();
-      return data.url;
-    } catch (parseError) {
-      console.error('❌ [FRONTEND] Failed to parse success response as JSON (profile):', parseError);
-      throw new Error(t.unexpectedServerResponse);
-    }
-  };
-
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
     setUploading(true);
 
     try {
-      const url = await uploadImage(file as File);
+      const url = await uploadAdminImage(file as File, t, uploadPath);
       onImageChange(url);
       message.success(t.uploadSuccess);
       onSuccess?.(url);
@@ -83,18 +45,11 @@ export default function ProfileImageUploader({
   };
 
   const beforeUpload = (file: File) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error(t.onlyImageFiles);
+    const invalid = validateImageFile(file, t);
+    if (invalid) {
+      message.error(invalid);
       return false;
     }
-
-    const isLt50M = file.size / 1024 / 1024 < 50;
-    if (!isLt50M) {
-      message.error(t.imageMaxSize);
-      return false;
-    }
-
     return true;
   };
 

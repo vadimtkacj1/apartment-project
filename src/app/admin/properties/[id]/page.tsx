@@ -2,10 +2,11 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { Button, Form, Spin } from 'antd';
-import { SaveOutlined, ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import AdminFormActions from '@/components/admin/AdminFormActions';
 import { usePropertyForm } from './usePropertyForm';
 import {
   BasicInfoSection,
@@ -87,33 +88,13 @@ export default function PropertyEditPage() {
         <ImagesSection formData={formData} handleChange={handleChange} />
         <SeoSection formData={formData} handleChange={handleChange} />
 
-        {/* Submit Buttons */}
-        <div
-          style={{
-            marginTop: '30px',
-            padding: '16px 0',
-          }}
-        >
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={saving}
-              size="large"
-              icon={<SaveOutlined />}
-              className="w-full sm:w-auto"
-            >
-              {t.page.save}
-            </Button>
-            <Button
-              size="large"
-              onClick={() => router.push('/admin/properties')}
-              className="w-full sm:w-auto"
-            >
-              {t.page.cancel}
-            </Button>
-          </div>
-        </div>
+        <AdminFormActions
+          saveLabel={t.page.save}
+          cancelLabel={t.page.cancel}
+          saving={saving}
+          submit
+          onCancel={() => router.push('/admin/properties')}
+        />
       </Form>
     </div>
   );

@@ -50,7 +50,9 @@
   margin: 0;
   padding: 0;
   background: #fff !important;
-  border-inline-end: 1px solid #E4E8F2; /* edge facing the content */
+  /* No hard edge against the content — the white rail meets the blue-grey
+     canvas directly (Fernand/Anam pattern); the tone shift IS the divider. */
+  border-inline-end: none;
   box-shadow: none;
   transition: inset-inline-start 0.3s ease, box-shadow 0.3s ease;
 }
@@ -82,7 +84,11 @@
   background: #fff !important;
   height: auto;
   padding: 0 24px;
-  margin: 12px 20px;
+  /* Same 1480px cap as .content-ant so the header card and the page content
+     share one aligned column on wide monitors. */
+  max-width: 1480px;
+  margin-block: 12px;
+  margin-inline: max(20px, calc((100% - 1480px) / 2));
   line-height: inherit;
   border-radius: 12px;
   border: 1px solid #E4E8F2;
@@ -143,9 +149,13 @@
 /* ===== CONTENT AREA =====
    Single source of truth for page padding — every admin page inherits this,
    so no page needs its own px-* wrapper. Consistent horizontal rhythm across
-   the whole panel: 24px desktop, 20px tablet, 16px phone. */
+   the whole panel: 24px desktop, 20px tablet, 16px phone.
+   Content is capped at 1480px and centered so cards don't stretch into empty
+   slabs on wide monitors (Fernand/Mapbox-console pattern). */
 .layout-dashboard .content-ant {
-  margin: 0 20px;
+  max-width: 1480px;
+  margin-block: 0;
+  margin-inline: max(20px, calc((100% - 1480px) / 2));
   padding: 24px;
   min-height: calc(100vh - 140px);
   overflow-x: hidden;
@@ -156,6 +166,17 @@
   .layout-dashboard .content-ant {
     margin: 0 16px;
     padding: 20px;
+  }
+}
+
+/* Shared save/cancel row under edit forms (AdminFormActions.tsx) — stacks to
+   full-width buttons on phones. */
+@media (max-width: 575px) {
+  .admin-form-actions {
+    flex-direction: column;
+  }
+  .admin-form-actions .ant-btn {
+    width: 100%;
   }
 }
 

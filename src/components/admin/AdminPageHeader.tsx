@@ -25,7 +25,7 @@ export default function AdminPageHeader({
         alignItems: 'flex-start',
         flexWrap: 'wrap',
         gap: 12,
-        marginBottom: 24,
+        marginBottom: 28,
         ...style,
       }}
     >

@@ -7,6 +7,7 @@ import type { UploadProps } from 'antd';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
+import { uploadAdminImage, validateImageFile } from './adminUpload';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -39,86 +40,26 @@ export default function ImageUploader({
     };
   }, [previewImage]);
 
-  const uploadImage = async (file: File): Promise<string> => {
-    console.log('🚀 [FRONTEND] Starting file upload:', file.name);
-    console.log('   Size:', file.size, 'bytes');
-    console.log('   Type:', file.type);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    console.log('📡 [FRONTEND] Sending request to /api/admin/upload...');
-    const response = await fetch('/api/admin/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    console.log('📥 [FRONTEND] Received response, status:', response.status);
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to upload image';
-
-      try {
-        const error = await response.json();
-        console.error('❌ [FRONTEND] Error from server (JSON):', error);
-        errorMessage = error.error || errorMessage;
-      } catch (jsonError) {
-        console.error('❌ [FRONTEND] Error parsing JSON error response:', jsonError);
-
-        if (response.status === 413) {
-          // Payload Too Large – сервер отверг файл ещё до обработки нашим бэкендом
-          errorMessage = t.imageTooLargeForServer;
-        } else {
-          const text = await response.text().catch(() => null);
-          console.error('❌ [FRONTEND] Non-JSON error response body:', text);
-        }
-      }
-
-      throw new Error(errorMessage);
-    }
-
-    try {
-      const data = await response.json();
-      console.log('✅ [FRONTEND] File uploaded successfully!');
-      console.log('   URL:', data.url);
-      return data.url;
-    } catch (parseError) {
-      console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
-      throw new Error(t.unexpectedServerResponse);
-    }
-  };
-
   const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
-    console.log('📤 [FRONTEND] handleUpload called');
     setUploading(true);
 
     try {
-      const url = await uploadImage(file as File);
-      console.log('💾 [FRONTEND] Adding URL to images list:', url);
+      const url = await uploadAdminImage(file as File, t);
       onImagesChange([...images, url]);
-      console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
       message.success(t.uploadSuccess);
       onSuccess?.(url);
     } catch (err: any) {
-      console.error('❌ [FRONTEND] Upload error:', err);
       message.error(err.message || t.uploadError);
       onError?.(err);
     } finally {
       setUploading(false);
-      console.log('🏁 [FRONTEND] Upload completed\n');
     }
   };
 
   const beforeUpload = (file: File) => {
-    const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error(t.onlyImageFiles);
-      return false;
-    }
-
-    const isLt50M = file.size / 1024 / 1024 < 50;
-    if (!isLt50M) {
-      message.error(t.imageMaxSize);
+    const invalid = validateImageFile(file, t);
+    if (invalid) {
+      message.error(invalid);
       return false;
     }
 
