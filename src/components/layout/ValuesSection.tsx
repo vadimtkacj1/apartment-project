@@ -4,6 +4,7 @@ import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -32,12 +33,13 @@ const values: ValueCard[] = [
     id: 3,
     image: "/Problem solving-rafiki.svg",
     title: "מקצועיות וניסיון מוכח",
-    description: "עם ניסיון של מעל 24 שנים, רם שיווק נכסים פועל בתחום למעלה משני עשורים, יחד עם חיים ענבי בעל ניסיון של כעשור. השילוב בין הוותק, הידע המקומי וההתמקדות בתיווך בחולון מאפשר לנו לנהל כל עסקה בצורה מדויקת ובטוחה"
+    description: "עם ניסיון של מעל 24 שנים, Aiterra פועל בתחום למעלה משני עשורים, יחד עם יואב אלמוג בעל ניסיון של כעשור. השילוב בין הוותק, הידע המקומי וההתמקדות בתיווך בחולון מאפשר לנו לנהל כל עסקה בצורה מדויקת ובטוחה"
   }
 ];
 
 const ValuesSection: React.FC = () => {
   const [title, setTitle] = useState('למה לבחור בנו?');
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     const fetchTitle = async () => {
@@ -60,7 +62,11 @@ const ValuesSection: React.FC = () => {
   }, []);
 
   return (
-    <section dir="rtl" className="relative w-full py-16 md:py-20 bg-[#faf7f2] overflow-hidden">
+    <section
+      dir="rtl"
+      className="relative w-full py-16 md:py-20 overflow-hidden"
+      style={{ background: 'linear-gradient(135deg, rgba(5,17,80,0.03), rgba(85,148,241,0.05)), #f5f7fb' }}
+    >
 
       {/* ── Geometric background ── */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -72,37 +78,37 @@ const ValuesSection: React.FC = () => {
           {/* Diagonal lines grid */}
           <defs>
             <pattern id="diag-lines" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-              <line x1="0" y1="0" x2="0" y2="60" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.08" />
+              <line x1="0" y1="0" x2="0" y2="60" stroke="#051150" strokeWidth="1" strokeOpacity="0.08" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#diag-lines)" />
 
           {/* Large decorative diagonal accent — top-right */}
-          <line x1="60%" y1="0" x2="100%" y2="55%" stroke="#1c3664" strokeWidth="1.5" strokeOpacity="0.12" />
-          <line x1="65%" y1="0" x2="100%" y2="50%" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.08" />
-          <line x1="70%" y1="0" x2="100%" y2="45%" stroke="#c5a357" strokeWidth="1" strokeOpacity="0.15" />
+          <line x1="60%" y1="0" x2="100%" y2="55%" stroke="#051150" strokeWidth="1.5" strokeOpacity="0.12" />
+          <line x1="65%" y1="0" x2="100%" y2="50%" stroke="#051150" strokeWidth="1" strokeOpacity="0.08" />
+          <line x1="70%" y1="0" x2="100%" y2="45%" stroke="#5594f1" strokeWidth="1" strokeOpacity="0.15" />
 
           {/* Large decorative diagonal accent — bottom-left */}
-          <line x1="0" y1="45%" x2="40%" y2="100%" stroke="#1c3664" strokeWidth="1.5" strokeOpacity="0.12" />
-          <line x1="0" y1="50%" x2="35%" y2="100%" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.08" />
-          <line x1="0" y1="55%" x2="30%" y2="100%" stroke="#c5a357" strokeWidth="1" strokeOpacity="0.15" />
+          <line x1="0" y1="45%" x2="40%" y2="100%" stroke="#051150" strokeWidth="1.5" strokeOpacity="0.12" />
+          <line x1="0" y1="50%" x2="35%" y2="100%" stroke="#051150" strokeWidth="1" strokeOpacity="0.08" />
+          <line x1="0" y1="55%" x2="30%" y2="100%" stroke="#5594f1" strokeWidth="1" strokeOpacity="0.15" />
 
           {/* Geometric rectangles — decorative outlines */}
           <rect x="5%" y="8%" width="120" height="120" rx="4"
-            fill="none" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.1"
+            fill="none" stroke="#051150" strokeWidth="1" strokeOpacity="0.1"
             transform="rotate(-15, 120, 120)" />
           <rect x="80%" y="65%" width="90" height="90" rx="4"
-            fill="none" stroke="#c5a357" strokeWidth="1.5" strokeOpacity="0.2"
+            fill="none" stroke="#5594f1" strokeWidth="1.5" strokeOpacity="0.2"
             transform="rotate(20, 1200, 600)" />
           <rect x="88%" y="5%" width="70" height="70" rx="2"
-            fill="none" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.12"
+            fill="none" stroke="#051150" strokeWidth="1" strokeOpacity="0.12"
             transform="rotate(-30, 1350, 80)" />
 
           {/* Small diamond shapes */}
           <polygon points="120,30 135,50 120,70 105,50"
-            fill="none" stroke="#1c3664" strokeWidth="1" strokeOpacity="0.15" />
+            fill="none" stroke="#051150" strokeWidth="1" strokeOpacity="0.15" />
           <polygon points="1380,400 1395,420 1380,440 1365,420"
-            fill="none" stroke="#c5a357" strokeWidth="1.5" strokeOpacity="0.2" />
+            fill="none" stroke="#5594f1" strokeWidth="1.5" strokeOpacity="0.2" />
         </svg>
       </div>
 
@@ -113,7 +119,7 @@ const ValuesSection: React.FC = () => {
           margin-top: 24px !important;
         }
         .values-swiper .swiper-pagination-bullet-active {
-          background: #1c3664 !important;
+          background: #354ac4 !important;
         }
       `}</style>
 
@@ -134,12 +140,12 @@ const ValuesSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
               היתרונות שלנו
             </span>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
 
@@ -155,7 +161,7 @@ const ValuesSection: React.FC = () => {
             spaceBetween={30}
             slidesPerView={1}
             pagination={{ clickable: true }}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            autoplay={reduced ? false : { delay: 5000, disableOnInteraction: false, pauseOnMouseEnter: true }}
             className="values-swiper"
           >
             {values.map((value) => (
@@ -164,7 +170,7 @@ const ValuesSection: React.FC = () => {
                   <div className="flex justify-center mb-6">
                     <Image src={value.image} alt={value.title} width={256} height={256} className="object-contain" loading="lazy" />
                   </div>
-                  <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
+                  <h3 className="text-2xl font-bold text-[#051150] mb-4">{value.title}</h3>
                   <p className="text-base text-slate-600 leading-relaxed">{value.description}</p>
                 </div>
               </SwiperSlide>
@@ -188,7 +194,7 @@ const ValuesSection: React.FC = () => {
                   <Image src={value.image} alt={value.title} fill className="object-contain" loading="lazy" />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-[#1c3664] mb-4">{value.title}</h3>
+              <h3 className="text-2xl font-bold text-[#051150] mb-4">{value.title}</h3>
               <p className="text-base md:text-lg text-slate-600 leading-relaxed">{value.description}</p>
             </m.div>
           ))}

@@ -18,12 +18,12 @@ export default function Footer() {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 8,
-          color: '#9aa0aa',
+          color: '#64748B',
           fontSize: 12.5,
         }}
       >
         <span>{t.footerRights(year)}</span>
-        <span style={{ color: '#b08642', fontWeight: 600 }}>{t.footerSystem}</span>
+        <span style={{ color: '#64748B', fontWeight: 600 }}>{t.footerSystem}</span>
       </div>
     </AntFooter>
   );

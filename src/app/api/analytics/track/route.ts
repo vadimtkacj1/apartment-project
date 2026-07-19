@@ -37,7 +37,7 @@ function classifyReferer(referer: string | null): string {
   if (!referer) return 'direct';
   let host = referer.toLowerCase();
   try { host = new URL(referer).hostname.toLowerCase(); } catch { /* keep raw */ }
-  if (host.includes('ram-haim') || host.includes('localhost') || host.includes('127.0.0.1')) return 'internal';
+  if (host.includes('go-apartsale') || host.includes('localhost') || host.includes('127.0.0.1')) return 'internal';
   if (host.includes('google')) return 'google';
   if (host.includes('facebook') || host.includes('fb.')) return 'facebook';
   if (host.includes('instagram')) return 'instagram';

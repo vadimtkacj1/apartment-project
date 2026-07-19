@@ -11,7 +11,7 @@ import ApartmentDetailClient from './ApartmentDetailClient';
 // freshness of the old client-side fetch (API s-maxage=300).
 export const revalidate = 300;
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -106,7 +106,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `${siteUrl}/apartments/${id}`,
     },
     openGraph: {
-      title: `${title} | רם נכסים`,
+      title: `${title} | Aiterra`,
       description,
       type: 'article',
       url: `${siteUrl}/apartments/${id}`,

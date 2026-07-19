@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import LocationPicker from '@/components/admin/LocationPicker';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { contactMessages } from '@/lib/adminI18n/messages/contact';
@@ -154,9 +155,7 @@ export default function ContactInfoPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: '16px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
-      </div>
+      <AdminPageHeader title={t.title} />
 
       <Form
         form={form}

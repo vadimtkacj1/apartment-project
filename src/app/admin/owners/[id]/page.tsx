@@ -6,6 +6,8 @@ import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import { BRAND } from '@/lib/adminTheme';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { ownersMessages } from '@/lib/adminI18n/messages/owners';
 
@@ -158,27 +160,23 @@ export default function OwnerEditPage() {
   }
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
+    <div>
       {/* Header */}
-      <div style={{ marginBottom: '24px' }}>
-        <Button
-          icon={<ArrowRightOutlined />}
-          onClick={() => router.push('/admin/owners')}
-          style={{ marginBottom: '16px' }}
-        >
-          {t.backToList}
-        </Button>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>
-          {isNew ? t.addNew : t.editTitle}
-        </h1>
-      </div>
+      <Button
+        icon={<ArrowRightOutlined />}
+        onClick={() => router.push('/admin/owners')}
+        style={{ marginBottom: '16px' }}
+      >
+        {t.backToList}
+      </Button>
+      <AdminPageHeader title={isNew ? t.addNew : t.editTitle} />
 
       {/* Basic Information */}
       <Card title={t.basicInfoCard} style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldName} <span style={{ color: 'red' }}>*</span>
+              {t.fieldName} <span style={{ color: BRAND.danger }}>*</span>
             </label>
             <Input
               value={formData.name}
@@ -189,7 +187,7 @@ export default function OwnerEditPage() {
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldRole} <span style={{ color: 'red' }}>*</span>
+              {t.fieldRole} <span style={{ color: BRAND.danger }}>*</span>
             </label>
             <Input
               value={formData.title}
@@ -287,7 +285,7 @@ export default function OwnerEditPage() {
               size="large"
               style={{ width: '100%' }}
             />
-            <div style={{ color: '#8c8c8c', fontSize: '12px', marginTop: '4px' }}>
+            <div style={{ color: BRAND.textMuted, fontSize: '12px', marginTop: '4px' }}>
               {t.orderHint}
             </div>
           </div>
@@ -305,25 +303,20 @@ export default function OwnerEditPage() {
         </div>
       </Card>
 
-      {/* Sticky Footer */}
+      {/* Actions — start-aligned with the form fields (right in RTL), primary first */}
       <div
         style={{
-          position: 'sticky',
-          bottom: 0,
-          background: '#fff',
           padding: '16px 0',
-          borderTop: '1px solid #f0f0f0',
           display: 'flex',
           gap: '12px',
-          justifyContent: 'flex-end',
-          zIndex: 10,
+          justifyContent: 'flex-start',
         }}
       >
-        <Button size="large" onClick={() => router.push('/admin/owners')}>
-          {t.cancel}
-        </Button>
         <Button type="primary" size="large" loading={saving} onClick={handleSave}>
           {t.save}
+        </Button>
+        <Button size="large" onClick={() => router.push('/admin/owners')}>
+          {t.cancel}
         </Button>
       </div>
     </div>

@@ -36,12 +36,12 @@ const ContactFormPopup: React.FC<ContactFormPopupProps> = ({ isOpen, onClose }) 
               margin: 10px 0;
             }
             .form-scroll-area::-webkit-scrollbar-thumb {
-              background-color: #1c3664;
+              background-color: #354ac4;
               border-radius: 10px;
             }
             .form-scroll-area {
               scrollbar-width: thin;
-              scrollbar-color: #1c3664 transparent;
+              scrollbar-color: #354ac4 transparent;
             }
           `}</style>
 

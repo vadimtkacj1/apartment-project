@@ -14,7 +14,7 @@ describe('siteUrl', () => {
   it('defaults to the production domain when the env var is unset', () => {
     // NEXT_PUBLIC_SITE_URL is not set in the test environment.
     if (!process.env.NEXT_PUBLIC_SITE_URL) {
-      expect(siteUrl).toBe('https://ram-haim.co.il');
+      expect(siteUrl).toBe('https://go-apartsale.online');
     } else {
       expect(siteUrl).toBe(process.env.NEXT_PUBLIC_SITE_URL);
     }

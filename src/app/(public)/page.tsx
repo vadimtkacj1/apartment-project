@@ -22,6 +22,10 @@ const AboutSection = dynamic(() => import('@/components/layout/AboutSection'), {
   loading: () => <div className="h-96 bg-warm animate-pulse" />,
 });
 
+const Stats = dynamic(() => import('@/components/layout/Stats'), {
+  loading: () => <div className="h-64 bg-warm animate-pulse" />,
+});
+
 const ValuesSection = dynamic(() => import('@/components/layout/ValuesSection'), {
   loading: () => <div className="h-96 bg-warm animate-pulse" />,
 });
@@ -185,6 +189,9 @@ export default async function Home() {
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <AboutSection />
+        </Suspense>
+        <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
+          <Stats />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ValuesSection />

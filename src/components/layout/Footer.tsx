@@ -9,6 +9,7 @@ interface Owner {
   phone: string | null;
   email: string | null;
   whatsapp: string | null;
+  licenceNumber: string | null;
 }
 
 interface ContactInfo {
@@ -26,6 +27,7 @@ async function getOwners(): Promise<Owner[]> {
         phone: true,
         email: true,
         whatsapp: true,
+        licenceNumber: true,
       },
       orderBy: { order: 'asc' },
     });
@@ -54,15 +56,20 @@ async function getSocialLinks(): Promise<ContactInfo | null> {
 export default async function Footer() {
   const [owners, socialLinks] = await Promise.all([getOwners(), getSocialLinks()]);
 
+  // Broker license numbers (מספר רישיון תיווך) — surfaced only when present in the data
+  const licenceNumbers = owners
+    .map((owner) => owner.licenceNumber?.trim())
+    .filter((n): n is string => Boolean(n));
+
   return (
-    <footer dir="rtl" className="bg-[#1a1a1a] text-white pt-12 pb-10 px-6 lg:px-20 2xl:px-24 relative min-h-70 overflow-hidden flex flex-col items-start justify-start">
+    <footer dir="rtl" className="bg-[#051150] text-white pt-12 pb-10 px-6 lg:px-20 2xl:px-24 relative min-h-70 overflow-hidden flex flex-col items-start justify-start">
       
       {/* City Background - High Visibility Version */}
       <div
         className="absolute bottom-0 left-0 w-full h-[220px] pointer-events-none z-0 hidden md:block"
         style={{
           backgroundImage: `
-            linear-gradient(to top, rgba(26,26,26,1) 0%, rgba(26,26,26,0) 30%),
+            linear-gradient(to top, rgba(5,17,80,1) 0%, rgba(5,17,80,0) 30%),
             url('/footer-city-bg.svg')
           `,
           backgroundPosition: 'bottom center',
@@ -196,31 +203,38 @@ export default async function Footer() {
         </nav>
 
         {/* Legal Content Section */}
-        <div className="mt-8 pt-8 border-t-2 border-[#c5a357]/30 text-center">
-          <div className="text-[#c5a357] font-bold text-sm uppercase tracking-wide mb-4">
+        <div className="mt-8 pt-8 border-t-2 border-[#5594f1]/30 text-center">
+          <div className="text-[#5594f1] font-bold text-sm uppercase tracking-wide mb-4">
             תוכן משפטי
           </div>
 
           <p className="text-gray-400 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
-            © {new Date().getFullYear()} H&R נדל"ן בע"מ. כל הזכויות שמורות.
+            © {new Date().getFullYear()} Aiterra נדל"ן בע"מ. כל הזכויות שמורות.
           </p>
 
+          {licenceNumbers.length > 0 && (
+            <p className="text-gray-400 font-medium mb-3" style={{ fontSize: 'clamp(12px, 0.9vw, 15px)' }}>
+              {licenceNumbers.length > 1 ? 'רישיונות תיווך מס׳ ' : 'רישיון תיווך מס׳ '}
+              <span dir="ltr">{licenceNumbers.join(', ')}</span>
+            </p>
+          )}
+
           <div className="flex items-center justify-center gap-3 text-gray-400 flex-wrap" style={{ fontSize: 'clamp(12px, 0.85vw, 14px)' }}>
-            <Link href="/privacy-policy" className="hover:text-[#c5a357] transition-colors font-medium">
+            <Link href="/privacy-policy" className="hover:text-[#5594f1] transition-colors font-medium">
               מדיניות פרטיות
             </Link>
             <span className="text-gray-600">|</span>
-            <Link href="/accessibility" className="hover:text-[#c5a357] transition-colors font-medium">
+            <Link href="/accessibility" className="hover:text-[#5594f1] transition-colors font-medium">
               נגישות
             </Link>
             <span className="text-gray-600">|</span>
-            <Link href="/sitemap.xml" className="hover:text-[#c5a357] transition-colors font-medium">
+            <Link href="/sitemap.xml" className="hover:text-[#5594f1] transition-colors font-medium">
               מפת האתר
             </Link>
           </div>
 
           <p className="text-gray-400 font-medium mt-4" style={{ fontSize: 'clamp(11px, 0.85vw, 13px)' }}>
-            נבנה על ידי <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#c5a357] transition-colors">Aiterra</a>
+            נבנה על ידי <a href="https://aiterra.co.il/" target="_blank" rel="noopener noreferrer" className="text-gray-300 underline hover:text-[#5594f1] transition-colors">Aiterra</a>
           </p>
         </div>
       </div>
@@ -236,7 +250,7 @@ function SocialIcon({ icon, href, hoverClass, label }: { icon: React.ReactNode, 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className={`w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-[#2a2a2a] flex items-center justify-center text-gray-300 transition-all border border-white/5 shadow-lg ${hoverClass}`}
+      className={`w-10 h-10 2xl:w-12 2xl:h-12 rounded-full bg-[#0c1d63] flex items-center justify-center text-gray-300 transition-all border border-white/10 shadow-lg ${hoverClass}`}
     >
       {icon}
     </a>

@@ -4,32 +4,17 @@ import { useEffect } from 'react';
 
 export default function AlternatingFavicon() {
   useEffect(() => {
-    const favicons = ['/favicon-rm.png', '/favicon-ha.png'];
-    let currentIndex = 0;
+    const href = '/favicon.png';
 
-    // Update favicon function
-    const updateFavicon = (href: string) => {
-      const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
-      if (link) {
-        link.href = href;
-      } else {
-        const newLink = document.createElement('link');
-        newLink.rel = 'icon';
-        newLink.href = href;
-        document.head.appendChild(newLink);
-      }
-    };
-
-    // Set initial favicon
-    updateFavicon(favicons[0]);
-
-    // Alternate every 3 seconds
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % favicons.length;
-      updateFavicon(favicons[currentIndex]);
-    }, 3000);
-
-    return () => clearInterval(interval);
+    const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    if (link) {
+      link.href = href;
+    } else {
+      const newLink = document.createElement('link');
+      newLink.rel = 'icon';
+      newLink.href = href;
+      document.head.appendChild(newLink);
+    }
   }, []);
 
   return null;

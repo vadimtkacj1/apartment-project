@@ -309,7 +309,7 @@ const SocialSidebar = () => {
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
       >
         {/* Main Icons Panel */}
-        <div className="bg-[#1c3664] rounded-r-2xl shadow-xl py-2 flex flex-col items-center w-12 md:w-16">
+        <div className="bg-[#051150] rounded-r-2xl shadow-xl py-2 flex flex-col items-center w-12 md:w-16">
           {socialLinks.map((link, index) => (
             <button
               key={link.name}
@@ -326,7 +326,7 @@ const SocialSidebar = () => {
         {/* Mobile Toggle Button - Connected to the panel without gaps */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden bg-[#1c3664] text-white p-2 h-10 flex items-center justify-center rounded-r-lg shadow-lg border-l border-white/10"
+          className="md:hidden bg-[#051150] text-white p-2 h-10 flex items-center justify-center rounded-r-lg shadow-lg border-l border-white/10"
           aria-label="פתיחת תפריט"
         >
           {isMobileMenuOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}

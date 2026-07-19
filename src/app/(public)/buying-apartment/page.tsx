@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import BuyingApartmentContent from './BuyingApartmentContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 export const metadata: Metadata = {
   title: 'קונים דירה בחולון | מדריך רכישת דירה',

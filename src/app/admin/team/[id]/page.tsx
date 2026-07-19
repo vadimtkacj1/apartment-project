@@ -6,6 +6,7 @@ import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { ArrowRightOutlined } from '@ant-design/icons';
 import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { teamMessages } from '@/lib/adminI18n/messages/team';
 
@@ -170,7 +171,7 @@ export default function TeamMemberEditPage() {
   }
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
+    <div>
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <Button
@@ -180,9 +181,7 @@ export default function TeamMemberEditPage() {
         >
           {t.backToList}
         </Button>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>
-          {isNew ? t.addNew : t.editTitle}
-        </h1>
+        <AdminPageHeader title={isNew ? t.addNew : t.editTitle} style={{ marginBottom: 0 }} />
       </div>
 
       {/* Basic Information */}
@@ -190,7 +189,7 @@ export default function TeamMemberEditPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldName} <span style={{ color: 'red' }}>*</span>
+              {t.fieldName} <span style={{ color: '#C0392B' }}>*</span>
             </label>
             <Input
               value={formData.name}
@@ -201,7 +200,7 @@ export default function TeamMemberEditPage() {
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldRole} <span style={{ color: 'red' }}>*</span>
+              {t.fieldRole} <span style={{ color: '#C0392B' }}>*</span>
             </label>
             <Input
               value={formData.role}
@@ -321,7 +320,7 @@ export default function TeamMemberEditPage() {
               size="large"
               style={{ width: '100%' }}
             />
-            <div style={{ color: '#8c8c8c', fontSize: '12px', marginTop: '4px' }}>
+            <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>
               {t.orderHint}
             </div>
           </div>
@@ -339,25 +338,20 @@ export default function TeamMemberEditPage() {
         </div>
       </Card>
 
-      {/* Sticky Footer */}
+      {/* Actions — start-aligned with the form fields (right in RTL), primary first */}
       <div
         style={{
-          position: 'sticky',
-          bottom: 0,
-          background: '#fff',
           padding: '16px 0',
-          borderTop: '1px solid #E6E8EC',
           display: 'flex',
           gap: '12px',
-          justifyContent: 'flex-end',
-          zIndex: 10,
+          justifyContent: 'flex-start',
         }}
       >
-        <Button size="large" onClick={() => router.push('/admin/team')}>
-          {t.cancel}
-        </Button>
         <Button type="primary" size="large" loading={saving} onClick={handleSave}>
           {t.save}
+        </Button>
+        <Button size="large" onClick={() => router.push('/admin/team')}>
+          {t.cancel}
         </Button>
       </div>
     </div>

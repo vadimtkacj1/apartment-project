@@ -5,17 +5,17 @@ import Image from 'next/image';
 
 export default function AboutMainIntro() {
   return (
-    <section className="py-20 w-full bg-[#faf7f2]" dir="rtl">
+    <section className="py-20 w-full bg-[#f5f7fb]" dir="rtl">
       <div className="max-w-[1200px] mx-auto px-6">
 
         {/* H1 Title */}
         <m.h1
-          className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-12 text-center"
+          className="text-4xl md:text-5xl font-extrabold text-[#051150] mb-12 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          רם וחיים שיווק נכסים
+          דניאל ויואב שיווק נכסים
         </m.h1>
 
         {/* Content: Image + Text */}
@@ -29,7 +29,7 @@ export default function AboutMainIntro() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <p className="text-lg text-slate-700 leading-relaxed">
-              רם וחיים שיווק נכסים הוא משרד תיווך נדל"ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים באזור חולון והסביבה.
+              דניאל ויואב שיווק נכסים הוא משרד תיווך נדל"ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים באזור חולון והסביבה.
             </p>
 
             <p className="text-lg text-slate-700 leading-relaxed">
@@ -54,7 +54,7 @@ export default function AboutMainIntro() {
           >
             <Image
               src="/holon.jpg"
-              alt="רם וחיים"
+              alt="דניאל ויואב"
               fill
               className="object-cover"
             />

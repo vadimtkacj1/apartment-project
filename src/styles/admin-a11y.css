@@ -30,9 +30,19 @@
 .layout-signin .ant-btn:focus-visible,
 .layout-signin .ant-input:focus-visible,
 .layout-signin .ant-input-affix-wrapper:focus-within {
-  outline: 2px solid #1c3664 !important;
+  outline: 2px solid #354ac4 !important;
   outline-offset: 2px !important;
-  border-radius: 8px;
+}
+
+/* Dark-surface focus: on the solid-indigo active nav item and the console
+   masthead CTA an offset navy ring would vanish — use a white halo (nav) or a
+   white ring (CTA) so keyboard focus stays visible against the dark fill. */
+.layout-dashboard .estate-nav-item.active:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #354AC4;
+}
+.estate-console .ec-mast-cta:focus-visible {
+  outline-color: #fff !important;
 }
 
 /* Keep the mouse experience clean — outline only for keyboard focus. */

@@ -1,7 +1,7 @@
 /* ===== Team Section ===== */
 .team-section {
   padding: 6rem 2rem;
-  background: #faf7f2;
+  background: #f5f7fb;
 }
 
 .team-container {
@@ -47,17 +47,17 @@
 }
 
 .agent-card-horizontal {
-  background: #faf7f2;
+  background: #f5f7fb;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(28, 54, 100, 0.1);
+  border: 2px solid rgba(53, 74, 196, 0.1);
   transition: all 0.3s ease;
 }
 
 .agent-card-horizontal:hover {
-  box-shadow: 0 20px 60px rgba(28, 54, 100, 0.2);
-  border-color: #1c3664;
+  box-shadow: 0 20px 60px rgba(5, 17, 80, 0.2);
+  border-color: #354AC4;
   transform: translateY(-5px);
 }
 
@@ -86,7 +86,7 @@
 
 .agent-role {
   font-size: 1.2rem;
-  color: #1c3664;
+  color: #051150;
   font-weight: 700;
   margin: 0;
 }
@@ -117,14 +117,14 @@
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  border: 1px solid rgba(28, 54, 100, 0.2);
+  border: 1px solid rgba(53, 74, 196, 0.2);
 }
 
 .contact-link:hover {
-  background: #1c3664;
+  background: #354AC4;
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(28, 54, 100, 0.3);
+  box-shadow: 0 4px 15px rgba(5, 17, 80, 0.3);
 }
 
 .contact-link svg {

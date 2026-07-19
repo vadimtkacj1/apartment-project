@@ -46,7 +46,7 @@ export default function PageLoader() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: '#faf7f2',
+        background: '#f5f7fb',
         transition: 'opacity 0.5s ease',
         opacity: fadeOut ? 0 : 1,
         pointerEvents: fadeOut ? 'none' : 'all',
@@ -54,15 +54,23 @@ export default function PageLoader() {
     >
       {/* Logo / Title */}
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
+        <img
+          src="/aiterra-logo.png"
+          alt=""
+          width={52}
+          height={37}
+          aria-hidden="true"
+          style={{ display: 'block', margin: '0 auto 12px' }}
+        />
         <div
           style={{
             fontFamily: 'var(--font-caramel), cursive',
             fontSize: '28px',
-            color: '#1c3664',
+            color: '#051150',
             letterSpacing: '0.05em',
           }}
         >
-          רם נכסים
+          Aiterra
         </div>
       </div>
 
@@ -75,7 +83,7 @@ export default function PageLoader() {
             inset: 0,
             borderRadius: '50%',
             border: '3px solid #e8e0d4',
-            borderTopColor: '#1c3664',
+            borderTopColor: '#354AC4',
             animation: 'page-spin 0.9s linear infinite',
           }}
         />
@@ -86,7 +94,7 @@ export default function PageLoader() {
             inset: '10px',
             borderRadius: '50%',
             border: '3px solid #e8e0d4',
-            borderBottomColor: '#c9a96e',
+            borderBottomColor: '#5594F1',
             animation: 'page-spin 1.4s linear infinite reverse',
           }}
         />

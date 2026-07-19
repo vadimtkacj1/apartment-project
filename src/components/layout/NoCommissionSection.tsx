@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 interface Property {
   id: number;
@@ -43,6 +44,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
   const [loading, setLoading] = useState(initialProperty === undefined);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState(initialTitle ?? 'דירה ללא עמלת תיווך');
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     if (initialProperty !== undefined) return;
@@ -122,7 +124,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       <section
         className="relative py-16 md:py-20 w-full overflow-hidden"
         dir="rtl"
-        style={{ background: 'rgb(42, 74, 138)' }}
+        style={{ background: '#28389B' }}
       >
         <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1200px' }}>
           <div className="text-center">
@@ -139,14 +141,14 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
 
   return (
     <section
-      className="relative py-16 md:py-24 w-full overflow-hidden"
+      className={`relative py-16 md:py-24 w-full overflow-hidden ${reduced ? 'rm' : ''}`}
       dir="rtl"
-      style={{ background: 'linear-gradient(135deg, rgb(42, 74, 138) 0%, rgb(35, 62, 115) 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #28389B 0%, #051150 100%)' }}
     >
       <style>{`
         @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 30px 3px rgba(212,168,67,0.4), 0 8px 24px rgba(0,0,0,0.3); }
-          50%       { box-shadow: 0 0 50px 10px rgba(212,168,67,0.7), 0 8px 32px rgba(0,0,0,0.3); }
+          0%, 100% { box-shadow: 0 0 30px 3px rgba(85,148,241,0.4), 0 8px 24px rgba(0,0,0,0.3); }
+          50%       { box-shadow: 0 0 50px 10px rgba(85,148,241,0.7), 0 8px 32px rgba(0,0,0,0.3); }
         }
         @keyframes shineSwipe {
           0%   { transform: translateX(-200%) skewX(-20deg); }
@@ -171,7 +173,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         }
         .btn-no-commission:hover {
           transform: scale(1.05) translateY(-4px);
-          box-shadow: 0 0 60px 15px rgba(212,168,67,0.8), 0 12px 40px rgba(0,0,0,0.4);
+          box-shadow: 0 0 60px 15px rgba(85,148,241,0.8), 0 12px 40px rgba(0,0,0,0.4);
         }
         .btn-no-commission:active {
           transform: scale(0.98);
@@ -197,6 +199,27 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         .feature-tag:hover {
           background: rgba(255,255,255,0.12) !important;
         }
+        /* Honour prefers-reduced-motion: kill the pulsing glow, shine swipe and
+           the entrance / hover transforms while keeping the layout intact. */
+        .rm .btn-no-commission {
+          animation: none !important;
+        }
+        .rm .btn-no-commission:hover {
+          transform: none !important;
+          box-shadow: 0 0 30px 3px rgba(85,148,241,0.4), 0 8px 24px rgba(0,0,0,0.3) !important;
+        }
+        .rm .btn-no-commission:hover .btn-shine {
+          animation: none !important;
+        }
+        .rm .no-commission-card {
+          animation: none !important;
+        }
+        .rm .no-commission-card:hover {
+          transform: none !important;
+        }
+        .rm .no-commission-card:hover .property-image {
+          transform: none !important;
+        }
       `}</style>
 
       <div
@@ -205,7 +228,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       >
         {/* Header */}
         <div className="text-center mb-4 md:mb-6">
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
           <p className="text-xl md:text-2xl font-semibold max-w-3xl mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>
@@ -231,7 +254,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 <div className="absolute top-5 right-5 z-10">
                   <span
                     className="text-sm font-bold px-4 py-1.5 rounded-lg shadow-lg"
-                    style={{ background: '#D4AF37', color: '#1C1000' }}
+                    style={{ background: '#5594F1', color: '#051150' }}
                   >
                     ללא עמלה
                   </span>
@@ -246,7 +269,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 {/* Property Type Badge */}
                 <span
                   className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3"
-                  style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', letterSpacing: '0.06em' }}
+                  style={{ background: 'rgba(85,148,241,0.15)', color: '#7BAAF5', letterSpacing: '0.06em' }}
                 >
                   {property.propertyType === 'apartment' ? 'דירה' :
                    property.propertyType === 'penthouse' ? 'פנטהאוז' :
@@ -269,7 +292,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 </div>
 
                 {/* Price */}
-                <p className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#D4AF37' }}>
+                <p className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#7BAAF5' }}>
                   {property.price}
                 </p>
 
@@ -303,7 +326,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                       className="text-center p-2 rounded-lg"
                       style={{ background: 'rgba(255,255,255,0.06)' }}
                     >
-                      <svg className="w-4 h-4 mx-auto mb-1" style={{ color: '#D4AF37' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mx-auto mb-1" style={{ color: '#7BAAF5' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {item.icon}
                       </svg>
                       <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.65rem', marginBottom: '2px' }}>{item.label}</p>
@@ -347,8 +370,8 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 <div
                   className="btn-no-commission group relative text-center py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
                   style={{
-                    background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
-                    color: '#1C1000',
+                    background: 'linear-gradient(135deg, #4A8BEF 0%, #7BAAF5 50%, #5594F1 100%)',
+                    color: '#051150',
                     letterSpacing: '0.04em',
                     minWidth: '180px',
                   }}

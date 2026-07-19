@@ -41,11 +41,11 @@ export default function AboutTeam() {
     }
     fetchTeam();
   }, []);
-console.log(team);
+
   return (
     <m.section
       ref={teamRef}
-      className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
+      className="relative py-24 w-full overflow-hidden bg-[#f5f7fb]"
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={teamInView ? { opacity: 1 } : {}}
@@ -59,7 +59,7 @@ console.log(team);
             initial={{ y: -20, opacity: 0 }}
             animate={teamInView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.6 }}
-            className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-6"
+            className="font-caramel text-4xl md:text-5xl font-extrabold text-[#051150] mb-6"
           >
             הצוות המקצועי
           </m.h2>

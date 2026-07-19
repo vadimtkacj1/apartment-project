@@ -40,10 +40,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
       <div className="estate-brand">
         <Link href="/admin" className="estate-brand-link" onClick={onClose}>
           <span className="estate-brand-logo" aria-hidden="true">
-            <svg viewBox="0 0 112 112" fill="currentColor">
-              <path d="M55.03 5.92L88.17 68.07L73.41 67.96L54.82 33.88L32.67 75.40L47.28 75.45L55.92 88.59L11.31 88.70Z" />
-              <path d="M57.49 75.50L92.21 75.45L99.27 88.70L66.86 88.75Z" />
-            </svg>
+            <img src="/aiterra-logo.png" alt="" />
           </span>
           <span className="estate-brand-text">
             <span className="estate-brand-title">Aiterra</span>
@@ -108,7 +105,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
           display: flex;
           align-items: center;
           padding: 18px 18px 16px;
-          border-bottom: 1px solid #e6e8ec;
+          border-bottom: 1px solid #e4e8f2;
           flex: 0 0 auto;
         }
         .estate-brand-link {
@@ -123,16 +120,12 @@ export default function Sidenav({ onClose }: SidenavProps) {
           justify-content: center;
           width: 42px;
           height: 42px;
-          border-radius: 11px;
-          background: rgba(28, 54, 100, 0.06);
-          color: #1c3664;
           flex-shrink: 0;
-          overflow: hidden;
         }
-        .estate-brand-logo svg {
-          width: 26px;
-          height: 26px;
-          fill: currentColor;
+        .estate-brand-logo img {
+          width: 36px;
+          height: auto;
+          display: block;
         }
         .estate-brand-text {
           display: flex;
@@ -142,8 +135,8 @@ export default function Sidenav({ onClose }: SidenavProps) {
         .estate-brand-title {
           font-size: 16px;
           font-weight: 700;
-          color: #1c3664;
-          letter-spacing: -0.01em;
+          color: #051150;
+          letter-spacing: -0.02em;
         }
         .estate-brand-sub {
           display: inline-flex;
@@ -158,7 +151,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #c5a357; /* lone gold accent */
+          background: #5594f1; /* lone sky-blue accent */
           flex-shrink: 0;
         }
         .estate-close-btn {
@@ -170,7 +163,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         }
         .estate-close-btn:hover {
           background: #f1f3f5 !important;
-          color: #1c3664 !important;
+          color: #354ac4 !important;
         }
 
         /* --- Navigation --- */
@@ -185,11 +178,12 @@ export default function Sidenav({ onClose }: SidenavProps) {
           gap: 2px;
         }
         .estate-nav-item {
+          position: relative;
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 10px 12px;
-          border-radius: 10px;
+          padding: 11px 14px;
+          border-radius: 11px;
           color: #64748b;
           font-size: 14.5px;
           font-weight: 500;
@@ -197,13 +191,25 @@ export default function Sidenav({ onClose }: SidenavProps) {
           transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-nav-item:hover {
-          background: rgba(28, 54, 100, 0.06);
-          color: #1c3664;
+          background: rgba(53, 74, 196, 0.06);
+          color: #354ac4;
         }
+        /* Clean active state (Polar/Exa): soft indigo wash + indigo text/icon +
+           a short accent bar on the reading-start edge — calm, not a loud pill. */
         .estate-nav-item.active {
-          background: #1c3664;
-          color: #ffffff;
+          background: rgba(53, 74, 196, 0.10);
+          color: #354ac4;
           font-weight: 600;
+        }
+        .estate-nav-item.active::before {
+          content: '';
+          position: absolute;
+          inset-inline-start: 4px;
+          top: 9px;
+          bottom: 9px;
+          width: 3px;
+          border-radius: 3px;
+          background: #354ac4;
         }
         .estate-nav-icon {
           display: inline-flex;
@@ -225,7 +231,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         /* --- Sign-out footer --- */
         .estate-user {
           flex: 0 0 auto;
-          border-top: 1px solid #e6e8ec;
+          border-top: 1px solid #e4e8f2;
           padding: 12px 16px;
         }
         .estate-logout.ant-btn {
@@ -237,8 +243,8 @@ export default function Sidenav({ onClose }: SidenavProps) {
           color: #64748b;
         }
         .estate-logout.ant-btn:hover {
-          background: rgba(28, 54, 100, 0.06) !important;
-          color: #1c3664 !important;
+          background: rgba(53, 74, 196, 0.07) !important;
+          color: #354ac4 !important;
         }
 
         /* The ✕ only makes sense for the mobile overlay. On desktop the

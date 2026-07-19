@@ -7,7 +7,6 @@ import {
   Col,
   Card,
   Table,
-  Tag,
   Button,
   Select,
   Input,
@@ -15,7 +14,7 @@ import {
   Popconfirm,
   Segmented,
   Statistic,
-  Modal,
+  Drawer,
   Tooltip,
   Skeleton,
 } from 'antd';
@@ -25,10 +24,16 @@ import {
   DeleteOutlined,
   EyeOutlined,
   HomeOutlined,
+  InboxOutlined,
+  StarOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons';
+import MetricCard from '@/components/admin/MetricCard';
 import Link from 'next/link';
 import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { inquiriesMessages } from '@/lib/adminI18n/messages/inquiries';
 
@@ -52,10 +57,13 @@ interface TeamOption {
   name: string;
 }
 
-const STATUS_COLORS: Record<Inquiry['status'], string> = {
-  new: 'gold',
-  in_progress: 'blue',
-  closed: 'green',
+const STATUSES: Inquiry['status'][] = ['new', 'in_progress', 'closed'];
+
+// Maps each status to its pill role class (see SHARED PILL-CLASS CONTRACT).
+const STATUS_PILL_CLASS: Record<Inquiry['status'], string> = {
+  new: 'new',
+  in_progress: 'progress',
+  closed: 'closed',
 };
 
 const { TextArea } = Input;
@@ -63,13 +71,18 @@ const { TextArea } = Input;
 export default function InquiriesPage() {
   const { message } = App.useApp();
   const t = useAdminMessages(inquiriesMessages);
-  const { locale } = useAdminI18n();
+  const { locale, dir } = useAdminI18n();
   const dateLocale = locale === 'he' ? 'he-IL' : 'en-GB';
   const statusLabels: Record<Inquiry['status'], string> = {
     new: t.statusNew,
     in_progress: t.statusInProgress,
     closed: t.statusClosed,
   };
+  const statusPill = (status: Inquiry['status']) => (
+    <span className={`admin-pill admin-pill--${STATUS_PILL_CLASS[status]}`}>
+      {statusLabels[status]}
+    </span>
+  );
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [team, setTeam] = useState<TeamOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -195,9 +208,9 @@ export default function InquiriesPage() {
           size="small"
           style={{ width: 110 }}
           onChange={(v) => changeStatus(rec.id, v)}
-          options={(Object.keys(STATUS_COLORS) as Inquiry['status'][]).map((s) => ({
+          options={STATUSES.map((s) => ({
             value: s,
-            label: <Tag color={STATUS_COLORS[s]} style={{ marginInlineEnd: 0 }}>{statusLabels[s]}</Tag>,
+            label: statusPill(s),
           }))}
         />
       ),
@@ -207,15 +220,21 @@ export default function InquiriesPage() {
       key: 'client',
       render: (_, r) => (
         <div>
-          <div style={{ fontWeight: 600, color: '#141414' }}>{r.name}</div>
+          <button
+            type="button"
+            onClick={() => openDetails(r)}
+            style={{ fontWeight: 600, color: '#051150', cursor: 'pointer', background: 'none', border: 0, padding: 0, font: 'inherit', textAlign: 'start' }}
+          >
+            {r.name}
+          </button>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4, fontSize: 13 }}>
             {r.phone && (
-              <a href={`tel:${r.phone}`} style={{ color: '#1C3664' }}>
+              <a href={`tel:${r.phone}`} style={{ color: '#354AC4' }}>
                 <PhoneOutlined /> {r.phone}
               </a>
             )}
             {r.email && (
-              <a href={`mailto:${r.email}`} style={{ color: '#1C3664' }}>
+              <a href={`mailto:${r.email}`} style={{ color: '#354AC4' }}>
                 <MailOutlined /> {r.email}
               </a>
             )}
@@ -229,7 +248,7 @@ export default function InquiriesPage() {
       key: 'message',
       ellipsis: true,
       render: (m: string | null) =>
-        m ? <Tooltip title={m}><span>{m}</span></Tooltip> : <span style={{ color: '#bfbfbf' }}>—</span>,
+        m ? <Tooltip title={m}><span>{m}</span></Tooltip> : <span style={{ color: '#94A3B8' }}>—</span>,
     },
     {
       title: t.colProperty,
@@ -237,11 +256,11 @@ export default function InquiriesPage() {
       width: 150,
       render: (_, r) =>
         r.property ? (
-          <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#1C3664' }}>
+          <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#354AC4' }}>
             <HomeOutlined /> {r.property.title}
           </Link>
         ) : (
-          <span style={{ color: '#bfbfbf' }}>—</span>
+          <span style={{ color: '#94A3B8' }}>—</span>
         ),
     },
     {
@@ -249,7 +268,7 @@ export default function InquiriesPage() {
       key: 'agent',
       width: 110,
       render: (_, r) =>
-        agentName(r.agentId) || <span style={{ color: '#bfbfbf' }}>—</span>,
+        agentName(r.agentId) || <span style={{ color: '#94A3B8' }}>—</span>,
     },
     {
       title: t.colDate,
@@ -283,13 +302,13 @@ export default function InquiriesPage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold" style={{ marginBottom: 16 }}>{t.title}</h1>
+      <AdminPageHeader title={t.title} />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={12} lg={6}><Card><Statistic title={t.statTotal} value={stats.total} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title={t.statNew} value={stats.new} styles={{ content: { color: BRAND.goldText } }} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title={t.statInProgress} value={stats.in_progress} styles={{ content: { color: BRAND.navy } }} /></Card></Col>
-        <Col xs={12} lg={6}><Card><Statistic title={t.statClosed} value={stats.closed} styles={{ content: { color: BRAND.success } }} /></Card></Col>
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={12} lg={6}><MetricCard icon={<InboxOutlined />} label={t.statTotal} value={stats.total} accent="#354AC4" /></Col>
+        <Col xs={12} lg={6}><MetricCard icon={<StarOutlined />} label={t.statNew} value={stats.new} accent="#5594F1" /></Col>
+        <Col xs={12} lg={6}><MetricCard icon={<ClockCircleOutlined />} label={t.statInProgress} value={stats.in_progress} accent="#354AC4" /></Col>
+        <Col xs={12} lg={6}><MetricCard icon={<CheckCircleOutlined />} label={t.statClosed} value={stats.closed} accent="#2A69C4" /></Col>
       </Row>
 
       <Card>
@@ -337,13 +356,9 @@ export default function InquiriesPage() {
                       value={r.status}
                       style={{ width: 120 }}
                       onChange={(v) => changeStatus(r.id, v)}
-                      options={(Object.keys(STATUS_COLORS) as Inquiry['status'][]).map((s) => ({
+                      options={STATUSES.map((s) => ({
                         value: s,
-                        label: (
-                          <Tag color={STATUS_COLORS[s]} style={{ marginInlineEnd: 0 }}>
-                            {statusLabels[s]}
-                          </Tag>
-                        ),
+                        label: statusPill(s),
                       }))}
                     />
                   </div>
@@ -352,7 +367,7 @@ export default function InquiriesPage() {
                     {r.phone && (
                       <span>
                         <b>{t.fieldPhone}</b>{' '}
-                        <a href={`tel:${r.phone}`} style={{ color: '#1C3664' }}>
+                        <a href={`tel:${r.phone}`} style={{ color: '#354AC4' }}>
                           {r.phone}
                         </a>
                       </span>
@@ -360,7 +375,7 @@ export default function InquiriesPage() {
                     {r.email && (
                       <span>
                         <b>{t.fieldEmail}</b>{' '}
-                        <a href={`mailto:${r.email}`} style={{ color: '#1C3664' }}>
+                        <a href={`mailto:${r.email}`} style={{ color: '#354AC4' }}>
                           {r.email}
                         </a>
                       </span>
@@ -368,7 +383,7 @@ export default function InquiriesPage() {
                     {r.property && (
                       <span>
                         <b>{t.fieldProperty}</b>{' '}
-                        <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#1C3664' }}>
+                        <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#354AC4' }}>
                           {r.property.title}
                         </Link>
                       </span>
@@ -403,49 +418,73 @@ export default function InquiriesPage() {
         </div>
       </Card>
 
-      <Modal
+      <Drawer
         open={!!active}
         title={active ? t.modalTitle(active.name) : ''}
-        onCancel={() => setActive(null)}
-        onOk={saveDetails}
-        okText={t.save}
-        cancelText={t.close}
-        confirmLoading={saving}
+        onClose={() => setActive(null)}
+        placement={dir === 'rtl' ? 'left' : 'right'}
+        width="min(440px, 100vw)"
         destroyOnHidden
+        footer={
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <Button onClick={() => setActive(null)}>{t.close}</Button>
+            <Button type="primary" loading={saving} onClick={saveDetails}>
+              {t.save}
+            </Button>
+          </div>
+        }
       >
         {active && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>{statusPill(active.status)}</div>
+
             {active.message && (
               <div>
-                <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.messageLabel}</div>
+                <div style={{ color: '#64748B', fontSize: 12.5, marginBottom: 4 }}>{t.messageLabel}</div>
                 <div style={{ background: '#F1F3F5', padding: 12, borderRadius: 8, whiteSpace: 'pre-wrap' }}>
                   {active.message}
                 </div>
               </div>
             )}
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14 }}>
-              {active.phone && <a href={`tel:${active.phone}`} style={{ color: '#1C3664' }}><PhoneOutlined /> {active.phone}</a>}
-              {active.email && <a href={`mailto:${active.email}`} style={{ color: '#1C3664' }}><MailOutlined /> {active.email}</a>}
-              {active.source && <span style={{ color: '#8c8c8c' }}>{t.sourceLabel(active.source)}</span>}
-            </div>
+
+            {active.phone && (
+              <div>
+                <div style={{ color: '#64748B', fontSize: 12.5, marginBottom: 2 }}>{t.fieldPhone}</div>
+                <a href={`tel:${active.phone}`} style={{ color: '#354AC4' }}>
+                  <PhoneOutlined /> {active.phone}
+                </a>
+              </div>
+            )}
+            {active.email && (
+              <div>
+                <div style={{ color: '#64748B', fontSize: 12.5, marginBottom: 2 }}>{t.fieldEmail}</div>
+                <a href={`mailto:${active.email}`} style={{ color: '#354AC4' }}>
+                  <MailOutlined /> {active.email}
+                </a>
+              </div>
+            )}
+            {active.source && (
+              <div style={{ color: '#94A3B8', fontSize: 13 }}>{t.sourceLabel(active.source)}</div>
+            )}
+
             <div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.assignedAgent}</div>
+              <div style={{ color: '#64748B', fontSize: 12.5, marginBottom: 4 }}>{t.assignedAgent}</div>
               <Select
                 allowClear
                 placeholder={t.assignAgentPlaceholder}
                 style={{ width: '100%' }}
                 value={draftAgent}
                 onChange={setDraftAgent}
-                options={team.map((t) => ({ label: t.name, value: `team-${t.id}` }))}
+                options={team.map((tm) => ({ label: tm.name, value: `team-${tm.id}` }))}
               />
             </div>
             <div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>{t.internalNotes}</div>
+              <div style={{ color: '#64748B', fontSize: 12.5, marginBottom: 4 }}>{t.internalNotes}</div>
               <TextArea rows={4} value={draftNotes} onChange={(e) => setDraftNotes(e.target.value)} placeholder={t.notesPlaceholder} />
             </div>
           </div>
         )}
-      </Modal>
+      </Drawer>
     </div>
   );
 }

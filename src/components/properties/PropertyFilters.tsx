@@ -1,7 +1,10 @@
 "use client";
-import React, { useState } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import React from 'react';
+import {
+  MapPin, Ruler, Sparkles,
+  Wind, ArrowUpDown, Sun, Shield, Warehouse, Accessibility,
+  ShieldCheck, GripVertical, Dog, Building2, Home,
+} from 'lucide-react';
 import { FilterState } from '@/types/property.types';
 import { ISRAELI_CITIES } from '@/data/cities';
 
@@ -12,15 +15,52 @@ interface PropertyFiltersProps {
   onReset: () => void;
 }
 
+// Shared input/label styling — inputs sit on the blue-tinted section cards, so
+// they use a white surface + hairline border to stand out.
+const inputClass =
+  "w-full px-4 py-3 bg-white border border-[#E4E8F2] rounded-xl font-semibold text-gray-900 focus:border-[#354AC4] focus:ring-2 focus:ring-[#354AC4]/20 focus:outline-none transition-all duration-200";
+const labelClass = "block text-sm font-bold text-gray-700 mb-2";
+
+// The 11 feature toggles, rendered as blue chips matching the property-card tags.
+const FEATURE_OPTIONS: { key: string; label: string; icon: React.ElementType }[] = [
+  { key: 'hasAirConditioning', label: 'מיזוג', icon: Wind },
+  { key: 'hasElevator', label: 'מעלית', icon: ArrowUpDown },
+  { key: 'hasSunBalcony', label: 'מ. שמש', icon: Sun },
+  { key: 'hasSafeRoom', label: 'ממ״ד', icon: Shield },
+  { key: 'hasStorage', label: 'מחסן', icon: Warehouse },
+  { key: 'hasDisabledAccess', label: 'גישה לנכים', icon: Accessibility },
+  { key: 'hasMamak', label: 'ממ״ק', icon: ShieldCheck },
+  { key: 'hasBars', label: 'סורגים', icon: GripVertical },
+  { key: 'hasPets', label: 'חיות מחמד', icon: Dog },
+  { key: 'hasHousingUnit', label: 'יחידת דיור', icon: Building2 },
+  { key: 'hasShelter', label: 'מקלט בבניין', icon: Home },
+];
+
+// Blue-tinted elevated section card with a lead icon.
+const FilterSection: React.FC<{ icon: React.ElementType; title: string; children: React.ReactNode }> = ({
+  icon: Icon,
+  title,
+  children,
+}) => (
+  <div className="rounded-2xl bg-[#f5f7fb] border border-[#E4E8F2] p-5 shadow-[0_2px_10px_rgba(53,74,196,0.06)]">
+    <div className="mb-5">
+      <div className="flex items-center gap-2.5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EAF1FE] text-[#354AC4]">
+          <Icon size={16} />
+        </span>
+        <h3 className="text-base font-black text-[#051150]">{title}</h3>
+      </div>
+    </div>
+    {children}
+  </div>
+);
+
 const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   filters,
   onFiltersChange,
   onApply,
   onReset
 }) => {
-  // State to manage the expansion of advanced filters
-  const [isExpanded, setIsExpanded] = useState(false);
-
   // Helper to update a specific filter key
   const updateFilter = (key: keyof FilterState, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -39,444 +79,302 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 shadow-lg" dir="rtl">
-      
-      {/* --- BASIC FILTERS (Always Visible) --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        
-        {/* Filter: Deal Type */}
-        <div>
-          <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-            סוג עסקה
-          </label>
-          <select
-            value={filters.dealType}
-            onChange={(e) => updateFilter('dealType', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-          >
-            <option value="all">הכל</option>
-            <option value="sale">מכירה</option>
-            <option value="rent">השכרה</option>
-          </select>
-        </div>
+    <div
+      className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E4E8F2] shadow-[0_4px_20px_rgba(5,17,80,0.08)] space-y-5"
+      dir="rtl"
+    >
+      {/* --- SECTION: LOCATION --- */}
+      <FilterSection icon={MapPin} title="מיקום">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label className={labelClass}>עיר</label>
+            <select
+              value={filters.city}
+              onChange={(e) => updateFilter('city', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              {ISRAELI_CITIES.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
 
-        {/* Filter: City */}
-        <div>
-          <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-            עיר
-          </label>
-          <select
-            value={filters.city}
-            onChange={(e) => updateFilter('city', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-          >
-            <option value="all">הכל</option>
-            {ISRAELI_CITIES.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
-        </div>
+          <div>
+            <label className={labelClass}>שכונה</label>
+            <input
+              type="text"
+              value={filters.neighborhood || ''}
+              onChange={(e) => updateFilter('neighborhood', e.target.value)}
+              placeholder="הזן שכונה"
+              className={inputClass}
+            />
+          </div>
 
-        {/* Filter: Property Type */}
-        <div>
-          <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-            סוג הנכס
-          </label>
-          <select
-            value={filters.propertyType || 'all'}
-            onChange={(e) => updateFilter('propertyType', e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-          >
-            <option value="all">הכל</option>
-            <option value="apartment">דירה</option>
-            <option value="garden-apartment">דירת גן</option>
-            <option value="cottage">קוטג׳</option>
-            <option value="house">בית</option>
-            <option value="duplex">דופלקס</option>
-            <option value="penthouse">פנטהאוז</option>
-            <option value="mini-penthouse">מיני פנטהאוז</option>
-            <option value="roof-apartment">דירת גג</option>
-            <option value="housing-unit">יחידת דיור</option>
-            <option value="studio">סטודיו</option>
-            <option value="basement-apartment">דירת מרתף</option>
-            <option value="villa">וילה</option>
-          </select>
+          <div>
+            <label className={labelClass}>רחוב</label>
+            <input
+              type="text"
+              value={filters.street || ''}
+              onChange={(e) => updateFilter('street', e.target.value)}
+              placeholder="שם הרחוב"
+              className={inputClass}
+            />
+          </div>
         </div>
+      </FilterSection>
 
-         {/* Filter: Rooms (Min/Max combined in one block for layout efficiency) */}
-         <div className="flex gap-2">
+      {/* --- SECTION: SIZE & PRICE --- */}
+      <FilterSection icon={Ruler} title="גודל ומחיר">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Rooms */}
+          <div className="flex gap-2">
             <div className="w-1/2">
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    חדרים (מ-)
-                </label>
-                <input
-                    type="number"
-                    value={filters.minRooms || ''}
-                    onChange={(e) => updateFilter('minRooms', e.target.value ? parseFloat(e.target.value) : undefined)}
-                    placeholder="מ-"
-                    step="0.5"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                />
+              <label className={labelClass}>חדרים (מ-)</label>
+              <input
+                type="number"
+                value={filters.minRooms || ''}
+                onChange={(e) => updateFilter('minRooms', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="מ-"
+                step="0.5"
+                className={inputClass}
+              />
             </div>
             <div className="w-1/2">
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    (עד-)
-                </label>
-                <input
-                    type="number"
-                    value={filters.maxRooms || ''}
-                    onChange={(e) => updateFilter('maxRooms', e.target.value ? parseFloat(e.target.value) : undefined)}
-                    placeholder="עד"
-                    step="0.5"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                />
+              <label className={labelClass}>(עד-)</label>
+              <input
+                type="number"
+                value={filters.maxRooms || ''}
+                onChange={(e) => updateFilter('maxRooms', e.target.value ? parseFloat(e.target.value) : undefined)}
+                placeholder="עד"
+                step="0.5"
+                className={inputClass}
+              />
             </div>
+          </div>
+
+          {/* Price */}
+          <div className="flex gap-2">
+            <div className="w-1/2">
+              <label className={labelClass}>מחיר (מ-)</label>
+              <input
+                type="number"
+                value={filters.minPrice || ''}
+                onChange={(e) => updateFilter('minPrice', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="₪"
+                className={inputClass}
+              />
+            </div>
+            <div className="w-1/2">
+              <label className={labelClass}>(עד-)</label>
+              <input
+                type="number"
+                value={filters.maxPrice || ''}
+                onChange={(e) => updateFilter('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="₪"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          {/* Area */}
+          <div className="flex gap-2">
+            <div className="w-1/2">
+              <label className={labelClass}>מ״ר (מ-)</label>
+              <input
+                type="number"
+                value={filters.minArea || ''}
+                onChange={(e) => updateFilter('minArea', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="מ״ר"
+                className={inputClass}
+              />
+            </div>
+            <div className="w-1/2">
+              <label className={labelClass}>(עד-)</label>
+              <input
+                type="number"
+                value={filters.maxArea || ''}
+                onChange={(e) => updateFilter('maxArea', e.target.value ? parseInt(e.target.value) : undefined)}
+                placeholder="מ״ר"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          {/* Floor */}
+          <div>
+            <label className={labelClass}>קומה</label>
+            <input
+              type="number"
+              value={filters.floor || ''}
+              onChange={(e) => updateFilter('floor', e.target.value ? parseInt(e.target.value) : undefined)}
+              placeholder="מספר קומה"
+              className={inputClass}
+            />
+          </div>
         </div>
-      </div>
+      </FilterSection>
 
-      {/* --- ADVANCED FILTERS (Collapsible) --- */}
-      <AnimatePresence>
-        {isExpanded && (
-          <m.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6 pt-6 border-t-2 border-gray-100">
-                
-                {/* Neighborhood */}
-                <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    שכונה
-                </label>
-                <input
-                    type="text"
-                    value={filters.neighborhood || ''}
-                    onChange={(e) => updateFilter('neighborhood', e.target.value)}
-                    placeholder="הזן שכונה"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                />
-                </div>
+      {/* --- SECTION: FEATURES & ATTRIBUTES --- */}
+      <FilterSection icon={Sparkles} title="מאפיינים">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Deal Type */}
+          <div>
+            <label className={labelClass}>סוג עסקה</label>
+            <select
+              value={filters.dealType}
+              onChange={(e) => updateFilter('dealType', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="sale">מכירה</option>
+              <option value="rent">השכרה</option>
+            </select>
+          </div>
 
-                {/* Price Range */}
-                <div className="flex gap-2">
-                    <div className="w-1/2">
-                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                        מחיר (מ-)
-                        </label>
-                        <input
-                        type="number"
-                        value={filters.minPrice || ''}
-                        onChange={(e) => updateFilter('minPrice', e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder="₪"
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                        />
-                    </div>
-                    <div className="w-1/2">
-                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                        (עד-)
-                        </label>
-                        <input
-                        type="number"
-                        value={filters.maxPrice || ''}
-                        onChange={(e) => updateFilter('maxPrice', e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder="₪"
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                        />
-                    </div>
-                </div>
+          {/* Property Type */}
+          <div>
+            <label className={labelClass}>סוג הנכס</label>
+            <select
+              value={filters.propertyType || 'all'}
+              onChange={(e) => updateFilter('propertyType', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="apartment">דירה</option>
+              <option value="garden-apartment">דירת גן</option>
+              <option value="cottage">קוטג׳</option>
+              <option value="house">בית</option>
+              <option value="duplex">דופלקס</option>
+              <option value="penthouse">פנטהאוז</option>
+              <option value="mini-penthouse">מיני פנטהאוז</option>
+              <option value="roof-apartment">דירת גג</option>
+              <option value="housing-unit">יחידת דיור</option>
+              <option value="studio">סטודיו</option>
+              <option value="basement-apartment">דירת מרתף</option>
+              <option value="villa">וילה</option>
+            </select>
+          </div>
 
-                {/* Area Range */}
-                <div className="flex gap-2">
-                    <div className="w-1/2">
-                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                        מ״ר (מ-)
-                        </label>
-                        <input
-                        type="number"
-                        value={filters.minArea || ''}
-                        onChange={(e) => updateFilter('minArea', e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder="מ״ר"
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                        />
-                    </div>
-                    <div className="w-1/2">
-                        <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                        (עד-)
-                        </label>
-                        <input
-                        type="number"
-                        value={filters.maxArea || ''}
-                        onChange={(e) => updateFilter('maxArea', e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder="מ״ר"
-                        className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                        />
-                    </div>
-                </div>
+          {/* Parking */}
+          <div>
+            <label className={labelClass}>חניה</label>
+            <select
+              value={filters.parking || 'all'}
+              onChange={(e) => updateFilter('parking', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="yes">יש</option>
+              <option value="none">אין</option>
+              <option value="double">כפולה</option>
+              <option value="shared">משותפת</option>
+              <option value="two-seperate">שניים נפרדות</option>
+              <option value="covered">מקורה</option>
+              <option value="three">שלוש</option>
+              <option value="robotic">רובוטית</option>
+              <option value="multiplier">מכפיל</option>
+            </select>
+          </div>
 
-                {/* Floor */}
-                <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    קומה
-                </label>
-                <input
-                    type="number"
-                    value={filters.floor || ''}
-                    onChange={(e) => updateFilter('floor', e.target.value ? parseInt(e.target.value) : undefined)}
-                    placeholder="מספר קומה"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                />
-                </div>
+          {/* Furniture */}
+          <div>
+            <label className={labelClass}>ריהוט</label>
+            <select
+              value={filters.furniture || 'all'}
+              onChange={(e) => updateFilter('furniture', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="none">אין</option>
+              <option value="partial">חלקי</option>
+              <option value="full">מלא</option>
+            </select>
+          </div>
 
-                {/* Parking */}
-                <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    חניה
-                </label>
-                <select
-                    value={filters.parking || 'all'}
-                    onChange={(e) => updateFilter('parking', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
+          {/* Kitchen */}
+          <div>
+            <label className={labelClass}>מטבח</label>
+            <select
+              value={filters.kitchen || 'all'}
+              onChange={(e) => updateFilter('kitchen', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="upgraded">משופר</option>
+              <option value="standard">סטנדרט</option>
+            </select>
+          </div>
+
+          {/* Position */}
+          <div>
+            <label className={labelClass}>מיקום בבניין</label>
+            <select
+              value={filters.position || 'all'}
+              onChange={(e) => updateFilter('position', e.target.value)}
+              className={inputClass}
+            >
+              <option value="all">הכל</option>
+              <option value="front">חזית</option>
+              <option value="back">עורף</option>
+              <option value="front-back">ח\ע</option>
+              <option value="side">צד</option>
+              <option value="corner">פינה</option>
+            </select>
+          </div>
+
+          {/* Vacancy Date */}
+          <div>
+            <label className={labelClass}>תאריך פינוי</label>
+            <input
+              type="date"
+              value={filters.vacancyDate || ''}
+              onChange={(e) => updateFilter('vacancyDate', e.target.value)}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        {/* Feature toggle chips */}
+        <div className="mt-6 pt-5 border-t border-[#E4E8F2]">
+          <div className="flex flex-wrap gap-2.5">
+            {FEATURE_OPTIONS.map(({ key, label, icon: Icon }) => {
+              const active = Boolean((filters.features as any)?.[key]);
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => toggleFeature(key)}
+                  aria-pressed={active}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 ${
+                    active
+                      ? 'bg-[#354AC4] text-white border-transparent shadow-sm'
+                      : 'bg-[#EAF1FE] text-[#354AC4] border-[#dbe6fd] hover:bg-[#dce8fd]'
+                  }`}
                 >
-                    <option value="all">הכל</option>
-                    <option value="yes">יש</option>
-                    <option value="none">אין</option>
-                    <option value="double">כפולה</option>
-                    <option value="shared">משותפת</option>
-                    <option value="two-seperate">שניים נפרדות</option>
-                    <option value="covered">מקורה</option>
-                    <option value="three">שלוש</option>
-                    <option value="robotic">רובוטית</option>
-                    <option value="multiplier">מכפיל</option>
-                </select>
-                </div>
-
-                {/* Furniture */}
-                <div>
-                <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    ריהוט
-                </label>
-                <select
-                    value={filters.furniture || 'all'}
-                    onChange={(e) => updateFilter('furniture', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                >
-                    <option value="all">הכל</option>
-                    <option value="none">אין</option>
-                    <option value="partial">חלקי</option>
-                    <option value="full">מלא</option>
-                </select>
-                </div>
-
-                 {/* Kitchen */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    מטבח
-                  </label>
-                  <select
-                    value={filters.kitchen || 'all'}
-                    onChange={(e) => updateFilter('kitchen', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                  >
-                    <option value="all">הכל</option>
-                    <option value="upgraded">משופר</option>
-                    <option value="standard">סטנדרט</option>
-                  </select>
-                </div>
-
-                {/* Position */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-מיקום בבניין                  </label>
-                  <select
-                    value={filters.position || 'all'}
-                    onChange={(e) => updateFilter('position', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                  >
-                    <option value="all">הכל</option>
-                    <option value="front">חזית</option>
-                    <option value="back">עורף</option>
-                    <option value="front-back">ח\ע</option>
-                    <option value="side">צד</option>
-                    <option value="corner">פינה</option>
-                  </select>
-                </div>
-
-                {/* Additional Text Inputs */}
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    רחוב
-                  </label>
-                  <input
-                    type="text"
-                    value={filters.street || ''}
-                    onChange={(e) => updateFilter('street', e.target.value)}
-                    placeholder="שם הרחוב"
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-900 mb-3 uppercase">
-                    תאריך פינוי
-                  </label>
-                  <input
-                    type="date"
-                    value={filters.vacancyDate || ''}
-                    onChange={(e) => updateFilter('vacancyDate', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl font-semibold text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all duration-300"
-                  />
-                </div>
-
-            </div>
-
-             {/* Directions & Features Checkboxes */}
-             <div className="mt-6 pt-6 border-t-2 border-gray-200">
-                 <h3 className="text-lg font-black text-gray-900 mb-4 uppercase">מאפיינים נוספים</h3>
-                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                     <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasAirConditioning || false}
-                          onChange={() => toggleFeature('hasAirConditioning')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">מיזוג</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasElevator || false}
-                          onChange={() => toggleFeature('hasElevator')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">מעלית</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasSunBalcony || false}
-                          onChange={() => toggleFeature('hasSunBalcony')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">מ. שמש</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasSafeRoom || false}
-                          onChange={() => toggleFeature('hasSafeRoom')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">ממ״ד</span>
-                      </label>
-                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasStorage || false}
-                          onChange={() => toggleFeature('hasStorage')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">מחסן</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasDisabledAccess || false}
-                          onChange={() => toggleFeature('hasDisabledAccess')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">גישה לנכים</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasMamak || false}
-                          onChange={() => toggleFeature('hasMamak')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">ממ״ק</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasBars || false}
-                          onChange={() => toggleFeature('hasBars')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">סורגים</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasPets || false}
-                          onChange={() => toggleFeature('hasPets')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">חיות מחמד</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasHousingUnit || false}
-                          onChange={() => toggleFeature('hasHousingUnit')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">יחידת דיור</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={filters.features?.hasShelter || false}
-                          onChange={() => toggleFeature('hasShelter')}
-                          className="w-5 h-5 rounded border-2 border-gray-300 text-[#1c3664] focus:ring-[#1c3664]"
-                        />
-                        <span className="text-sm font-semibold text-gray-700">מקלט בבניין</span>
-                      </label>
-                 </div>
-             </div>
-          </m.div>
-        )}
-      </AnimatePresence>
+                  <Icon size={15} />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </FilterSection>
 
       {/* --- FILTER CONTROL BUTTONS --- */}
-      <div className="mt-6 flex flex-col md:flex-row gap-4 pt-4 border-t-2 border-gray-100">
-        
-        {/* Toggle Advanced Filters Button */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-end pt-1">
         <button
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center justify-center gap-2 text-gray-600 font-bold hover:text-[#1c3664] transition-colors"
+          onClick={onReset}
+          className="px-6 py-3 bg-white text-[#354AC4] font-bold text-base rounded-2xl border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
         >
-            {isExpanded ? (
-                <>
-                    <ChevronUp size={20} />
-                    <span>פחות סינונים</span>
-                </>
-            ) : (
-                <>
-                    <ChevronDown size={20} />
-                    <span>חיפוש מתקדם</span>
-                </>
-            )}
+          אפס
         </button>
-
-        {/* Action Buttons (Apply / Reset) */}
-        <div className="flex-1 flex gap-3 justify-end">
-            <button
-            onClick={onReset}
-            className="px-6 py-3 bg-gray-100 text-gray-700 font-bold text-base uppercase rounded-2xl hover:bg-gray-200 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-            אפס
-            </button>
-            <button
-            onClick={onApply}
-            className="px-8 py-3 bg-[#1c3664] text-white font-black text-base uppercase rounded-2xl hover:bg-[#152a4f] transition-all duration-300 shadow-2xl hover:scale-105 border border-white/20"
-            >
-            החל פילטרים
-            </button>
-        </div>
+        <button
+          onClick={onApply}
+          className="px-8 py-3 bg-gradient-to-l from-[#354AC4] to-[#4A5FD6] text-white font-black text-base rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          החל פילטרים
+        </button>
       </div>
     </div>
   );

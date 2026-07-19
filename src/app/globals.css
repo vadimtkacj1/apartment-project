@@ -2,27 +2,28 @@
 
 :root {
   color-scheme: light;
-  --background: #f9f6f0;
+  /* Aiterra: cool blue-tinted neutrals (former warm beige ramp — var names kept) */
+  --background: #f4f6fb;
   --foreground: #171717;
-  --warm-beige: #faf7f2;
-  --warm-sand: #f9f6f0;
-  --warm-cream: #fdfbf7;
-  --warm-light: #fcf9f5;
-  --warm-lighter: #fefcfa;
+  --warm-beige: #f5f7fb;
+  --warm-sand: #f4f6fb;
+  --warm-cream: #fbfcfe;
+  --warm-light: #f9fbfe;
+  --warm-lighter: #fcfdff;
 }
 
 /* Завжди використовуємо світлу тему */
 html {
   overflow-y: auto;
   overflow-x: hidden;
-  background: #faf7f2 !important;
+  background: #f5f7fb !important;
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
-  background: #faf7f2 !important;
+  background: #f5f7fb !important;
   color: #171717 !important;
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
@@ -35,9 +36,24 @@ body {
 
 @layer utilities {
   .bg-warm {
-    background-color: #faf7f2 !important;
+    background-color: #f5f7fb !important;
   }
-  
+
+  /* Section rhythm helpers — the two alternating band backgrounds the
+     homepage sections lay out against: a plain white and the cool page tint. */
+  .section-white {
+    background-color: #ffffff !important;
+  }
+  .section-tint {
+    background-color: #f5f7fb !important;
+  }
+
+  /* Brand möbius band — a very low-opacity ink→sky wash for ONE feature band,
+     so a single section can carry the brand gradient without shouting. */
+  .brand-band {
+    background: linear-gradient(135deg, rgba(5, 17, 80, 0.03), rgba(85, 148, 241, 0.05));
+  }
+
 
   .text-balance {
     text-wrap: balance;
@@ -170,14 +186,4 @@ header {
   }
 }
 
-/* Admin panel - sold properties styling */
-.sold-property-row {
-  background-color: #fff1f0 !important;
-  opacity: 0.7;
-}
-
-.sold-property-row:hover {
-  background-color: #ffe7e6 !important;
-  opacity: 0.8;
-}
 

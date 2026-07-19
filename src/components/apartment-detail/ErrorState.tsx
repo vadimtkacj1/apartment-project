@@ -13,10 +13,10 @@ export function ErrorState({ error }: ErrorStateProps) {
         <p className="text-gray-600 text-xl mb-4">{error || 'נכס לא נמצא'}</p>
         <Link
           href="/apartments"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[#1c3664] text-white font-bold rounded-xl hover:bg-[#152a4f] transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#354AC4] text-white font-bold rounded-xl hover:bg-[#28389B] transition-colors"
         >
           <span>חזרה לנכסים</span>
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} aria-hidden="true" />
         </Link>
       </div>
     </div>

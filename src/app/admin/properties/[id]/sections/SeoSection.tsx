@@ -9,7 +9,7 @@ export function SeoSection({ handleChange }: PropertyFormSectionProps) {
   const t = useAdminMessages(propertyFormMessages);
   return (
     <Card title={t.seo.cardTitle} className="mb-4">
-      <p style={{ color: '#8c8c8c', marginTop: 0, marginBottom: 16 }}>
+      <p style={{ color: '#64748B', marginTop: 0, marginBottom: 16 }}>
         {t.seo.helpText}
       </p>
       <Row gutter={16}>

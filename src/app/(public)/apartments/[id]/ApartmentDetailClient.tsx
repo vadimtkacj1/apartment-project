@@ -2,10 +2,13 @@
 import dynamic from 'next/dynamic';
 import { m } from 'framer-motion';
 import { ArrowLeft, Share2, Check } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
 import { PropertyGallery } from '@/components/apartment-detail/PropertyGallery';
+import { formatShekelPrice } from '@/components/apartment-detail/PriceCard';
+import { analytics } from '@/lib/analytics';
 import { usePropertyData } from '@/hooks/usePropertyData';
 import {
   LoadingState,
@@ -41,6 +44,13 @@ interface ApartmentDetailClientProps {
   initialDescription?: string;
 }
 
+function formatWhatsAppNumber(num: string): string {
+  const digits = num.replace(/\D/g, '');
+  if (digits.startsWith('972')) return digits;
+  if (digits.startsWith('0')) return '972' + digits.slice(1);
+  return '972' + digits;
+}
+
 export default function ApartmentDetailClient({ propertyId, initialProperty, initialTitle, initialDescription }: ApartmentDetailClientProps) {
   const { property, loading, error } = usePropertyData(propertyId, initialProperty);
   const [previousId, setPreviousId] = useState<number | null>(null);
@@ -52,6 +62,11 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
   // the target div mounts only after `property` is available.
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapNearViewport, setMapNearViewport] = useState(false);
+
+  // 'צור קשר' in the mobile sticky bar scrolls the lead form into view.
+  const leadFormRef = useRef<HTMLDivElement>(null);
+  const scrollToForm = () =>
+    leadFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -97,16 +112,26 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
   // the keywords buyers actually search.
   const displayTitle = initialTitle || property?.title?.trim() || property?.location || '';
 
+  // Primary contact for the mobile sticky WhatsApp CTA (the full list lives in
+  // PropertyAgentBlock / the lead form).
+  const primaryContact = (property?.owners ?? []).find((o: any) => o.whatsapp || o.phone);
+  const stickyWhatsappLink = primaryContact
+    ? `https://wa.me/${formatWhatsAppNumber(primaryContact.whatsapp || primaryContact.phone || '')}`
+    : null;
+  const showStickyBar = !!property && !isSold;
+
   return (
-    <div className="min-h-screen bg-warm pt-24 pb-16 relative" dir="rtl">
+    <div className={`min-h-screen bg-warm pt-24 relative ${showStickyBar ? 'pb-28 lg:pb-16' : 'pb-16'}`} dir="rtl">
       <m.div
+        role="status"
+        aria-live="polite"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: copied ? 1 : 0, y: copied ? 0 : 20 }}
         transition={{ duration: 0.25 }}
-        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+        className="fixed bottom-24 lg:bottom-8 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
       >
-        <div className="flex items-center gap-2 bg-[#1c3664] text-white px-5 py-3 rounded-full shadow-lg text-sm font-medium">
-          <Check size={16} />
+        <div className="flex items-center gap-2 bg-[#354AC4] text-white px-5 py-3 rounded-full shadow-lg text-sm font-medium">
+          <Check size={16} aria-hidden="true" />
           <span>הקישור הועתק ללוח!</span>
         </div>
       </m.div>
@@ -114,26 +139,26 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
         <div className="w-full px-6 flex justify-between items-center mb-4 lg:px-12">
           <button
             onClick={handleShare}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#1c3664] text-[#1c3664] hover:bg-[#1c3664] hover:text-white transition-all duration-200 text-sm font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#354AC4] text-[#354AC4] hover:bg-[#354AC4] hover:text-white transition-all duration-200 text-sm font-medium"
           >
             {copied ? (
               <>
-                <Check size={16} />
+                <Check size={16} aria-hidden="true" />
                 <span>הקישור הועתק!</span>
               </>
             ) : (
               <>
-                <Share2 size={16} />
+                <Share2 size={16} aria-hidden="true" />
                 <span>שתף נכס</span>
               </>
             )}
           </button>
           <Link
             href="/apartments"
-            className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#1c3664] transition-colors duration-300 font-bold text-lg"
+            className="group inline-flex items-center gap-2 text-gray-600 hover:text-[#354AC4] transition-colors duration-300 font-bold text-lg"
           >
             <span>חזרה לנכסים</span>
-            <ArrowLeft size={22} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft size={22} className="group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
 
@@ -144,9 +169,24 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
         )}
 
         {displayTitle && (
-          <h1 className="w-full px-6 lg:px-12 text-2xl md:text-3xl font-bold text-[#1c3664] mb-6 text-center md:text-right" dir="rtl">
+          <h1 className="w-full px-6 lg:px-12 text-3xl md:text-4xl font-black text-[#051150] mb-3 text-center md:text-right" dir="rtl">
             {displayTitle}
           </h1>
+        )}
+
+        {/* Compact price line directly under the H1 on mobile — the price/lead rail
+            otherwise stacks dead-last below the gallery + specs. Hidden on lg where
+            the sticky rail is visible alongside. */}
+        {property && (
+          <div className="w-full px-6 lg:px-12 mb-6 lg:hidden text-center md:text-start">
+            <span className="text-sm font-semibold text-gray-500 me-2">מחיר מבוקש:</span>
+            <span
+              dir="ltr"
+              className={`text-2xl font-black text-[#354AC4] ${isSold ? 'line-through' : ''}`}
+            >
+              {formatShekelPrice(property.price)} ₪
+            </span>
+          </div>
         )}
 
         {!property && initialDescription && (
@@ -212,15 +252,18 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
                   <PriceCard
                     price={property.price}
                     originalPrice={property.originalPrice}
+                    area={property.area}
                     isSold={isSold}
                     dealType={property.dealType}
                   />
-                  <ContactForm
-                    propertyId={propertyId}
-                    isSold={isSold}
-                    owners={property.owners ?? []}
-                    dealType={property.dealType}
-                  />
+                  <div ref={leadFormRef} id="lead-form" className="scroll-mt-28">
+                    <ContactForm
+                      propertyId={propertyId}
+                      isSold={isSold}
+                      owners={property.owners ?? []}
+                      dealType={property.dealType}
+                    />
+                  </div>
                 </m.div>
               </div>
             </div>
@@ -229,6 +272,38 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
           </>
         )}
       </div>
+
+      {/* Mobile sticky action bar: price + צור קשר + WhatsApp. Keeps the primary
+          conversion actions reachable while the lead rail sits far below on mobile. */}
+      {showStickyBar && (
+        <div className="fixed inset-x-0 bottom-0 z-40 lg:hidden bg-white/95 backdrop-blur border-t border-[#E4E8F2] shadow-[0_-4px_20px_rgba(5,17,80,0.12)] px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-semibold text-gray-500 leading-none mb-1">מחיר מבוקש</div>
+            <div dir="ltr" className="text-lg font-black text-[#051150] truncate text-start">
+              {formatShekelPrice(property!.price)} ₪
+            </div>
+          </div>
+          {stickyWhatsappLink && (
+            <a
+              href={stickyWhatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => analytics.trackWhatsAppClick(propertyId)}
+              aria-label="WhatsApp"
+              className="inline-flex items-center justify-center w-12 h-12 shrink-0 rounded-xl bg-[#25D366] text-white shadow-md"
+            >
+              <FaWhatsapp size={24} aria-hidden="true" />
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={scrollToForm}
+            className="inline-flex items-center justify-center h-12 px-5 shrink-0 rounded-xl bg-gradient-to-br from-[#354AC4] to-[#5594F1] text-white font-black shadow-md"
+          >
+            צור קשר
+          </button>
+        </div>
+      )}
     </div>
   );
 }

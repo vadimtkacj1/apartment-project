@@ -7,16 +7,16 @@ async function addLicenceNumbers() {
   try {
     console.log('Adding licence numbers...');
 
-    // חיים עגני - 3164492
+    // חיים עגני - 3184627
     const chaim = await prisma.teamMember.findFirst({
       where: { name: { contains: 'חיים' } }
     });
     if (chaim) {
       await prisma.teamMember.update({
         where: { id: chaim.id },
-        data: { licenceNumber: '3164492' }
+        data: { licenceNumber: '3184627' }
       });
-      console.log('✓ Updated חיים עגני: 3164492');
+      console.log('✓ Updated חיים עגני: 3184627');
     } else {
       console.log('⚠ חיים עגני not found in TeamMember, checking Owner...');
       const chaimOwner = await prisma.owner.findFirst({
@@ -25,37 +25,37 @@ async function addLicenceNumbers() {
       if (chaimOwner) {
         await prisma.owner.update({
           where: { id: chaimOwner.id },
-          data: { licenceNumber: '3164492' }
+          data: { licenceNumber: '3184627' }
         });
-        console.log('✓ Updated חיים עגני (Owner): 3164492');
+        console.log('✓ Updated חיים עגני (Owner): 3184627');
       } else {
         console.log('✗ חיים עגני not found');
       }
     }
 
-    // רם מזרחי - 3019640
+    // דניאל שרון - 3072851
     const ram = await prisma.teamMember.findFirst({
       where: { name: { contains: 'רם' } }
     });
     if (ram) {
       await prisma.teamMember.update({
         where: { id: ram.id },
-        data: { licenceNumber: '3019640' }
+        data: { licenceNumber: '3072851' }
       });
-      console.log('✓ Updated רם מזרחי: 3019640');
+      console.log('✓ Updated דניאל שרון: 3072851');
     } else {
-      console.log('⚠ רם מזרחי not found in TeamMember, checking Owner...');
+      console.log('⚠ דניאל שרון not found in TeamMember, checking Owner...');
       const ramOwner = await prisma.owner.findFirst({
         where: { name: { contains: 'רם' } }
       });
       if (ramOwner) {
         await prisma.owner.update({
           where: { id: ramOwner.id },
-          data: { licenceNumber: '3019640' }
+          data: { licenceNumber: '3072851' }
         });
-        console.log('✓ Updated רם מזרחי (Owner): 3019640');
+        console.log('✓ Updated דניאל שרון (Owner): 3072851');
       } else {
-        console.log('✗ רם מזרחי not found');
+        console.log('✗ דניאל שרון not found');
       }
     }
 

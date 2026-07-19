@@ -192,7 +192,7 @@ export const propertyFormMessages = defineMessages({
       helpText: 'השאר ריק כדי להשתמש בכותרת, בתיאור ובתמונה הראשית של הנכס כברירת מחדל.',
       metaTitleLabel: 'כותרת SEO (Meta Title)',
       metaTitleTooltip: 'עד ~60 תווים — מוצג בלשונית הדפדפן ובתוצאות גוגל',
-      metaTitlePlaceholder: 'לדוגמה: דירת 4 חדרים למכירה בחולון — רם נכסים',
+      metaTitlePlaceholder: 'לדוגמה: דירת 4 חדרים למכירה בחולון — Aiterra',
       metaDescriptionLabel: 'תיאור SEO (Meta Description)',
       metaDescriptionTooltip: 'עד ~160 תווים — הסניפט שמופיע מתחת לכותרת בגוגל',
       metaDescriptionPlaceholder: 'תיאור קצר ומושך שיופיע בתוצאות החיפוש...',

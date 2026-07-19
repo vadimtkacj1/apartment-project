@@ -22,7 +22,7 @@ function resolveDealType(dealType: string, category?: string | null): string {
   return dealType;
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 interface PageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -79,7 +79,10 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 export default async function ApartmentsPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const dealType = params.dealType as DealType | undefined;
+  // Validate like `city` below — an unrecognized dealType collapses to undefined
+  // so SSR data + the client's skip-initial-fetch key stay consistent.
+  const dealType: DealType | undefined =
+    params.dealType === 'sale' || params.dealType === 'rent' ? params.dealType : undefined;
   const cityParam = typeof params.city === 'string' ? params.city : undefined;
   const city = cityParam && ISRAELI_CITIES.some((c) => c.value === cityParam) ? cityParam : undefined;
 
@@ -170,7 +173,7 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
         <p>
           מבחר נכסים איכותיים למכירה ולהשכרה בחולון, בת ים וכל אזור המרכז.
           דירות 2–6 חדרים, דירות גן, קוטג׳ים ונכסים להשקעה.
-          רם נכסים וחיים ענבי — משרד תיווך עם ניסיון של מעל 24 שנה,
+          Aiterra — משרד תיווך עם ניסיון של מעל 24 שנה,
           מלווה קונים, מוכרים ומשכירים לאורך כל הדרך.
         </p>
         <nav aria-label="רשימת נכסים">

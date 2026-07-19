@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, memo, useEffect, useState } from "react";
+import { useMemo, memo, useEffect, useState, type CSSProperties } from "react";
 import { m } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
@@ -71,28 +72,18 @@ const MarqueeRow = ({
   const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
 
   return (
-    <div className="flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
-      <m.div
-        key={`hot-propositions-marquee-${direction}-${animationDuration}`}
-        className="flex gap-4 md:gap-6 py-4 md:py-6"
+    // CSS-driven marquee: the transform loop lives in a keyframe (see the
+    // <style> block in the section) so it can pause on hover / keyboard-focus,
+    // letting a moving card be clicked without a drag-interception hack.
+    <div className="hp-marquee-viewport flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
+      <div
+        className="hp-marquee-track flex gap-4 md:gap-6 py-4 md:py-6"
         style={{
+          animation: `hp-marquee-x ${animationDuration}s linear infinite`,
           willChange: 'transform',
-          pointerEvents: 'auto'
-        }}
-        initial={{ x: xInitial }}
-        animate={{ x: xAnimate }}
-        transition={{
-          duration: animationDuration,
-          ease: "linear",
-          repeat: Infinity,
-        }}
-        onMouseDown={(e) => {
-          // Allow clicks to pass through to links
-          const target = e.target as HTMLElement;
-          if (target.closest('a')) {
-            e.stopPropagation();
-          }
-        }}
+          '--hp-from': xInitial,
+          '--hp-to': xAnimate,
+        } as CSSProperties}
       >
         {duplicatedItems.map((item: Property, i: number) => {
           const cardProps = {
@@ -105,20 +96,20 @@ const MarqueeRow = ({
             <a
               key={`hot-proposition-card-${direction}-${i}`}
               href={`/apartments/${item.id}`}
-              onClick={(e) => {
+              onClick={() => {
                 if (!item.isSold) {
                   analytics.trackPropertyClick(item.id, 'hot-proposition');
                 }
               }}
               draggable={false}
               className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block select-none"
-              style={{ pointerEvents: 'auto', cursor: 'pointer' }}
+              style={{ cursor: 'pointer' }}
             >
               <PropertyCard {...cardProps} />
             </a>
           );
         })}
-      </m.div>
+      </div>
     </div>
   );
 };
@@ -130,6 +121,7 @@ interface HotPropositionsProps {
 
 function HotPropositions({ initialProperties, initialTitle }: HotPropositionsProps = {}) {
   const { isMobile } = usePerformanceSettings();
+  const reduced = usePrefersReducedMotion();
   const [properties, setProperties] = useState<Property[]>(initialProperties ?? []);
   const [loading, setLoading] = useState(initialProperties === undefined);
   const [title, setTitle] = useState(initialTitle ?? 'הצעות חמות');
@@ -220,6 +212,16 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
 
   return (
     <section className="relative py-16 md:py-20 overflow-hidden w-full" dir="rtl">
+      <style>{`
+        @keyframes hp-marquee-x {
+          from { transform: translateX(var(--hp-from)); }
+          to   { transform: translateX(var(--hp-to)); }
+        }
+        .hp-marquee-viewport:hover .hp-marquee-track,
+        .hp-marquee-viewport:focus-within .hp-marquee-track {
+          animation-play-state: paused;
+        }
+      `}</style>
       <div className="relative z-10 w-full">
         {/* Section Header */}
         <m.div
@@ -236,25 +238,49 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
               מבחר נכסים
             </span>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
         </m.div>
 
-        {/* Scrolling Rows */}
-        <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">
-          <MarqueeRow
-            items={properties}
-            direction="left"
-            duration={60}
-            isMobile={isMobile}
-          />
-        </div>
+        {/* Reduced motion → static 3-up grid; otherwise the paused-on-hover marquee */}
+        {reduced ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 md:px-6">
+            {properties.slice(0, 3).map((item, i) => (
+              <a
+                key={`hot-proposition-static-${item.id}`}
+                href={`/apartments/${item.id}`}
+                onClick={() => {
+                  if (!item.isSold) {
+                    analytics.trackPropertyClick(item.id, 'hot-proposition');
+                  }
+                }}
+                className="block"
+              >
+                <PropertyCard
+                  {...item}
+                  propertyType={item.propertyType as PropertyType | undefined}
+                  index={i}
+                  disableClick={true}
+                />
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">
+            <MarqueeRow
+              items={properties}
+              direction="left"
+              duration={60}
+              isMobile={isMobile}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

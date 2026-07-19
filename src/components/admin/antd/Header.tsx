@@ -40,7 +40,7 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
             onClick={onPress}
             aria-label={collapsed ? t.openMenu : t.collapseMenu}
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            style={{ color: '#595959', fontSize: '18px', minWidth: 44, minHeight: 44 }}
+            style={{ color: '#475569', fontSize: '18px', minWidth: 44, minHeight: 44 }}
           />
         </Tooltip>
         <LanguageSwitcher />
@@ -58,7 +58,7 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
             if (!isLast && c.href) {
               return {
                 title: (
-                  <Link href={c.href} style={{ color: '#8c8c8c', fontFamily: FONT }}>
+                  <Link href={c.href} style={{ color: '#64748B', fontFamily: FONT }}>
                     {c.title}
                   </Link>
                 ),
@@ -68,7 +68,7 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
               title: (
                 <span
                   style={{
-                    color: isLast ? '#1C3664' : '#8c8c8c',
+                    color: isLast ? '#051150' : '#64748B',
                     fontWeight: isLast ? 600 : 400,
                     fontFamily: FONT,
                   }}

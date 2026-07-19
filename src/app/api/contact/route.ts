@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
         await transporter.verify();
 
         // EMAIL_TO can be a comma-separated list of emails.
-        const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com,info@ram-haim.co.il";
+        const recipients = EMAIL_TO || "vadim.tkach1378@gmail.com";
 
         // Escape all user-controlled values before they enter the HTML body.
         const safeName = escapeHtml(name.trim());
@@ -114,12 +114,12 @@ export async function POST(request: NextRequest) {
         const safeMessage = message ? escapeHtml(String(message)) : "";
 
         await transporter.sendMail({
-          from: `"Ram Nekasim" <${EMAIL_SERVER_USER}>`,
+          from: `"Aiterra" <${EMAIL_SERVER_USER}>`,
           to: recipients,
           subject: `פנייה חדשה מהאתר: ${safeSubjectName}`,
           html: `
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #eee;">
-          <div style="background-color: #1c3664; color: white; padding: 20px; text-align: center;">
+          <div style="background-color: #051150; color: white; padding: 20px; text-align: center;">
             <h1 style="margin: 0; font-size: 24px;">פנייה חדשה מהאתר</h1>
           </div>
           <div style="padding: 30px; background-color: #ffffff;">
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
             ${safeMessage ? `<p><strong>הודעה:</strong></p><p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px;">${safeMessage}</p>` : '<p><em style="color: #999;">לא צוינה הודעה</em></p>'}
             <div style="margin-top: 30px; padding: 15px; background-color: #f9f9f9; border-radius: 5px;">
               <small style="color: #666;">
-                This is an automated message from the contact form at ram-haim.co.il
+                This is an automated message from the contact form at go-apartsale.online
               </small>
             </div>
           </div>

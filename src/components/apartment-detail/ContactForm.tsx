@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { m } from 'framer-motion';
-import { Send, Phone, CheckCircle2 } from 'lucide-react';
-import { ContactFormData } from './types';
+import React from 'react';
+import { Phone, CheckCircle2 } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
+import ContactFormFields from '@/components/layout/ContactFormFields';
 import { analytics } from '@/lib/analytics';
 import { DealType } from '@/types/property.types';
 
@@ -19,24 +19,21 @@ interface ContactFormProps {
   dealType?: DealType;
 }
 
+function formatWhatsAppNumber(num: string): string {
+  const digits = num.replace(/\D/g, '');
+  if (digits.startsWith('972')) return digits;
+  if (digits.startsWith('0')) return '972' + digits.slice(1);
+  return '972' + digits;
+}
+
 export function ContactForm({ propertyId, isSold, owners = [], dealType }: ContactFormProps) {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    phone: '',
-    message: ''
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    analytics.trackContactForm(propertyId);
-  };
+  // Single primary contact for the consolidated phone + WhatsApp row (the full
+  // per-agent list lives in PropertyAgentBlock — this avoids the duplicated
+  // phone list that used to sit at the bottom of this card).
+  const primaryContact = owners.find((o) => o.phone || o.whatsapp);
+  const contactPhone = primaryContact?.phone || primaryContact?.whatsapp || '';
+  const whatsappRaw = primaryContact?.whatsapp || primaryContact?.phone || '';
+  const whatsappLink = whatsappRaw ? `https://wa.me/${formatWhatsAppNumber(whatsappRaw)}` : null;
 
   return (
     <div className={`rounded-2xl p-8 shadow-xl border ${
@@ -44,7 +41,7 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
         ? 'bg-gray-100 border-gray-300 opacity-75'
         : 'bg-white border-gray-100'
     }`}>
-      <h3 className={`text-2xl font-black mb-6 uppercase ${
+      <h3 className={`text-2xl font-black mb-6 ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`} style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
         מעוניין? צור קשר
@@ -52,78 +49,49 @@ export function ContactForm({ propertyId, isSold, owners = [], dealType }: Conta
       {isSold ? (
         <div className="text-center py-8">
           <div className="flex items-center justify-center gap-2 bg-red-100 text-red-700 px-6 py-4 rounded-lg font-bold mb-4">
-            <CheckCircle2 size={24} />
+            <CheckCircle2 size={24} aria-hidden="true" />
             <span>הנכס {dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
           </div>
           <p className="text-gray-500">לא ניתן ליצור קשר לגבי נכס זה</p>
         </div>
       ) : (
         <>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-gray-900 mb-2">שם מלא *</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all"
-                placeholder="הזן שם מלא"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-900 mb-2">טלפון *</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all"
-                placeholder="050-123-4567"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-900 mb-2">הודעה</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none transition-all resize-none"
-                placeholder="ספר לנו עוד..."
-              />
-            </div>
-            <m.button
-              type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full px-6 py-4 bg-[#1c3664] text-white font-black text-lg uppercase rounded-xl shadow-lg hover:bg-[#152a4f] transition-all flex items-center justify-center gap-2"
-            >
-              <span>שלח הודעה</span>
-              <Send size={20} className="transform rotate-180" />
-            </m.button>
-          </form>
-          {owners.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-              <p className="text-sm font-semibold text-gray-600 mb-3">או התקשר ישירות:</p>
-              <div className="flex flex-col gap-2">
-                {owners.map((owner) => {
-                  const contactPhone = owner.phone || owner.whatsapp || '';
-                  if (!contactPhone) return null;
-                  return (
-                    <a
-                      key={owner.id}
-                      href={`tel:${contactPhone.replace(/[^0-9+]/g, '')}`}
-                      onClick={() => analytics.trackPhoneClick(propertyId)}
-                      className="inline-flex items-center justify-center gap-2 text-xl font-black text-[#1c3664] hover:text-gray-900 transition-colors"
-                    >
-                      <Phone size={20} />
-                      <span>{owner.name} - <span dir="ltr">{contactPhone}</span></span>
-                    </a>
-                  );
-                })}
+          {/* Real async POST to /api/contact (disabled-while-submitting, success/
+              error status, reset, §16ג consent) — analytics fire on success only,
+              attributed to this property via propertyId. */}
+          <ContactFormFields
+            idPrefix="property-"
+            propertyId={propertyId}
+            source="property_detail"
+            resetOnSubmit
+          />
+
+          {(contactPhone || whatsappLink) && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-sm font-semibold text-gray-600 mb-3 text-center">או דברו איתנו ישירות</p>
+              <div className="flex flex-col sm:flex-row items-stretch gap-3">
+                {contactPhone && (
+                  <a
+                    href={`tel:${contactPhone.replace(/[^0-9+]/g, '')}`}
+                    onClick={() => analytics.trackPhoneClick(propertyId)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-[#354AC4] text-[#354AC4] font-bold hover:bg-[#354AC4] hover:text-white transition-colors"
+                  >
+                    <Phone size={20} aria-hidden="true" />
+                    <span dir="ltr">{contactPhone}</span>
+                  </a>
+                )}
+                {whatsappLink && (
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => analytics.trackWhatsAppClick(propertyId)}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#25D366] text-white font-bold hover:bg-[#20bd5a] transition-colors shadow-md"
+                  >
+                    <FaWhatsapp size={20} aria-hidden="true" />
+                    <span>WhatsApp</span>
+                  </a>
+                )}
               </div>
             </div>
           )}

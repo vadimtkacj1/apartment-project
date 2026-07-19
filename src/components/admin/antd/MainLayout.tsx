@@ -20,7 +20,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   // JS runs. The matchMedia effect promotes to the open desktop state on mount.
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(true);
-  const sidenavColor = '#1C3664';
+  const sidenavColor = '#354AC4';
   const { dir } = useAdminI18n();
 
   const pathname = usePathname();

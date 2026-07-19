@@ -2,7 +2,7 @@
 import React, { useEffect, Suspense, useMemo, useState, useRef, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, SearchX } from 'lucide-react';
 
 // Component Imports
 import SecondaryHero from '@/components/layout/SecondaryHero';
@@ -108,14 +108,14 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     // Return prev unchanged when values are equal — a new object identity here
     // re-triggers the fetch effect and causes a duplicate API call.
     const syncFromUrl = (prev: FilterState): FilterState => {
-      let nextDealType = prev.dealType;
-      let nextCity = prev.city;
-      if (dealTypeFromUrl && (dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent')) {
-        nextDealType = dealTypeFromUrl as DealType;
-      }
-      if (cityFromUrl) {
-        nextCity = ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
-      }
+      // Absent/invalid params reset to 'all' so browser Back (or any URL that
+      // drops a param) actually clears the filter instead of keeping the stale one.
+      const nextDealType: FilterState['dealType'] =
+        dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent' ? dealTypeFromUrl : 'all';
+      const nextCity: FilterState['city'] =
+        cityFromUrl && ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
+      // Return prev unchanged when values are equal — a new object identity here
+      // re-triggers the fetch effect and causes a duplicate API call.
       if (nextDealType === prev.dealType && nextCity === prev.city) return prev;
       return { ...prev, dealType: nextDealType, city: nextCity };
     };
@@ -142,6 +142,8 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     const updatedFilters = { ...filters, dealType: newDealType };
     setFilters(updatedFilters);
     setAppliedFilters(updatedFilters);
+    // Keep the address bar in sync with the shown results (mirrors onApply/onReset).
+    syncUrlFromFilters(updatedFilters);
   };
 
   // Sync category when dealType changes
@@ -276,11 +278,29 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     return () => controller.abort();
   }, [appliedFilters, selectedCategory]);
 
-  const currentProperties = useMemo(() => {
-    return properties.slice(0, visibleCount);
-  }, [properties, visibleCount]);
+  // Apply the sort <select> before paginating. Price is a display string
+  // ("1,850,000") so strip non-digits to compare numerically; 'newest' keeps the
+  // createdAt order the server/API already returned. sortSoldLast always wins so
+  // available listings stay ahead of sold/rented ones.
+  const sortedProperties = useMemo(() => {
+    const parsePrice = (value: string) => {
+      const n = parseInt(String(value ?? '').replace(/[^\d]/g, ''), 10);
+      return Number.isNaN(n) ? 0 : n;
+    };
+    const list = [...properties];
+    if (sortBy === 'price-asc') {
+      list.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+    } else if (sortBy === 'price-desc') {
+      list.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+    }
+    return sortSoldLast(list);
+  }, [properties, sortBy]);
 
-  const hasMore = visibleCount < properties.length;
+  const currentProperties = useMemo(() => {
+    return sortedProperties.slice(0, visibleCount);
+  }, [sortedProperties, visibleCount]);
+
+  const hasMore = visibleCount < sortedProperties.length;
 
   const loadMore = useCallback(() => {
     setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, properties.length));
@@ -335,6 +355,15 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     router.push(`?${params.toString()}`, { scroll: false });
   };
 
+  // Shared by the filter panel's reset button and the empty-state reset button.
+  const handleReset = () => {
+    const resetFilters: FilterState = { dealType: initialDealType ?? 'all', city: 'all' };
+    setFilters(resetFilters);
+    setAppliedFilters(resetFilters);
+    setVisibleCount(ITEMS_PER_PAGE);
+    syncUrlFromFilters(resetFilters);
+  };
+
   return (
     <>
       <ContactFormPopup isOpen={isContactPopupOpen} onClose={() => setIsContactPopupOpen(false)} />
@@ -346,21 +375,23 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
       <Breadcrumbs />
 
       <div className="min-h-screen bg-warm pt-16 pb-32" dir="rtl">
-        <div className="mx-auto px-6">
+        {/* One shared container so the filter zone and the card grid share rails
+            and cards don't over-stretch on ultrawide screens. */}
+        <div className="max-w-[1400px] mx-auto px-6">
           {/* Categories */}
           <div className="flex justify-center gap-3 mb-10">
             {CATEGORIES.filter((cat) => ['all', 'sales', 'rentals'].includes(cat.value)).map((cat: any) => (
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`px-8 py-3 rounded-2xl font-bold transition-all ${selectedCategory === cat.value ? 'bg-[#1c3664] text-white shadow-lg scale-105' : 'bg-white text-gray-600 border border-gray-200'}`}
+                className={`px-8 py-3 rounded-2xl font-bold transition-all ${selectedCategory === cat.value ? 'bg-[#354AC4] text-white shadow-lg scale-105' : 'bg-white text-gray-600 border border-gray-200'}`}
               >
                 {cat.label}
               </button>
             ))}
           </div>
 
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm"
@@ -374,9 +405,10 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
+                aria-label="מיון נכסים"
                 className="pr-4 pl-10 py-3 bg-white border border-gray-200 rounded-2xl font-bold outline-none shadow-sm appearance-none cursor-pointer"
                 style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231c3664' stroke-width='3'%3E%3Cpath d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23354AC4' stroke-width='3'%3E%3Cpath d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                   backgroundRepeat: 'no-repeat',
                   backgroundPosition: 'left 12px center',
                   backgroundSize: '16px',
@@ -395,7 +427,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="max-w-5xl mx-auto mb-10"
+                className="mb-10"
               >
                 <PropertyFilters
                   filters={filters}
@@ -405,13 +437,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                     setVisibleCount(ITEMS_PER_PAGE);
                     syncUrlFromFilters(filters);
                   }}
-                  onReset={() => {
-                    const resetFilters: FilterState = { dealType: initialDealType ?? 'all', city: 'all' };
-                    setFilters(resetFilters);
-                    setAppliedFilters(resetFilters);
-                    setVisibleCount(ITEMS_PER_PAGE);
-                    syncUrlFromFilters(resetFilters);
-                  }}
+                  onReset={handleReset}
                 />
               </m.div>
             )}
@@ -419,11 +445,46 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
 
           {loading ? (
             <div className="text-center py-20 font-bold text-gray-400">טוען נכסים...</div>
+          ) : sortedProperties.length === 0 ? (
+            /* Explicit empty state instead of a blank grid area. */
+            <div className="max-w-xl mx-auto text-center py-16 px-6">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#EAF1FE]">
+                <SearchX size={36} className="text-[#354AC4]" />
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-[#051150] mb-3">
+                לא נמצאו נכסים התואמים לחיפוש
+              </h3>
+              <p className="text-slate-500 font-medium mb-8 leading-relaxed">
+                נסו לשנות את קריטריוני הסינון או לאפס אותם. נשמח גם ללוות אתכם אישית ולמצוא עבורכם את הנכס המתאים.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <button
+                  onClick={handleReset}
+                  className="px-6 py-3 rounded-2xl font-black text-white bg-gradient-to-l from-[#354AC4] to-[#4A5FD6] shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  אפס סינון
+                </button>
+                <button
+                  onClick={() => setIsContactPopupOpen(true)}
+                  className="px-6 py-3 rounded-2xl font-bold text-[#354AC4] bg-white border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
+                >
+                  דברו איתנו
+                </button>
+              </div>
+            </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {currentProperties.map((prop, i) => (
-                  <PropertyCard key={prop.id} {...prop} index={i} />
+                  <m.div
+                    key={prop.id}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '0px 0px -50px 0px' }}
+                    transition={{ duration: 0.4, delay: Math.min(i, 7) * 0.05 }}
+                  >
+                    <PropertyCard {...prop} index={i} priority={i < 4} />
+                  </m.div>
                 ))}
               </div>
 
@@ -435,7 +496,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                     animate={{ opacity: 1 }}
                     className="flex items-center gap-2 text-gray-400 font-bold py-4"
                   >
-                    <span className="w-5 h-5 border-2 border-[#1c3664] border-t-transparent rounded-full animate-spin inline-block" />
+                    <span className="w-5 h-5 border-2 border-[#354AC4] border-t-transparent rounded-full animate-spin inline-block" />
                     <span>טוען עוד נכסים...</span>
                   </m.div>
                 )}

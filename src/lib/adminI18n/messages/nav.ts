@@ -12,7 +12,7 @@ export const navMessages = defineMessages({
     signOut: 'התנתק',
     add: 'הוספה',
     edit: 'עריכה',
-    footerRights: (year: number) => `© ${year} רם נכסים · כל הזכויות שמורות`,
+    footerRights: (year: number) => `© ${year} Aiterra · כל הזכויות שמורות`,
     footerSystem: 'מערכת ניהול נכסים',
   },
   en: {
@@ -25,7 +25,7 @@ export const navMessages = defineMessages({
     signOut: 'Sign out',
     add: 'Add',
     edit: 'Edit',
-    footerRights: (year: number) => `© ${year} Ram Nechasim · All rights reserved`,
+    footerRights: (year: number) => `© ${year} Aiterra · All rights reserved`,
     footerSystem: 'Property Management System',
   },
 });

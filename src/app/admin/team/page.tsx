@@ -15,7 +15,6 @@ import {
   Space,
   Switch,
   Table,
-  Image,
   Skeleton,
 } from 'antd';
 import {
@@ -24,9 +23,13 @@ import {
   DeleteOutlined,
   TeamOutlined,
   SearchOutlined,
+  CheckCircleOutlined,
+  StopOutlined,
 } from '@ant-design/icons';
+import MetricCard from '@/components/admin/MetricCard';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { teamMessages } from '@/lib/adminI18n/messages/team';
 
@@ -42,6 +45,8 @@ interface TeamMember {
   description: string | null;
   order: number;
   isActive: boolean;
+  propertiesCount: number;
+  soldCount: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -132,27 +137,29 @@ export default function TeamPage() {
   };
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
+    <div>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
-        <Link href="/admin/team/new" className="w-full sm:w-auto">
-          <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-            {t.addNew}
-          </Button>
-        </Link>
-      </div>
+      <AdminPageHeader
+        title={t.title}
+        extra={
+          <Link href="/admin/team/new" className="w-full sm:w-auto">
+            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
+              {t.addNew}
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title={t.statTotal} value={stats.total} prefix={<TeamOutlined />} /></Card>
+          <MetricCard icon={<TeamOutlined />} label={t.statTotal} value={stats.total} accent="#354AC4" />
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title={t.statActive} value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
+          <MetricCard icon={<CheckCircleOutlined />} label={t.statActive} value={stats.active} accent="#2A69C4" />
         </Col>
         <Col xs={24} sm={12} md={8}>
-          <Card><Statistic title={t.statInactive} value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
+          <MetricCard icon={<StopOutlined />} label={t.statInactive} value={stats.inactive} accent="#64748B" />
         </Col>
       </Row>
 
@@ -192,7 +199,7 @@ export default function TeamPage() {
             showSizeChanger: true,
             showTotal: (total) => t.paginationTotal(total),
           }}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1440 }}
           locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} /> }}
           columns={[
             {
@@ -203,32 +210,38 @@ export default function TeamPage() {
               render: (image: string | null) => (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   {image ? (
-                    <Image
-                      src={image}
-                      alt="Team Member"
-                      width={60}
-                      height={60}
-                      preview={false}
+                    <div
                       style={{
-                        objectFit: 'cover',
+                        width: 60,
+                        height: 60,
                         borderRadius: '50%',
-                        border: '2px solid #d9d9d9',
+                        overflow: 'hidden',
+                        border: '2px solid #E4E8F2',
+                        flexShrink: 0,
+                        background: '#F4F6FB',
                       }}
-                      fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23e5e7eb'/%3E%3C/svg%3E"
-                    />
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={image}
+                        alt="Team Member"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    </div>
                   ) : (
                     <div
                       style={{
                         width: '60px',
                         height: '60px',
                         borderRadius: '50%',
-                        background: '#E6E8EC',
+                        background: '#E4E8F2',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <TeamOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
+                      <TeamOutlined style={{ fontSize: '24px', color: '#94A3B8' }} />
                     </div>
                   )}
                 </div>
@@ -239,12 +252,19 @@ export default function TeamPage() {
               dataIndex: 'name',
               key: 'name',
               width: 150,
+              render: (name: string, record: TeamMember) => (
+                <Link href={`/admin/team/${record.id}`} style={{ fontWeight: 600, color: '#354AC4' }}>
+                  {name}
+                </Link>
+              ),
             },
             {
               title: t.fieldRole,
               dataIndex: 'role',
               key: 'role',
               width: 150,
+              render: (role: string) =>
+                role ? <span className="admin-pill admin-pill--neutral">{role}</span> : '-',
             },
             {
               title: t.fieldEmail,
@@ -266,6 +286,32 @@ export default function TeamPage() {
               key: 'mobile',
               width: 120,
               render: (mobile: string | null) => mobile || '-',
+            },
+            {
+              title: t.fieldProperties,
+              dataIndex: 'propertiesCount',
+              key: 'propertiesCount',
+              width: 120,
+              align: 'center',
+              render: (count: number) =>
+                count > 0 ? (
+                  <span className="admin-pill admin-pill--sale">{count}</span>
+                ) : (
+                  <span style={{ color: '#94A3B8' }}>0</span>
+                ),
+            },
+            {
+              title: t.fieldSold,
+              dataIndex: 'soldCount',
+              key: 'soldCount',
+              width: 120,
+              align: 'center',
+              render: (count: number) =>
+                count > 0 ? (
+                  <span className="admin-pill admin-pill--closed">{count}</span>
+                ) : (
+                  <span style={{ color: '#94A3B8' }}>0</span>
+                ),
             },
             {
               title: t.fieldOrder,
@@ -331,29 +377,35 @@ export default function TeamPage() {
               <div key={member.id} className="admin-card">
                 <div className="admin-card__head">
                   {member.image ? (
-                    <img className="admin-card__thumb" src={member.image} alt={member.name} />
+                    <img className="admin-card__thumb admin-card__thumb--round" src={member.image} alt={member.name} />
                   ) : (
                     <div
-                      className="admin-card__thumb"
+                      className="admin-card__thumb admin-card__thumb--round"
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: '#E6E8EC',
+                        background: '#E4E8F2',
                       }}
                     >
-                      <TeamOutlined style={{ fontSize: '22px', color: '#bfbfbf' }} />
+                      <TeamOutlined style={{ fontSize: '22px', color: '#94A3B8' }} />
                     </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="admin-card__title">{member.name}</div>
-                    <div className="admin-card__meta">{member.role}</div>
+                    {member.role ? (
+                      <div style={{ marginTop: 4 }}>
+                        <span className="admin-pill admin-pill--neutral">{member.role}</span>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
                 <div className="admin-card__fields">
                   {member.phone && <span><b>{t.fieldPhone}</b> <span dir="ltr">{member.phone}</span></span>}
                   {member.mobile && <span><b>{t.fieldMobile}</b> <span dir="ltr">{member.mobile}</span></span>}
                   {member.email && <span><b>{t.fieldEmail}</b> <span dir="ltr">{member.email}</span></span>}
+                  <span><b>{t.fieldProperties}</b> {member.propertiesCount}</span>
+                  <span><b>{t.fieldSold}</b> {member.soldCount}</span>
                   <span><b>{t.fieldOrder}</b> {member.order}</span>
                 </div>
                 <div className="admin-card__actions">

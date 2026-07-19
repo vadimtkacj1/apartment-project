@@ -1,10 +1,11 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { Button, Form, Spin, Typography } from 'antd';
+import { Button, Form, Spin } from 'antd';
 import { SaveOutlined, ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { usePropertyForm } from './usePropertyForm';
 import {
   BasicInfoSection,
@@ -16,8 +17,6 @@ import {
   ImagesSection,
   SeoSection,
 } from './sections';
-
-const { Title } = Typography;
 
 export default function PropertyEditPage() {
   const params = useParams();
@@ -44,22 +43,26 @@ export default function PropertyEditPage() {
   }
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <Title level={2} style={{ margin: 0, fontSize: 'clamp(1.25rem, 4vw, 1.5rem)' }}>
-          <HomeOutlined style={{ marginInlineEnd: '8px' }} />
-          {isNew ? t.page.addTitle : t.page.editTitle}
-        </Title>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          iconPlacement="end"
-          onClick={() => router.push('/admin/properties')}
-          size="large"
-          className="w-full sm:w-auto"
-        >
-          {t.page.backToList}
-        </Button>
-      </div>
+    <div>
+      <AdminPageHeader
+        title={
+          <>
+            <HomeOutlined style={{ marginInlineEnd: '8px' }} />
+            {isNew ? t.page.addTitle : t.page.editTitle}
+          </>
+        }
+        extra={
+          <Button
+            icon={<ArrowLeftOutlined />}
+            iconPlacement="end"
+            onClick={() => router.push('/admin/properties')}
+            size="large"
+            className="w-full sm:w-auto"
+          >
+            {t.page.backToList}
+          </Button>
+        }
+      />
 
       <Form
         form={form}
@@ -87,32 +90,27 @@ export default function PropertyEditPage() {
         {/* Submit Buttons */}
         <div
           style={{
-            position: 'sticky',
-            bottom: 0,
             marginTop: '30px',
-            zIndex: 10,
-            backgroundColor: 'white',
             padding: '16px 0',
-            borderTop: '1px solid #f0f0f0',
           }}
         >
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-            <Button
-              size="large"
-              onClick={() => router.push('/admin/properties')}
-              className="w-full sm:w-auto order-2 sm:order-1"
-            >
-              {t.page.cancel}
-            </Button>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
             <Button
               type="primary"
               htmlType="submit"
               loading={saving}
               size="large"
               icon={<SaveOutlined />}
-              className="w-full sm:w-auto order-1 sm:order-2"
+              className="w-full sm:w-auto"
             >
               {t.page.save}
+            </Button>
+            <Button
+              size="large"
+              onClick={() => router.push('/admin/properties')}
+              className="w-full sm:w-auto"
+            >
+              {t.page.cancel}
             </Button>
           </div>
         </div>

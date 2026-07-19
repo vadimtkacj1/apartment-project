@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Card,
   Table,
-  Tag,
   Button,
   Switch,
   Modal,
@@ -20,6 +19,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { usersMessages } from '@/lib/adminI18n/messages/users';
 
@@ -33,20 +33,15 @@ interface AdminUser {
   createdAt: string;
 }
 
-const ROLE_COLORS: Record<AdminUser['role'], string> = {
-  admin: '#1C3664',
-  agent: 'gold',
-};
-
 export default function UsersPage() {
   const { message } = App.useApp();
   const { data: session, status } = useSession();
   const router = useRouter();
   const t = useAdminMessages(usersMessages);
 
-  const ROLE_META: Record<AdminUser['role'], { label: string; color: string }> = {
-    admin: { label: t.roleAdmin, color: ROLE_COLORS.admin },
-    agent: { label: t.roleAgent, color: ROLE_COLORS.agent },
+  const ROLE_META: Record<AdminUser['role'], { label: string; pill: string }> = {
+    admin: { label: t.roleAdmin, pill: 'admin-pill admin-pill--admin' },
+    agent: { label: t.roleAgent, pill: 'admin-pill admin-pill--neutral' },
   };
 
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -175,7 +170,7 @@ export default function UsersPage() {
       dataIndex: 'role',
       key: 'role',
       width: 110,
-      render: (r: AdminUser['role']) => <Tag color={ROLE_META[r].color}>{ROLE_META[r].label}</Tag>,
+      render: (r: AdminUser['role']) => <span className={ROLE_META[r].pill}>{ROLE_META[r].label}</span>,
     },
     {
       title: t.active,
@@ -208,11 +203,11 @@ export default function UsersPage() {
   ];
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.title}</h1>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>{t.addUser}</Button>
-      </div>
+    <div>
+      <AdminPageHeader
+        title={t.title}
+        extra={<Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>{t.addUser}</Button>}
+      />
 
       {/* desktop — existing table, unchanged, just wrapped */}
       <div className="admin-only-desktop">
@@ -245,7 +240,7 @@ export default function UsersPage() {
                       <UserOutlined /> {u.username}
                     </div>
                   </div>
-                  <Tag color={ROLE_META[u.role].color}>{ROLE_META[u.role].label}</Tag>
+                  <span className={ROLE_META[u.role].pill}>{ROLE_META[u.role].label}</span>
                 </div>
                 <div className="admin-card__fields">
                   <span>

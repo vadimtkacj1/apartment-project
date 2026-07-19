@@ -18,9 +18,9 @@ export default function PropertyNavigation({ previousId, nextId }: PropertyNavig
           <m.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#1c3664] hover:text-white"
+            className="group flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#354AC4] hover:text-white"
           >
-            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             <span className="font-semibold">נכס קודם</span>
           </m.button>
         </Link>
@@ -34,10 +34,10 @@ export default function PropertyNavigation({ previousId, nextId }: PropertyNavig
           <m.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#1c3664] hover:text-white"
+            className="group flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:bg-[#354AC4] hover:text-white"
           >
             <span className="font-semibold">נכס הבא</span>
-            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
           </m.button>
         </Link>
       ) : (

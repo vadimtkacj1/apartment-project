@@ -15,7 +15,7 @@ export default function PublicLayout({
       className="flex flex-col min-h-screen bg-warm"
       style={{
         colorScheme: 'light',
-        background: '#faf7f2',
+        background: '#f5f7fb',
         color: '#171717',
         overflowX: 'hidden',
         width: '100%'
@@ -25,7 +25,7 @@ export default function PublicLayout({
       <main
         className="flex-grow bg-warm"
         style={{
-          background: '#faf7f2',
+          background: '#f5f7fb',
           color: '#171717'
         } as React.CSSProperties}
       >

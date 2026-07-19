@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Statistic, Table, Spin, DatePicker, Select, Tag, Button, Popconfirm, Empty, App } from 'antd';
+import { Row, Col, Card, Table, Spin, DatePicker, Select, Button, Popconfirm, Empty, App } from 'antd';
 import {
   EyeOutlined,
   AppstoreOutlined,
@@ -21,8 +21,11 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useAdminMessages } from '@/lib/adminI18n';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import MetricCard from '@/components/admin/MetricCard';
 import {
   BarChart,
   Bar,
@@ -100,22 +103,22 @@ interface ChartDataPoint {
   uniqueUsers: number;
 }
 
-/* Brand palette (matches src/lib/adminTheme.ts) — navy · gold · cream, no rainbow */
-const NAVY = '#1C3664';
-const GOLD = '#C5A357';
-const GOLD_TEXT = '#8A6D2F'; // AA-safe gold for text on light surfaces
-const HAIRLINE = '#E6E8EC';
-// Categorical sequence kept within the navy/gold family + neutrals
-const COLORS = ['#1C3664', '#C5A357', '#2A4A8A', '#8A6D2F', '#5B6B8C', '#B8A98A', '#9AA0AA', '#C9CDD6'];
+/* Brand palette (matches src/lib/adminTheme.ts) — Aiterra: indigo · sky · deep navy, no rainbow */
+const NAVY = '#354AC4';
+const GOLD = '#5594F1'; // sky-blue accent
+const GOLD_TEXT = '#2A69C4'; // AA-safe accent blue for text on light surfaces
+const HAIRLINE = '#E4E8F2';
+// Categorical sequence kept within the indigo/sky family + neutrals
+const COLORS = ['#354AC4', '#5594F1', '#051150', '#2A69C4', '#7BAAF5', '#8F9BD8', '#9AA0AA', '#C9CDD6'];
 
 // Referer buckets / Inquiry.source labels moved into analyticsMessages
 // (t.trafficLabels / t.leadSourceLabels) — resolved per locale in the component.
 // Matches STATUS_META in /admin/inquiries, tinted to the estate palette.
 // Labels live in analyticsMessages (t.statusLabels).
 const LEAD_STATUS_STYLES: Record<string, { color: string; bg: string }> = {
-  new: { color: GOLD_TEXT, bg: 'rgba(197,163,87,.14)' },
-  in_progress: { color: NAVY, bg: 'rgba(28,54,100,.08)' },
-  closed: { color: '#3F7D4F', bg: 'rgba(63,125,79,.10)' },
+  new: { color: '#2A69C4', bg: 'rgba(85,148,241,.16)' },
+  in_progress: { color: NAVY, bg: 'rgba(53,74,196,.08)' },
+  closed: { color: '#051150', bg: 'rgba(5,17,80,.07)' },
 };
 
 // Compact ranked bar list — used for both traffic sources and lead sources.
@@ -134,7 +137,7 @@ function SourceBars({ items, labels }: { items?: Array<{ source: string; count: 
           <div key={d.source} style={{ padding: '9px 0', borderBottom: i === data.length - 1 ? 'none' : `1px solid ${HAIRLINE}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
               <span style={{ fontWeight: 600, color: '#334155' }}>{labels[d.source] || d.source}</span>
-              <span style={{ color: '#6B7280' }}>{d.count} · {pct}%</span>
+              <span style={{ color: '#475569' }}>{d.count} · {pct}%</span>
             </div>
             <div style={{ position: 'relative', height: 6, borderRadius: 4, background: '#F0F1F3' }}>
               <div style={{ position: 'absolute', insetInlineStart: 0, top: 0, height: 6, borderRadius: 4, width: `${pct}%`, background: i === 0 ? GOLD : NAVY }} />
@@ -146,10 +149,23 @@ function SourceBars({ items, labels }: { items?: Array<{ source: string; count: 
   );
 }
 
+/* Section heading (matches AdminPageHeader). Top margin separates it from the
+   previous section (24px row margin + 16px = 40px break); the smaller bottom
+   margin keeps it visually attached to its own cards. */
+function SectionHeading({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ margin: '16px 2px 16px' }}>
+      <div style={{ fontWeight: 700, color: '#051150', fontSize: 18, letterSpacing: '-0.01em' }}>{children}</div>
+    </div>
+  );
+}
+
 export default function AnalyticsPage() {
   const { message } = App.useApp();
   const t = useAdminMessages(analyticsMessages);
+  const { dir } = useAdminI18n();
   const isMobile = useIsMobile();
+  const reduced = usePrefersReducedMotion();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [views, setViews] = useState<PropertyView[]>([]);
@@ -320,8 +336,8 @@ export default function AnalyticsPage() {
     const lead = LEAD_EVENTS.includes(eventType);
     const isView = eventType === 'property_view';
     return {
-      background: lead ? 'rgba(197,163,87,.14)' : isView ? 'rgba(28,54,100,.08)' : '#F2F1EE',
-      color: lead ? GOLD_TEXT : isView ? NAVY : '#6B7280',
+      background: lead ? 'rgba(85,148,241,.14)' : isView ? 'rgba(53,74,196,.08)' : '#EEF1F7',
+      color: lead ? GOLD_TEXT : isView ? NAVY : '#475569',
       borderRadius: 6,
       padding: '2px 9px',
       fontSize: 12,
@@ -349,9 +365,9 @@ export default function AnalyticsPage() {
       render: (property) => property ? (
         <div style={{ fontWeight: 500 }}>
           <div>{property.title}</div>
-          <div style={{color: '#999', fontSize: '0.85em', marginTop: '2px'}}>{property.location}</div>
+          <div style={{color: '#64748B', fontSize: '0.85em', marginTop: '2px'}}>{property.location}</div>
         </div>
-      ) : <span style={{color: '#ccc'}}>{t.notAvailable}</span>,
+      ) : <span style={{color: '#94A3B8'}}>{t.notAvailable}</span>,
     },
     {
       title: t.colVisitorId,
@@ -359,7 +375,7 @@ export default function AnalyticsPage() {
       key: 'ipAddress',
       width: '20%',
       render: (ip) => (
-        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#354AC4' }}>
           {getVisitorNumber(ip)}
         </span>
       ),
@@ -402,9 +418,9 @@ export default function AnalyticsPage() {
       render: (property, record) => property ? (
         <div>
           <div style={{ fontWeight: 600 }}>{property.title}</div>
-          <div style={{ fontSize: '0.85em', color: '#999' }}>#{record.propertyId}</div>
+          <div style={{ fontSize: '0.85em', color: '#64748B' }}>#{record.propertyId}</div>
         </div>
-      ) : record.propertyId ? <Tag>#{record.propertyId}</Tag> : '-',
+      ) : record.propertyId ? <span className="admin-pill admin-pill--neutral">#{record.propertyId}</span> : '-',
     },
     {
       title: t.colAction,
@@ -423,7 +439,7 @@ export default function AnalyticsPage() {
       key: 'ipAddress',
       width: '18%',
       render: (ip) => (
-        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#354AC4' }}>
           {getVisitorNumber(ip)}
         </span>
       ),
@@ -459,8 +475,9 @@ export default function AnalyticsPage() {
 
   if (loading && !summary) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
-        <Spin size="large" description={t.loadingData} />
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, height: '400px' }}>
+        <Spin size="large" />
+        <span style={{ color: '#64748B' }}>{t.loadingData}</span>
       </div>
     );
   }
@@ -487,36 +504,35 @@ export default function AnalyticsPage() {
     }));
 
   return (
-    <div className="px-2 sm:px-4 md:px-0 analytics-console">
+    <div className="analytics-console" style={{ maxWidth: 1440, marginInline: 'auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h1 className="text-4xl font-bold" style={{ margin: 0, color: '#1C3664' }}>{t.title}</h1>
-          <div style={{ color: '#8c8c8c', marginTop: '4px' }}>{t.subtitle}</div>
-        </div>
-        
-        <div style={{ display: 'flex', gap: '12px' }}>
+      <AdminPageHeader
+        title={t.title}
+        subtitle={t.subtitle}
+        extra={
+          <div style={{ display: 'flex', gap: '12px' }}>
             <Button icon={<ReloadOutlined />} onClick={fetchAnalytics} loading={loading}>
-                {t.refresh}
+              {t.refresh}
             </Button>
             <Popconfirm
-            title={t.deleteConfirmTitle}
-            description={t.deleteConfirmDescription}
-            onConfirm={() => handleDeleteAnalytics('all')}
-            okText={t.deleteAll}
-            cancelText={t.cancel}
-            okButtonProps={{ danger: true }}
+              title={t.deleteConfirmTitle}
+              description={t.deleteConfirmDescription}
+              onConfirm={() => handleDeleteAnalytics('all')}
+              okText={t.deleteAll}
+              cancelText={t.cancel}
+              okButtonProps={{ danger: true }}
             >
-            <Button danger icon={<DeleteOutlined />}>
+              <Button danger icon={<DeleteOutlined />}>
                 {t.resetData}
-            </Button>
+              </Button>
             </Popconfirm>
-        </div>
-      </div>
+          </div>
+        }
+      />
 
       {/* Filters Bar */}
       <Card className="mb-6">
-        <Row gutter={24} align="middle">
+        <Row gutter={[24, 16]} align="middle">
           <Col xs={24} md={12} lg={8}>
             <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.dateRangeLabel}</div>
             <RangePicker
@@ -574,13 +590,13 @@ export default function AnalyticsPage() {
         <Card className="mb-6">
           <Row align="middle" gutter={16}>
             <Col>
-              <UserOutlined style={{ fontSize: '32px', color: '#1C3664' }} />
+              <UserOutlined style={{ fontSize: '32px', color: '#354AC4' }} />
             </Col>
             <Col xs={24} flex="auto">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                {t.userActivity} <span style={{ fontWeight: 700, color: '#1C3664' }}>{getVisitorNumber(selectedIP)}</span>
+                {t.userActivity} <span style={{ fontWeight: 700, color: '#354AC4' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
-              <div style={{ color: '#666' }}>
+              <div style={{ color: '#64748B' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
                   <>
                     {t.totalClicksOf(summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks)}
@@ -602,77 +618,36 @@ export default function AnalyticsPage() {
       )}
 
       {/* Key Metrics Cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-        <Col xs={24} sm={24} md={12} lg={6}>
-            <Card style={{ height: '100%' }}>
-            <Statistic
-                title={t.totalViews}
-                value={summary?.totalViews || 0}
-                prefix={<EyeOutlined style={{ color: '#1C3664' }} />}
-                styles={{ content: { fontWeight: 'bold', color: '#1C3664' } }}
-            />
-            </Card>
+      <Row gutter={[20, 20]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={12} lg={6}>
+          <MetricCard icon={<EyeOutlined />} label={t.totalViews} value={summary?.totalViews || 0} accent={NAVY} />
         </Col>
-
-        <Col xs={24} sm={24} md={12} lg={6}>
-            <Card style={{ height: '100%' }}>
-            <Statistic
-                title={t.totalClicks}
-                value={summary?.totalClicks || 0}
-                prefix={<AppstoreOutlined style={{ color: NAVY }} />}
-                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
-            />
-            </Card>
+        <Col xs={24} sm={12} lg={6}>
+          <MetricCard icon={<AppstoreOutlined />} label={t.totalClicks} value={summary?.totalClicks || 0} accent={NAVY} />
         </Col>
-
-        <Col xs={24} sm={24} md={12} lg={6}>
-            <Card style={{ height: '100%' }}>
-            <Statistic
-                title={t.engagement}
-                value={engagementRate}
-                suffix="%"
-                prefix={<RiseOutlined style={{ color: GOLD }} />}
-                styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }}
-                precision={1}
-            />
-            </Card>
+        <Col xs={24} sm={12} lg={6}>
+          <MetricCard icon={<RiseOutlined />} label={t.engagement} value={Number(engagementRate || 0).toFixed(1)} suffix="%" accent={GOLD} />
         </Col>
-
-        <Col xs={24} sm={24} md={12} lg={6}>
-            <Card style={{ height: '100%' }}>
-            <Statistic
-                title={t.uniqueUsers}
-                value={summary?.uniqueVisitors || 0}
-                prefix={<UserOutlined style={{ color: NAVY }} />}
-                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
-            />
-            </Card>
+        <Col xs={24} sm={12} lg={6}>
+          <MetricCard icon={<UserOutlined />} label={t.uniqueUsers} value={summary?.uniqueVisitors || 0} accent={NAVY} />
         </Col>
       </Row>
 
       {/* Leads (Inquiry table) — the money metric — plus where traffic and leads come
           from. All values are computed server-side in /api/analytics/track (summary). */}
-      <div style={{ fontWeight: 700, color: NAVY, fontSize: 18, margin: '4px 4px 12px' }}>{t.inquiriesSection}</div>
-      <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+      <SectionHeading>{t.inquiriesSection}</SectionHeading>
+      <Row gutter={[20, 20]} style={{ marginBottom: '24px' }}>
         <Col xs={24} sm={12} lg={6}>
-          <Card style={{ height: '100%' }}>
-            <Statistic title={t.totalInquiries} value={summary?.totalInquiries || 0} prefix={<MessageOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
-          </Card>
+          <MetricCard icon={<MessageOutlined />} label={t.totalInquiries} value={summary?.totalInquiries || 0} accent={NAVY} />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card style={{ height: '100%' }}>
-            <Statistic title={t.newInquiries} value={summary?.newInquiries || 0} prefix={<RiseOutlined style={{ color: GOLD }} />} styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }} />
-          </Card>
+          <MetricCard icon={<RiseOutlined />} label={t.newInquiries} value={summary?.newInquiries || 0} accent={GOLD} />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card style={{ height: '100%' }}>
-            <Statistic title={t.inquiriesToday} value={summary?.inquiriesToday || 0} prefix={<PhoneOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
-          </Card>
+          <MetricCard icon={<PhoneOutlined />} label={t.inquiriesToday} value={summary?.inquiriesToday || 0} accent={NAVY} />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card style={{ height: '100%' }}>
-            <Statistic title={t.inquiriesLast7Days} value={summary?.inquiriesLast7Days || 0} prefix={<MailOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
-          </Card>
+          <MetricCard icon={<MailOutlined />} label={t.inquiriesLast7Days} value={summary?.inquiriesLast7Days || 0} accent={NAVY} />
         </Col>
       </Row>
 
@@ -713,12 +688,15 @@ export default function AnalyticsPage() {
             title={<span style={{ fontWeight: 600 }}>{t.trendsOverTime}</span>}
             style={{ height: '100%' }}
           >
+            {displayChartData.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t.noDataInRange} style={{ margin: '48px 0' }} />
+            ) : (
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart data={displayChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1C3664" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#1C3664" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#354AC4" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#354AC4" stopOpacity={0.1}/>
                   </linearGradient>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={GOLD} stopOpacity={0.7}/>
@@ -728,6 +706,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis
                   dataKey="date"
+                  reversed={dir === 'rtl'}
                   tick={{fontSize: 12}}
                   interval="preserveStartEnd"
                   minTickGap={24}
@@ -735,14 +714,15 @@ export default function AnalyticsPage() {
                 />
                 <YAxis tick={{fontSize: 12}} />
                 <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', direction: dir, textAlign: 'start' }}
                   labelStyle={{ fontWeight: 'bold', marginBottom: '5px' }}
                 />
                 <Legend verticalAlign="top" height={36} />
-                <Area type="monotone" dataKey="views" stroke="#1C3664" fillOpacity={1} fill="url(#colorViews)" name={t.viewsLegend} activeDot={{ r: 6 }} />
-                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="views" stroke="#354AC4" fillOpacity={1} fill="url(#colorViews)" name={t.viewsLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
+                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
               </AreaChart>
             </ResponsiveContainer>
+            )}
           </Card>
         </Col>
 
@@ -752,6 +732,9 @@ export default function AnalyticsPage() {
             title={<span style={{ fontWeight: 600 }}>{t.actionsDistribution}</span>}
             style={{ height: '100%' }}
           >
+            {pieChartData.length === 0 ? (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t.noDataInRange} style={{ margin: '48px 0' }} />
+            ) : (
             <ResponsiveContainer width="100%" height={350}>
               <PieChart>
                 <Pie
@@ -763,6 +746,7 @@ export default function AnalyticsPage() {
                   paddingAngle={5}
                   dataKey="value"
                   label={({ name, percent }) => `${(percent ? percent * 100 : 0).toFixed(0)}%`}
+                  isAnimationActive={!reduced}
                 >
                   {pieChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -772,6 +756,7 @@ export default function AnalyticsPage() {
                 <Legend verticalAlign="bottom" height={36} iconType="circle" />
               </PieChart>
             </ResponsiveContainer>
+            )}
           </Card>
         </Col>
       </Row>
@@ -801,7 +786,7 @@ export default function AnalyticsPage() {
                         if (active && payload && payload.length) {
                             const data = payload[0].payload;
                             return (
-                                <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
+                                <div style={{ backgroundColor: '#fff', padding: '10px 12px', border: '1px solid #E4E8F2', borderRadius: 10, boxShadow: '0 6px 18px rgba(5,17,80,0.08)' }}>
                                     <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
                                     <p style={{ margin: 0, color: GOLD_TEXT }}>{t.clicksCount(data.clicks)}</p>
                                 </div>
@@ -810,7 +795,7 @@ export default function AnalyticsPage() {
                         return null;
                     }}
                   />
-                  <Bar dataKey="clicks" name={t.clicksLegend} radius={[0, 4, 4, 0]} barSize={24}>
+                  <Bar dataKey="clicks" name={t.clicksLegend} radius={[0, 4, 4, 0]} barSize={24} isAnimationActive={!reduced}>
                     {barChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={index === 0 ? GOLD : NAVY} />
                     ))}
@@ -836,12 +821,18 @@ export default function AnalyticsPage() {
                   const isSelected = selectedIP === user.ipAddress;
 
                   return (
-                    <div
+                    <button
+                      type="button"
                       key={user.ipAddress}
                       onClick={() => setSelectedIP(user.ipAddress)}
+                      className={`analytics-visitor-row${isSelected ? ' is-selected' : ''}`}
                       style={{
+                        width: '100%',
+                        textAlign: 'start',
+                        border: 0,
+                        color: 'inherit',
+                        font: 'inherit',
                         padding: '12px 16px',
-                        backgroundColor: isSelected ? 'rgba(28, 54, 100, 0.06)' : 'transparent',
                         borderBottom: `1px solid ${HAIRLINE}`,
                         display: 'flex',
                         alignItems: 'center',
@@ -852,15 +843,15 @@ export default function AnalyticsPage() {
                     >
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <Tag color={index < 3 ? 'gold' : 'default'}>#{index + 1}</Tag>
-                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#1C3664' }}>
+                          <span className="admin-pill admin-pill--neutral">#{index + 1}</span>
+                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#354AC4' }}>
                             {getVisitorNumber(user.ipAddress)}
                           </span>
                           {isSelected && (
-                            <Tag color="gold">{t.filteredTag}</Tag>
+                            <span className="admin-pill admin-pill--neutral">{t.filteredTag}</span>
                           )}
                         </div>
-                        <div style={{ fontSize: '0.85em', color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ fontSize: '0.85em', color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
                           {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
                           {browser}
                         </div>
@@ -868,14 +859,14 @@ export default function AnalyticsPage() {
                       <div style={{
                         fontSize: '1.5em',
                         fontWeight: 'bold',
-                        color: '#1C3664',
+                        color: '#354AC4',
                         minWidth: '60px',
                         textAlign: 'center',
                       }}>
                         {user.clicks}
-                        <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>{t.clicksLegend}</div>
+                        <div style={{ fontSize: '0.4em', color: '#64748B', fontWeight: 'normal' }}>{t.clicksLegend}</div>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -916,9 +907,14 @@ export default function AnalyticsPage() {
         dangerouslySetInnerHTML={{
           __html: `
 /* Flatten cards: one hairline enclosure, no border+shadow stacking — matches the dashboard */
-.layout-dashboard .analytics-console .ant-card{box-shadow:none;border:1px solid ${HAIRLINE};border-radius:12px;}
-.layout-dashboard .analytics-console .ant-card-head{border-bottom:1px solid ${HAIRLINE};}
+.layout-dashboard .analytics-console .ant-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
+.layout-dashboard .analytics-console .ant-card-head{border-bottom:none;}
 .analytics-console .recharts-default-legend{font-size:12px;}
+/* Active-visitors rows are real buttons; background lives here so :hover isn't overridden by inline styles */
+.analytics-console .analytics-visitor-row{background:transparent;}
+.analytics-console .analytics-visitor-row:hover{background:rgba(53,74,196,.05);}
+.analytics-console .analytics-visitor-row.is-selected{background:rgba(53,74,196,.07);}
+.analytics-console .analytics-visitor-row:focus-visible{outline:2px solid ${NAVY};outline-offset:-2px;}
 `,
         }}
       />

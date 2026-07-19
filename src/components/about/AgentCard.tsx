@@ -78,7 +78,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             />
           ) : (
             /* Fallback: branded initials avatar */
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1c3664] to-[#2d5a9e]">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#051150] to-[#354AC4]">
               <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
                 {initials}
               </span>
@@ -93,18 +93,18 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
         
         {/* Inner wrapper with padding based on direction to ensure text doesn't touch the image too closely, but isn't too far either */}
         <div className={`w-full ${!isEven ? 'md:pr-6' : 'md:pl-6'}`}>
-            <h3 className="text-3xl md:text-4xl font-extrabold text-[#1c3664] mb-3">
+            <h3 className="font-caramel text-3xl md:text-4xl font-extrabold text-[#051150] mb-3">
               {member.name}
             </h3>
 
             {/* License Number */}
             {member.licenceNumber && (
-              <p className="text-xl text-blue-600 font-semibold mb-6">
+              <p className="text-xl text-[#2A69C4] font-semibold mb-6">
                 {member.licenceNumber}
               </p>
             )}
 
-            <p className="text-xl text-blue-600 font-semibold mb-6">
+            <p className="text-xl text-[#2A69C4] font-semibold mb-6">
               {member.role}
             </p>
 
@@ -118,7 +118,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                 {/* Main Phone */}
                 <a
                   href={`tel:${member.phone}`}
-                  className="flex items-center gap-3 px-6 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg group"
+                  className="flex items-center gap-3 px-6 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-all hover:shadow-lg group"
                 >
                   <Phone size={18} className="group-hover:rotate-12 transition-transform" />
                   <span
@@ -134,7 +134,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
                 {member.email && (
                   <button
                     onClick={handleCopyEmail}
-                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all relative group"
+                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#354AC4] text-[#354AC4] rounded-full hover:bg-blue-50 transition-all relative group"
                     title="לחצו להעתקת האימייל"
                   >
                     {copied ? (

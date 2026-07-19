@@ -68,6 +68,18 @@ const HeroMedia: React.FC = () => {
           display: 'block',
         }}
       />
+      {/* Bottom-anchored ink→transparent möbius scrim: guarantees text contrast
+          over the video without touching the LCP media below it. Paints above the
+          video (later sibling) but below the z-20 content. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+          background: 'linear-gradient(to top, rgba(5,17,80,0.75), transparent)',
+        }}
+      />
       {/* Kick off the video fetch at HTML parse time (~FCP) instead of at React
           hydration — the first video frame is this page's LCP, so every ms the
           fetch starts earlier moves LCP earlier. */}

@@ -63,7 +63,7 @@ function FloorPlansSection() {
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-block mb-4">
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="text-[#051150] font-bold text-lg uppercase tracking-wider">
               תוכניות הפרויקט
             </span>
           </div>
@@ -100,7 +100,7 @@ function FloorPlansSection() {
           >
             {PLANS.map((plan, i) => (
               <SwiperSlide key={`${plan.image}-${i}`} className="!h-auto">
-                <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#1c3664]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
+                <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#051150]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
                   {/* Plan preview */}
                   <button
                     type="button"
@@ -117,8 +117,8 @@ function FloorPlansSection() {
                       loading="lazy"
                       quality={85}
                     />
-                    <span className="absolute inset-0 flex items-center justify-center bg-[#1c3664]/0 group-hover:bg-[#1c3664]/15 transition-colors duration-300">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                    <span className="absolute inset-0 flex items-center justify-center bg-[#354ac4]/0 group-hover:bg-[#354ac4]/15 transition-colors duration-300">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#354ac4] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
                         <Eye className="w-4 h-4" />
                         להגדלה
                       </span>
@@ -127,7 +127,7 @@ function FloorPlansSection() {
 
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-5 text-center">
-                    <h3 className="text-2xl font-black text-[#1c3664] leading-tight">
+                    <h3 className="text-2xl font-black text-[#051150] leading-tight">
                       {plan.title}
                     </h3>
                     <p className="text-gray-500 font-medium mt-1 mb-5">{plan.subtitle}</p>
@@ -137,7 +137,7 @@ function FloorPlansSection() {
                       <button
                         type="button"
                         onClick={() => setActive(plan)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#1c3664] text-white font-bold text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#354ac4] text-white font-bold text-sm hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
                       >
                         <Eye className="w-4 h-4" />
                         צפייה בתוכנית
@@ -146,7 +146,7 @@ function FloorPlansSection() {
                         href={plan.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#1c3664]/30 text-[#1c3664] font-bold text-sm hover:border-[#c5a357] hover:text-[#c5a357] transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#354ac4]/30 text-[#354ac4] font-bold text-sm hover:border-[#5594f1] hover:text-[#2a69c4] transition-colors"
                       >
                         <Download className="w-4 h-4" />
                         הורדה / פתיחה
@@ -163,14 +163,14 @@ function FloorPlansSection() {
             <button
               onClick={() => swiper?.slideNext()}
               aria-label="התוכנית הבאה"
-              className="pointer-events-auto w-12 h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+              className="pointer-events-auto w-12 h-12 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
             >
               <ChevronRight size={26} aria-hidden="true" />
             </button>
             <button
               onClick={() => swiper?.slidePrev()}
               aria-label="התוכנית הקודמת"
-              className="pointer-events-auto w-12 h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+              className="pointer-events-auto w-12 h-12 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
             >
               <ChevronLeft size={26} aria-hidden="true" />
             </button>
@@ -185,7 +185,7 @@ function FloorPlansSection() {
             href={ONE_THE_PARK_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#1c3664] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
+            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#354ac4] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#5594f1] hover:text-[#051150] hover:-translate-y-0.5"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
             <span dir="ltr">ONE THE PARK</span>
@@ -208,7 +208,7 @@ function FloorPlansSection() {
             type="button"
             onClick={closeLightbox}
             aria-label="סגירה"
-            className="absolute top-4 left-4 w-11 h-11 rounded-full bg-white/90 text-[#1c3664] flex items-center justify-center shadow-lg hover:bg-[#c5a357] transition-colors"
+            className="absolute top-4 left-4 w-11 h-11 rounded-full bg-white/90 text-[#051150] flex items-center justify-center shadow-lg hover:bg-[#5594f1] transition-colors"
           >
             <X size={24} />
           </button>
@@ -236,7 +236,7 @@ function FloorPlansSection() {
               href={active.pdf}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#c5a357] text-[#1c3664] font-bold text-sm hover:bg-white transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#5594f1] text-[#051150] font-bold text-sm hover:bg-white transition-colors"
             >
               <Download className="w-4 h-4" />
               הורדה / פתיחה (PDF באיכות מלאה)
@@ -256,7 +256,7 @@ function FloorPlansSection() {
         }
         .plan-bullet-active {
           width: 30px;
-          background: #1c3664;
+          background: #354ac4;
           border-radius: 10px;
         }
       `}</style>

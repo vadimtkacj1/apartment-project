@@ -93,7 +93,7 @@ export default function LinksPage() {
               >
                 <div className="flex items-start gap-4">
                   <div className="shrink-0 mt-1">
-                    <IconComponent size={24} className="text-[#1c3664]" />
+                    <IconComponent size={24} className="text-[#354AC4]" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-gray-900 mb-3">
@@ -115,7 +115,7 @@ export default function LinksPage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-[#1c3664] hover:text-[#2a4a8a] font-medium transition-colors"
+                      className="inline-flex items-center gap-2 text-[#354AC4] hover:text-[#4A5FD6] font-medium transition-colors"
                     >
                       <span>למעבר לאתר</span>
                       <ExternalLink size={18} />

@@ -19,8 +19,8 @@ const FAQ: React.FC = () => {
     >
       {/* Decorative Background */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-1/4 left-10 w-96 h-96 bg-[#1c3664] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl"></div>
+        <div className="absolute top-1/4 left-10 w-96 h-96 bg-[#051150] rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-10 w-80 h-80 bg-[#051150] rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 lg:px-12">
@@ -37,19 +37,17 @@ const FAQ: React.FC = () => {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-3 mb-6"
+            className="inline-flex flex-col items-center mb-6"
           >
-            <HelpCircle className="text-[#1c3664]" size={32} />
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="inline-flex items-center gap-2 text-[13px] md:text-sm font-semibold text-[#354AC4]">
+              <HelpCircle size={18} aria-hidden="true" />
               שאלות נפוצות
             </span>
           </m.div>
 
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
+          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
             שאלות ותשובות
           </h1>
-
-          <div className="w-32 h-1 bg-[#1c3664] mx-auto mb-6"></div>
 
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             מצאנו עבורכם את התשובות לשאלות הנפוצות ביותר בתחום הנדל&quot;ן
@@ -82,7 +80,7 @@ const FAQ: React.FC = () => {
                 >
                   <ChevronDown
                     className={`${
-                      openId === item.id ? 'text-[#1c3664]' : 'text-gray-400'
+                      openId === item.id ? 'text-[#354ac4]' : 'text-gray-400'
                     } transition-colors duration-200`}
                     size={28}
                   />
@@ -117,7 +115,7 @@ const FAQ: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="mt-16 text-center"
         >
-          <div className="bg-gradient-to-br from-[#1c3664] to-[#152a4f] rounded-3xl p-8 md:p-12 shadow-2xl">
+          <div className="bg-gradient-to-br from-[#051150] to-[#051150] rounded-3xl p-8 md:p-12 shadow-2xl">
             <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
               לא מצאתם תשובה?
             </h3>
@@ -126,7 +124,7 @@ const FAQ: React.FC = () => {
             </p>
             <a
               href="/#contact"
-              className="inline-block bg-white text-[#1c3664] font-bold text-lg px-8 py-4 rounded-full hover:scale-105 hover:shadow-lg transition-all duration-300"
+              className="inline-block bg-white text-[#354ac4] font-bold text-lg px-8 py-4 rounded-full hover:scale-105 hover:shadow-lg transition-all duration-300"
               style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
             >
               צור קשר

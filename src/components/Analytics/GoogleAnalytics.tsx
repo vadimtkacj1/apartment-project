@@ -3,8 +3,8 @@ import Script from 'next/script';
 /**
  * Google Analytics 4 (GA4) tag.
  *
- * Measurement ID "G-DNZER16M0L" -> GA4 property "Ram-Haim" (properties/543571916,
- * web stream "ram-haim.co.il") under the Aiterra account. A Measurement ID is not
+ * Measurement ID "G-DNZER16M0L" -> GA4 property "Aiterra" (properties/543571916,
+ * web stream "go-apartsale.online") under the Aiterra account. A Measurement ID is not
  * a secret (it ships in the page HTML), so it's the hardcoded default; set
  * NEXT_PUBLIC_GA_ID to override (e.g. a separate staging property).
  *

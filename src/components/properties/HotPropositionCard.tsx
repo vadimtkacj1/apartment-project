@@ -65,7 +65,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
         style={{
           boxShadow: isSold
             ? '0 2px 8px rgba(0, 0, 0, 0.08)'
-            : '0 4px 16px rgba(28, 54, 100, 0.12), 0 0 32px rgba(28, 54, 100, 0.06)'
+            : '0 4px 16px rgba(5, 17, 80, 0.12), 0 0 32px rgba(5, 17, 80, 0.06)'
         }}
         dir="rtl"
       >
@@ -88,10 +88,10 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
           {/* Logo overlay - positioned left */}
           <div className="absolute top-4 left-4 z-30 pointer-events-none">
             <Image
-              src="/images/logos.png"
-              alt="לוגו רם נכסים חיים ענבי"
-              width={70}
-              height={35}
+              src="/aiterra-logo.png"
+              alt="לוגו Aiterra"
+              width={44}
+              height={32}
               className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
             />
           </div>
@@ -99,7 +99,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
           {/* Status Badge - positioned right for RTL */}
           {status && !isSold && (
             <div className="absolute top-4 right-4 z-30">
-              <div className="bg-[#1c3664] text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm">
+              <div className="bg-[#051150] text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm">
                 {getStatusLabel(status)}
               </div>
             </div>
@@ -110,7 +110,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             <div className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl backdrop-blur-md shadow-xl ${
               isSold
                 ? 'bg-gray-500/80 text-gray-200'
-                : 'bg-[#1c3664]/90 text-white'
+                : 'bg-[#051150]/90 text-white'
             }`}>
               <p className={`text-2xl sm:text-3xl font-black ${isSold ? 'line-through' : ''}`}>
                 <span dir="ltr">{price} ₪</span>
@@ -157,7 +157,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               isSold ? 'text-gray-400' : 'text-gray-600'
             }`}>
               <div className={`p-1.5 rounded-lg ${isSold ? 'bg-gray-200' : 'bg-blue-50'}`}>
-                <MapPin size={16} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
+                <MapPin size={16} className={`${isSold ? 'text-gray-400' : 'text-[#354AC4]'}`} />
               </div>
               <span className="text-sm sm:text-base font-semibold truncate">{location}</span>
             </div>
@@ -172,7 +172,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               </div>
             ) : (
               <button className="w-full group/btn">
-                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#1c3664] to-[#2a4a7a] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#354AC4] to-[#4A5FD6] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                   <span>לפרטים נוספים</span>
                   <ArrowLeft size={18} className="transition-transform duration-300 group-hover/btn:-translate-x-1" />
                 </div>

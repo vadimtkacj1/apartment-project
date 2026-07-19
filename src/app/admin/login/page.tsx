@@ -9,25 +9,15 @@ import { useAdminI18n, useAdminMessages, DEFAULT_ADMIN_LOCALE, dirOf } from '@/l
 import { loginMessages } from '@/lib/adminI18n/messages/login';
 import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 
-function AiterraLogo({ size = 56, color = '#1C3664' }: { size?: number; color?: string }) {
+function AiterraLogo({ size = 56 }: { size?: number }) {
   return (
-    <svg
+    <img
+      src="/aiterra-logo.png"
+      alt="Aiterra"
       width={size}
-      height={size}
-      // The artwork's bounding box sits high in a plain "0 0 112 112" box
-      // (ink center ≈ y47 vs box center y56), so the mark looked shifted up.
-      // Re-center the viewBox on the actual paths — same 112 side length, so
-      // it only pans the glyph to true center, no scaling/distortion.
-      viewBox="-0.71 -8.66 112 112"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ color, display: 'block' }}
-      role="img"
-      aria-label="Aiterra"
-    >
-      <path fill="currentColor" d="M55.03 5.92L88.17 68.07L73.41 67.96L54.82 33.88L32.67 75.40L47.28 75.45L55.92 88.59L11.31 88.70Z" />
-      <path fill="currentColor" d="M57.49 75.50L92.21 75.45L99.27 88.70L66.86 88.75Z" />
-    </svg>
+      height={Math.round(size * 0.72)}
+      style={{ display: 'block' }}
+    />
   );
 }
 
@@ -89,7 +79,7 @@ function LoginForm() {
           background: '#fff',
           padding: '40px',
           borderRadius: '12px',
-          border: '1px solid #E6E8EC',
+          border: '1px solid #E4E8F2',
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
@@ -98,7 +88,20 @@ function LoginForm() {
 
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-            <AiterraLogo size={56} />
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 76,
+                height: 76,
+                borderRadius: 20,
+                background: '#ffffff',
+                boxShadow: '0 10px 24px rgba(53, 74, 196, 0.30)',
+              }}
+            >
+              <AiterraLogo size={48} />
+            </div>
           </div>
           <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
             {t.title}

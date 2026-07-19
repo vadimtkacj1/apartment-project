@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import UrbanRenewalContent from './UrbanRenewalContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 const ogImage = `${siteUrl}/images/articles/urban-renewal.jpg`;
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'התחדשות עירונית בחולון: פינוי-בינוי ותמ״א 38',
-    description: 'אילו שכונות בחולון בתנופת התחדשות, ומה זה שווה לבעלי דירות ולמשקיעים — רם נכסים חיים ענבי.',
+    description: 'אילו שכונות בחולון בתנופת התחדשות, ומה זה שווה לבעלי דירות ולמשקיעים — Aiterra.',
     url: `${siteUrl}/articles/urban-renewal-holon`,
     type: 'article',
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'התחדשות עירונית בחולון: פינוי-בינוי ותמ״א 38',
-    description: 'אילו שכונות בחולון בתנופת התחדשות, ומה זה שווה לבעלי דירות ולמשקיעים — רם נכסים חיים ענבי.',
+    description: 'אילו שכונות בחולון בתנופת התחדשות, ומה זה שווה לבעלי דירות ולמשקיעים — Aiterra.',
     images: [ogImage],
   },
 };
@@ -59,14 +59,14 @@ const articleSchema = {
   author: {
     '@type': 'Person',
     '@id': `${siteUrl}/about#owner-2`,
-    name: 'חיים ענבי',
+    name: 'יואב אלמוג',
     jobTitle: 'מתווך נדל״ן מורשה ומייסד',
     url: `${siteUrl}/about`,
     worksFor: { '@id': `${siteUrl}/#organization` },
     hasCredential: {
       '@type': 'EducationalOccupationalCredential',
       credentialCategory: 'Real Estate License',
-      identifier: '3164492',
+      identifier: '3184627',
     },
   },
   publisher: { '@id': `${siteUrl}/#organization` },

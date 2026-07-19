@@ -44,7 +44,7 @@ export default function AboutOwners() {
   return (
     <m.section
       ref={ownersRef}
-      className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
+      className="relative py-24 w-full overflow-hidden bg-white"
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={ownersInView ? { opacity: 1 } : {}}
@@ -53,7 +53,7 @@ export default function AboutOwners() {
         
         {/* Header */}
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-4">
+          <h2 className="font-caramel text-4xl md:text-5xl font-extrabold text-[#051150] mb-4">
             המייסדים שלנו
           </h2>
         </div>

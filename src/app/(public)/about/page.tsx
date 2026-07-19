@@ -9,25 +9,26 @@ import AboutMarketing from '@/components/about/AboutMarketing';
 import AboutStoryNew from '@/components/about/AboutStoryNew';
 import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
+import AboutCTA from '@/components/about/AboutCTA';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 export const metadata: Metadata = {
-  title: 'אודות | רם נכסים חיים ענבי - תיווך נדל״ן בחולון',
-  description: 'הכירו את צוות רם נכסים — משרד תיווך נדל״ן מוביל בחולון. מומחיות מקומית, שיווק מתקדם, ליווי מלא בקנייה ומכירה של דירות בחולון, בת ים וראשון לציון.',
+  title: 'אודות | Aiterra - תיווך נדל״ן בחולון',
+  description: 'הכירו את צוות Aiterra — משרד תיווך נדל״ן מוביל בחולון. מומחיות מקומית, שיווק מתקדם, ליווי מלא בקנייה ומכירה של דירות בחולון, בת ים וראשון לציון.',
   alternates: {
     canonical: `${siteUrl}/about`,
   },
   openGraph: {
-    title: 'אודות | רם נכסים חיים ענבי - תיווך נדל״ן בחולון',
-    description: 'הכירו את צוות רם נכסים — משרד תיווך נדל״ן מוביל בחולון עם מומחיות מקומית וניסיון מצטבר.',
+    title: 'אודות | Aiterra - תיווך נדל״ן בחולון',
+    description: 'הכירו את צוות Aiterra — משרד תיווך נדל״ן מוביל בחולון עם מומחיות מקומית וניסיון מצטבר.',
     url: `${siteUrl}/about`,
   },
 };
 
 export default function AboutPage() {
   return (
-    <div className="about-page bg-[#faf7f2]" dir="rtl">
+    <div className="about-page bg-[#f5f7fb]" dir="rtl">
       <BreadcrumbSchema items={[{ name: 'אודות', path: '/about' }]} />
       <PersonSchema />
       <SecondaryHero
@@ -42,6 +43,7 @@ export default function AboutPage() {
       <AboutStoryNew />
       <AboutOwners />
       <AboutTeam />
+      <AboutCTA />
     </div>
   );
 }

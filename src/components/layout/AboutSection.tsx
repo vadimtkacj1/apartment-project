@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 
 const AboutSection: React.FC = memo(() => {
   const sectionRef = useRef<HTMLElement>(null);
-  const logoPattern = "url('/images/about-logo.svg')";
+  const logoPattern = "url('/images/about-aiterra-pattern.svg')";
   const [title, setTitle] = useState('אודות');
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const AboutSection: React.FC = memo(() => {
       ref={sectionRef}
       dir="rtl"
       className="relative w-full py-16 md:py-20 overflow-hidden"
-      style={{ background: 'rgb(42, 74, 138)' }}
+      style={{ background: '#051150' }}
     >
       {/* Скрываем белый фон с паттерном на мобильных (hidden md:block) */}
       <m.div
@@ -71,14 +71,14 @@ const AboutSection: React.FC = memo(() => {
       <div className="absolute inset-0 z-10 pointer-events-none hidden md:block">
         {/* Left-side blue */}
         <div
-          className="absolute inset-0 bg-[#2A4A8A]"
+          className="absolute inset-0 bg-[#051150]"
           style={{
             clipPath: 'polygon(0 0, 21% 0, 1.5% 100%, 0 100%)'
           }}
         />
         {/* Right-side blue */}
         <div
-          className="absolute inset-0 bg-[#2A4A8A]"
+          className="absolute inset-0 bg-[#051150]"
           style={{
             clipPath: 'polygon(35% 0, 100% 0, 100% 100%, 14.5% 100%)'
           }}
@@ -97,17 +97,17 @@ const AboutSection: React.FC = memo(() => {
             className="order-2 lg:order-1 lg:col-span-3 text-white"
           >
             <div className="mb-4">
-              <span className="text-white/80 font-bold text-lg uppercase tracking-wider">
+              <span className="block text-[13px] md:text-sm font-semibold text-[#7FB4F5]">
                 קצת עלינו
               </span>
             </div>
-            <m.h2 className="text-5xl md:text-6xl font-black mb-6 uppercase tracking-tight text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            <m.h2 className="text-5xl md:text-6xl font-black mb-6 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               {title}
             </m.h2>
 
             <div className="space-y-6">
-              <p className="text-xl sm:text-3xl font-bold leading-tight text-[#c5a357]">
-               רם שיווק נכסים & חיים ענבי הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ-24 שנה. המשרד מתמחה
+              <p className="text-xl sm:text-3xl font-bold leading-tight text-[#5594f1]">
+               Aiterra הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ-24 שנה. המשרד מתמחה
 במכירה, השכרה וליווי עסקאות נדל״ן במקצועיות גבוהה, עם פעילות מרכזית בחולון, בת ים וכל אזור המרכז
  
               </p>
@@ -122,7 +122,7 @@ const AboutSection: React.FC = memo(() => {
             <div className="mt-10">
               <Link
                 href="/about"
-                className="inline-flex items-center gap-3 px-10 py-4 bg-[#c5a357] text-[#1c3664] font-black text-xl rounded-sm hover:bg-[#d4b46b] transition-all shadow-xl"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-[#5594f1] text-[#051150] font-black text-xl rounded-2xl hover:bg-[#78a9f5] transition-all shadow-xl"
               >
                 קראו עוד על המשרד
                 <ArrowLeft className="w-6 h-6" />

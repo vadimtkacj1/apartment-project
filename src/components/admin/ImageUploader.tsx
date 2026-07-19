@@ -163,7 +163,7 @@ export default function ImageUploader({
         }}
       >
         <p className="ant-upload-drag-icon">
-          <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
+          <InboxOutlined style={{ fontSize: '48px', color: '#354AC4' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
           {t.dragImagesHint}
@@ -201,7 +201,7 @@ export default function ImageUploader({
                 key={`${url}-${index}`}
                 style={{
                   position: 'relative',
-                  border: index === 0 ? '3px solid #1C3664' : '1px solid #d9d9d9',
+                  border: index === 0 ? '3px solid #354AC4' : '1px solid #d9d9d9',
                   borderRadius: '10px',
                   overflow: 'hidden',
                   aspectRatio: '1',
@@ -214,7 +214,7 @@ export default function ImageUploader({
                       position: 'absolute',
                       top: '8px',
                       right: '8px',
-                      background: '#1C3664',
+                      background: '#354AC4',
                       color: 'white',
                       padding: '2px 10px',
                       borderRadius: '6px',
@@ -238,8 +238,8 @@ export default function ImageUploader({
                   }}
                 >
                   <img
-                    src="/images/logos.png"
-                    alt="Logo"
+                    src="/aiterra-logo.png"
+                    alt="Aiterra logo"
                     style={{
                       maxWidth: '140px',
                       maxHeight: '70px',
@@ -345,8 +345,8 @@ export default function ImageUploader({
               }}
             >
               <img
-                src="/images/logos.png"
-                alt="Logo"
+                src="/aiterra-logo.png"
+                alt="Aiterra logo"
                 style={{
                   maxWidth: '200px',
                   maxHeight: '100px',

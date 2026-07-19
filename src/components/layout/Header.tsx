@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Phone } from "lucide-react";
 
 interface NavLink {
   label: string;
@@ -13,7 +12,7 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { label: "דף הבית", href: "/" },
-  { label: "הנכסים השלנו", href: "/apartments" },
+  { label: "הנכסים שלנו", href: "/apartments" },
   {
     label: 'מידע מקצועי בנדל"ן',
     href: "#",
@@ -41,7 +40,26 @@ export default function Header() {
   const [activeDesktopSubmenu, setActiveDesktopSubmenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [ownerPhone, setOwnerPhone] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Same owner data the footer/WhatsApp button use — fetched client-side so the
+  // header CTA can click-to-call the office without turning Header into a
+  // server component.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/owners", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
+        if (cancelled || !Array.isArray(data)) return;
+        const phone = data.find((o) => o?.phone)?.phone;
+        if (phone) setOwnerPhone(phone as string);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 30);
@@ -58,7 +76,9 @@ export default function Header() {
   const isHomePage = pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled;
 
-  const textColor = shouldBeTransparent ? "#ffffff" : "#1c3664";
+  const textColor = shouldBeTransparent ? "#ffffff" : "#354ac4";
+  // Logo mark + wordmark stay in the brand's ink navy (like the brand board's "Aiterra.")
+  const brandColor = shouldBeTransparent ? "#ffffff" : "#051150";
 
   const handleMenuEnter = (label: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -100,35 +120,91 @@ export default function Header() {
           justifyContent: "space-between",
         }}
       >
-        {/* Logos */}
-        <div style={{ display: "flex", alignItems: "flex-end" }}>
-          <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <Link
+            href="/"
+            aria-label="Aiterra"
+            style={{ display: "flex", alignItems: "center", gap: 10, transition: "transform 0.2s" }}
             onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
             onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
           >
-            <Image src="/favicon-rm.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
-              className="object-contain" priority
-              style={{ transition: "filter 0.35s ease" }}
+            <img
+              src="/aiterra-logo.png"
+              alt=""
+              width={46}
+              height={33}
+              aria-hidden="true"
+              style={{
+                display: "block",
+                transition: "filter 0.35s ease",
+                filter: shouldBeTransparent
+                  ? "drop-shadow(0 1px 4px rgba(0,0,0,0.55))"
+                  : "none",
+              }}
             />
-          </Link>
-          <Image src="/images/second-and.svg" alt="" width={36} height={36}
-            className="object-contain"
-            style={{ transition: "filter 0.35s ease", marginBottom: "8px" }}
-          />
-          <Link href="/" style={{ display: "flex", transition: "transform 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            <Image src="/favicon-ha.png" alt="לוגו רם נכסים חיים ענבי" width={60} height={60}
-              className="object-contain"
-              style={{ transition: "filter 0.35s ease" }}
-            />
+            <span
+              style={{
+                fontFamily: "var(--font-caramel), cursive, sans-serif",
+                fontSize: "clamp(24px, 1.8vw, 30px)",
+                fontWeight: 700,
+                lineHeight: 1,
+                color: brandColor,
+                letterSpacing: "0.06em",
+                textShadow: shouldBeTransparent
+                  ? "0 0 3px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.7)"
+                  : "none",
+                transition: "color 0.35s ease",
+              }}
+            >
+              Aiterra
+            </span>
           </Link>
         </div>
 
         {/* Desktop menu */}
         {!isMobile && (
           <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            {/* Contact CTA pill — reading-start end of the nav. Reuses the hero
+                primary button recipe (indigo→sky gradient, ink text) so it reads
+                as the site's primary action token. Click-to-call the office. */}
+            {ownerPhone && (
+              <a
+                href={`tel:${ownerPhone}`}
+                aria-label="התקשרו אלינו"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "9px 22px",
+                  borderRadius: 999,
+                  background:
+                    "linear-gradient(135deg, #4A8BEF 0%, #7BAAF5 50%, #5594F1 100%)",
+                  color: "#051150",
+                  fontWeight: 800,
+                  fontSize: "clamp(15px, 1.05vw, 18px)",
+                  whiteSpace: "nowrap",
+                  textDecoration: "none",
+                  boxShadow:
+                    "0 4px 16px rgba(85,148,241,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
+                  fontFamily: "var(--font-caramel), cursive, sans-serif",
+                  transition: "transform 0.2s ease, box-shadow 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 6px 22px rgba(85,148,241,0.5), inset 0 1px 0 rgba(255,255,255,0.35)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 16px rgba(85,148,241,0.35), inset 0 1px 0 rgba(255,255,255,0.35)";
+                }}
+              >
+                <Phone size={17} strokeWidth={2.5} aria-hidden="true" />
+                צור קשר
+              </a>
+            )}
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               const isOpen = activeDesktopSubmenu === link.label;
@@ -221,7 +297,7 @@ export default function Header() {
                             padding: "14px 20px", 
                             fontSize: 17, 
                             fontWeight: 600,
-                            color: "#1c3664",
+                            color: "#354ac4",
                             textDecoration: "none",
                             borderBottom: i < link.submenu!.length - 1 ? "1px solid rgba(0,0,0,0.05)" : "none",
                             transition: "background 0.15s",
@@ -241,8 +317,37 @@ export default function Header() {
           </div>
         )}
 
-        {/* Burger button */}
+        {/* Burger button + quick click-to-call chip */}
         {isMobile && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {ownerPhone && (
+              <a
+                href={`tel:${ownerPhone}`}
+                aria-label="התקשרו אלינו"
+                style={{
+                  // Matches the burger chip (solid indigo, sky hairline) so the
+                  // two controls read as one deliberate cluster.
+                  width: 46,
+                  height: 46,
+                  background: "#354ac4",
+                  border: "1px solid rgba(85, 148, 241, 0.6)",
+                  borderRadius: 13,
+                  cursor: "pointer",
+                  color: "#ffffff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textDecoration: "none",
+                  boxShadow: shouldBeTransparent
+                    ? "0 6px 18px rgba(0,0,0,0.4)"
+                    : "0 6px 18px rgba(5,17,80,0.3)",
+                  WebkitTapHighlightColor: "transparent",
+                  touchAction: "manipulation",
+                }}
+              >
+                <Phone size={22} strokeWidth={2.5} aria-hidden="true" />
+              </a>
+            )}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
@@ -252,14 +357,14 @@ export default function Header() {
             onTouchEnd={e => (e.currentTarget.style.transform = "scale(1)")}
             onTouchCancel={e => (e.currentTarget.style.transform = "scale(1)")}
             style={{
-              // Solid, branded navy chip in BOTH states — reads as a deliberate
+              // Solid, branded indigo chip in BOTH states — reads as a deliberate
               // control instead of the faint ghost box it used to be on the
-              // white (scrolled) header. Gold hairline + soft shadow tie it to
-              // the site's navy↔gold button system.
+              // white (scrolled) header. Sky hairline + soft shadow tie it to
+              // the site's indigo↔sky button system.
               width: 46,
               height: 46,
-              background: "#1c3664",
-              border: "1px solid rgba(197, 163, 87, 0.6)", // brand gold #c5a357
+              background: "#354ac4",
+              border: "1px solid rgba(85, 148, 241, 0.6)", // brand sky #5594f1
               borderRadius: 13,
               padding: 0,
               cursor: "pointer",
@@ -269,7 +374,7 @@ export default function Header() {
               justifyContent: "center",
               boxShadow: shouldBeTransparent
                 ? "0 6px 18px rgba(0,0,0,0.4)"
-                : "0 6px 18px rgba(28,54,100,0.3)",
+                : "0 6px 18px rgba(5,17,80,0.3)",
               transition: "transform 0.15s ease, box-shadow 0.3s ease, background 0.3s ease",
               WebkitTapHighlightColor: "transparent",
               touchAction: "manipulation",
@@ -279,6 +384,7 @@ export default function Header() {
           >
             {isMobileMenuOpen ? <X size={24} strokeWidth={2.5} /> : <Menu size={24} strokeWidth={2.5} />}
           </button>
+          </div>
         )}
       </nav>
     </header>
@@ -312,7 +418,7 @@ export default function Header() {
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: "#1c3664",
+              color: "#354ac4",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -330,7 +436,7 @@ export default function Header() {
                 <Link
                   href={link.href}
                   onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                  style={{ fontSize: 20, fontWeight: 700, color: "#1c3664", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
+                  style={{ fontSize: 20, fontWeight: 700, color: "#354ac4", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
                 >
                   {link.label}
                 </Link>
@@ -339,7 +445,7 @@ export default function Header() {
                     onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
                     aria-label={openSubmenu === link.label ? `סגור ${link.label}` : `פתח ${link.label}`}
                     aria-expanded={openSubmenu === link.label}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#1c3664" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#354ac4" }}
                   >
                     <ChevronDown size={22} style={{
                       transform: openSubmenu === link.label ? "rotate(180deg)" : "rotate(0)",
@@ -361,9 +467,9 @@ export default function Header() {
                         padding: "14px 20px",
                         fontSize: 18,
                         fontWeight: 600,
-                        color: "#1c3664",
+                        color: "#354ac4",
                         textDecoration: "none",
-                        borderInlineStart: "3px solid #1c3664",
+                        borderInlineStart: "3px solid #354ac4",
                         fontFamily: "var(--font-caramel), cursive, sans-serif",
                       }}
                     >

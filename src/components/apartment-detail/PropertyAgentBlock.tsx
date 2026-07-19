@@ -43,7 +43,7 @@ export function PropertyAgentBlock({
         isSold ? "border-gray-200 opacity-70" : "border-gray-100"
       }`}
     >
-      <h3 className="mb-4 text-xl font-bold text-[#1c3664]">יצירת קשר</h3>
+      <h3 className="mb-4 text-xl font-bold text-[#051150]">יצירת קשר</h3>
       <div className="flex flex-col gap-3">
         {agents.filter((agent) => agent.image).map((agent) => {
           const whatsappNum = agent.whatsapp || agent.phone;
@@ -74,10 +74,10 @@ export function PropertyAgentBlock({
                   href={`tel:${agent.phone.replace(/\D/g, "")}`}
                   onClick={() => propertyId && analytics.trackPhoneClick(propertyId)}
                   className={`inline-flex items-center gap-1.5 font-medium ${
-                    isSold ? "pointer-events-none text-gray-400" : "text-[#1c3664] hover:underline"
+                    isSold ? "pointer-events-none text-gray-400" : "text-[#354AC4] hover:underline"
                   }`}
                 >
-                  <Phone size={16} />
+                  <Phone size={16} aria-hidden="true" />
                   <span dir="ltr">{agent.phone}</span>
                 </a>
               )}
@@ -93,7 +93,7 @@ export function PropertyAgentBlock({
                       : "bg-[#25D366] text-white hover:bg-[#20bd5a] hover:shadow-lg"
                   }`}
                 >
-                  <FaWhatsapp size={20} />
+                  <FaWhatsapp size={20} aria-hidden="true" />
                   <span>WhatsApp</span>
                 </a>
               )}

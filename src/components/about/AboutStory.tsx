@@ -10,7 +10,7 @@ const milestones = [
   {
     icon: '/Create-rafiki.svg',
     title: 'הקמת המשרד',
-    description: 'רם וחיים הקימו את המשרד מתוך מטרה לשנות את הדרך שבה מתווכים נדל"ן בחולון'
+    description: 'דניאל ויואב הקימו את המשרד מתוך מטרה לשנות את הדרך שבה מתווכים נדל"ן בחולון'
   },
   {
     icon: '/Conversation-amico.svg',
@@ -36,7 +36,7 @@ export default function AboutStory() {
   return (
     <section 
       ref={storyRef} 
-      className="py-24 w-full bg-[#faf7f2]" // Warm background color
+      className="py-24 w-full bg-[#f5f7fb]" // Warm background color
       dir="rtl" 
     >
       <div className="max-w-[1300px] mx-auto px-6">
@@ -48,7 +48,7 @@ export default function AboutStory() {
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#051150] mb-4">
             הסיפור שלנו
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
@@ -63,8 +63,8 @@ export default function AboutStory() {
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <p className="text-xl text-[#1c3664]/80 leading-relaxed font-medium">
-            רם וחיים הקימו את המשרד לאחר שנים של עבודה בשוק המקומי. הם זיהו את הצורך בשירות אישי, שקוף ומקצועי יותר עבור בעלי נכסים וקונים.
+          <p className="text-xl text-[#051150]/80 leading-relaxed font-medium">
+            דניאל ויואב הקימו את המשרד לאחר שנים של עבודה בשוק המקומי. הם זיהו את הצורך בשירות אישי, שקוף ומקצועי יותר עבור בעלי נכסים וקונים.
           </p>
           <p className="text-lg text-slate-500 leading-relaxed">
             הגישה שלהם מבוססת על אמינות, עבודה יסודית והבנה עמוקה של כל עסקה. במקום שיווק כללי ולא ממוקד, הם בנו שיטת עבודה שמתחילה בתמחור נכון, ממשיכה בשיווק ממוקד ומסתיימת בניהול משא ומתן מדויק.
@@ -103,7 +103,7 @@ export default function AboutStory() {
                 />
               </div>
 
-              <h3 className="text-2xl font-bold text-[#1c3664] mb-3">
+              <h3 className="text-2xl font-bold text-[#051150] mb-3">
                 {milestone.title}
               </h3>
               
@@ -116,7 +116,7 @@ export default function AboutStory() {
 
         {/* Footer Section (Dark Blue Block) */}
         <m.div
-          className="bg-[#1c3664] text-white p-8 md:p-12 rounded-3xl text-center shadow-xl shadow-blue-900/10 relative overflow-hidden"
+          className="bg-[#051150] text-white p-8 md:p-12 rounded-3xl text-center shadow-xl shadow-blue-900/10 relative overflow-hidden"
           initial={{ y: 30, opacity: 0 }}
           animate={storyInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -125,7 +125,7 @@ export default function AboutStory() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
           <p className="text-lg md:text-xl font-medium leading-relaxed max-w-4xl mx-auto relative z-10">
-            כיום רם וחיים מלווים עשרות עסקאות של דירות למכירה ודירות להשכרה בחולון מדי שנה,
+            כיום דניאל ויואב מלווים עשרות עסקאות של דירות למכירה ודירות להשכרה בחולון מדי שנה,
             עם דגש על שירות אישי, שקיפות מלאה ותוצאות מוכחות.
           </p>
         </m.div>

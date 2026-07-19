@@ -24,11 +24,15 @@ export default function ForeignInvestorsContent() {
     }
   ];
 
+  const article = getArticle('foreign-investors')!;
+
   return (
     <div className="article-page" dir="rtl">
-      {/* Hero with Background Image */}
+      {/* Hero — uses this article's own image (not the shared /7.jpg index hero),
+          which also serves as the single top visual so we don't stack a second
+          near-identical feature image directly below it. */}
       <SecondaryHero
-        img="/7.jpg"
+        img={article.image}
         title="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
         centered={true}
       />
@@ -42,14 +46,6 @@ export default function ForeignInvestorsContent() {
           {/* Main Content */}
           <div className="article-body">
             <ArticleByline id="foreign-investors" />
-            <Image
-              src={getArticle('foreign-investors')!.image}
-              alt={getArticle('foreign-investors')!.title}
-              width={1200}
-              height={630}
-              className="article-hero-image"
-              priority
-            />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">
@@ -88,7 +84,7 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 2: The Biggest Mistake */}
             <figure className="article-inline-figure">
-              <Image src="/images/articles/inbody/foreign-investors-a.jpg" alt={getArticle('foreign-investors')!.title} width={1200} height={675} className="article-inline-image" />
+              <Image src="/images/articles/inbody/foreign-investors-a.jpg" alt={article.title} width={1200} height={675} className="article-inline-image" />
             </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
@@ -169,7 +165,7 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 4: Why Choose Us */}
             <figure className="article-inline-figure">
-              <Image src="/images/articles/inbody/foreign-investors-b.jpg" alt={getArticle('foreign-investors')!.title} width={1200} height={675} className="article-inline-image" />
+              <Image src="/images/articles/inbody/foreign-investors-b.jpg" alt={article.title} width={1200} height={675} className="article-inline-image" />
             </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה דווקא אנחנו?</h2>
@@ -177,7 +173,7 @@ export default function ForeignInvestorsContent() {
                 בניהול נכסים בשלט רחוק, <strong>אמון הוא המטבע החשוב ביותר</strong>. עם 24 שנות ניסיון ותעודות, אנחנו גוף יציב עם כתובת פיזית ומוניטין של אמינות וזמינות.
               </p>
               <p>
-                אנחנו לא "חברה וירטואלית", אלא אנשים אמיתיים – <strong>רם, חיים והצוות</strong> - שדואגים לנכס שלכם כאילו הוא שלנו.
+                אנחנו לא "חברה וירטואלית", אלא אנשים אמיתיים – <strong>דניאל, יואב והצוות</strong> - שדואגים לנכס שלכם כאילו הוא שלנו.
               </p>
             </section>
 

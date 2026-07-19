@@ -5,7 +5,7 @@ import { articles } from '@/data/articles';
 // article registry as the /articles grid and the sitemap, so it never drifts.
 export const dynamic = 'force-static';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 function escapeXml(s: string): string {
   return s
@@ -26,7 +26,7 @@ export async function GET() {
     .join('');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel><title>${escapeXml('רם נכסים חיים ענבי — מאמרים')}</title><link>${siteUrl}/articles</link><description>${escapeXml('מדריכי נדל״ן בחולון, בת ים וראשון לציון')}</description><language>he-IL</language>${items}
+<rss version="2.0"><channel><title>${escapeXml('Aiterra — מאמרים')}</title><link>${siteUrl}/articles</link><description>${escapeXml('מדריכי נדל״ן בחולון, בת ים וראשון לציון')}</description><language>he-IL</language>${items}
 </channel></rss>`;
 
   return new Response(xml, {

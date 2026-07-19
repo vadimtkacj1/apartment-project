@@ -25,6 +25,9 @@ export const uploadersMessages = defineMessages({
     delete: 'מחק',
     dragImageHint: 'גרור תמונה לכאן או לחץ להעלאה',
     profileUploadHint: 'JPG, PNG, GIF - מקסימום 50MB',
+    cropModalTitle: 'חיתוך תמונת פרופיל',
+    cropApply: 'אישור',
+    cropCancel: 'ביטול',
     // Location picker (LocationPicker)
     searchPlaceholder: 'הזן מיקוד או כתובת',
     search: 'חפש',
@@ -58,6 +61,9 @@ export const uploadersMessages = defineMessages({
     delete: 'Delete',
     dragImageHint: 'Drag an image here or click to upload',
     profileUploadHint: 'JPG, PNG, GIF - maximum 50MB',
+    cropModalTitle: 'Crop profile photo',
+    cropApply: 'Apply',
+    cropCancel: 'Cancel',
     // Location picker (LocationPicker)
     searchPlaceholder: 'Enter a postal code or address',
     search: 'Search',

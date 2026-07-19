@@ -4,7 +4,7 @@ import { defineMessages } from '@/lib/adminI18n';
 export const dashboardMessages = defineMessages({
   he: {
     pageTitle: 'לוח בקרה',
-    mastheadTitle: 'רם נכסים · לוח בקרה',
+    mastheadTitle: 'Aiterra · לוח בקרה',
     /** Long date, e.g. "1 ביולי 2026" / "1 July 2026" (day-first). monthIndex is 0-based; self-contained month names (no dayjs locale dependency). */
     longDate: (day: number, monthIndex: number, year: number) =>
       `${day} ב${['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'][monthIndex]} ${year}`,
@@ -35,6 +35,8 @@ export const dashboardMessages = defineMessages({
     todayLabel: 'היום',
     viewsLower: 'צפיות',
     inquiriesLower: 'פניות',
+    vsPrev7: 'לעומת 7 הימים הקודמים',
+    allTime: 'סה"כ מאז ההשקה',
 
     // Portfolio composition card
     portfolioComposition: 'הרכב התיק',
@@ -84,7 +86,7 @@ export const dashboardMessages = defineMessages({
   },
   en: {
     pageTitle: 'Dashboard',
-    mastheadTitle: 'Ram Nechasim · Dashboard',
+    mastheadTitle: 'Aiterra · Dashboard',
     longDate: (day: number, monthIndex: number, year: number) =>
       `${day} ${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][monthIndex]} ${year}`,
 
@@ -114,6 +116,8 @@ export const dashboardMessages = defineMessages({
     todayLabel: 'Today',
     viewsLower: 'views',
     inquiriesLower: 'inquiries',
+    vsPrev7: 'vs previous 7 days',
+    allTime: 'all-time',
 
     // Portfolio composition card
     portfolioComposition: 'Portfolio Composition',

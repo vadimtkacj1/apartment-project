@@ -164,12 +164,12 @@ export function BasicInfoSection({ formData, handleChange }: PropertyFormSection
                 />
               )}
               {vacancyType === 'immediately' && (
-                <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
+                <div style={{ padding: '8px 12px', background: '#E8F0FD', borderRadius: '10px', color: '#475569' }}>
                   {t.basicInfo.vacancyImmediate}
                 </div>
               )}
               {vacancyType === 'flexible' && (
-                <div style={{ padding: '8px 12px', background: '#F1F3F5', borderRadius: '6px', color: '#595959' }}>
+                <div style={{ padding: '8px 12px', background: '#E8F0FD', borderRadius: '10px', color: '#475569' }}>
                   {t.basicInfo.vacancyFlexible}
                 </div>
               )}

@@ -16,7 +16,6 @@ import {
   Switch,
   Spin,
   Table,
-  Tag,
   Image,
   Skeleton,
 } from 'antd';
@@ -26,9 +25,15 @@ import {
   DeleteOutlined,
   HomeOutlined,
   SearchOutlined,
+  TagOutlined,
+  KeyOutlined,
+  CheckCircleOutlined,
+  StopOutlined,
 } from '@ant-design/icons';
+import MetricCard from '@/components/admin/MetricCard';
 import Link from 'next/link';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertiesMessages } from '@/lib/adminI18n/messages/properties';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
@@ -254,35 +259,30 @@ export default function PropertiesPage() {
   };
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
+    <div>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.pageTitle}</h1>
-        <Link href="/admin/properties/new" className="w-full sm:w-auto">
-          <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-            {t.addNewProperty}
-          </Button>
-        </Link>
-      </div>
+      <AdminPageHeader
+        title={t.pageTitle}
+        extra={
+          <Link href="/admin/properties/new" className="w-full sm:w-auto">
+            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
+              {t.addNewProperty}
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Statistics */}
       <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
         {[
-          { title: t.statTotal, value: stats.total, prefix: <HomeOutlined /> },
-          { title: t.statForSale, value: stats.forSale, color: BRAND.success },
-          { title: t.statForRent, value: stats.forRent, color: BRAND.navy },
-          { title: t.statActive, value: stats.active, color: BRAND.goldText },
-          { title: t.statSold, value: stats.sold, color: BRAND.danger },
+          { label: t.statTotal, value: stats.total, icon: <HomeOutlined />, accent: '#354AC4' },
+          { label: t.statForSale, value: stats.forSale, icon: <TagOutlined />, accent: '#354AC4' },
+          { label: t.statForRent, value: stats.forRent, icon: <KeyOutlined />, accent: '#5594F1' },
+          { label: t.statActive, value: stats.active, icon: <CheckCircleOutlined />, accent: '#2A69C4' },
+          { label: t.statSold, value: stats.sold, icon: <StopOutlined />, accent: '#64748B' },
         ].map((s) => (
-          <Col key={s.title} flex="1 1 180px">
-            <Card>
-              <Statistic
-                title={s.title}
-                value={s.value}
-                prefix={s.prefix}
-                styles={s.color ? { content: { color: s.color } } : undefined}
-              />
-            </Card>
+          <Col key={String(s.label)} flex="1 1 180px">
+            <MetricCard icon={s.icon} label={s.label} value={s.value} accent={s.accent} />
           </Col>
         ))}
       </Row>
@@ -356,50 +356,56 @@ export default function PropertiesPage() {
           rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
           columns={[
             {
-              title: t.colImage,
-              dataIndex: 'images',
-              key: 'image',
-              width: 72,
-              render: (images: string[]) => (
-                <Image
-                  src={images[0] || '/images/hero/sales.jpg'}
-                  alt="Property"
-                  width={56}
-                  height={56}
-                  preview={false}
-                  style={{
-                    objectFit: 'cover',
-                    borderRadius: '8px',
-                    display: 'block',
-                    width: '56px',
-                    height: '56px'
-                  }}
-                  fallback="/images/hero/sales.jpg"
-                />
-              ),
-            },
-            {
               title: t.colTitle,
-              dataIndex: 'title',
-              key: 'title',
-              width: 250,
-              ellipsis: {
-                showTitle: true,
-              },
-            },
-            {
-              title: t.colLocation,
-              dataIndex: 'location',
-              key: 'location',
-              width: 150,
-              ellipsis: true,
-            },
-            {
-              title: t.colCity,
-              dataIndex: 'city',
-              key: 'city',
-              width: 100,
-              render: (city: string) => getCityLabel(city) || city,
+              key: 'property',
+              width: 300,
+              render: (_, record: Property) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <Image
+                    src={record.images[0] || '/images/hero/sales.jpg'}
+                    alt={record.title}
+                    width={40}
+                    height={40}
+                    preview={false}
+                    style={{
+                      objectFit: 'cover',
+                      borderRadius: 8,
+                      display: 'block',
+                      width: 40,
+                      height: 40,
+                      flexShrink: 0,
+                    }}
+                    fallback="/images/hero/sales.jpg"
+                  />
+                  <div style={{ minWidth: 0 }}>
+                    <Link
+                      href={`/admin/properties/${record.id}`}
+                      style={{
+                        display: 'block',
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: '#354AC4',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {record.title}
+                    </Link>
+                    <div
+                      style={{
+                        fontSize: 12.5,
+                        color: '#64748B',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {`${getCityLabel(record.city) || record.location} · ${t.roomsShort(record.rooms)} · ${t.sqm(record.area)}`}
+                    </div>
+                  </div>
+                </div>
+              ),
             },
             {
               title: t.colDealType,
@@ -407,9 +413,9 @@ export default function PropertiesPage() {
               key: 'dealType',
               width: 100,
               render: (dealType: string) => (
-                <Tag color={dealType === 'sale' ? 'green' : '#1C3664'}>
+                <span className={`admin-pill admin-pill--${dealType === 'sale' ? 'sale' : 'rent'}`}>
                   {dealType === 'sale' ? t.dealSale : t.dealRent}
-                </Tag>
+                </span>
               ),
             },
             {
@@ -418,25 +424,10 @@ export default function PropertiesPage() {
               key: 'price',
               width: 120,
               render: (price: string) => (
-                <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
+                <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block', color: '#051150', fontWeight: 600 }}>
                   {formatPropertyPrice(price)}
                 </span>
               ),
-            },
-            {
-              title: t.colRooms,
-              dataIndex: 'rooms',
-              key: 'rooms',
-              width: 80,
-              align: 'center',
-            },
-            {
-              title: t.colArea,
-              dataIndex: 'area',
-              key: 'area',
-              width: 80,
-              align: 'center',
-              render: (area: number) => t.sqm(area),
             },
             {
               title: t.colFloor,
@@ -541,10 +532,10 @@ export default function PropertiesPage() {
                       <div className="admin-card__meta">{metaParts.join(' · ')}</div>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
-                      <Tag color={property.dealType === 'sale' ? 'green' : '#1C3664'} style={{ marginInlineEnd: 0 }}>
+                      <span className={`admin-pill admin-pill--${property.dealType === 'sale' ? 'sale' : 'rent'}`}>
                         {property.dealType === 'sale' ? t.dealSale : t.dealRent}
-                      </Tag>
-                      <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', fontWeight: 600, color: '#1C3664' }}>
+                      </span>
+                      <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', fontWeight: 600, color: '#051150' }}>
                         {formatPropertyPrice(property.price)}
                       </span>
                     </div>

@@ -6,6 +6,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 
 const { Title, Text } = Typography;
 
@@ -478,12 +479,9 @@ export default function HomepagePage() {
   }
 
   return (
-    <div className="px-2 sm:px-4 md:px-0">
+    <div>
         {/* Header */}
-        <div style={{ marginBottom: '16px' }}>
-          <h1 className="text-4xl font-bold" style={{ margin: 0 }}>{t.pageTitle}</h1>
-          <Text type="secondary">{t.pageSubtitle}</Text>
-        </div>
+        <AdminPageHeader title={t.pageTitle} subtitle={t.pageSubtitle} />
 
         {/* Section Titles Editor */}
         <Card
@@ -610,7 +608,7 @@ export default function HomepagePage() {
             }
           >
             {/* Price Filter Settings */}
-            <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #f0f0f0' }}>
+            <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #E4E8F2' }}>
               <Radio.Group
                 value={hotPropositionsMode}
                 onChange={(e) => setHotPropositionsMode(e.target.value)}
@@ -621,7 +619,7 @@ export default function HomepagePage() {
               </Radio.Group>
 
               {hotPropositionsMode === 'price' && (
-                <div className="mt-2 pt-2 admin-filter-full" style={{ borderTop: '1px solid #f0f0f0' }}>
+                <div className="mt-2 pt-2 admin-filter-full" style={{ borderTop: '1px solid #E4E8F2' }}>
                   <InputNumber
                     value={hotPropositionsMaxPrice}
                     onChange={(value) => setHotPropositionsMaxPrice(value || 0)}
@@ -675,7 +673,7 @@ export default function HomepagePage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.noCommissionSection}</span>
                 </div>
-                <div style={{ fontSize: '12px', fontWeight: 'normal', color: '#999' }}>
+                <div style={{ fontSize: '12px', fontWeight: 'normal', color: '#64748B' }}>
                   {t.onlyOneNote}
                 </div>
               </div>
@@ -734,7 +732,7 @@ export default function HomepagePage() {
                 {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
               </div>
               {modalType === 'noCommission' && (
-                <div style={{ fontSize: '13px', fontWeight: 'normal', color: '#999', marginTop: '4px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 'normal', color: '#64748B', marginTop: '4px' }}>
                   {t.modalNoteOnlyOne}
                 </div>
               )}
@@ -758,7 +756,7 @@ export default function HomepagePage() {
         >
           <div>
             {modalType === 'hot' && (
-              <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
+              <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #E4E8F2' }}>
                 <Checkbox
                   checked={selectedIds.length === availableProperties.length && availableProperties.length > 0}
                   indeterminate={selectedIds.length > 0 && selectedIds.length < availableProperties.length}

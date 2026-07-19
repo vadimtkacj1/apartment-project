@@ -12,7 +12,7 @@ interface FAQProps {
   items: FAQItem[];
 }
 
-export default function FAQ({ title = 'שאלות נפוצות – רם וחיים עונים', items }: FAQProps) {
+export default function FAQ({ title = 'שאלות נפוצות – דניאל ויואב עונים', items }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleItem = (index: number) => {

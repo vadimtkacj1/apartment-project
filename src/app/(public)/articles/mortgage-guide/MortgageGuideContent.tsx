@@ -158,7 +158,7 @@ export default function MortgageGuideContent() {
                 <strong>2. סדרו את התיק הפיננסי.</strong> סגרו מינוס והלוואות קטנות לפני הבקשה — הם פוגעים ביחס ההחזר שהבנק מחשב.
               </p>
               <p>
-                <strong>3. שקלו יועץ משכנתאות.</strong> אנחנו עובדים צמוד עם <a href="https://avi-mashkanta.com" target="_blank" rel="noopener" className="text-[#1c3664] underline decoration-[#c5a357] underline-offset-2 hover:text-[#c5a357]">אבי בוקעי (&quot;אבי — הבית למשכנתאות&quot;)</a>, שמלווה את הלקוחות שלנו משלב האישור העקרוני ועד החתימה — ויודע בדיוק איפה אפשר ללחוץ.
+                <strong>3. שקלו יועץ משכנתאות.</strong> אנחנו עובדים צמוד עם <a href="https://avi-mashkanta.com" target="_blank" rel="noopener" className="text-[#354AC4] underline decoration-[#5594F1] underline-offset-2 hover:text-[#2A69C4]">אבי בוקעי (&quot;אבי — הבית למשכנתאות&quot;)</a>, שמלווה את הלקוחות שלנו משלב האישור העקרוני ועד החתימה — ויודע בדיוק איפה אפשר ללחוץ.
               </p>
               <p>
                 <strong>4. אל תמתחו את התקציב לקצה.</strong> השאירו כרית ביטחון. דירה קצת יותר צנועה עם שינה טובה בלילה מנצחת דירה גדולה עם החזר שחונק.

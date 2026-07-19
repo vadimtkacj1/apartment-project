@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Upload, Button, App, Typography } from 'antd';
-import { InboxOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import ImgCrop from 'antd-img-crop';
+import { CameraOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
@@ -102,10 +103,22 @@ export default function ProfileImageUploader({
     message.success(t.imageDeleted);
   };
 
+  // Crop-modal props shared by both upload entry points: a round 1:1 crop so
+  // the admin sees exactly what the circular avatar will show on the site.
+  const cropProps = {
+    cropShape: 'round' as const,
+    showGrid: false,
+    rotationSlider: true,
+    quality: 0.92,
+    modalTitle: t.cropModalTitle,
+    modalOk: t.cropApply,
+    modalCancel: t.cropCancel,
+  };
+
   // If image exists, show preview with edit/delete buttons
   if (image) {
     return (
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         <div
           style={{
             position: 'relative',
@@ -113,8 +126,8 @@ export default function ProfileImageUploader({
             height: '200px',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: '3px solid #1C3664',
-            margin: '0 auto 16px',
+            border: '3px solid #354AC4',
+            marginBottom: '16px',
             background: '#F1F3F5',
           }}
         >
@@ -132,18 +145,20 @@ export default function ProfileImageUploader({
           />
         </div>
 
-        <div style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-          <Upload
-            accept="image/*"
-            customRequest={handleUpload}
-            beforeUpload={beforeUpload}
-            showUploadList={false}
-            disabled={uploading}
-          >
-            <Button icon={<EditOutlined />} loading={uploading}>
-              {t.changeImage}
-            </Button>
-          </Upload>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <ImgCrop {...cropProps}>
+            <Upload
+              accept="image/*"
+              customRequest={handleUpload}
+              beforeUpload={beforeUpload}
+              showUploadList={false}
+              disabled={uploading}
+            >
+              <Button icon={<EditOutlined />} loading={uploading}>
+                {t.changeImage}
+              </Button>
+            </Upload>
+          </ImgCrop>
           <Button danger icon={<DeleteOutlined />} onClick={removeImage}>
             {t.delete}
           </Button>
@@ -183,38 +198,52 @@ export default function ProfileImageUploader({
     );
   }
 
-  // If no image, show upload dragger
+  // If no image, show a circular dropzone — same 200px circle as the filled
+  // preview above, so the empty state previews how the photo renders on the
+  // public site. Selecting/dropping a file opens the round crop modal first.
   return (
-    <div>
-      <Dragger
-        name="file"
-        accept="image/*"
-        customRequest={handleUpload}
-        beforeUpload={beforeUpload}
-        showUploadList={false}
-        disabled={uploading}
-        style={{
-          borderRadius: '12px',
-          border: '2px dashed #d9d9d9',
-          background: '#F7F8FA',
-          padding: '20px',
-        }}
-      >
-        <p className="ant-upload-drag-icon">
-          <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
-        </p>
-        <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
-          {t.dragImageHint}
-        </p>
-        <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          {t.profileUploadHint}
-        </p>
-        {uploading && (
-          <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
-            {t.uploading}
-          </Text>
-        )}
-      </Dragger>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'center' }}>
+      <ImgCrop {...cropProps}>
+        <Dragger
+          name="file"
+          accept="image/*"
+          customRequest={handleUpload}
+          beforeUpload={beforeUpload}
+          showUploadList={false}
+          disabled={uploading}
+          style={{
+            width: '200px',
+            height: '200px',
+            borderRadius: '50%',
+            border: '2px dashed #B9C4DE',
+            background: '#F7F8FA',
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ padding: '0 26px' }}>
+            <CameraOutlined style={{ fontSize: '32px', color: '#354AC4' }} />
+            <p
+              style={{
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#141414',
+                margin: '10px 0 0',
+                lineHeight: 1.35,
+              }}
+            >
+              {t.dragImageHint}
+            </p>
+          </div>
+        </Dragger>
+      </ImgCrop>
+      <p style={{ color: '#8c8c8c', fontSize: '13px', margin: '12px 0 0' }}>
+        {t.profileUploadHint}
+      </p>
+      {uploading && (
+        <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
+          {t.uploading}
+        </Text>
+      )}
     </div>
   );
 }

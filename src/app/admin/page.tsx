@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Card, Skeleton } from 'antd';
-import { ArrowLeftOutlined, PictureOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, PictureOutlined } from '@ant-design/icons';
 import {
   AreaChart,
   Area,
@@ -17,14 +17,15 @@ import { getCityLabel } from '@/data/cities';
 import { useAdminI18n, useAdminMessages, type MessagesShape } from '@/lib/adminI18n';
 import { dashboardMessages } from '@/lib/adminI18n/messages/dashboard';
 
-/* ===== palette (matches src/lib/adminTheme.ts) — Clean Slate: navy · gold · cool-neutral ===== */
-const NAVY = '#1C3664';
-const GOLD = '#C5A357'; // accent on dark surfaces / chart / pills
-const GOLD_TEXT = '#8A6D2F'; // gold that clears WCAG AA on light surfaces
-const HAIRLINE = '#E6E8EC'; // neutral slate hairline (single enclosure method)
+/* ===== palette (matches src/lib/adminTheme.ts) — Aiterra: indigo · sky · deep navy ===== */
+const NAVY = '#354AC4'; // brand indigo — primary
+const DEEP = '#051150'; // brand's darkest navy — masthead / logo surfaces
+const GOLD = '#5594F1'; // sky-blue accent on dark surfaces / chart / pills
+const GOLD_TEXT = '#2A69C4'; // accent blue that clears WCAG AA on light surfaces
+const HAIRLINE = '#E4E8F2'; // neutral slate hairline (single enclosure method)
 const INK = '#1F2733';
 const MUTED = '#64748B';
-const HOVER_BG = '#F4F6F8'; // slate page tint
+const HOVER_BG = '#F4F6FB'; // slate page tint
 
 const WINDOW_DAYS = 14; // sparkline window; the full, filterable trend lives on /admin/analytics
 
@@ -100,7 +101,7 @@ const Label: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }
 );
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontSize: 15, fontWeight: 700, color: NAVY }}>{children}</span>
+  <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: DEEP }}>{children}</span>
 );
 
 const cardBody: { body: React.CSSProperties } = { body: { padding: 22 } };
@@ -109,6 +110,7 @@ const cardBody: { body: React.CSSProperties } = { body: { padding: 22 } };
 export default function AdminDashboard() {
   const t = useAdminMessages(dashboardMessages);
   const { dir } = useAdminI18n();
+  const Fwd = dir === 'rtl' ? ArrowLeftOutlined : ArrowRightOutlined;
   const [props, setProps] = useState<PropertyRow[] | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [propsLoading, setPropsLoading] = useState(true);
@@ -209,9 +211,40 @@ export default function AdminDashboard() {
 
   const trendEmpty = series.every((d) => d.views === 0 && d.clicks === 0);
 
+  // Week-over-week deltas for the two series-backed KPIs (views, interactions).
+  // Unique-visitors and inquiries carry no prior series, so they get no delta.
+  const { viewsDelta, interactionsDelta } = useMemo(() => {
+    const last7 = series.slice(-7);
+    const prior7 = series.slice(-14, -7);
+    const sum = (a: typeof series, k: 'views' | 'clicks') => a.reduce((s, d) => s + d[k], 0);
+    const pct = (n: number, p: number): number | null => (p > 0 ? Math.round(((n - p) / p) * 100) : null);
+    return {
+      viewsDelta: pct(sum(last7, 'views'), sum(prior7, 'views')),
+      interactionsDelta: pct(sum(last7, 'clicks'), sum(prior7, 'clicks')),
+    };
+  }, [series]);
+
+  // Bidi-isolated delta chip rendered under a KPI value; null when there's no prior week.
+  const deltaChip = (d: number | null): React.ReactNode =>
+    d === null ? null : (
+      <span
+        dir="ltr"
+        aria-label={t.vsPrev7}
+        style={{
+          display: 'inline-block',
+          unicodeBidi: 'isolate',
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: d > 0 ? '#2A69C4' : d < 0 ? '#64748B' : '#94A3B8',
+        }}
+      >
+        {(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + Math.abs(d) + '%'}
+      </span>
+    );
+
   /* ===== render ===== */
   return (
-    <div className="px-2 sm:px-4 md:px-0 estate-console">
+    <div className="estate-console">
       <h1 className="ec-sr-only">{t.pageTitle}</h1>
 
       {/* ── Masthead — a slim navy bar (brand + date, one honest stat line, thin detail),
@@ -228,20 +261,20 @@ export default function AdminDashboard() {
           <>
             <div className="ec-mast-line">
               <span className="ec-mast-stat">
-                <Num style={{ fontSize: 17, fontWeight: 700, color: '#fff' }}>{ils(portfolio.portfolioValue)}</Num>
+                <Num style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{ils(portfolio.portfolioValue)}</Num>
                 <span className="ec-mast-cap">{t.portfolioValue}</span>
               </span>
               <span className="ec-mast-sep">·</span>
               <span className="ec-mast-stat"><Num style={{ fontWeight: 700 }}>{portfolio.activeCount}</Num> {t.activeProperties}</span>
               <span className="ec-mast-sep">·</span>
               <span className="ec-mast-stat">
-                <Num style={{ fontWeight: 700 }}>{portfolio.saleCount}</Num> {t.forSaleLower} · <Num style={{ fontWeight: 700 }}>{portfolio.rentCount}</Num> {t.forRentLower}
+                <Num style={{ fontWeight: 600 }}>{portfolio.saleCount}</Num> {t.forSaleLower} · <Num style={{ fontWeight: 600 }}>{portfolio.rentCount}</Num> {t.forRentLower}
               </span>
 
               {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
                 <Link href="/admin/inquiries" className="ec-mast-cta">
                   <Num style={{ fontWeight: 700 }}>{summary?.newInquiries}</Num> {t.newInquiries}
-                  <ArrowLeftOutlined style={{ fontSize: 11 }} />
+                  <Fwd style={{ fontSize: 11 }} />
                 </Link>
               )}
             </div>
@@ -261,7 +294,7 @@ export default function AdminDashboard() {
         title={<SectionTitle>{t.siteTraffic}</SectionTitle>}
         extra={
           <Link href="/admin/analytics" className="ec-viewall">
-            {t.fullAnalytics} <ArrowLeftOutlined style={{ fontSize: 11 }} />
+            {t.fullAnalytics} <Fwd style={{ fontSize: 11 }} />
           </Link>
         }
       >
@@ -273,12 +306,19 @@ export default function AdminDashboard() {
                 not an even grid of interchangeable numbers. Rates live in the foot, honest. */}
             <div className="ec-kpis">
               <Kpi label={t.kpiUniqueVisitors} value={uniqueVisitors} />
-              <Kpi label={t.kpiViews} value={totalViews} />
-              <Kpi label={t.kpiInteractions} value={totalClicks} />
+              <Kpi label={t.kpiViews} value={totalViews} delta={deltaChip(viewsDelta)} />
+              <Kpi label={t.kpiInteractions} value={totalClicks} delta={deltaChip(interactionsDelta)} />
               <Kpi label={t.kpiInquiries} value={leadSignals} accent />
             </div>
 
             <div className="ec-spark">
+              <div className="ec-spark-head">
+                <span className="ec-spark-eyebrow">{t.lastDays(WINDOW_DAYS)}</span>
+                <span className="ec-spark-legend">
+                  <span className="ec-legend-item"><span className="ec-dot" style={{ background: NAVY }} />{t.chartViews}</span>
+                  <span className="ec-legend-item"><span className="ec-dot" style={{ background: GOLD }} />{t.chartInteractions}</span>
+                </span>
+              </div>
               {trendEmpty ? (
                 <EmptyBlock height={72} text={t.noTrafficData} />
               ) : (
@@ -286,7 +326,7 @@ export default function AdminDashboard() {
                   <AreaChart data={series} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
                     <defs>
                       <linearGradient id="ecSparkViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={NAVY} stopOpacity={0.22} />
+                        <stop offset="5%" stopColor={GOLD} stopOpacity={0.34} />
                         <stop offset="95%" stopColor={NAVY} stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="ecSparkClicks" x1="0" y1="0" x2="0" y2="1">
@@ -300,15 +340,18 @@ export default function AdminDashboard() {
                       contentStyle={{ borderRadius: 10, border: `1px solid ${HAIRLINE}`, direction: dir, textAlign: 'start', boxShadow: '0 6px 18px rgba(0,0,0,.06)', fontSize: 12 }}
                       labelStyle={{ fontWeight: 700, marginBottom: 4, color: NAVY }}
                     />
-                    <Area type="monotone" dataKey="views" name={t.chartViews} stroke={NAVY} strokeWidth={2} fill="url(#ecSparkViews)" activeDot={{ r: 4 }} />
-                    <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={GOLD} strokeWidth={2} fill="url(#ecSparkClicks)" activeDot={{ r: 4 }} />
+                    <Area type="monotone" dataKey="views" name={t.chartViews} stroke={NAVY} strokeWidth={2} fill="url(#ecSparkViews)" activeDot={{ r: 4 }} isAnimationActive={false} />
+                    <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={GOLD} strokeWidth={1.5} strokeDasharray="3 3" fill="transparent" activeDot={{ r: 4 }} isAnimationActive={false} />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
               <div className="ec-spark-foot">
-                {t.conversionRate} <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: INK, fontWeight: 600 }}>{engagement}%</Num>
-                <br />
-                {t.lastDays(WINDOW_DAYS)} · {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
+                <div className="ec-spark-rates">
+                  {t.conversionRate} <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: '#1E293B', fontWeight: 600 }}>{engagement}%</Num>
+                </div>
+                <div className="ec-spark-window">
+                  {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
+                </div>
               </div>
             </div>
           </div>
@@ -326,8 +369,8 @@ export default function AdminDashboard() {
             ) : (
               <>
                 <div className="ec-splitbar" role="img" aria-label={t.splitBarAria}>
-                  {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ width: `${portfolio.salePct}%`, background: NAVY }} />}
-                  {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ width: `${100 - portfolio.salePct}%`, background: GOLD }} />}
+                  {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ width: `${portfolio.salePct}%`, background: 'linear-gradient(90deg, #354AC4, #4A5FD6)' }} />}
+                  {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ width: `${100 - portfolio.salePct}%`, background: 'linear-gradient(90deg, #5594F1, #7FB4F5)' }} />}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 13 }}>
                   <span style={{ color: NAVY, fontWeight: 600 }}>
@@ -386,7 +429,7 @@ export default function AdminDashboard() {
       </Row>
 
       {/* ── Recent listings ── */}
-      <Card styles={cardBody} title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <ArrowLeftOutlined style={{ fontSize: 11 }} /></Link>}>
+      <Card styles={cardBody} title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd style={{ fontSize: 11 }} /></Link>}>
         {propsLoading ? (
           <Skeleton active paragraph={{ rows: 4 }} />
         ) : portfolio.recentListings.length === 0 ? (
@@ -404,7 +447,7 @@ export default function AdminDashboard() {
                   </span>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, color: NAVY, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.title}</div>
+                  <div style={{ fontWeight: 600, color: DEEP, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.title}</div>
                   <div style={{ fontSize: 12.5, color: MUTED }}>
                     {getCityLabel(x.city) || x.location} · <Num>{x.rooms}</Num> {t.roomsAbbr} · <Num>{x.area}</Num> {t.sqmAbbr} · {relDaysLabel(x.createdAt, t)}
                   </div>
@@ -425,30 +468,33 @@ export default function AdminDashboard() {
 }
 
 /* ===== sub-components ===== */
-function Kpi({ label, value, text, accent }: { label: string; value?: number; text?: string; accent?: boolean }) {
+function Kpi({ label, value, text, accent, delta }: { label: string; value?: number; text?: string; accent?: boolean; delta?: React.ReactNode }) {
   return (
     <div className="ec-kpi">
       <div className="ec-kpi-label">{label}</div>
       <Num style={{ fontSize: 24, fontWeight: 700, color: accent ? GOLD_TEXT : NAVY }}>
         {text ?? (value ?? 0).toLocaleString('en-US')}
       </Num>
+      {delta}
     </div>
   );
 }
 
 function AttentionRow({ label, count, muted }: { label: string; count: number; muted?: boolean }) {
   const t = useAdminMessages(dashboardMessages);
+  const { dir } = useAdminI18n();
+  const Fwd = dir === 'rtl' ? ArrowLeftOutlined : ArrowRightOutlined;
   const ok = count === 0;
   return (
     <Link href="/admin/properties" className="ec-row ec-attrow">
-      <span className="ec-attdot" style={{ background: ok ? '#DAD5CB' : muted ? '#C9CDD6' : GOLD }} />
-      <span style={{ flex: 1, color: ok ? '#9AA0AA' : INK, fontSize: 14 }}>{label}</span>
+      <span className="ec-attdot" style={{ background: ok ? '#CBD5E1' : muted ? '#C9CDD6' : '#354AC4' }} />
+      <span style={{ flex: 1, color: ok ? '#64748B' : INK, fontSize: 14 }}>{label}</span>
       {ok ? (
-        <span style={{ color: '#9AA0AA', fontSize: 13 }}>{t.allClear}</span>
+        <span style={{ color: '#64748B', fontSize: 13 }}>{t.allClear}</span>
       ) : (
         <>
           <Num style={{ fontWeight: 700, color: muted ? '#6B7280' : NAVY, fontSize: 15, marginInlineEnd: 10 }}>{count}</Num>
-          <span className="ec-att-cta">{t.view} <ArrowLeftOutlined style={{ fontSize: 10 }} /></span>
+          <span className="ec-att-cta">{t.view} <Fwd style={{ fontSize: 10 }} /></span>
         </>
       )}
     </Link>
@@ -457,7 +503,7 @@ function AttentionRow({ label, count, muted }: { label: string; count: number; m
 
 function EmptyBlock({ height, text }: { height: number; text: string }) {
   return (
-    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A0A6B0', fontSize: 13.5, textAlign: 'center', padding: 16 }}>
+    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: 13.5, textAlign: 'center', padding: 16 }}>
       {text}
     </div>
   );
@@ -472,22 +518,28 @@ function DashboardStyles() {
 .ec-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
 /* Cards: a single hairline (no border+shadow stacking) on cream — flat & editorial */
-.layout-dashboard .estate-console .ant-card{box-shadow:none;border:1px solid ${HAIRLINE};border-radius:12px;}
-.layout-dashboard .estate-console .ant-card-head{border-bottom:1px solid ${HAIRLINE};}
+.layout-dashboard .estate-console .ant-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
+.layout-dashboard .estate-console .ant-card-head{border-bottom:none;}
 
-/* Masthead — slim navy bar, one soft navy-tinted shadow. Informative, not a billboard. */
+/* Masthead — the brand's möbius gradient (deep-navy -> indigo) with a bright-blue
+   corner glow as the signature "ribbon light". Multi-layer background so the glow
+   always sits BEHIND the white text (which stays AA on the navy->indigo sweep). */
 .estate-console .ec-masthead{
-  background:${NAVY};border-radius:12px;padding:18px 26px;margin-bottom:22px;
-  box-shadow:0 4px 16px rgba(28,54,100,.10);
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(340px 300px at 90% -40%, rgba(85,148,241,.55) 0%, rgba(85,148,241,0) 70%),
+    linear-gradient(120deg, #051150 0%, #1B2670 55%, #28389B 100%);
+  border-radius:12px;padding:18px 26px;margin-bottom:22px;
+  box-shadow:0 8px 24px rgba(5,17,80,.22);
 }
 .estate-console .ec-mast-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
-.estate-console .ec-mast-title{color:#fff;font-size:15.5px;font-weight:700;letter-spacing:-.01em;}
-.estate-console .ec-mast-date{color:rgba(255,255,255,.45);font-size:12.5px;white-space:nowrap;}
+.estate-console .ec-mast-title{color:#fff;font-size:15.5px;font-weight:700;letter-spacing:-.02em;}
+.estate-console .ec-mast-date{color:rgba(255,255,255,.62);font-size:12.5px;white-space:nowrap;}
 .estate-console .ec-mast-line{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:13px;color:rgba(255,255,255,.9);font-size:14px;}
 .estate-console .ec-mast-stat{display:inline-flex;align-items:baseline;gap:6px;}
 .estate-console .ec-mast-cap{color:rgba(255,255,255,.55);font-size:12px;}
 .estate-console .ec-mast-sep{color:rgba(255,255,255,.28);}
-.estate-console .ec-mast-cta{margin-inline-start:auto;display:inline-flex;align-items:center;gap:7px;background:${GOLD};color:${NAVY};font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;text-decoration:none;white-space:nowrap;transition:filter .15s ease;}
+.estate-console .ec-mast-cta{margin-inline-start:auto;display:inline-flex;align-items:center;gap:7px;background:${GOLD};color:${DEEP};font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;text-decoration:none;white-space:nowrap;transition:filter .15s ease;}
 .estate-console .ec-mast-cta:hover{filter:brightness(1.06);}
 .estate-console .ec-mast-detail{color:rgba(255,255,255,.5);font-size:12px;margin-top:9px;}
 
@@ -497,35 +549,41 @@ function DashboardStyles() {
 .estate-console .ec-kpi{display:flex;flex-direction:column;gap:3px;}
 .estate-console .ec-kpi-label{font-size:12.5px;font-weight:600;color:${MUTED};}
 .estate-console .ec-spark{width:320px;max-width:100%;flex-shrink:0;}
-.estate-console .ec-spark-foot{font-size:11.5px;color:#A0A6B0;margin-top:6px;text-align:center;}
+.estate-console .ec-spark-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px;}
+.estate-console .ec-spark-eyebrow{font-size:11.5px;color:#64748B;}
+.estate-console .ec-spark-legend{display:inline-flex;align-items:center;gap:12px;font-size:11.5px;color:#64748B;}
+.estate-console .ec-legend-item{display:inline-flex;align-items:center;}
+.estate-console .ec-spark-foot{margin-top:8px;text-align:start;}
+.estate-console .ec-spark-rates{font-size:12px;color:#475569;}
+.estate-console .ec-spark-window{font-size:11.5px;color:#64748B;margin-top:3px;}
 @media (max-width:767px){.estate-console .ec-spark{width:100%;}}
 
 /* Composition */
-.estate-console .ec-splitbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#EEECE7;}
+.estate-console .ec-splitbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#EAEDF5;}
 .estate-console .ec-bar-fill{height:100%;transition:width .8s cubic-bezier(.22,1,.36,1);}
 .estate-console .ec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;vertical-align:middle;}
-.estate-console .ec-typerow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F5F2EC;}
+.estate-console .ec-typerow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F0F3FA;}
 .estate-console .ec-typerow:last-child{border-bottom:none;}
-.estate-console .ec-countbadge{background:rgba(197,163,87,.14);color:${GOLD_TEXT};font-weight:700;font-size:12.5px;min-width:26px;text-align:center;padding:1px 8px;border-radius:7px;}
-.estate-console .ec-citychip{background:#F6F3ED;border:1px solid ${HAIRLINE};border-radius:8px;padding:4px 10px;font-size:12.5px;color:${INK};}
+.estate-console .ec-countbadge{background:rgba(85,148,241,.14);color:${GOLD_TEXT};font-weight:700;font-size:12.5px;min-width:26px;text-align:center;padding:1px 8px;border-radius:7px;}
+.estate-console .ec-citychip{background:#F0F4FC;border:1px solid ${HAIRLINE};border-radius:8px;padding:4px 10px;font-size:12.5px;color:${INK};}
 
 /* Rows (attention / listings) — hover via background, no extra borders */
 .estate-console .ec-row{transition:background .15s ease;}
 .estate-console .ec-row:hover{background:${HOVER_BG};}
-.estate-console .ec-attrow{display:flex;align-items:center;gap:10px;padding:12px 8px;margin-inline:-8px;border-radius:8px;text-decoration:none;border-bottom:1px solid #F5F2EC;}
+.estate-console .ec-attrow{display:flex;align-items:center;gap:10px;padding:12px 8px;margin-inline:-8px;border-radius:8px;text-decoration:none;border-bottom:1px solid #F0F3FA;}
 .estate-console .ec-attrow:last-child{border-bottom:none;}
 .estate-console .ec-attdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:transform .15s ease;}
 .estate-console .ec-attrow:hover .ec-attdot{transform:scale(1.25);}
 .estate-console .ec-att-cta{color:${GOLD_TEXT};font-size:12.5px;font-weight:600;white-space:nowrap;}
 
 /* Recent listings */
-.estate-console .ec-listrow{display:flex;align-items:center;gap:14px;padding:11px 8px;margin-inline:-8px;border-radius:10px;text-decoration:none;border-bottom:1px solid #F5F2EC;}
+.estate-console .ec-listrow{display:flex;align-items:center;gap:14px;padding:11px 8px;margin-inline:-8px;border-radius:10px;text-decoration:none;border-bottom:1px solid #F0F3FA;}
 .estate-console .ec-listrow:last-child{border-bottom:none;}
 .estate-console .ec-thumb{width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0;}
 .estate-console .ec-thumb-empty{display:inline-flex;align-items:center;justify-content:center;background:${NAVY};}
 .estate-console .ec-dealpill{font-size:11.5px;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap;}
-.estate-console .ec-dealpill.sale{background:rgba(28,54,100,.08);color:${NAVY};}
-.estate-console .ec-dealpill.rent{background:rgba(197,163,87,.16);color:${GOLD_TEXT};}
+.estate-console .ec-dealpill.sale{background:rgba(53,74,196,.08);color:${NAVY};}
+.estate-console .ec-dealpill.rent{background:rgba(85,148,241,.16);color:${GOLD_TEXT};}
 .estate-console .ec-viewall{color:${GOLD_TEXT};font-weight:600;font-size:13px;text-decoration:none;}
 .estate-console .ec-viewall:hover{color:${NAVY};}
 

@@ -30,7 +30,7 @@ export default function GuidesSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-350">
         <div className="flex flex-col items-center text-center gap-6">
           {/* Heading */}
-          <h2 className="text-2xl md:text-3xl font-black text-[#1c3664]">
+          <h2 className="text-2xl md:text-3xl font-black text-[#051150]">
             מדריכים ומידע שימושי
           </h2>
 
@@ -40,7 +40,7 @@ export default function GuidesSection() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1c3664] text-white font-semibold text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#354ac4] text-white font-semibold text-sm hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
                 >
                   <Icon className="w-4 h-4" />
                   {title}
@@ -51,9 +51,9 @@ export default function GuidesSection() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#1c3664]/10 text-[#1c3664] font-semibold text-sm hover:border-[#c5a357] hover:bg-[#faf7f2] transition-all"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#354ac4]/10 text-[#354ac4] font-semibold text-sm hover:border-[#5594f1] hover:bg-[#f5f7fb] transition-all"
                 >
-                  <FileText className="w-4 h-4 text-[#c5a357]" />
+                  <FileText className="w-4 h-4 text-[#5594f1]" />
                   {title}
                 </Link>
               </li>
@@ -63,7 +63,7 @@ export default function GuidesSection() {
           {/* Link to the full guides hub */}
           <Link
             href="/articles"
-            className="inline-flex items-center gap-1.5 text-[#c5a357] font-bold hover:text-[#1c3664] transition-colors"
+            className="inline-flex items-center gap-1.5 text-[#2a69c4] font-bold hover:text-[#354ac4] transition-colors"
           >
             כל המדריכים
             <ArrowLeft className="w-4 h-4" />
