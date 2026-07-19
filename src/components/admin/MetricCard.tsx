@@ -24,26 +24,9 @@ export default function MetricCard({
 }) {
   return (
     <Card style={{ height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {icon ? (
-          <span
-            aria-hidden="true"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 42,
-              height: 42,
-              borderRadius: 12,
-              flexShrink: 0,
-              background: `${accent}16`,
-              color: accent,
-              fontSize: 19,
-            }}
-          >
-            {icon}
-          </span>
-        ) : null}
+      {/* Text at the inline-start, icon chip in the opposite corner — fills the
+          tile's width instead of clustering everything at one edge. */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ color: '#64748B', fontSize: 12.5, fontWeight: 600, marginBottom: 3 }}>{label}</div>
           <div
@@ -63,6 +46,25 @@ export default function MetricCard({
             {suffix ? <span style={{ fontSize: 17, color: '#64748B', fontWeight: 700 }}>{suffix}</span> : null}
           </div>
         </div>
+        {icon ? (
+          <span
+            aria-hidden="true"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              flexShrink: 0,
+              background: `${accent}16`,
+              color: accent,
+              fontSize: 19,
+            }}
+          >
+            {icon}
+          </span>
+        ) : null}
       </div>
     </Card>
   );

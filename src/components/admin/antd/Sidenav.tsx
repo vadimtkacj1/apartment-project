@@ -105,7 +105,6 @@ export default function Sidenav({ onClose }: SidenavProps) {
           display: flex;
           align-items: center;
           padding: 18px 18px 16px;
-          border-bottom: 1px solid #e4e8f2;
           flex: 0 0 auto;
         }
         .estate-brand-link {
@@ -201,16 +200,6 @@ export default function Sidenav({ onClose }: SidenavProps) {
           color: #354ac4;
           font-weight: 600;
         }
-        .estate-nav-item.active::before {
-          content: '';
-          position: absolute;
-          inset-inline-start: 4px;
-          top: 9px;
-          bottom: 9px;
-          width: 3px;
-          border-radius: 3px;
-          background: #354ac4;
-        }
         .estate-nav-icon {
           display: inline-flex;
           align-items: center;
@@ -231,8 +220,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         /* --- Sign-out footer --- */
         .estate-user {
           flex: 0 0 auto;
-          border-top: 1px solid #e4e8f2;
-          padding: 12px 16px;
+          padding: 12px 16px 16px;
         }
         .estate-logout.ant-btn {
           width: 100%;
