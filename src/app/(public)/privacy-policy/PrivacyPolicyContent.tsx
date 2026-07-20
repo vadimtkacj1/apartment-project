@@ -342,7 +342,7 @@ export default function PrivacyPolicyContent() {
         }
 
         .contact-section {
-          background: linear-gradient(135deg, rgba(5, 17, 80, 0.05) 0%, rgba(85, 148, 241, 0.05) 100%);
+          background: #f4f6fb;
           border-radius: 16px;
           padding: 2rem;
           border: 1px solid rgba(5, 17, 80, 0.1);

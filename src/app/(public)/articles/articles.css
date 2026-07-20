@@ -1,7 +1,7 @@
 /* Articles Page Container */
 .articles-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fb 0%, #f5f1ea 50%, #f5f7fb 100%);
+  background: #f5f7fb;
   position: relative;
   overflow: hidden;
 }
@@ -201,7 +201,7 @@
 
 .category-badge {
   align-self: flex-start;
-  background: linear-gradient(135deg, #f5f7fb 0%, #f5f1ea 100%);
+  background: #f5f7fb;
   color: #354AC4;
   padding: 0.5rem 1rem;
   border-radius: 25px;
@@ -216,7 +216,7 @@
 }
 
 .article-card:hover .category-badge {
-  background: linear-gradient(135deg, #354AC4 0%, #4A5FD6 100%);
+  background: #354AC4;
   color: white;
   border-color: #354AC4;
   box-shadow: 0 4px 10px rgba(5, 17, 80, 0.2);
@@ -237,7 +237,7 @@
   flex-grow: 1;
   direction: rtl;
   text-align: right;
-  background: linear-gradient(180deg, white 0%, #fafafa 100%);
+  background: #ffffff;
 }
 
 .article-meta {
@@ -289,7 +289,7 @@
   color: #1f2937;
   text-decoration: none;
   transition: all 0.3s ease;
-  background: linear-gradient(90deg, #354AC4 0%, #354AC4 100%);
+  background: #354AC4;
   background-size: 0% 2px;
   background-repeat: no-repeat;
   background-position: right bottom;
@@ -317,7 +317,7 @@
 }
 
 .tag {
-  background: linear-gradient(135deg, #f5f7fb 0%, #f5f1ea 100%);
+  background: #f5f7fb;
   color: #354AC4;
   padding: 0.5rem 0.9rem;
   border-radius: 15px;
@@ -331,7 +331,7 @@
 }
 
 .tag:hover {
-  background: linear-gradient(135deg, #354AC4 0%, #4A5FD6 100%);
+  background: #354AC4;
   color: white;
   border-color: #354AC4;
   transform: translateY(-2px);
@@ -358,12 +358,12 @@
   align-self: flex-start;
   padding: 0.75rem 1.5rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(53, 74, 196, 0.1) 0%, rgba(53, 74, 196, 0.05) 100%);
+  background: #eef1f8;
   border: 2px solid rgba(53, 74, 196, 0.2);
 }
 
 .read-more:hover {
-  background: linear-gradient(135deg, #354AC4 0%, #4A5FD6 100%);
+  background: #354AC4;
   color: white;
   border-color: #354AC4;
   transform: translateX(-6px);

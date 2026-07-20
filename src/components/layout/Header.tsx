@@ -76,7 +76,6 @@ export default function Header() {
   const isHomePage = pathname === "/";
   const shouldBeTransparent = isHomePage && !isScrolled;
 
-  const textColor = shouldBeTransparent ? "#ffffff" : "#354ac4";
   // Logo mark + wordmark stay in the brand's ink navy (like the brand board's "Aiterra.")
   const brandColor = shouldBeTransparent ? "#ffffff" : "#051150";
 
@@ -96,15 +95,18 @@ export default function Header() {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 1000,
-        transition: "all 0.35s ease",
+        transition: "background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease",
         background: shouldBeTransparent
           ? "transparent"
           : "rgba(255, 255, 255, 0.95)",
         backdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
         WebkitBackdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
+        borderBottom: shouldBeTransparent
+          ? "1px solid transparent"
+          : "1px solid #E9EDF5",
         boxShadow: shouldBeTransparent
           ? "none"
-          : "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.15)",
+          : "0 8px 24px -20px rgba(5,17,80,0.12)",
       }}
     >
       <nav
@@ -114,7 +116,7 @@ export default function Header() {
           margin: "0 auto",
           /* ✅ Уменьшен padding на мобилке — логотип и бургер прижаты к краям */
           padding: isMobile ? "0 1rem" : "0 3rem",
-          height: 70,
+          height: 68,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -139,7 +141,7 @@ export default function Header() {
                 display: "block",
                 transition: "filter 0.35s ease",
                 filter: shouldBeTransparent
-                  ? "drop-shadow(0 1px 4px rgba(0,0,0,0.55))"
+                  ? "drop-shadow(0 1px 3px rgba(0,0,0,0.40))"
                   : "none",
               }}
             />
@@ -152,7 +154,7 @@ export default function Header() {
                 color: brandColor,
                 letterSpacing: "0.06em",
                 textShadow: shouldBeTransparent
-                  ? "0 0 3px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.7)"
+                  ? "0 1px 3px rgba(0,0,0,0.45)"
                   : "none",
                 transition: "color 0.35s ease",
               }}
@@ -164,10 +166,9 @@ export default function Header() {
 
         {/* Desktop menu */}
         {!isMobile && (
-          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            {/* Contact CTA pill — reading-start end of the nav. Reuses the hero
-                primary button recipe (indigo→sky gradient, ink text) so it reads
-                as the site's primary action token. Click-to-call the office. */}
+          <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            {/* Contact CTA — the single strong accent (solid indigo, white text
+                7.17:1). Reading-start/right corner of the cluster. Click-to-call. */}
             {ownerPhone && (
               <a
                 href={`tel:${ownerPhone}`}
@@ -176,38 +177,82 @@ export default function Header() {
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  padding: "9px 22px",
-                  borderRadius: 999,
-                  background:
-                    "linear-gradient(135deg, #4A8BEF 0%, #7BAAF5 50%, #5594F1 100%)",
-                  color: "#051150",
-                  fontWeight: 800,
-                  fontSize: "clamp(15px, 1.05vw, 18px)",
+                  padding: "10px 20px",
+                  borderRadius: 12,
+                  background: "#354AC4",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                  fontSize: 15,
+                  letterSpacing: 0,
                   whiteSpace: "nowrap",
                   textDecoration: "none",
-                  boxShadow:
-                    "0 4px 16px rgba(85,148,241,0.35), inset 0 1px 0 rgba(255,255,255,0.35)",
-                  fontFamily: "var(--font-caramel), cursive, sans-serif",
-                  transition: "transform 0.2s ease, box-shadow 0.3s ease",
+                  border: shouldBeTransparent
+                    ? "1px solid rgba(255,255,255,0.22)"
+                    : "1px solid transparent",
+                  boxShadow: shouldBeTransparent
+                    ? "0 4px 12px rgba(0,0,0,0.22)"
+                    : "0 2px 6px rgba(5,17,80,0.10)",
+                  fontFamily: "var(--font-assistant), system-ui, sans-serif",
+                  transition: "background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 6px 22px rgba(85,148,241,0.5), inset 0 1px 0 rgba(255,255,255,0.35)";
+                  e.currentTarget.style.background = "#4A5FD6";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = shouldBeTransparent
+                    ? "0 8px 20px rgba(0,0,0,0.28)"
+                    : "0 6px 16px rgba(5,17,80,0.14)";
                 }}
                 onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#354AC4";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 16px rgba(85,148,241,0.35), inset 0 1px 0 rgba(255,255,255,0.35)";
+                  e.currentTarget.style.boxShadow = shouldBeTransparent
+                    ? "0 4px 12px rgba(0,0,0,0.22)"
+                    : "0 2px 6px rgba(5,17,80,0.10)";
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.background = "#28389B";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.background = "#4A5FD6";
                 }}
               >
-                <Phone size={17} strokeWidth={2.5} aria-hidden="true" />
+                <Phone size={16} strokeWidth={2.25} aria-hidden="true" />
                 צור קשר
               </a>
             )}
+
+            {/* Hairline divider — editorial separation of the one action from
+                the navigation links. */}
+            <span
+              aria-hidden="true"
+              style={{
+                width: 1,
+                height: 20,
+                alignSelf: "center",
+                borderRadius: 0,
+                background: shouldBeTransparent ? "rgba(255,255,255,0.28)" : "#E4E8F2",
+              }}
+            />
+
+            {/* Links group — free-floating, clean sans, even rhythm. */}
+            <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
             {NAV_LINKS.map((link) => {
-              const isActive = pathname === link.href;
+              // Dropdown parents use href="#", so pathname never matches them —
+              // fall back to "is any of my sub-routes the current page?" so
+              // /faq, /links, /selling-apartment, /buying-apartment light their parent.
+              const isActive = link.href !== "#"
+                ? pathname === link.href
+                : !!link.submenu?.some((s) => s.href === pathname);
               const isOpen = activeDesktopSubmenu === link.label;
+
+              // Resting color for the current header state (3-tier brand ramp).
+              const restColor = shouldBeTransparent
+                ? (isActive ? "#ffffff" : "rgba(255,255,255,0.90)")
+                : (isActive ? "#051150" : "#475569");
+              const hoverColor = shouldBeTransparent ? "#ffffff" : "#354AC4";
+              // An open dropdown parent reads in the hover color even off-hover.
+              const displayColor = (isOpen && !isActive) ? hoverColor : restColor;
 
               return (
                 <div
@@ -219,26 +264,26 @@ export default function Header() {
                   <Link
                     href={link.href}
                     style={{
-                      fontSize: "clamp(17px, 1.35vw, 22px)",
-                      fontWeight: 700,
-                      color: textColor,
+                      fontSize: 15,
+                      fontWeight: 500,
+                      color: displayColor,
                       textShadow: shouldBeTransparent
-                        ? "0 0 3px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.7), 0 2px 10px rgba(0,0,0,0.5)"
+                        ? "0 1px 3px rgba(0,0,0,0.45)"
                         : "none",
                       display: "flex",
                       alignItems: "center",
-                      gap: 5,
-                      padding: "6px 0",
+                      gap: 4,
+                      padding: "6px 2px",
                       textDecoration: "none",
                       whiteSpace: "nowrap",
                       position: "relative",
-                      letterSpacing: "0.04em",
-                      opacity: 1,
-                      transition: "opacity 0.2s",
-                      fontFamily: "var(--font-caramel), cursive, sans-serif",
+                      letterSpacing: 0,
+                      lineHeight: 1,
+                      transition: "color 0.18s ease",
+                      fontFamily: "var(--font-assistant), system-ui, sans-serif",
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.opacity = "0.75")}
-                    onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = hoverColor; }}
+                    onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = restColor; }}
                     onClick={e => {
                       if (link.submenu && link.href === "#") {
                         e.preventDefault();
@@ -248,22 +293,24 @@ export default function Header() {
                   >
                     {link.label}
                     {link.submenu && (
-                      <ChevronDown size={16} style={{ 
-                        opacity: 0.6,
+                      <ChevronDown size={15} strokeWidth={2} style={{
+                        color: "currentColor",
+                        marginInlineStart: 2,
                         transition: "transform 0.25s",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
                       }} />
                     )}
-                    {/* Active underline */}
+                    {/* Active underline — grows from the reading-start (right) for RTL */}
                     <span style={{
                       position: "absolute",
-                      bottom: 0, right: 0, left: 0,
-                      height: 2.5,
-                      borderRadius: 2,
-                      background: textColor,
+                      insetInlineStart: 0, insetInlineEnd: 0,
+                      bottom: 0,
+                      height: 2,
+                      borderRadius: 0,
+                      background: shouldBeTransparent ? "#ffffff" : "#354AC4",
                       transform: isActive ? "scaleX(1)" : "scaleX(0)",
                       transformOrigin: "right",
-                      transition: "transform 0.25s ease",
+                      transition: "transform 0.22s ease",
                     }} />
                   </Link>
 
@@ -273,47 +320,58 @@ export default function Header() {
                       style={{
                         position: "absolute",
                         top: "calc(100% + 10px)",
-                        right: 0,
-                        width: 230, 
+                        // RTL: inline-start = right edge (reading-start) — the
+                        // logical equivalent of the old physical right:0.
+                        insetInlineStart: 0,
+                        width: 240,
                         background: "#ffffff",
                         borderRadius: 14,
-                        boxShadow: "0 8px 40px rgba(0,0,0,0.14)",
-                        border: "1px solid rgba(0,0,0,0.06)",
-                        overflow: "hidden",
+                        border: "1px solid #E4E8F2",
+                        padding: 6,
+                        boxShadow: "0 16px 40px -16px rgba(5,17,80,0.14), 0 2px 6px rgba(5,17,80,0.05)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 2,
                         opacity: isOpen ? 1 : 0,
                         visibility: isOpen ? "visible" : "hidden",
-                        transform: isOpen ? "translateY(0)" : "translateY(8px)",
-                        transition: "all 0.25s ease",
+                        transform: isOpen ? "translateY(0)" : "translateY(6px)",
+                        transition: "opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease",
                         pointerEvents: isOpen ? "auto" : "none",
                       }}
                     >
-                      {link.submenu.map((sub, i) => (
+                      {link.submenu.map((sub) => {
+                        const subActive = pathname === sub.href;
+                        return (
                         <Link
                           key={sub.label}
                           href={sub.href}
                           onClick={() => setActiveDesktopSubmenu(null)}
                           style={{
                             display: "block",
-                            padding: "14px 20px", 
-                            fontSize: 17, 
-                            fontWeight: 600,
-                            color: "#354ac4",
+                            padding: "11px 14px",
+                            fontSize: 15,
+                            fontWeight: subActive ? 600 : 500,
+                            letterSpacing: 0,
+                            color: subActive ? "#051150" : "#475569",
+                            background: subActive ? "#EEF1F8" : "transparent",
+                            borderRadius: 8,
                             textDecoration: "none",
-                            borderBottom: i < link.submenu!.length - 1 ? "1px solid rgba(0,0,0,0.05)" : "none",
-                            transition: "background 0.15s",
-                            fontFamily: "var(--font-caramel), cursive, sans-serif",
+                            transition: "background-color 0.15s ease, color 0.15s ease",
+                            fontFamily: "var(--font-assistant), system-ui, sans-serif",
                           }}
-                          onMouseEnter={e => (e.currentTarget.style.background = "#f0f4ff")}
-                          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                          onMouseEnter={e => { if (!subActive) { e.currentTarget.style.background = "#F4F6FB"; e.currentTarget.style.color = "#354AC4"; } }}
+                          onMouseLeave={e => { if (!subActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#475569"; } }}
                         >
                           {sub.label}
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
               );
             })}
+            </div>
           </div>
         )}
 
@@ -431,12 +489,12 @@ export default function Header() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {NAV_LINKS.map((link) => (
-            <div key={link.label} style={{ borderBottom: "1px solid #f0f0f0" }}>
+            <div key={link.label} style={{ borderBottom: "1px solid #EEF1F8" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
                 <Link
                   href={link.href}
                   onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                  style={{ fontSize: 20, fontWeight: 700, color: "#354ac4", textDecoration: "none", flex: 1, fontFamily: "var(--font-caramel), cursive, sans-serif" }}
+                  style={{ fontSize: 18, fontWeight: 600, color: pathname === link.href ? "#354AC4" : "#051150", textDecoration: "none", flex: 1, fontFamily: "var(--font-assistant), system-ui, sans-serif" }}
                 >
                   {link.label}
                 </Link>
@@ -456,7 +514,7 @@ export default function Header() {
               </div>
 
               {link.submenu && openSubmenu === link.label && (
-                <div style={{ background: "#f7f9ff", borderRadius: 10, marginBottom: 12, overflow: "hidden" }}>
+                <div style={{ background: "#F4F6FB", borderRadius: 10, marginBottom: 12, overflow: "hidden" }}>
                   {link.submenu.map((sub) => (
                     <Link
                       key={sub.label}
@@ -465,12 +523,12 @@ export default function Header() {
                       style={{
                         display: "block",
                         padding: "14px 20px",
-                        fontSize: 18,
-                        fontWeight: 600,
-                        color: "#354ac4",
+                        fontSize: 16,
+                        fontWeight: 500,
+                        color: "#475569",
                         textDecoration: "none",
-                        borderInlineStart: "3px solid #354ac4",
-                        fontFamily: "var(--font-caramel), cursive, sans-serif",
+                        borderInlineStart: "3px solid #354AC4",
+                        fontFamily: "var(--font-assistant), system-ui, sans-serif",
                       }}
                     >
                       {sub.label}

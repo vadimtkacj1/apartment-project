@@ -97,7 +97,7 @@ const Testimonials: React.FC = () => {
         <div className="flex justify-center mb-12 md:mb-16">
           <div
             className="inline-flex items-center gap-2.5 rounded-2xl bg-white border border-[#E4E8F2] px-5 py-2.5"
-            style={{ boxShadow: '0 2px 10px rgba(53,74,196,0.06)' }}
+            style={{ boxShadow: '0 2px 10px rgba(5,17,80,0.06)' }}
           >
             <span className="font-bold text-[#051150]">Google</span>
             <span className="text-slate-300" aria-hidden="true">·</span>

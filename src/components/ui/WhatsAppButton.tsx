@@ -55,7 +55,7 @@ const WhatsAppButton: React.FC = () => {
         transition: { type: "spring", stiffness: 400, damping: 10 }
       }}
       whileTap={{ scale: 0.9 }}
-      className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:shadow-[#25D366]/50 transition-shadow duration-300 group flex items-center justify-center"
+      className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:shadow-[0_8px_24px_rgba(5,17,80,0.18)] transition-shadow duration-300 group flex items-center justify-center"
       aria-label="צרו קשר בוואטסאפ"
     >
       {/* Subtle ping animation */}

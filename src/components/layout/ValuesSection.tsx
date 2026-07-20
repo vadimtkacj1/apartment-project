@@ -65,7 +65,7 @@ const ValuesSection: React.FC = () => {
     <section
       dir="rtl"
       className="relative w-full py-16 md:py-20 overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, rgba(5,17,80,0.03), rgba(85,148,241,0.05)), #f5f7fb' }}
+      style={{ background: '#f5f7fb' }}
     >
 
       {/* ── Geometric background ── */}

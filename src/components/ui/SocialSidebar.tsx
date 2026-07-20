@@ -157,7 +157,7 @@ const SocialSidebar = () => {
       name: 'Instagram',
       type: 'instagram' as ContactType,
       icon: <Instagram className="w-4 h-4 md:w-5 md:h-5" />,
-      bgColor: 'bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500',
+      bgColor: 'bg-[#E1306C]',
     },
     {
       name: 'Facebook',

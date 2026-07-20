@@ -56,34 +56,35 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
       className="block h-full"
     >
       <m.div
-        whileHover={isSold ? {} : { y: -4, scale: 1.02 }}
+        whileHover={isSold ? {} : { y: -4 }}
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
           isSold
-            ? 'bg-gray-50 border-2 border-gray-200 opacity-70'
-            : 'bg-white border border-gray-100 shadow-md hover:shadow-lg'
+            ? 'bg-gray-50 border border-gray-200 opacity-70'
+            : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40'
         }`}
         style={{
+          // Unified with PropertyCard: one soft grounded shadow, no blue glow.
           boxShadow: isSold
-            ? '0 2px 8px rgba(0, 0, 0, 0.08)'
-            : '0 4px 16px rgba(5, 17, 80, 0.12), 0 0 32px rgba(5, 17, 80, 0.06)'
+            ? '0 1px 2px rgba(5, 17, 80, 0.05), 0 6px 14px -10px rgba(5, 17, 80, 0.12)'
+            : '0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.20)'
         }}
         dir="rtl"
       >
         {/* Property Image */}
-        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative h-64 overflow-hidden bg-slate-100">
           <Image
             src={displayImage}
             alt={title}
             fill
-            className={`object-contain transition-all duration-500 ${
+            className={`object-cover transition-all duration-500 ${
               isSold ? 'grayscale opacity-50' : 'group-hover:scale-105'
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={index !== undefined && index < 3}
           />
 
-          {/* Enhanced gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          {/* Ink scrim — enough for the price/logo legibility, light enough to keep the photo vivid */}
+          <div className="absolute inset-0 bg-linear-to-t from-[#051150]/55 via-[#051150]/5 to-[#051150]/15"></div>
 
           {/* Logo overlay - positioned left */}
           <div className="absolute top-4 left-4 z-30 pointer-events-none">

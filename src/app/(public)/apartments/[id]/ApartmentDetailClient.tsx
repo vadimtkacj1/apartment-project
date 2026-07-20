@@ -298,7 +298,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
           <button
             type="button"
             onClick={scrollToForm}
-            className="inline-flex items-center justify-center h-12 px-5 shrink-0 rounded-xl bg-gradient-to-br from-[#354AC4] to-[#5594F1] text-white font-black shadow-md"
+            className="inline-flex items-center justify-center h-12 px-5 shrink-0 rounded-xl bg-[#354AC4] text-white font-black shadow-md"
           >
             צור קשר
           </button>

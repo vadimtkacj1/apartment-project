@@ -58,7 +58,7 @@
 .stat-value {
   font-size: clamp(3rem, 5vw, 4rem);
   font-weight: 900;
-  background: linear-gradient(135deg, #051150 0%, #051150 100%);
+  background: #051150;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

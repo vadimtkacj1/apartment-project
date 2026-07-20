@@ -132,13 +132,15 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     isSold ? 'bg-[#F8FAFC] border border-[#E4E8F2] opacity-80' : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40'
   }`;
 
+  // Calm, grounded elevation: one soft directional shadow (light from above) plus
+  // the hairline border — no omnidirectional blue glow. Matches HotPropositionCard.
   const cardShadow = isSold
-    ? '0 2px 10px rgba(0, 0, 0, 0.1)'
-    : '0 4px 20px rgba(5, 17, 80, 0.15), 0 0 40px rgba(5, 17, 80, 0.08)';
+    ? '0 1px 2px rgba(5, 17, 80, 0.05), 0 6px 14px -10px rgba(5, 17, 80, 0.12)'
+    : '0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.20)';
 
   const cardInner = (
       <m.div
-        whileHover={isSold ? {} : { y: -5 }}
+        whileHover={isSold ? {} : { y: -4 }}
         className={cardClasses}
         style={{ boxShadow: cardShadow }}
         dir="rtl"
@@ -158,13 +160,13 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             />
 
             {imageError && (
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+              <div className="absolute inset-0 bg-slate-200 flex items-center justify-center">
                 <span className="text-gray-500 text-sm">תמונה לא זמינה</span>
               </div>
             )}
 
-            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
-              isSold ? 'opacity-40' : 'opacity-60'
+            <div className={`absolute inset-0 bg-linear-to-t from-[#051150]/35 via-[#051150]/0 to-transparent ${
+              isSold ? 'opacity-50' : ''
             }`} />
 
             {/* Штамп продано/сдано */}
@@ -193,12 +195,6 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               </div>
             )}
 
-            {/* Тип недвижимости */}
-            {propertyType && (
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#051150] px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
-                {PROPERTY_TYPE_LABELS[propertyType] || propertyType}
-              </div>
-            )}
           </div>
         )}
 
@@ -214,7 +210,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <div className={`flex items-start gap-1.5 text-xs mb-2 ${isSold ? 'text-[#94A3B8]' : 'text-[#64748B]'}`}>
               <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-[#94A3B8]' : 'text-[#354AC4]'}`} />
               <span className="break-words">
-                {location}{neighborhood && ` • ${neighborhood}`}
+                {propertyTypeLabel && `${propertyTypeLabel} • `}{location}{neighborhood && ` • ${neighborhood}`}
               </span>
             </div>
             {isSold && (

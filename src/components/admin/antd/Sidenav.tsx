@@ -9,6 +9,17 @@ import { sectionsForRole } from '@/config/adminSections';
 import { useAdminI18n, useAdminMessages } from '@/lib/adminI18n';
 import { navMessages } from '@/lib/adminI18n/messages/nav';
 
+// Sidebar nav grouped into small labelled sections (Polar/Exa/Stripe) instead of
+// a flat 9-item list — easier to scan. New sections default to the first group.
+const NAV_GROUPS: { id: string; label: Record<'he' | 'en', string> }[] = [
+  { id: 'main', label: { he: 'ניהול', en: 'Management' } },
+  { id: 'settings', label: { he: 'הגדרות ומידע', en: 'Settings & info' } },
+];
+const SECTION_GROUP: Record<string, string> = {
+  dashboard: 'main', inquiries: 'main', properties: 'main', owners: 'main', team: 'main', analytics: 'main',
+  homepage: 'settings', contact: 'settings', users: 'settings',
+};
+
 interface SidenavProps {
   color: string;
   onClose: () => void;
@@ -34,6 +45,12 @@ export default function Sidenav({ onClose }: SidenavProps) {
     isActive: s.isActive(pathname),
   }));
 
+  // Bucket the (role-filtered) items into their labelled groups, in group order.
+  const groupedNav = NAV_GROUPS.map((g) => ({
+    label: g.label[locale],
+    items: navItems.filter((i) => (SECTION_GROUP[i.key] ?? 'main') === g.id),
+  })).filter((g) => g.items.length > 0);
+
   return (
     <nav className="estate-sidenav" aria-label={t.adminNavAria}>
       {/* Brand */}
@@ -58,21 +75,28 @@ export default function Sidenav({ onClose }: SidenavProps) {
         </Tooltip>
       </div>
 
-      {/* Navigation */}
-      <ul className="estate-nav">
-        {navItems.map((item) => (
-          <li key={item.key}>
-            <Link
-              href={item.href}
-              className={`estate-nav-item ${item.isActive ? 'active' : ''}`}
-              aria-current={item.isActive ? 'page' : undefined}
-            >
-              <span className="estate-nav-icon">{item.icon}</span>
-              <span className="estate-nav-label">{item.label}</span>
-            </Link>
-          </li>
+      {/* Navigation — grouped into labelled sections */}
+      <div className="estate-nav">
+        {groupedNav.map((group) => (
+          <div className="estate-nav-group" key={group.label}>
+            <div className="estate-nav-group-label">{group.label}</div>
+            <ul className="estate-nav-list">
+              {group.items.map((item) => (
+                <li key={item.key}>
+                  <Link
+                    href={item.href}
+                    className={`estate-nav-item ${item.isActive ? 'active' : ''}`}
+                    aria-current={item.isActive ? 'page' : undefined}
+                  >
+                    <span className="estate-nav-icon">{item.icon}</span>
+                    <span className="estate-nav-label">{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
 
       {/* Sign out */}
       <div className="estate-user">
@@ -167,11 +191,24 @@ export default function Sidenav({ onClose }: SidenavProps) {
 
         /* --- Navigation --- */
         .estate-nav {
-          list-style: none;
           margin: 0;
-          padding: 14px 12px;
+          padding: 8px 12px 14px;
           flex: 1 1 auto;
           overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .estate-nav-group-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: #94a3b8;
+          padding: 12px 14px 6px;
+        }
+        .estate-nav-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -181,7 +218,10 @@ export default function Sidenav({ onClose }: SidenavProps) {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 11px 14px;
+          width: 100%;
+          min-height: 44px;
+          box-sizing: border-box;
+          padding: 0 14px;
           border-radius: 11px;
           color: #64748b;
           font-size: 14.5px;
@@ -193,8 +233,8 @@ export default function Sidenav({ onClose }: SidenavProps) {
           background: rgba(53, 74, 196, 0.06);
           color: #354ac4;
         }
-        /* Clean active state (Polar/Exa): soft indigo wash + indigo text/icon +
-           a short accent bar on the reading-start edge — calm, not a loud pill. */
+        /* Clean active state (Polar/Exa): soft indigo wash + indigo text/icon —
+           calm and uniform with the other buttons, not a loud pill. */
         .estate-nav-item.active {
           background: rgba(53, 74, 196, 0.10);
           color: #354ac4;
@@ -214,6 +254,11 @@ export default function Sidenav({ onClose }: SidenavProps) {
           fill: currentColor;
         }
         .estate-nav-label {
+          flex: 1 1 auto;
+          min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
           color: inherit;
         }
 

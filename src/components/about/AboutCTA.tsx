@@ -13,17 +13,6 @@ const WHATSAPP_URL = `https://wa.me/972523847291?text=${encodeURIComponent(
 export default function AboutCTA() {
   return (
     <section className="relative py-20 md:py-24 w-full overflow-hidden bg-[#051150]" dir="rtl">
-      {/* Möbius glow — very soft indigo→sky wash so the navy band carries the
-          brand gradient without competing with the type. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(60% 80% at 85% 0%, rgba(85,148,241,0.22), transparent 60%), radial-gradient(50% 70% at 0% 100%, rgba(53,74,196,0.35), transparent 60%)',
-        }}
-      />
-
       <m.div
         className="relative z-10 max-w-3xl mx-auto px-6 text-center flex flex-col items-center"
         initial={{ opacity: 0, y: 24 }}
@@ -44,7 +33,7 @@ export default function AboutCTA() {
           <Link
             href="/#contact"
             className="flex items-center gap-3 px-8 py-4 rounded-full text-white font-bold shadow-lg transition-all hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg, #354AC4, #4A5FD6)' }}
+            style={{ background: '#354AC4' }}
           >
             <Phone size={20} strokeWidth={2.5} />
             <span>צרו קשר</span>

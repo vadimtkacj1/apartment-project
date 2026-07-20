@@ -143,17 +143,9 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
     <section
       className={`relative py-16 md:py-24 w-full overflow-hidden ${reduced ? 'rm' : ''}`}
       dir="rtl"
-      style={{ background: 'linear-gradient(135deg, #28389B 0%, #051150 100%)' }}
+      style={{ background: '#051150' }}
     >
       <style>{`
-        @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 30px 3px rgba(85,148,241,0.4), 0 8px 24px rgba(0,0,0,0.3); }
-          50%       { box-shadow: 0 0 50px 10px rgba(85,148,241,0.7), 0 8px 32px rgba(0,0,0,0.3); }
-        }
-        @keyframes shineSwipe {
-          0%   { transform: translateX(-200%) skewX(-20deg); }
-          100% { transform: translateX(400%) skewX(-20deg); }
-        }
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -164,16 +156,13 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
             transform: translateY(0);
           }
         }
-        .btn-no-commission:hover .btn-shine {
-          animation: shineSwipe 0.6s ease forwards;
-        }
         .btn-no-commission {
-          animation: goldGlow 3s ease-in-out infinite;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.18);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-no-commission:hover {
-          transform: scale(1.05) translateY(-4px);
-          box-shadow: 0 0 60px 15px rgba(85,148,241,0.8), 0 12px 40px rgba(0,0,0,0.4);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.28);
         }
         .btn-no-commission:active {
           transform: scale(0.98);
@@ -199,17 +188,10 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         .feature-tag:hover {
           background: rgba(255,255,255,0.12) !important;
         }
-        /* Honour prefers-reduced-motion: kill the pulsing glow, shine swipe and
-           the entrance / hover transforms while keeping the layout intact. */
-        .rm .btn-no-commission {
-          animation: none !important;
-        }
+        /* Honour prefers-reduced-motion: kill the entrance / hover transforms
+           while keeping the layout intact. */
         .rm .btn-no-commission:hover {
           transform: none !important;
-          box-shadow: 0 0 30px 3px rgba(85,148,241,0.4), 0 8px 24px rgba(0,0,0,0.3) !important;
-        }
-        .rm .btn-no-commission:hover .btn-shine {
-          animation: none !important;
         }
         .rm .no-commission-card {
           animation: none !important;
@@ -370,19 +352,12 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 <div
                   className="btn-no-commission group relative text-center py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
                   style={{
-                    background: 'linear-gradient(135deg, #4A8BEF 0%, #7BAAF5 50%, #5594F1 100%)',
+                    background: '#5594F1',
                     color: '#051150',
                     letterSpacing: '0.04em',
                     minWidth: '180px',
                   }}
                 >
-                  <span
-                    className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                      transform: 'translateX(-200%) skewX(-20deg)',
-                    }}
-                  />
                   <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים ←</span>
                 </div>
 

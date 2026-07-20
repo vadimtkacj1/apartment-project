@@ -42,7 +42,7 @@ const FilterSection: React.FC<{ icon: React.ElementType; title: string; children
   title,
   children,
 }) => (
-  <div className="rounded-2xl bg-[#f5f7fb] border border-[#E4E8F2] p-5 shadow-[0_2px_10px_rgba(53,74,196,0.06)]">
+  <div className="rounded-2xl bg-[#f5f7fb] border border-[#E4E8F2] p-5 shadow-[0_2px_10px_rgba(5,17,80,0.06)]">
     <div className="mb-5">
       <div className="flex items-center gap-2.5">
         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EAF1FE] text-[#354AC4]">

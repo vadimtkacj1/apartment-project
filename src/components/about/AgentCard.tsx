@@ -78,7 +78,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             />
           ) : (
             /* Fallback: branded initials avatar */
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#051150] to-[#354AC4]">
+            <div className="w-full h-full flex items-center justify-center bg-[#354AC4]">
               <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
                 {initials}
               </span>

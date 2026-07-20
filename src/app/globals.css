@@ -51,7 +51,7 @@ body {
   /* Brand möbius band — a very low-opacity ink→sky wash for ONE feature band,
      so a single section can carry the brand gradient without shouting. */
   .brand-band {
-    background: linear-gradient(135deg, rgba(5, 17, 80, 0.03), rgba(85, 148, 241, 0.05));
+    background: #f5f7fb;
   }
 
 

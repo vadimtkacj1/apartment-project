@@ -41,7 +41,7 @@ export function PriceCard({ price, originalPrice, area, isSold, dealType }: Pric
     <div className={`rounded-2xl p-8 mb-6 shadow-2xl ${
       isSold
         ? 'bg-gray-400 text-white opacity-75'
-        : 'bg-gradient-to-br from-[#051150] via-[#354AC4] to-[#5594F1] text-white'
+        : 'bg-[#051150] text-white'
     }`}>
       <div className="text-sm font-bold mb-2 opacity-90">מחיר מבוקש</div>
       <div className={`text-4xl font-black mb-2 ${isSold ? 'line-through' : ''}`}>

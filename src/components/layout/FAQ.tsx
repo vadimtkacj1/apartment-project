@@ -115,7 +115,7 @@ const FAQ: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="mt-16 text-center"
         >
-          <div className="bg-gradient-to-br from-[#051150] to-[#051150] rounded-3xl p-8 md:p-12 shadow-2xl">
+          <div className="bg-[#051150] rounded-3xl p-8 md:p-12 shadow-2xl">
             <h3 className="text-3xl md:text-4xl font-black text-white mb-4">
               לא מצאתם תשובה?
             </h3>

@@ -76,7 +76,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
             />
           ) : (
             /* Fallback: initials avatar when no image or broken image */
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#051150] to-[#354AC4]">
+            <div className="w-full h-full flex items-center justify-center bg-[#354AC4]">
               <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
                 {initials}
               </span>
