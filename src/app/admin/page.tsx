@@ -265,34 +265,39 @@ export default function AdminDashboard() {
           <h1 className="ec-h1">{t.pageTitle}</h1>
           <p className="ec-subtitle">{formatLongDate(dayjs(), t)}</p>
         </div>
-        {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
-          <Link href="/admin/inquiries" className="ec-newleads">
-            <bdi dir="ltr">{summary?.newInquiries}</bdi> {t.newInquiries}
-            <Fwd className="size-3.5" />
-          </Link>
-        )}
       </header>
 
-      {/* ── 1. Context ribbon — borderless label/value facts from the old band ── */}
+      {/* ── 1. Focal hero — dark navy card holding the portfolio headline + facts + CTA ── */}
       {propsLoading ? (
-        <Skeleton className="h-6 w-105 max-w-full" style={{ marginBlock: '6px 26px' }} />
+        <Skeleton className="w-full" style={{ height: 108, marginBlock: '6px 24px', borderRadius: 16 }} />
       ) : (
-        <div className="admin-ribbon">
-          <div>
-            <span className="k">{t.portfolioValue}</span>
-            <span className="v"><bdi dir="ltr">{ils(portfolio.portfolioValue)}</bdi></span>
+        <div className="ec-focal">
+          <div className="ec-focal-main">
+            <span className="ec-focal-label">{t.portfolioValue}</span>
+            <span className="ec-focal-value"><bdi dir="ltr">{ils(portfolio.portfolioValue)}</bdi></span>
+            <span className="ec-focal-sub">
+              <bdi dir="ltr">{portfolio.activeCount}</bdi> {t.activeProperties}
+              {' · '}<bdi dir="ltr">{portfolio.saleCount}</bdi> {t.forSaleLower}
+              {' · '}<bdi dir="ltr">{portfolio.rentCount}</bdi> {t.forRentLower}
+            </span>
           </div>
-          <div>
-            <span className="k">{t.activeProperties}</span>
-            <span className="v"><bdi dir="ltr">{portfolio.activeCount}</bdi></span>
-          </div>
-          <div>
-            <span className="k">{t.mostExpensive}</span>
-            <span className="v"><bdi dir="ltr">{ils(portfolio.maxPrice)}</bdi></span>
-          </div>
-          <div>
-            <span className="k">{t.averageLabel}</span>
-            <span className="v"><bdi dir="ltr">{ils(portfolio.avgPrice)}</bdi></span>
+          <div className="ec-focal-side">
+            <div className="ec-focal-stats">
+              <div>
+                <span className="fk">{t.mostExpensive}</span>
+                <span className="fv"><bdi dir="ltr">{ils(portfolio.maxPrice)}</bdi></span>
+              </div>
+              <div>
+                <span className="fk">{t.averageLabel}</span>
+                <span className="fv"><bdi dir="ltr">{ils(portfolio.avgPrice)}</bdi></span>
+              </div>
+            </div>
+            {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
+              <Link href="/admin/inquiries" className="ec-focal-cta">
+                <bdi dir="ltr">{summary?.newInquiries}</bdi> {t.newInquiries}
+                <Fwd className="size-3.5" />
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -332,7 +337,7 @@ export default function AdminDashboard() {
         ) : (
           <>
             {trendEmpty ? (
-              <EmptyBlock height={240} text={t.noTrafficData} />
+              <EmptyBlock height={130} text={t.noTrafficData} />
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={series} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
@@ -530,6 +535,22 @@ function DashboardStyles() {
 .estate-console .ec-subtitle{font-size:13px;line-height:1.4;color:var(--text-muted);margin-block-start:4px;}
 .estate-console .ec-newleads{display:inline-flex;align-items:center;gap:7px;background:var(--brand);color:#fff;font-weight:600;font-size:13px;line-height:1;padding:9px 16px;border-radius:var(--r-pill);text-decoration:none;white-space:nowrap;transition:background .15s ease;}
 .estate-console .ec-newleads:hover{background:var(--brand-hover);}
+
+/* Focal hero — the one dark premium card on the light page (Runey cashflow-card move) */
+.estate-console .ec-focal{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:#051150;border-radius:var(--r-hero);box-shadow:var(--shadow-hero);padding:22px 26px;margin-block:6px 24px;}
+.estate-console .ec-focal::after{content:"";position:absolute;inset-block-start:-60%;inset-inline-end:-8%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(85,148,241,.28) 0%,rgba(85,148,241,0) 70%);pointer-events:none;}
+.estate-console .ec-focal-main{position:relative;z-index:1;min-width:0;}
+.estate-console .ec-focal-label{display:block;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55);}
+.estate-console .ec-focal-value{display:block;font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.1;color:#fff;margin-block-start:4px;font-variant-numeric:tabular-nums;}
+.estate-console .ec-focal-sub{display:block;font-size:13px;color:rgba(255,255,255,.72);margin-block-start:8px;}
+.estate-console .ec-focal-side{position:relative;z-index:1;display:flex;align-items:center;gap:28px;flex-wrap:wrap;}
+.estate-console .ec-focal-stats{display:flex;gap:26px;}
+.estate-console .ec-focal-stats>div{display:flex;flex-direction:column;gap:3px;}
+.estate-console .ec-focal-stats .fk{font-size:12px;color:rgba(255,255,255,.5);}
+.estate-console .ec-focal-stats .fv{font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;}
+.estate-console .ec-focal-cta{display:inline-flex;align-items:center;gap:7px;background:#5594f1;color:#051150;font-weight:700;font-size:13px;line-height:1;padding:9px 16px;border-radius:var(--r-pill);text-decoration:none;white-space:nowrap;transition:filter .15s ease;}
+.estate-console .ec-focal-cta:hover{filter:brightness(1.08);}
+@media (max-width:640px){.estate-console .ec-focal-value{font-size:28px;}.estate-console .ec-focal-stats{gap:18px;}}
 
 /* Cards — quiet by default (hairline + soft shadow); ONE hero variant */
 .estate-console .ec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow-card);}
