@@ -106,3 +106,19 @@
 
 /* ---- Inset well (radio groups / secondary controls inside a card) ---- */
 .inset-well { background: var(--surface-sunken); border-radius: var(--r-tile); padding: 12px 14px; }
+
+/* ---- Homepage settings: two-pane (settings left, live preview right) ---- */
+.hp-split { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.hp-settings { min-width: 0; }
+.hp-preview { position: sticky; inset-block-start: 12px; display: flex; flex-direction: column; }
+.hp-preview-head { display: flex; align-items: center; justify-content: space-between; margin-block-end: 10px; }
+.hp-preview-title { font: 600 13px/1.3 var(--font-assistant), system-ui; color: var(--text-muted); }
+.hp-preview-refresh { border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-body); font: 600 12px/1 var(--font-assistant), system-ui; padding: 7px 12px; border-radius: 8px; cursor: pointer; transition: background-color .15s ease; }
+.hp-preview-refresh:hover { background: var(--surface-sunken); }
+.hp-preview-frame-wrap { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-raise); background: #fff; height: calc(100vh - 150px); max-height: 900px; min-height: 480px; }
+.hp-preview-frame { width: 100%; height: 100%; border: 0; display: block; }
+@media (max-width: 1100px) {
+  .hp-split { grid-template-columns: 1fr; }
+  .hp-preview { position: static; }
+  .hp-preview-frame-wrap { height: 560px; }
+}
