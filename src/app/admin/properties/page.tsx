@@ -483,7 +483,10 @@ export default function PropertiesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
+                          <Button
+                            asChild variant="ghost" size="icon" aria-label={t.edit}
+                            className="text-slate-500 hover:bg-[#354AC4]/10 hover:text-[#354AC4]"
+                          >
                             <Link href={`/admin/properties/${record.id}`}>
                               <Pencil className="size-4" />
                             </Link>
@@ -491,7 +494,7 @@ export default function PropertiesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            className="text-slate-400 hover:bg-destructive/10 hover:text-destructive"
                             onClick={() => openDelete(record.id)}
                             aria-label={t.delete}
                           >
