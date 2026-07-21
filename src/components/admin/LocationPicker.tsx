@@ -2,8 +2,10 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { Input, Button, Space, App } from 'antd';
-import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Search, MapPin, Loader2 } from 'lucide-react';
+import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/shadcn/button';
+import { toast } from '@/components/shadcn/sonner';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
@@ -54,7 +56,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onPositionChange,
   onAddressChange,
 }) => {
-  const { message } = App.useApp();
   const t = useAdminMessages(uploadersMessages);
   const [searchAddress, setSearchAddress] = useState('');
   const [searching, setSearching] = useState(false);
@@ -169,16 +170,16 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           onAddressChange(addressData);
         }
 
-        message.success(t.foundResult(result.formatted || result.city || term));
+        toast.success(t.foundResult(result.formatted || result.city || term));
       } else {
         console.log('No results found for term:', term, 'Response:', data);
         const errorMsg = data.error || t.noResults;
-        message.error(errorMsg);
+        toast.error(errorMsg);
       }
     } catch (error: any) {
       console.error('Search error:', error);
       const errorMessage = error.message || t.searchError;
-      message.error(t.searchErrorWith(errorMessage));
+      toast.error(t.searchErrorWith(errorMessage));
     } finally {
       setSearching(false);
     }
@@ -262,27 +263,28 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     return (
       <div style={{ width: '100%' }}>
         <div style={{ marginBottom: '16px' }}>
-          <Space.Compact style={{ width: '100%' }}>
-            <Input
-              size="large"
-              placeholder={t.searchPlaceholder}
-              value={searchAddress}
-              onChange={(e) => setSearchAddress(e.target.value)}
-              onPressEnter={searchAddressOnMap}
-              prefix={<EnvironmentOutlined />}
-              disabled
-            />
+          <div className="flex w-full">
+            <div className="relative flex-1">
+              <MapPin className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-3 size-4 text-muted-foreground" />
+              <Input
+                className="h-11 ps-9 rounded-e-none"
+                placeholder={t.searchPlaceholder}
+                value={searchAddress}
+                onChange={(e) => setSearchAddress(e.target.value)}
+                disabled
+              />
+            </div>
             <Button
-              type="primary"
-              size="large"
-              icon={<SearchOutlined />}
+              type="button"
+              size="lg"
+              className="rounded-s-none"
               onClick={searchAddressOnMap}
-              loading={true}
               disabled
             >
+              <Loader2 className="size-4 animate-spin" />
               {t.search}
             </Button>
-          </Space.Compact>
+          </div>
         </div>
         <div style={{
           width: '100%',
@@ -303,25 +305,30 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   return (
     <div style={{ width: '100%' }}>
       <div style={{ marginBottom: '16px' }}>
-        <Space.Compact style={{ width: '100%' }}>
-          <Input
-            size="large"
-            placeholder={t.searchPlaceholder}
-            value={searchAddress}
-            onChange={(e) => setSearchAddress(e.target.value)}
-            onPressEnter={searchAddressOnMap}
-            prefix={<EnvironmentOutlined />}
-          />
+        <div className="flex w-full">
+          <div className="relative flex-1">
+            <MapPin className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-3 size-4 text-muted-foreground" />
+            <Input
+              className="h-11 ps-9 rounded-e-none"
+              placeholder={t.searchPlaceholder}
+              value={searchAddress}
+              onChange={(e) => setSearchAddress(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') searchAddressOnMap();
+              }}
+            />
+          </div>
           <Button
-            type="primary"
-            size="large"
-            icon={<SearchOutlined />}
+            type="button"
+            size="lg"
+            className="rounded-s-none"
             onClick={searchAddressOnMap}
-            loading={searching}
+            disabled={searching}
           >
+            {searching ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
             {t.search}
           </Button>
-        </Space.Compact>
+        </div>
       </div>
 
       <GoogleMap

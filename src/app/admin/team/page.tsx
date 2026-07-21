@@ -1,33 +1,25 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BRAND } from '@/lib/adminTheme';
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Input,
-  Select,
-  Modal,
-  App,
-  Statistic,
-  Space,
-  Switch,
-  Table,
-  Skeleton,
-} from 'antd';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  TeamOutlined,
-  SearchOutlined,
-  CheckCircleOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
-import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import Link from 'next/link';
+import { Plus, Pencil, Trash2, Search, Users, UserCheck, UserX } from 'lucide-react';
+import { toast } from '@/components/shadcn/sonner';
+import { Card } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Switch } from '@/components/shadcn/switch';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from '@/components/shadcn/select';
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '@/components/shadcn/alert-dialog';
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from '@/components/shadcn/table';
+import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -53,11 +45,9 @@ interface TeamMember {
 
 export default function TeamPage() {
   const t = useAdminMessages(teamMessages);
-  const { message } = App.useApp();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<TeamMember | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -74,7 +64,7 @@ export default function TeamPage() {
     } catch (error) {
       console.error('Error fetching team members:', error);
       setTeamMembers([]);
-      message.error(t.loadListError);
+      toast.error(t.loadListError);
     } finally {
       setLoading(false);
     }
@@ -100,18 +90,17 @@ export default function TeamPage() {
     });
   }, [teamMembers, searchTerm, filterStatus]);
 
-  const handleDelete = async () => {
-    if (!selectedMember) return;
+  const deleteMember = async (member: TeamMember) => {
     try {
-      const response = await fetch(`/api/admin/team/${selectedMember}`, { method: 'DELETE' });
+      const response = await fetch(`/api/admin/team/${member.id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      setDeleteModal(false);
-      setSelectedMember(null);
       fetchTeamMembers();
-      message.success(t.deleteSuccess);
+      toast.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting team member:', error);
-      message.error(t.deleteError);
+      toast.error(t.deleteError);
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -129,12 +118,14 @@ export default function TeamPage() {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       fetchTeamMembers();
-      message.success(value ? t.activatedSuccess : t.deactivatedSuccess);
+      toast.success(value ? t.activatedSuccess : t.deactivatedSuccess);
     } catch (error) {
       console.error('Error updating status:', error);
-      message.error(t.statusUpdateError);
+      toast.error(t.statusUpdateError);
     }
   };
+
+  const dash = <span style={{ color: '#94A3B8' }}>-</span>;
 
   return (
     <div>
@@ -142,229 +133,177 @@ export default function TeamPage() {
       <AdminPageHeader
         title={t.title}
         extra={
-          <Link href="/admin/team/new" className="w-full sm:w-auto">
-            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link href="/admin/team/new">
+              <Plus className="size-4" />
               {t.addNew}
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         }
       />
 
       {/* Statistics */}
       <MetricCardGrid
         items={[
-          { icon: <TeamOutlined />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <CheckCircleOutlined />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
-          { icon: <StopOutlined />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
+          { icon: <Users className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <UserCheck className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
+          { icon: <UserX className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
         ]}
       />
 
       {/* Filters */}
-      <Card className="mb-6">
-        <Space vertical style={{ width: '100%' }} size="middle">
-          <Input
-            placeholder={t.searchPlaceholder}
-            prefix={<SearchOutlined />}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="large"
-          />
-          <Select
-            value={filterStatus}
-            onChange={setFilterStatus}
-            style={{ minWidth: 120, width: '100%', maxWidth: '200px' }}
-            size="large"
-          >
-            <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
-            <Select.Option value="active">{t.statusActive}</Select.Option>
-            <Select.Option value="inactive">{t.statusInactive}</Select.Option>
+      <Card className="mb-6 p-5">
+        <div className="flex flex-col gap-4">
+          <div className="relative">
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={t.searchPlaceholder}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="ps-9"
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-full max-w-[200px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
+              <SelectItem value="active">{t.statusActive}</SelectItem>
+              <SelectItem value="inactive">{t.statusInactive}</SelectItem>
+            </SelectContent>
           </Select>
-        </Space>
+        </div>
       </Card>
 
       {/* Team Members Table — desktop */}
       <div className="admin-only-desktop">
-      <Card>
-        <Table
-          dataSource={filteredMembers}
-          loading={loading}
-          rowKey="id"
-          size="middle"
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total) => t.paginationTotal(total),
-          }}
-          scroll={{ x: 1440 }}
-          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} /> }}
-          columns={[
-            {
-              title: t.colImage,
-              dataIndex: 'image',
-              key: 'image',
-              width: 80,
-              render: (image: string | null) => (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                  {image ? (
-                    <div
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '2px solid #E4E8F2',
-                        flexShrink: 0,
-                        background: '#F4F6FB',
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={image}
-                        alt="Team Member"
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        <Card className="p-2">
+          {loading ? (
+            <div className="p-4"><Skeleton className="h-64 w-full" /></div>
+          ) : filteredMembers.length === 0 ? (
+            <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[80px]">{t.colImage}</TableHead>
+                  <TableHead>{t.fieldName}</TableHead>
+                  <TableHead>{t.fieldRole}</TableHead>
+                  <TableHead>{t.fieldEmail}</TableHead>
+                  <TableHead>{t.fieldPhone}</TableHead>
+                  <TableHead>{t.fieldMobile}</TableHead>
+                  <TableHead className="text-center">{t.fieldProperties}</TableHead>
+                  <TableHead className="text-center">{t.fieldSold}</TableHead>
+                  <TableHead className="text-center">{t.fieldOrder}</TableHead>
+                  <TableHead className="text-center">{t.fieldStatus}</TableHead>
+                  <TableHead className="w-[110px]">{t.colActions}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        {member.image ? (
+                          <div
+                            style={{
+                              width: 60,
+                              height: 60,
+                              borderRadius: '50%',
+                              overflow: 'hidden',
+                              border: '2px solid #E4E8F2',
+                              flexShrink: 0,
+                              background: '#F4F6FB',
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={member.image}
+                              alt={member.name}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                            />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: '60px',
+                              height: '60px',
+                              borderRadius: '50%',
+                              background: '#E4E8F2',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                            }}
+                          >
+                            <Users className="size-6" style={{ color: '#94A3B8' }} />
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Link href={`/admin/team/${member.id}`} style={{ fontWeight: 600, color: '#354AC4' }}>
+                        {member.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>
+                      {member.role ? <span className="admin-pill admin-pill--neutral">{member.role}</span> : dash}
+                    </TableCell>
+                    <TableCell>{member.email ? <bdi>{member.email}</bdi> : dash}</TableCell>
+                    <TableCell>{member.phone ? <span dir="ltr">{member.phone}</span> : dash}</TableCell>
+                    <TableCell>{member.mobile ? <span dir="ltr">{member.mobile}</span> : dash}</TableCell>
+                    <TableCell className="text-center">
+                      {member.propertiesCount > 0 ? (
+                        <span className="admin-pill admin-pill--sale">{member.propertiesCount}</span>
+                      ) : (
+                        <span style={{ color: '#94A3B8' }}>0</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {member.soldCount > 0 ? (
+                        <span className="admin-pill admin-pill--closed">{member.soldCount}</span>
+                      ) : (
+                        <span style={{ color: '#94A3B8' }}>0</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">{member.order}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch
+                        checked={member.isActive}
+                        onCheckedChange={(v) => handleStatusChange(member.id, v)}
                       />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        background: '#E4E8F2',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <TeamOutlined style={{ fontSize: '24px', color: '#94A3B8' }} />
-                    </div>
-                  )}
-                </div>
-              ),
-            },
-            {
-              title: t.fieldName,
-              dataIndex: 'name',
-              key: 'name',
-              width: 150,
-              render: (name: string, record: TeamMember) => (
-                <Link href={`/admin/team/${record.id}`} style={{ fontWeight: 600, color: '#354AC4' }}>
-                  {name}
-                </Link>
-              ),
-            },
-            {
-              title: t.fieldRole,
-              dataIndex: 'role',
-              key: 'role',
-              width: 150,
-              render: (role: string) =>
-                role ? <span className="admin-pill admin-pill--neutral">{role}</span> : '-',
-            },
-            {
-              title: t.fieldEmail,
-              dataIndex: 'email',
-              key: 'email',
-              width: 200,
-              render: (email: string | null) => email || '-',
-            },
-            {
-              title: t.fieldPhone,
-              dataIndex: 'phone',
-              key: 'phone',
-              width: 120,
-              render: (phone: string | null) => phone || '-',
-            },
-            {
-              title: t.fieldMobile,
-              dataIndex: 'mobile',
-              key: 'mobile',
-              width: 120,
-              render: (mobile: string | null) => mobile || '-',
-            },
-            {
-              title: t.fieldProperties,
-              dataIndex: 'propertiesCount',
-              key: 'propertiesCount',
-              width: 120,
-              align: 'center',
-              render: (count: number) =>
-                count > 0 ? (
-                  <span className="admin-pill admin-pill--sale">{count}</span>
-                ) : (
-                  <span style={{ color: '#94A3B8' }}>0</span>
-                ),
-            },
-            {
-              title: t.fieldSold,
-              dataIndex: 'soldCount',
-              key: 'soldCount',
-              width: 120,
-              align: 'center',
-              render: (count: number) =>
-                count > 0 ? (
-                  <span className="admin-pill admin-pill--closed">{count}</span>
-                ) : (
-                  <span style={{ color: '#94A3B8' }}>0</span>
-                ),
-            },
-            {
-              title: t.fieldOrder,
-              dataIndex: 'order',
-              key: 'order',
-              width: 80,
-              align: 'center',
-            },
-            {
-              title: t.fieldStatus,
-              key: 'status',
-              width: 100,
-              align: 'center',
-              render: (_, record: TeamMember) => (
-                <Switch
-                  checked={record.isActive}
-                  onChange={(v) => handleStatusChange(record.id, v)}
-                  checkedChildren={t.statusActive}
-                  unCheckedChildren={t.switchOff}
-                />
-              ),
-            },
-            {
-              title: t.colActions,
-              key: 'actions',
-              width: 150,
-              render: (_, record: TeamMember) => (
-                <Space size={4}>
-                  <Link href={`/admin/team/${record.id}`}>
-                    <Button type="primary" icon={<EditOutlined />} size="small">
-                      {t.edit}
-                    </Button>
-                  </Link>
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    onClick={() => {
-                      setSelectedMember(record.id);
-                      setDeleteModal(true);
-                    }}
-                  >
-                    {t.delete}
-                  </Button>
-                </Space>
-              ),
-            },
-          ]}
-        />
-      </Card>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
+                          <Link href={`/admin/team/${member.id}`}>
+                            <Pencil className="size-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => setDeleteTarget(member)}
+                          aria-label={t.delete}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
       </div>
 
       {/* Team Members — mobile card list */}
       <div className="admin-only-mobile">
         {loading ? (
-          <Skeleton active paragraph={{ rows: 6 }} />
+          <Skeleton className="h-64 w-full" />
         ) : filteredMembers.length === 0 ? (
           <AdminEmptyState message={t.emptyMessage} addHref="/admin/team/new" addLabel={t.emptyAddLabel} />
         ) : (
@@ -384,7 +323,7 @@ export default function TeamPage() {
                         background: '#E4E8F2',
                       }}
                     >
-                      <TeamOutlined style={{ fontSize: '22px', color: '#94A3B8' }} />
+                      <Users className="size-6" style={{ color: '#94A3B8' }} />
                     </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -407,26 +346,23 @@ export default function TeamPage() {
                 <div className="admin-card__actions">
                   <Switch
                     checked={member.isActive}
-                    onChange={(v) => handleStatusChange(member.id, v)}
-                    checkedChildren={t.statusActive}
-                    unCheckedChildren={t.switchOff}
+                    onCheckedChange={(v) => handleStatusChange(member.id, v)}
                   />
-                  <span className="admin-card__grow">
-                    <Link href={`/admin/team/${member.id}`}>
-                      <Button type="primary" icon={<EditOutlined />}>{t.edit}</Button>
-                    </Link>
+                  <span className="admin-card__grow flex gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/admin/team/${member.id}`}>
+                        <Pencil className="size-4" />{t.edit}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setDeleteTarget(member)}
+                    >
+                      <Trash2 className="size-4" />{t.delete}
+                    </Button>
                   </span>
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => {
-                      setSelectedMember(member.id);
-                      setDeleteModal(true);
-                    }}
-                  >
-                    {t.delete}
-                  </Button>
                 </div>
               </div>
             ))}
@@ -434,21 +370,23 @@ export default function TeamPage() {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title={t.deleteConfirmTitle}
-        open={deleteModal}
-        onOk={handleDelete}
-        onCancel={() => {
-          setDeleteModal(false);
-          setSelectedMember(null);
-        }}
-        okText={t.delete}
-        cancelText={t.cancel}
-        okButtonProps={{ danger: true }}
-      >
-        <p>{t.deleteConfirmBody}</p>
-      </Modal>
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.deleteConfirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t.deleteConfirmBody}{deleteTarget ? ` (${deleteTarget.name})` : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={() => deleteTarget && deleteMember(deleteTarget)}>
+              {t.delete}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,4 +1,6 @@
-import { Card } from 'antd';
+'use client';
+
+import { Card } from '@/components/shadcn/card';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
@@ -12,7 +14,8 @@ interface ImagesSectionProps {
 export function ImagesSection({ formData, handleChange }: ImagesSectionProps) {
   const t = useAdminMessages(propertyFormMessages);
   return (
-    <Card title={t.images.cardTitle} className="mb-4">
+    <Card className="mb-4 p-5">
+      <h3 className="mb-4 text-base font-semibold text-foreground">{t.images.cardTitle}</h3>
       <ImageUploader
         images={formData.images}
         onImagesChange={(images) => handleChange('images', images)}

@@ -302,7 +302,7 @@ export default function UsersPage() {
                 <FormField
                   control={form.control}
                   name="username"
-                  rules={{ required: t.usernameRequired ?? t.minChars(3), minLength: { value: 3, message: t.minChars(3) } }}
+                  rules={{ required: t.minChars(3), minLength: { value: 3, message: t.minChars(3) } }}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t.username}</FormLabel>

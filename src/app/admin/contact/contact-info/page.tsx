@@ -1,19 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  App,
-  InputNumber,
-} from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Save, Info } from 'lucide-react';
 import LocationPicker from '@/components/admin/LocationPicker';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import { toast } from '@/components/shadcn/sonner';
+import { Card, CardTitle } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Label } from '@/components/shadcn/label';
+import {
+  Tooltip, TooltipTrigger, TooltipContent,
+} from '@/components/shadcn/tooltip';
+import { cn } from '@/lib/utils';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { contactMessages } from '@/lib/adminI18n/messages/contact';
@@ -72,10 +71,16 @@ const INITIAL_FORM: Omit<ContactInfoForm, 'weekdayHours' | 'fridayHours'> = {
   linkedin: '',
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ContactInfoPage() {
-  const { message } = App.useApp();
   const t = useAdminMessages(contactMessages);
-  const [form] = Form.useForm();
+  const [values, setValues] = useState<ContactInfoForm>(() => ({
+    ...INITIAL_FORM,
+    weekdayHours: t.weekdayHoursExample,
+    fridayHours: t.fridayHoursExample,
+  }));
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactInfoForm, string>>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -93,7 +98,17 @@ export default function ContactInfoPage() {
       if (response.ok) {
         const data = await response.json();
         if (data) {
-          form.setFieldsValue(data);
+          // Merge only the known form fields (ignore server-only keys like id/links).
+          setValues((prev) => {
+            const next: ContactInfoForm = { ...prev };
+            const target = next as unknown as Record<string, unknown>;
+            for (const key of Object.keys(prev)) {
+              if (data[key] !== undefined) {
+                target[key] = data[key];
+              }
+            }
+            return next;
+          });
           // Update map position if coordinates exist
           if (data.latitude && data.longitude) {
             setMapPosition({ lat: data.latitude, lng: data.longitude });
@@ -102,13 +117,40 @@ export default function ContactInfoPage() {
       }
     } catch (err) {
       console.error('Error fetching contact info:', err);
-      message.error(t.loadError);
+      toast.error(t.loadError);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (values: ContactInfoForm) => {
+  const setField = (name: keyof ContactInfoForm, value: string | number | null) => {
+    setValues((v) => ({ ...v, [name]: value }));
+    setDirty(true);
+    setErrors((e) => (e[name] ? { ...e, [name]: undefined } : e));
+  };
+
+  const validate = (): Partial<Record<keyof ContactInfoForm, string>> => {
+    const e: Partial<Record<keyof ContactInfoForm, string>> = {};
+    if (!values.phone?.trim()) e.phone = t.phoneRequired;
+    if (!values.email?.trim()) e.email = t.emailRequired;
+    else if (!EMAIL_RE.test(values.email)) e.email = t.emailInvalid;
+    if (values.email2 && !EMAIL_RE.test(values.email2)) e.email2 = t.emailInvalid;
+    if (!values.address?.trim()) e.address = t.addressRequired;
+    if (!values.city?.trim()) e.city = t.cityRequired;
+    if (!values.weekdayHours?.trim()) e.weekdayHours = t.hoursRequired;
+    if (!values.fridayHours?.trim()) e.fridayHours = t.hoursRequired;
+    return e;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
     setSaving(true);
 
     try {
@@ -141,325 +183,282 @@ export default function ContactInfoPage() {
 
       if (response.ok) {
         setDirty(false);
-        message.success(t.saveSuccess);
+        toast.success(t.saveSuccess);
         fetchContactInfo();
       } else {
-        message.error(t.saveError);
+        toast.error(t.saveError);
       }
     } catch (err) {
-      message.error(t.saveError);
+      toast.error(t.saveError);
     } finally {
       setSaving(false);
     }
   };
 
+  const FieldLabel = ({
+    htmlFor,
+    tooltip,
+    required,
+    children,
+  }: {
+    htmlFor?: string;
+    tooltip?: string;
+    required?: boolean;
+    children: React.ReactNode;
+  }) => (
+    <Label htmlFor={htmlFor} className="flex items-center gap-1.5">
+      <span>
+        {children}
+        {required && <span className="ms-0.5 text-destructive">*</span>}
+      </span>
+      {tooltip && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-label="info"
+              className="inline-flex text-muted-foreground hover:text-foreground"
+            >
+              <Info className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{tooltip}</TooltipContent>
+        </Tooltip>
+      )}
+    </Label>
+  );
+
+  const renderText = (
+    name: keyof ContactInfoForm,
+    label: React.ReactNode,
+    opts: {
+      placeholder?: string;
+      tooltip?: string;
+      type?: string;
+      required?: boolean;
+      className?: string;
+    } = {},
+  ) => (
+    <div className={cn('space-y-2', opts.className)}>
+      <FieldLabel htmlFor={name} tooltip={opts.tooltip} required={opts.required}>
+        {label}
+      </FieldLabel>
+      <Input
+        id={name}
+        type={opts.type}
+        placeholder={opts.placeholder}
+        value={(values[name] as string | null | undefined) ?? ''}
+        onChange={(e) => setField(name, e.target.value)}
+      />
+      {errors[name] && (
+        <p className="text-sm font-medium text-destructive">{errors[name]}</p>
+      )}
+    </div>
+  );
+
+  const SectionCard = ({
+    title,
+    children,
+  }: {
+    title: React.ReactNode;
+    children: React.ReactNode;
+  }) => (
+    <Card className="mb-4 p-5">
+      <div className="mb-4 border-b border-border pb-3">
+        <CardTitle className="text-base font-semibold">{title}</CardTitle>
+      </div>
+      <div className="space-y-4">{children}</div>
+    </Card>
+  );
+
   return (
     <div>
       <AdminPageHeader title={t.title} />
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        onValuesChange={() => setDirty(true)}
-        initialValues={{
-          ...INITIAL_FORM,
-          weekdayHours: t.weekdayHoursExample,
-          fridayHours: t.fridayHoursExample,
-        }}
-        disabled={loading}
-      >
-        {/* Contact Details */}
-        <Card className="mb-4" title={t.contactCard1}>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label={t.phone1Label}
-                name="phone"
-                rules={[{ required: true, message: t.phoneRequired }]}
-              >
-                <Input placeholder="03-1234567" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label={t.phoneName1Label}
-                name="phoneName"
-                tooltip={t.phoneName1Tooltip}
-              >
-                <Input placeholder={t.personPlaceholder1} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label={t.email1Label}
-                name="email"
-                rules={[
-                  { required: true, message: t.emailRequired },
-                  { type: 'email', message: t.emailInvalid },
-                ]}
-              >
-                <Input type="email" placeholder="info@example.com" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="WhatsApp 1"
-                name="whatsapp"
-                tooltip={t.whatsapp1Tooltip}
-              >
-                <Input placeholder="972501234567" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label={t.whatsappName1Label}
-                name="whatsappName"
-                tooltip={t.whatsappNameTooltip}
-              >
-                <Input placeholder={t.personPlaceholder1} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+      <form onSubmit={handleSubmit}>
+        <fieldset disabled={loading} className="m-0 min-w-0 border-0 p-0">
+          {/* Contact Details */}
+          <SectionCard title={t.contactCard1}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('phone', t.phone1Label, { placeholder: '03-1234567', required: true })}
+              {renderText('phoneName', t.phoneName1Label, {
+                placeholder: t.personPlaceholder1,
+                tooltip: t.phoneName1Tooltip,
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('email', t.email1Label, {
+                placeholder: 'info@example.com',
+                type: 'email',
+                required: true,
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('whatsapp', 'WhatsApp 1', {
+                placeholder: '972501234567',
+                tooltip: t.whatsapp1Tooltip,
+              })}
+              {renderText('whatsappName', t.whatsappName1Label, {
+                placeholder: t.personPlaceholder1,
+                tooltip: t.whatsappNameTooltip,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Second Contact Details */}
-        <Card className="mb-4" title={t.contactCard2}>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label={t.phone2Label}
-                name="phone2"
-              >
-                <Input placeholder="03-7654321" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label={t.phoneName2Label}
-                name="phoneName2"
-                tooltip={t.phoneName2Tooltip}
-              >
-                <Input placeholder={t.personPlaceholder2} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label={t.email2Label}
-                name="email2"
-                rules={[
-                  { type: 'email', message: t.emailInvalid },
-                ]}
-              >
-                <Input type="email" placeholder="info2@example.com" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="WhatsApp 2"
-                name="whatsapp2"
-                tooltip={t.whatsapp2Tooltip}
-              >
-                <Input placeholder="972507654321" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label={t.whatsappName2Label}
-                name="whatsappName2"
-                tooltip={t.whatsappNameTooltip}
-              >
-                <Input placeholder={t.personPlaceholder2} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Second Contact Details */}
+          <SectionCard title={t.contactCard2}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('phone2', t.phone2Label, { placeholder: '03-7654321' })}
+              {renderText('phoneName2', t.phoneName2Label, {
+                placeholder: t.personPlaceholder2,
+                tooltip: t.phoneName2Tooltip,
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('email2', t.email2Label, {
+                placeholder: 'info2@example.com',
+                type: 'email',
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('whatsapp2', 'WhatsApp 2', {
+                placeholder: '972507654321',
+                tooltip: t.whatsapp2Tooltip,
+              })}
+              {renderText('whatsappName2', t.whatsappName2Label, {
+                placeholder: t.personPlaceholder2,
+                tooltip: t.whatsappNameTooltip,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Address */}
-        <Card className="mb-4" title={t.addressCard}>
-          <Row gutter={16}>
-            <Col md={16}>
-              <Form.Item
-                label={t.addressLabel}
-                name="address"
-                rules={[{ required: true, message: t.addressRequired }]}
-              >
-                <Input placeholder={t.addressPlaceholder} />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item
-                label={t.cityLabel}
-                name="city"
-                rules={[{ required: true, message: t.cityRequired }]}
-              >
-                <Input placeholder={t.cityPlaceholder} />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Address */}
+          <SectionCard title={t.addressCard}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('address', t.addressLabel, {
+                placeholder: t.addressPlaceholder,
+                required: true,
+                className: 'md:col-span-2',
+              })}
+              {renderText('city', t.cityLabel, {
+                placeholder: t.cityPlaceholder,
+                required: true,
+              })}
+            </div>
 
-          {/* Map Location Picker */}
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item label={t.mapLabel}>
-                <LocationPicker
-                  position={mapPosition}
-                  onPositionChange={(coords: { lat: number; lng: number }) => {
-                    setMapPosition(coords);
-                    form.setFieldsValue({
-                      latitude: coords.lat,
-                      longitude: coords.lng,
-                    });
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+            {/* Map Location Picker */}
+            <div className="space-y-2">
+              <Label>{t.mapLabel}</Label>
+              <LocationPicker
+                position={mapPosition}
+                onPositionChange={(coords: { lat: number; lng: number }) => {
+                  setMapPosition(coords);
+                  setValues((v) => ({ ...v, latitude: coords.lat, longitude: coords.lng }));
+                  setDirty(true);
+                }}
+              />
+            </div>
 
-          {/* Coordinates Display */}
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item label={t.latitudeLabel} name="latitude">
-                <InputNumber
-                  style={{ width: '100%' }}
+            {/* Coordinates Display */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="latitude">{t.latitudeLabel}</Label>
+                <Input
+                  id="latitude"
+                  type="number"
+                  step="any"
                   placeholder="32.0853"
-                  step={0.000001}
-                  precision={6}
-                  onChange={(value) => {
-                    if (typeof value === 'number' && form.getFieldValue('longitude')) {
-                      setMapPosition({ lat: value, lng: form.getFieldValue('longitude') });
+                  value={values.latitude ?? ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === '' ? null : parseFloat(raw);
+                    setField('latitude', num);
+                    if (
+                      typeof num === 'number' &&
+                      !Number.isNaN(num) &&
+                      typeof values.longitude === 'number'
+                    ) {
+                      setMapPosition({ lat: num, lng: values.longitude });
                     }
                   }}
                 />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item label={t.longitudeLabel} name="longitude">
-                <InputNumber
-                  style={{ width: '100%' }}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="longitude">{t.longitudeLabel}</Label>
+                <Input
+                  id="longitude"
+                  type="number"
+                  step="any"
                   placeholder="34.7818"
-                  step={0.000001}
-                  precision={6}
-                  onChange={(value) => {
-                    const lat = form.getFieldValue('latitude');
-                    if (typeof value === 'number' && typeof lat === 'number') {
-                      setMapPosition({ lat: lat, lng: value });
+                  value={values.longitude ?? ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === '' ? null : parseFloat(raw);
+                    setField('longitude', num);
+                    if (
+                      typeof num === 'number' &&
+                      !Number.isNaN(num) &&
+                      typeof values.latitude === 'number'
+                    ) {
+                      setMapPosition({ lat: values.latitude, lng: num });
                     }
                   }}
                 />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+              </div>
+            </div>
+          </SectionCard>
 
-        {/* Working Hours */}
-        <Card className="mb-4" title={t.hoursCard}>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label={t.weekdayHoursLabel}
-                name="weekdayHours"
-                rules={[{ required: true, message: t.hoursRequired }]}
-              >
-                <Input placeholder={t.weekdayHoursExample} />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label={t.fridayHoursLabel}
-                name="fridayHours"
-                rules={[{ required: true, message: t.hoursRequired }]}
-              >
-                <Input placeholder={t.fridayHoursExample} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Working Hours */}
+          <SectionCard title={t.hoursCard}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('weekdayHours', t.weekdayHoursLabel, {
+                placeholder: t.weekdayHoursExample,
+                required: true,
+              })}
+              {renderText('fridayHours', t.fridayHoursLabel, {
+                placeholder: t.fridayHoursExample,
+                required: true,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Social Media */}
-        <Card className="mb-4" title={t.socialCard1}>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Facebook 1 URL" name="facebook">
-                <Input placeholder="https://facebook.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label={t.facebookName1Label} name="facebookName">
-                <Input placeholder={t.personPlaceholder1} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Instagram 1 URL" name="instagram">
-                <Input placeholder="https://instagram.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label={t.instagramName1Label} name="instagramName">
-                <Input placeholder={t.personPlaceholder1} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="LinkedIn" name="linkedin">
-                <Input placeholder="https://linkedin.com/..." />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Social Media */}
+          <SectionCard title={t.socialCard1}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('facebook', 'Facebook 1 URL', { placeholder: 'https://facebook.com/...' })}
+              {renderText('facebookName', t.facebookName1Label, { placeholder: t.personPlaceholder1 })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('instagram', 'Instagram 1 URL', { placeholder: 'https://instagram.com/...' })}
+              {renderText('instagramName', t.instagramName1Label, { placeholder: t.personPlaceholder1 })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('linkedin', 'LinkedIn', { placeholder: 'https://linkedin.com/...' })}
+            </div>
+          </SectionCard>
 
-        {/* Second Social Media */}
-        <Card className="mb-4" title={t.socialCard2}>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Facebook 2 URL" name="facebook2">
-                <Input placeholder="https://facebook.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label={t.facebookName2Label} name="facebookName2">
-                <Input placeholder={t.personPlaceholder2} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Instagram 2 URL" name="instagram2">
-                <Input placeholder="https://instagram.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label={t.instagramName2Label} name="instagramName2">
-                <Input placeholder={t.personPlaceholder2} />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Second Social Media */}
+          <SectionCard title={t.socialCard2}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('facebook2', 'Facebook 2 URL', { placeholder: 'https://facebook.com/...' })}
+              {renderText('facebookName2', t.facebookName2Label, { placeholder: t.personPlaceholder2 })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('instagram2', 'Instagram 2 URL', { placeholder: 'https://instagram.com/...' })}
+              {renderText('instagramName2', t.instagramName2Label, { placeholder: t.personPlaceholder2 })}
+            </div>
+          </SectionCard>
 
-        {/* Submit */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={saving}
-            icon={<SaveOutlined />}
-          >
-            {t.saveButton}
-          </Button>
-        </div>
-      </Form>
+          {/* Submit */}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="submit" size="lg" disabled={saving}>
+              <Save className="size-4" />
+              {saving ? '…' : t.saveButton}
+            </Button>
+          </div>
+        </fieldset>
+      </form>
     </div>
   );
 }

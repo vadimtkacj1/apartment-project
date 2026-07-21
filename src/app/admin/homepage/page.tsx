@@ -1,14 +1,27 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Button, App, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, Statistic, RadioChangeEvent } from 'antd';
-import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
+import { Plus, Trash2, Pencil, Loader2 } from 'lucide-react';
+import type { DealType } from '@/types/property.types';
+import { toast } from '@/components/shadcn/sonner';
+import { Card } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Label } from '@/components/shadcn/label';
+import { Badge } from '@/components/shadcn/badge';
+import { Checkbox } from '@/components/shadcn/checkbox';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/shadcn/tabs';
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from '@/components/shadcn/table';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from '@/components/shadcn/dialog';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
-
-const { Title, Text } = Typography;
+import MetricCard from '@/components/admin/MetricCard';
 
 interface Property {
   id: number;
@@ -60,7 +73,6 @@ interface Property {
 }
 
 export default function HomepagePage() {
-  const { message } = App.useApp();
   const t = useAdminMessages(homepageMessages);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -89,7 +101,9 @@ export default function HomepagePage() {
   });
   const [titlesLoading, setTitlesLoading] = useState(true);
   const [titlesSaving, setTitlesSaving] = useState(false);
-  const [titlesForm] = Form.useForm();
+
+  const setTitle = (key: keyof typeof sectionTitles, value: string) =>
+    setSectionTitles((prev) => ({ ...prev, [key]: value }));
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -125,7 +139,6 @@ export default function HomepagePage() {
       if (!response.ok) {
         if (response.status === 401) {
           console.warn('Not authenticated - using default titles');
-          titlesForm.setFieldsValue(sectionTitles);
           return;
         }
         throw new Error('Failed to fetch titles');
@@ -133,11 +146,9 @@ export default function HomepagePage() {
 
       const data = await response.json();
       setSectionTitles(data);
-      titlesForm.setFieldsValue(data);
     } catch (error) {
       console.error('Error fetching section titles:', error);
       console.warn('Using default section titles');
-      titlesForm.setFieldsValue(sectionTitles);
     } finally {
       setTitlesLoading(false);
     }
@@ -146,7 +157,7 @@ export default function HomepagePage() {
   const handleSaveTitles = async () => {
     try {
       setTitlesSaving(true);
-      const values = titlesForm.getFieldsValue();
+      const values = sectionTitles;
       const response = await fetch('/api/admin/homepage-titles', {
         method: 'PUT',
         credentials: 'include',
@@ -158,20 +169,18 @@ export default function HomepagePage() {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(errorData.error || errorData.details || `HTTP ${response.status}: Failed to save titles`);
       }
-      
+
       const data = await response.json();
       if (data.settings) {
         setSectionTitles(data.settings);
-        titlesForm.setFieldsValue(data.settings);
       } else if (data) {
         setSectionTitles(data);
-        titlesForm.setFieldsValue(data);
       }
-      message.success(t.titlesSaved);
+      toast.success(t.titlesSaved);
     } catch (error) {
       console.error('Error saving titles:', error);
       const errorMessage = error instanceof Error ? error.message : t.unknownError;
-      message.error(t.titlesSaveError(errorMessage));
+      toast.error(t.titlesSaveError(errorMessage));
     } finally {
       setTitlesSaving(false);
     }
@@ -189,7 +198,7 @@ export default function HomepagePage() {
       setNoCommissionProperties(data.filter(p => p.isNoCommission));
     } catch (error) {
       console.error('Error fetching properties:', error);
-      message.error(t.propertiesLoadError);
+      toast.error(t.propertiesLoadError);
     } finally {
       setLoading(false);
     }
@@ -204,8 +213,8 @@ export default function HomepagePage() {
     setIsModalVisible(true);
   };
 
-  const handleRadioChange = (e: RadioChangeEvent) => {
-    setSelectedIds([e.target.value]);
+  const handleRadioChange = (id: number) => {
+    setSelectedIds([id]);
   };
 
   const handleSelectAll = () => {
@@ -220,16 +229,16 @@ export default function HomepagePage() {
     const selectedProperties = allProperties.filter(p => selectedIds.includes(p.id));
 
     if (modalType === 'noCommission' && selectedProperties.length > 1) {
-      message.warning(t.onlyOneNoCommissionWarning);
+      toast.warning(t.onlyOneNoCommissionWarning);
       return;
     }
 
     if (modalType === 'hot') {
       setHotProperties(selectedProperties);
-      message.success(t.propertiesSelected);
+      toast.success(t.propertiesSelected);
     } else {
       setNoCommissionProperties(selectedProperties);
-      message.success(t.propertySelected);
+      toast.success(t.propertySelected);
     }
 
     setIsModalVisible(false);
@@ -286,11 +295,11 @@ export default function HomepagePage() {
 
       await Promise.all(noCommissionPromises);
 
-      message.success(t.allChangesSaved);
+      toast.success(t.allChangesSaved);
       fetchProperties();
     } catch (error) {
       console.error('Error saving:', error);
-      message.error(t.changesSaveError);
+      toast.error(t.changesSaveError);
     } finally {
       setSaving(false);
     }
@@ -314,115 +323,97 @@ export default function HomepagePage() {
     return true;
   });
 
-  const tableColumns = (type: 'hot' | 'noCommission') => [
-    {
-      title: t.colImage,
-      dataIndex: 'images',
-      key: 'image',
-      width: 100,
-      render: (images: string[]) => (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '4px',
-          width: '80px',
-          height: '80px'
-        }}>
-          <Image
-            src={images[0] || '/images/hero/sales.jpg'}
-            alt={t.propertyAlt}
-            width={80}
-            height={80}
-            preview={false}
-            style={{
-              objectFit: 'cover',
-              borderRadius: '8px',
-              display: 'block',
-              width: '80px',
-              height: '80px'
-            }}
-            fallback="/images/hero/sales.jpg"
-          />
-        </div>
-      ),
-    },
-    {
-      title: t.colTitle,
-      dataIndex: 'title',
-      key: 'title',
-      width: 250,
-      ellipsis: { showTitle: true },
-      render: (text: string, record: Property) => (
-        <div style={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          maxWidth: '230px'
-        }}>
-          {text}
-          {record.isSold && <Tag color="error" style={{ marginInlineStart: '8px' }}>{record.dealType === 'rent' ? t.rented : t.sold}</Tag>}
-        </div>
-      ),
-    },
-    {
-      title: t.colLocation,
-      dataIndex: 'location',
-      key: 'location',
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: t.colPrice,
-      dataIndex: 'price',
-      key: 'price',
-      width: 120,
-      render: (price: string) => {
-        const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
-        return (
-          <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
-            {Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`}
-          </span>
-        );
-      },
-    },
-    {
-      title: t.colRooms,
-      dataIndex: 'rooms',
-      key: 'rooms',
-      width: 80,
-      align: 'center' as const,
-    },
-    {
-      title: t.colArea,
-      dataIndex: 'area',
-      key: 'area',
-      width: 80,
-      align: 'center' as const,
-      render: (area: number) => t.areaSqm(area),
-    },
-    {
-      title: t.colActions,
-      key: 'actions',
-      width: 150,
-      render: (_: any, record: Property) => (
-        <Button
-          type="primary"
-          danger
-          size="small"
-          icon={<DeleteOutlined />}
-          onClick={() => handleRemove(record.id, type)}
-        >
-          {t.remove}
-        </Button>
-      ),
-    },
-  ];
-
   const formatPrice = (price: string) => {
     const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
     return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
   };
+
+  // Desktop table mirroring the previous antd columns (same filtered data, same handlers)
+  const renderTable = (rows: Property[], type: 'hot' | 'noCommission') => (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">{t.colImage}</TableHead>
+            <TableHead className="w-[250px]">{t.colTitle}</TableHead>
+            <TableHead className="w-[150px]">{t.colLocation}</TableHead>
+            <TableHead className="w-[120px]">{t.colPrice}</TableHead>
+            <TableHead className="w-[80px] text-center">{t.colRooms}</TableHead>
+            <TableHead className="w-[80px] text-center">{t.colArea}</TableHead>
+            <TableHead className="w-[150px]">{t.colActions}</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((record) => (
+            <TableRow key={record.id}>
+              <TableCell>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  padding: '4px',
+                  width: '80px',
+                  height: '80px',
+                }}>
+                  <img
+                    src={record.images[0] || '/images/hero/sales.jpg'}
+                    alt={t.propertyAlt}
+                    width={80}
+                    height={80}
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg'; }}
+                    style={{
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      display: 'block',
+                      width: '80px',
+                      height: '80px',
+                    }}
+                  />
+                </div>
+              </TableCell>
+              <TableCell>
+                <div style={{
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '230px',
+                }}>
+                  {record.title}
+                  {record.isSold && (
+                    <Badge variant="destructive" className="ms-2">
+                      {record.dealType === 'rent' ? t.rented : t.sold}
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '150px' }}>
+                  {record.location}
+                </span>
+              </TableCell>
+              <TableCell>
+                <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
+                  {formatPrice(record.price)}
+                </span>
+              </TableCell>
+              <TableCell className="text-center">{record.rooms}</TableCell>
+              <TableCell className="text-center">{t.areaSqm(record.area)}</TableCell>
+              <TableCell>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleRemove(record.id, type)}
+                >
+                  <Trash2 className="size-4" />
+                  {t.remove}
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 
   // Mobile card list mirroring the desktop table (same filtered data, same handlers)
   const renderMobileCards = (rows: Property[], type: 'hot' | 'noCommission') => (
@@ -440,9 +431,9 @@ export default function HomepagePage() {
               <div className="admin-card__title">
                 {property.title}
                 {property.isSold && (
-                  <Tag color="error" style={{ marginInlineStart: '8px' }}>
+                  <Badge variant="destructive" className="ms-2">
                     {property.dealType === 'rent' ? t.rented : t.sold}
-                  </Tag>
+                  </Badge>
                 )}
               </div>
               <div className="admin-card__meta">{property.location}</div>
@@ -457,11 +448,10 @@ export default function HomepagePage() {
           </div>
           <div className="admin-card__actions">
             <Button
-              type="primary"
-              danger
-              icon={<DeleteOutlined />}
+              variant="destructive"
               onClick={() => handleRemove(property.id, type)}
             >
+              <Trash2 className="size-4" />
               {t.remove}
             </Button>
           </div>
@@ -473,7 +463,7 @@ export default function HomepagePage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Spin size="large" />
+        <Loader2 className="size-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -484,151 +474,185 @@ export default function HomepagePage() {
         <AdminPageHeader title={t.pageTitle} subtitle={t.pageSubtitle} />
 
         {/* Section Titles Editor */}
-        <Card
-          title={t.sectionTitlesCard}
-          className="rounded-lg"
-          style={{ marginBottom: '24px' }}
-          loading={titlesLoading}
-        >
-          <Form
-            form={titlesForm}
-            layout="vertical"
-            onFinish={() => handleSaveTitles()}
-          >
-            <Tabs
-              items={[
-                {
-                  key: 'main',
-                  label: t.tabMain,
-                  children: (
-                    <Space vertical className="w-full" size="large">
-                      <Form.Item label={t.labelHotTitle} name="hotPropositionsTitle">
-                        <Input placeholder={t.phHotTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelFeaturedTitle} name="featuredPropertiesTitle">
-                        <Input placeholder={t.phFeaturedTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelFeaturedSubtitle} name="featuredPropertiesSubtitle">
-                        <Input placeholder={t.phFeaturedSubtitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelValuesTitle} name="valuesSectionTitle">
-                        <Input placeholder={t.phValuesTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                    </Space>
-                  ),
-                },
-                {
-                  key: 'secondary',
-                  label: t.tabSecondary,
-                  children: (
-                    <Space vertical className="w-full" size="large">
-                      <Form.Item label={t.labelAboutTitle} name="aboutSectionTitle">
-                        <Input placeholder={t.phAboutTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelProcessTitle} name="processSectionTitle">
-                        <Input placeholder={t.phProcessTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelTestimonialsTitle} name="testimonialsTitle">
-                        <Input placeholder={t.phTestimonialsTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                      <Form.Item label={t.labelNoCommissionTitle} name="noCommissionTitle">
-                        <Input placeholder={t.phNoCommissionTitle} disabled={titlesLoading} />
-                      </Form.Item>
-                    </Space>
-                  ),
-                },
-              ]}
-            />
+        <Card className="p-5" style={{ marginBottom: '24px' }}>
+          <div className="mb-4" style={{ fontSize: '18px', fontWeight: 600, color: '#051150' }}>
+            {t.sectionTitlesCard}
+          </div>
 
-            <div style={{ marginTop: '24px', textAlign: 'start' }}>
-              <Button
-                type="primary"
-                size="large"
-                loading={titlesSaving}
-                onClick={handleSaveTitles}
-                icon={<EditOutlined />}
-                style={{ minWidth: '150px' }}
-              >
-                {t.saveTitles}
-              </Button>
+          {titlesLoading ? (
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
             </div>
-          </Form>
+          ) : (
+            <>
+              <Tabs defaultValue="main">
+                <TabsList>
+                  <TabsTrigger value="main">{t.tabMain}</TabsTrigger>
+                  <TabsTrigger value="secondary">{t.tabSecondary}</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="main">
+                  <div className="flex w-full flex-col gap-5 pt-2">
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelHotTitle}</Label>
+                      <Input
+                        value={sectionTitles.hotPropositionsTitle}
+                        onChange={(e) => setTitle('hotPropositionsTitle', e.target.value)}
+                        placeholder={t.phHotTitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelFeaturedTitle}</Label>
+                      <Input
+                        value={sectionTitles.featuredPropertiesTitle}
+                        onChange={(e) => setTitle('featuredPropertiesTitle', e.target.value)}
+                        placeholder={t.phFeaturedTitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelFeaturedSubtitle}</Label>
+                      <Input
+                        value={sectionTitles.featuredPropertiesSubtitle}
+                        onChange={(e) => setTitle('featuredPropertiesSubtitle', e.target.value)}
+                        placeholder={t.phFeaturedSubtitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelValuesTitle}</Label>
+                      <Input
+                        value={sectionTitles.valuesSectionTitle}
+                        onChange={(e) => setTitle('valuesSectionTitle', e.target.value)}
+                        placeholder={t.phValuesTitle}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="secondary">
+                  <div className="flex w-full flex-col gap-5 pt-2">
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelAboutTitle}</Label>
+                      <Input
+                        value={sectionTitles.aboutSectionTitle}
+                        onChange={(e) => setTitle('aboutSectionTitle', e.target.value)}
+                        placeholder={t.phAboutTitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelProcessTitle}</Label>
+                      <Input
+                        value={sectionTitles.processSectionTitle}
+                        onChange={(e) => setTitle('processSectionTitle', e.target.value)}
+                        placeholder={t.phProcessTitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelTestimonialsTitle}</Label>
+                      <Input
+                        value={sectionTitles.testimonialsTitle}
+                        onChange={(e) => setTitle('testimonialsTitle', e.target.value)}
+                        placeholder={t.phTestimonialsTitle}
+                      />
+                    </div>
+                    <div>
+                      <Label className="mb-1.5 block">{t.labelNoCommissionTitle}</Label>
+                      <Input
+                        value={sectionTitles.noCommissionTitle}
+                        onChange={(e) => setTitle('noCommissionTitle', e.target.value)}
+                        placeholder={t.phNoCommissionTitle}
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+
+              <div style={{ marginTop: '24px', textAlign: 'start' }}>
+                <Button
+                  size="lg"
+                  disabled={titlesSaving}
+                  onClick={handleSaveTitles}
+                  style={{ minWidth: '150px' }}
+                >
+                  {titlesSaving ? <Loader2 className="size-4 animate-spin" /> : <Pencil className="size-4" />}
+                  {t.saveTitles}
+                </Button>
+              </div>
+            </>
+          )}
         </Card>
 
         {/* Properties Section Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ marginTop: '24px', marginBottom: '16px' }}>
           <div>
-            <Title level={3} style={{ margin: 0, marginBottom: '4px' }}>{t.managePropertiesTitle}</Title>
-            <Text type="secondary">{t.managePropertiesSubtitle}</Text>
+            <h3 style={{ margin: 0, marginBottom: '4px', fontSize: '20px', fontWeight: 700, color: '#051150' }}>{t.managePropertiesTitle}</h3>
+            <p className="text-muted-foreground" style={{ margin: 0 }}>{t.managePropertiesSubtitle}</p>
           </div>
           <Button
-            type="primary"
-            size="middle"
-            loading={saving}
+            disabled={saving}
             onClick={handleSaveAll}
             style={{ width: '100%', maxWidth: '180px' }}
           >
+            {saving && <Loader2 className="size-4 animate-spin" />}
             {t.savePropertySelection}
           </Button>
         </div>
 
         {/* Statistics */}
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col xs={24} sm={12}>
-            <Card>
-              <Statistic title={t.hotDeals} value={hotProperties.length} suffix={t.statPropertiesSuffix} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12}>
-            <Card>
-              <Statistic title={t.statNoCommissionTitle} value={`${noCommissionProperties.length}/1`} suffix={t.statPropertySuffix} />
-            </Card>
-          </Col>
-        </Row>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5" style={{ marginBottom: '24px' }}>
+          <MetricCard label={t.hotDeals} value={hotProperties.length} suffix={` ${t.statPropertiesSuffix}`} />
+          <MetricCard label={t.statNoCommissionTitle} value={`${noCommissionProperties.length}/1`} suffix={` ${t.statPropertySuffix}`} />
+        </div>
 
         {/* Sections */}
         <div className="grid grid-cols-1 gap-6">
           {/* Hot Propositions Section */}
-          <Card
-            title={
+          <Card className="p-5">
+            <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.hotDeals}</span>
               </div>
-            }
-            extra={
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => openModal('hot')}
-                size="middle"
-                style={{ borderRadius: '8px', fontWeight: 500 }}
-              >
+              <Button onClick={() => openModal('hot')}>
+                <Plus className="size-4" />
                 {t.addProperties}
               </Button>
-            }
-          >
+            </div>
+
             {/* Price Filter Settings */}
             <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #E4E8F2' }}>
-              <Radio.Group
-                value={hotPropositionsMode}
-                onChange={(e) => setHotPropositionsMode(e.target.value)}
-                style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px' }}
-              >
-                <Radio value="manual">{t.manualSelection}</Radio>
-                <Radio value="price">{t.priceFilter}</Radio>
-              </Radio.Group>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px' }}>
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hotPropositionsMode"
+                    checked={hotPropositionsMode === 'manual'}
+                    onChange={() => setHotPropositionsMode('manual')}
+                  />
+                  <span>{t.manualSelection}</span>
+                </label>
+                <label className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hotPropositionsMode"
+                    checked={hotPropositionsMode === 'price'}
+                    onChange={() => setHotPropositionsMode('price')}
+                  />
+                  <span>{t.priceFilter}</span>
+                </label>
+              </div>
 
               {hotPropositionsMode === 'price' && (
                 <div className="mt-2 pt-2 admin-filter-full" style={{ borderTop: '1px solid #E4E8F2' }}>
-                  <InputNumber
+                  <Input
+                    type="number"
                     value={hotPropositionsMaxPrice}
-                    onChange={(value) => setHotPropositionsMaxPrice(value || 0)}
-                    formatter={value => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value!.replace(/₪\s?|(,*)/g, '') as any}
-                    style={{ width: '100%' }}
+                    onChange={(e) => setHotPropositionsMaxPrice(Number(e.target.value) || 0)}
                     min={0}
                     step={100000}
                     placeholder={t.maxPricePlaceholder}
+                    className="w-full"
                   />
                 </div>
               )}
@@ -636,27 +660,17 @@ export default function HomepagePage() {
 
             {hotProperties.length === 0 ? (
               <div className="text-center py-8">
-                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>{t.noPropertiesShown}</Text>
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<PlusOutlined />}
-                  onClick={() => openModal('hot')}
-                >
+                <p className="text-muted-foreground" style={{ marginBottom: '12px' }}>{t.noPropertiesShown}</p>
+                <Button size="sm" onClick={() => openModal('hot')}>
+                  <Plus className="size-4" />
                   {t.addProperties}
                 </Button>
               </div>
             ) : (
               <>
-                {/* desktop — existing table, unchanged */}
+                {/* desktop — table */}
                 <div className="admin-only-desktop">
-                  <Table
-                    dataSource={hotProperties}
-                    rowKey="id"
-                    pagination={false}
-                    scroll={{ x: 'max-content' }}
-                    columns={tableColumns('hot')}
-                  />
+                  {renderTable(hotProperties, 'hot')}
                 </div>
                 {/* mobile — card list */}
                 <div className="admin-only-mobile">
@@ -667,8 +681,8 @@ export default function HomepagePage() {
           </Card>
 
           {/* No Commission Section */}
-          <Card
-            title={
+          <Card className="p-5">
+            <div className="flex items-start justify-between gap-3 mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.noCommissionSection}</span>
@@ -677,43 +691,28 @@ export default function HomepagePage() {
                   {t.onlyOneNote}
                 </div>
               </div>
-            }
-            extra={
               <Button
-                type="primary"
-                icon={noCommissionProperties.length >= 1 ? <EditOutlined /> : <PlusOutlined />}
                 onClick={() => openModal('noCommission')}
                 disabled={noCommissionProperties.length >= 1}
-                size="middle"
-                style={{ borderRadius: '8px', fontWeight: 500 }}
               >
+                {noCommissionProperties.length >= 1 ? <Pencil className="size-4" /> : <Plus className="size-4" />}
                 {noCommissionProperties.length >= 1 ? t.propertyChosen : t.chooseProperty}
               </Button>
-            }
-          >
+            </div>
+
             {noCommissionProperties.length === 0 ? (
               <div className="text-center py-8">
-                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>{t.noPropertyChosen}</Text>
-                <Button
-                  type="primary"
-                  size="small"
-                  icon={<PlusOutlined />}
-                  onClick={() => openModal('noCommission')}
-                >
+                <p className="text-muted-foreground" style={{ marginBottom: '12px' }}>{t.noPropertyChosen}</p>
+                <Button size="sm" onClick={() => openModal('noCommission')}>
+                  <Plus className="size-4" />
                   {t.chooseProperty}
                 </Button>
               </div>
             ) : (
               <>
-                {/* desktop — existing table, unchanged */}
+                {/* desktop — table */}
                 <div className="admin-only-desktop">
-                  <Table
-                    dataSource={noCommissionProperties}
-                    rowKey="id"
-                    pagination={false}
-                    scroll={{ x: 'max-content' }}
-                    columns={tableColumns('noCommission')}
-                  />
+                  {renderTable(noCommissionProperties, 'noCommission')}
                 </div>
                 {/* mobile — card list */}
                 <div className="admin-only-mobile">
@@ -725,107 +724,97 @@ export default function HomepagePage() {
         </div>
 
         {/* Property Selector Modal */}
-        <Modal
-          title={
-            <div style={{ padding: '8px 0' }}>
-              <div style={{ fontSize: '20px', fontWeight: 600, marginBottom: '4px' }}>
+        <Dialog open={isModalVisible} onOpenChange={(o) => { if (!o) setIsModalVisible(false); }}>
+          <DialogContent className="w-[96vw] max-w-[900px]">
+            <DialogHeader>
+              <DialogTitle>
                 {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
-              </div>
+              </DialogTitle>
               {modalType === 'noCommission' && (
-                <div style={{ fontSize: '13px', fontWeight: 'normal', color: '#64748B', marginTop: '4px' }}>
-                  {t.modalNoteOnlyOne}
+                <DialogDescription>{t.modalNoteOnlyOne}</DialogDescription>
+              )}
+            </DialogHeader>
+
+            <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+              {modalType === 'hot' && (
+                <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #E4E8F2' }}>
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={
+                        selectedIds.length === availableProperties.length && availableProperties.length > 0
+                          ? true
+                          : selectedIds.length > 0
+                            ? 'indeterminate'
+                            : false
+                      }
+                      onCheckedChange={handleSelectAll}
+                    />
+                    <strong>{t.selectAll(selectedIds.length, availableProperties.length)}</strong>
+                  </label>
                 </div>
               )}
-            </div>
-          }
-          open={isModalVisible}
-          onOk={handleModalOk}
-          onCancel={() => setIsModalVisible(false)}
-          width="min(900px, 96vw)"
-          styles={{ body: { maxHeight: '70vh', overflowY: 'auto' } }}
-          okText={t.ok}
-          cancelText={t.cancel}
-          okButtonProps={{
-            size: 'large',
-            style: { borderRadius: '8px', fontWeight: 500 }
-          }}
-          cancelButtonProps={{
-            size: 'large',
-            style: { borderRadius: '8px' }
-          }}
-        >
-          <div>
-            {modalType === 'hot' && (
-              <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #E4E8F2' }}>
-                <Checkbox
-                  checked={selectedIds.length === availableProperties.length && availableProperties.length > 0}
-                  indeterminate={selectedIds.length > 0 && selectedIds.length < availableProperties.length}
-                  onChange={handleSelectAll}
-                >
-                  <strong>{t.selectAll(selectedIds.length, availableProperties.length)}</strong>
-                </Checkbox>
-              </div>
-            )}
 
-            <div>
-              {modalType === 'noCommission' ? (
-                <Radio.Group
-                  value={selectedIds[0]}
-                  onChange={handleRadioChange}
-                  className="w-full"
-                >
-                  <Space vertical className="w-full">
-                    {availableProperties.map((property) => (
-                      <Card key={property.id} size="small" className="w-full">
-                        <Radio value={property.id} className="w-full">
-                          <div className="flex items-center gap-3 ml-2">
-                            <img
-                              src={property.images[0] || '/images/placeholder.jpg'}
-                              alt={property.title}
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                            <div className="flex-1">
-                              <div className="font-semibold text-sm">{property.title}</div>
-                              <div className="text-xs text-gray-500">{property.location}</div>
-                              <div className="text-xs font-bold text-primary">{property.price}</div>
-                            </div>
-                          </div>
-                        </Radio>
-                      </Card>
+              <div className="flex w-full flex-col gap-2">
+                {modalType === 'noCommission'
+                  ? availableProperties.map((property) => (
+                      <label
+                        key={property.id}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border p-2"
+                      >
+                        <input
+                          type="radio"
+                          name="noCommissionPick"
+                          checked={selectedIds[0] === property.id}
+                          onChange={() => handleRadioChange(property.id)}
+                        />
+                        <img
+                          src={property.images[0] || '/images/placeholder.jpg'}
+                          alt={property.title}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">{property.title}</div>
+                          <div className="text-xs text-gray-500">{property.location}</div>
+                          <div className="text-xs font-bold text-primary">{property.price}</div>
+                        </div>
+                      </label>
+                    ))
+                  : availableProperties.map((property) => (
+                      <label
+                        key={property.id}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border p-2"
+                      >
+                        <Checkbox
+                          checked={selectedIds.includes(property.id)}
+                          onCheckedChange={(v) =>
+                            setSelectedIds((prev) =>
+                              v
+                                ? [...prev.filter((id) => id !== property.id), property.id]
+                                : prev.filter((id) => id !== property.id),
+                            )
+                          }
+                        />
+                        <img
+                          src={property.images[0] || '/images/placeholder.jpg'}
+                          alt={property.title}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                        <div className="flex-1">
+                          <div className="font-semibold text-sm">{property.title}</div>
+                          <div className="text-xs text-gray-500">{property.location}</div>
+                          <div className="text-xs font-bold text-primary">{property.price}</div>
+                        </div>
+                      </label>
                     ))}
-                  </Space>
-                </Radio.Group>
-              ) : (
-                <Checkbox.Group
-                  value={selectedIds}
-                  onChange={(values) => setSelectedIds(values as number[])}
-                  className="w-full"
-                >
-                  <Space vertical className="w-full">
-                    {availableProperties.map((property) => (
-                      <Card key={property.id} size="small" className="w-full">
-                        <Checkbox value={property.id} className="w-full">
-                          <div className="flex items-center gap-3 ml-2">
-                            <img
-                              src={property.images[0] || '/images/placeholder.jpg'}
-                              alt={property.title}
-                              className="w-12 h-12 object-cover rounded"
-                            />
-                            <div className="flex-1">
-                              <div className="font-semibold text-sm">{property.title}</div>
-                              <div className="text-xs text-gray-500">{property.location}</div>
-                              <div className="text-xs font-bold text-primary">{property.price}</div>
-                            </div>
-                          </div>
-                        </Checkbox>
-                      </Card>
-                    ))}
-                  </Space>
-                </Checkbox.Group>
-              )}
+              </div>
             </div>
-          </div>
-        </Modal>
+
+            <DialogFooter className="mt-2 gap-2">
+              <Button variant="outline" onClick={() => setIsModalVisible(false)}>{t.cancel}</Button>
+              <Button onClick={handleModalOk}>{t.ok}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

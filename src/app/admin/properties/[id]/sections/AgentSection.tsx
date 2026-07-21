@@ -1,7 +1,9 @@
 'use client';
 
-import { Card, Form, Select } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { User } from 'lucide-react';
+import { Card } from '@/components/shadcn/card';
+import { Label } from '@/components/shadcn/label';
+import { Checkbox } from '@/components/shadcn/checkbox';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
@@ -24,7 +26,7 @@ interface Owner {
   isActive: boolean;
 }
 
-export function AgentSection({ formData, handleChange }: PropertyFormSectionProps) {
+export function AgentSection({ formData, handleChange, errors }: PropertyFormSectionProps) {
   const t = useAdminMessages(propertyFormMessages);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [owners, setOwners] = useState<Owner[]>([]);
@@ -44,7 +46,7 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
   }, []);
 
   // Combine owners and team members into one list with prefixes
-  const options = [
+  const groups = [
     {
       label: t.agent.ownersGroup,
       options: owners.map((o) => ({
@@ -61,38 +63,59 @@ export function AgentSection({ formData, handleChange }: PropertyFormSectionProp
     },
   ];
 
+  const selected = formData.agentIds ?? [];
+  const isEmpty = teamMembers.length === 0 && owners.length === 0;
+
+  const toggle = (value: string, checked: boolean) => {
+    const next = checked
+      ? [...selected, value]
+      : selected.filter((v) => v !== value);
+    handleChange('agentIds', next);
+  };
+
   return (
-    <Card
-      title={
-        <>
-          <UserOutlined style={{ marginInlineEnd: '8px' }} />
-          {t.agent.cardTitle}
-        </>
-      }
-      className="mb-4"
-    >
-      <Form.Item
-        label={t.agent.selectLabel}
-        name="agentIds"
-        rules={[
-          {
-            required: true,
-            type: 'array',
-            min: 1,
-            message: t.agent.required,
-          },
-        ]}
-      >
-        <Select
-          mode="multiple"
-          placeholder={t.agent.placeholder}
-          options={options}
-          value={formData.agentIds}
-          onChange={(ids) => handleChange('agentIds', ids)}
-          disabled={teamMembers.length === 0 && owners.length === 0}
-          notFoundContent={teamMembers.length === 0 && owners.length === 0 ? t.agent.noneActive : t.agent.notFound}
-        />
-      </Form.Item>
+    <Card className="mb-4 p-5">
+      <h3 className="mb-4 flex items-center gap-2 text-base font-semibold text-foreground">
+        <User className="size-4" />
+        {t.agent.cardTitle}
+      </h3>
+
+      <div id="field-agentIds">
+        <Label className="mb-2 block">
+          {t.agent.selectLabel} <span className="text-destructive">*</span>
+        </Label>
+
+        {isEmpty ? (
+          <p className="text-sm text-muted-foreground">{t.agent.noneActive}</p>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {groups.map((group) =>
+              group.options.length > 0 ? (
+                <div key={group.label}>
+                  <div className="mb-2 text-sm font-semibold text-muted-foreground">
+                    {group.label}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {group.options.map((opt) => (
+                      <label key={opt.value} className="flex cursor-pointer items-center gap-2">
+                        <Checkbox
+                          checked={selected.includes(opt.value)}
+                          onCheckedChange={(c) => toggle(opt.value, c === true)}
+                        />
+                        <span className="text-sm">{opt.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null,
+            )}
+          </div>
+        )}
+
+        {errors?.agentIds && (
+          <p className="mt-2 text-sm text-destructive">{errors.agentIds}</p>
+        )}
+      </div>
     </Card>
   );
 }

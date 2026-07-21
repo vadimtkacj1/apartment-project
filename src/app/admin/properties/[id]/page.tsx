@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Button, Form, Spin } from 'antd';
-import { ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
+import { ArrowLeft, Home, Loader2 } from 'lucide-react';
+import { Button } from '@/components/shadcn/button';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
@@ -22,9 +23,9 @@ import {
 export default function PropertyEditPage() {
   const params = useParams();
   const router = useRouter();
-  const [form] = Form.useForm();
   const t = useAdminMessages(propertyFormMessages);
   const isNew = params.id === 'new';
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const {
     formData,
@@ -33,12 +34,44 @@ export default function PropertyEditPage() {
     handleChange,
     handleSubmit,
     handleAddressFromMap,
-  } = usePropertyForm(params.id, isNew, form);
+  } = usePropertyForm(params.id, isNew);
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!String(formData.title ?? '').trim()) e.title = t.basicInfo.titleRequired;
+    if (!String(formData.description ?? '').trim())
+      e.description = t.basicInfo.descriptionRequired;
+    if (!String(formData.price ?? '').trim()) e.price = t.basicInfo.priceRequired;
+    if (!formData.agentIds || formData.agentIds.length === 0)
+      e.agentIds = t.agent.required;
+    if (!formData.city) e.city = t.location.cityRequired;
+    if (!formData.rooms) e.rooms = t.details.roomsRequired;
+    if (formData.area === undefined || formData.area === null)
+      e.area = t.details.areaRequired;
+    return e;
+  };
+
+  const onSubmit = (ev: React.FormEvent) => {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length > 0) {
+      const order = ['title', 'description', 'price', 'agentIds', 'city', 'rooms', 'area'];
+      const first = order.find((k) => e[k]);
+      if (first) {
+        document
+          .getElementById(`field-${first}`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    handleSubmit(() => router.push('/admin/properties'));
+  };
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" />
+      <div className="flex justify-center p-12">
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -47,38 +80,29 @@ export default function PropertyEditPage() {
     <div>
       <AdminPageHeader
         title={
-          <>
-            <HomeOutlined style={{ marginInlineEnd: '8px' }} />
+          <span className="inline-flex items-center gap-2">
+            <Home className="size-6" />
             {isNew ? t.page.addTitle : t.page.editTitle}
-          </>
+          </span>
         }
         extra={
           <Button
-            icon={<ArrowLeftOutlined />}
-            iconPlacement="end"
-            onClick={() => router.push('/admin/properties')}
-            size="large"
+            variant="outline"
+            size="lg"
             className="w-full sm:w-auto"
+            onClick={() => router.push('/admin/properties')}
           >
             {t.page.backToList}
+            <ArrowLeft className="size-4" />
           </Button>
         }
       />
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={(values) => handleSubmit(values, () => router.push('/admin/properties'))}
-        onFinishFailed={({ errorFields }) => {
-          form.scrollToField(errorFields[0]?.name?.[0], { behavior: 'smooth' });
-        }}
-        scrollToFirstError
-        initialValues={formData}
-      >
-        <BasicInfoSection formData={formData} handleChange={handleChange} />
-        <AgentSection formData={formData} handleChange={handleChange} />
-        <LocationSection formData={formData} handleChange={handleChange} />
-        <PropertyDetailsSection formData={formData} handleChange={handleChange} />
+      <form onSubmit={onSubmit} noValidate>
+        <BasicInfoSection formData={formData} handleChange={handleChange} errors={errors} />
+        <AgentSection formData={formData} handleChange={handleChange} errors={errors} />
+        <LocationSection formData={formData} handleChange={handleChange} errors={errors} />
+        <PropertyDetailsSection formData={formData} handleChange={handleChange} errors={errors} />
         <FeaturesSection formData={formData} handleChange={handleChange} />
         <MapSection
           formData={formData}
@@ -95,7 +119,7 @@ export default function PropertyEditPage() {
           submit
           onCancel={() => router.push('/admin/properties')}
         />
-      </Form>
+      </form>
     </div>
   );
 }

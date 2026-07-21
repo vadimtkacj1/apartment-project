@@ -1,4 +1,7 @@
-import { Card, Row, Col, Form, Checkbox } from 'antd';
+'use client';
+
+import { Card } from '@/components/shadcn/card';
+import { Checkbox } from '@/components/shadcn/checkbox';
 import {
   Snowflake,
   Accessibility,
@@ -38,29 +41,29 @@ const FEATURES = [
 export function FeaturesSection({ formData, handleChange }: PropertyFormSectionProps) {
   const t = useAdminMessages(propertyFormMessages);
   return (
-    <Card title={t.features.cardTitle} className="mb-4">
-      <Row gutter={[16, 16]}>
+    <Card className="mb-4 p-5">
+      <h3 className="mb-4 text-base font-semibold text-foreground">{t.features.cardTitle}</h3>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {FEATURES.map((feature) => {
           const IconComponent = feature.icon;
+          const key = feature.key as keyof PropertyForm;
           return (
-            <Col xs={12} sm={8} md={6} key={feature.key}>
-              <Form.Item name={feature.key} valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Checkbox
-                  onChange={(e) =>
-                    handleChange(feature.key as keyof PropertyForm, e.target.checked)
-                  }
-                  style={{ display: 'flex', alignItems: 'center', minHeight: 44 }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                    <IconComponent size={16} />
-                    {t.features.items[feature.labelKey]}
-                  </span>
-                </Checkbox>
-              </Form.Item>
-            </Col>
+            <label
+              key={feature.key}
+              className="flex min-h-11 cursor-pointer items-center gap-2"
+            >
+              <Checkbox
+                checked={Boolean(formData[key])}
+                onCheckedChange={(c) => handleChange(key, c === true)}
+              />
+              <span className="flex items-center gap-2 text-sm">
+                <IconComponent size={16} />
+                {t.features.items[feature.labelKey]}
+              </span>
+            </label>
           );
         })}
-      </Row>
+      </div>
     </Card>
   );
 }

@@ -1,17 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Input, Switch, InputNumber, App, Spin } from 'antd';
-import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useRouter, useParams } from 'next/navigation';
+import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { toast } from '@/components/shadcn/sonner';
+import { Card, CardTitle } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Textarea } from '@/components/shadcn/textarea';
+import { Switch } from '@/components/shadcn/switch';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import AdminFormActions from '@/components/admin/AdminFormActions';
 import { useAdminMessages } from '@/lib/adminI18n';
 import { teamMessages } from '@/lib/adminI18n/messages/team';
-
-const { TextArea } = Input;
 
 interface TeamMemberForm {
   name: string;
@@ -50,7 +53,6 @@ export default function TeamMemberEditPage() {
   const isNew = id === 'new';
 
   const t = useAdminMessages(teamMessages);
-  const { message } = App.useApp();
   const [formData, setFormData] = useState<TeamMemberForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -72,7 +74,7 @@ export default function TeamMemberEditPage() {
       setFormData(data);
     } catch (error) {
       console.error('Error fetching team member:', error);
-      message.error(t.loadOneError);
+      toast.error(t.loadOneError);
     } finally {
       setLoading(false);
     }
@@ -106,29 +108,29 @@ export default function TeamMemberEditPage() {
 
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {
-      message.error(t.nameRequired);
+      toast.error(t.nameRequired);
       return false;
     }
     if (!formData.role.trim()) {
-      message.error(t.roleRequired);
+      toast.error(t.roleRequired);
       return false;
     }
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      message.error(t.emailInvalid);
+      toast.error(t.emailInvalid);
       return false;
     }
     // Проверка формата телефона (опционально)
     const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
     if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
-      message.error(t.phoneInvalid);
+      toast.error(t.phoneInvalid);
       return false;
     }
     if (formData.mobile && formData.mobile.trim() && !phoneRegex.test(formData.mobile)) {
-      message.error(t.mobileInvalid);
+      toast.error(t.mobileInvalid);
       return false;
     }
     if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
-      message.error(t.whatsappInvalid);
+      toast.error(t.whatsappInvalid);
       return false;
     }
     return true;
@@ -153,11 +155,11 @@ export default function TeamMemberEditPage() {
       }
 
       setDirty(false);
-      message.success(isNew ? t.createSuccess : t.updateSuccess);
+      toast.success(isNew ? t.createSuccess : t.updateSuccess);
       router.push('/admin/team');
     } catch (error) {
       console.error('Error saving team member:', error);
-      message.error(t.saveError);
+      toast.error(t.saveError);
     } finally {
       setSaving(false);
     }
@@ -166,7 +168,7 @@ export default function TeamMemberEditPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <Spin size="large" />
+        <Loader2 className="size-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -176,17 +178,19 @@ export default function TeamMemberEditPage() {
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <Button
-          icon={<ArrowRightOutlined />}
+          variant="outline"
           onClick={() => router.push('/admin/team')}
           style={{ marginBottom: '16px' }}
         >
+          <ArrowRight className="size-4" />
           {t.backToList}
         </Button>
         <AdminPageHeader title={isNew ? t.addNew : t.editTitle} style={{ marginBottom: 0 }} />
       </div>
 
       {/* Basic Information */}
-      <Card title={t.basicInfoCard} style={{ marginBottom: '24px' }}>
+      <Card className="p-6" style={{ marginBottom: '24px' }}>
+        <CardTitle className="mb-4">{t.basicInfoCard}</CardTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
@@ -196,7 +200,6 @@ export default function TeamMemberEditPage() {
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder={t.namePlaceholder}
-              size="large"
             />
           </div>
           <div>
@@ -207,7 +210,6 @@ export default function TeamMemberEditPage() {
               value={formData.role}
               onChange={(e) => handleChange('role', e.target.value)}
               placeholder={t.rolePlaceholder}
-              size="large"
             />
           </div>
           <div>
@@ -218,26 +220,25 @@ export default function TeamMemberEditPage() {
               value={formData.licenceNumber}
               onChange={(e) => handleChange('licenceNumber', e.target.value)}
               placeholder={t.licencePlaceholder}
-              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
               {t.descriptionLabel}
             </label>
-            <TextArea
+            <Textarea
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder={t.descriptionPlaceholder}
               rows={4}
-              size="large"
             />
           </div>
         </div>
       </Card>
 
       {/* Profile Photo */}
-      <Card title={t.profilePhotoCard} style={{ marginBottom: '24px' }}>
+      <Card className="p-6" style={{ marginBottom: '24px' }}>
+        <CardTitle className="mb-4">{t.profilePhotoCard}</CardTitle>
         <ProfileImageUploader
           image={formData.image}
           onImageChange={(image) => handleChange('image', image)}
@@ -246,7 +247,8 @@ export default function TeamMemberEditPage() {
       </Card>
 
       {/* Contact Information */}
-      <Card title={t.contactInfoCard} style={{ marginBottom: '24px' }}>
+      <Card className="p-6" style={{ marginBottom: '24px' }}>
+        <CardTitle className="mb-4">{t.contactInfoCard}</CardTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
@@ -256,7 +258,6 @@ export default function TeamMemberEditPage() {
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="050-123-4567"
-              size="large"
             />
           </div>
           <div>
@@ -267,7 +268,6 @@ export default function TeamMemberEditPage() {
               value={formData.mobile}
               onChange={(e) => handleChange('mobile', e.target.value)}
               placeholder="052-123-4567"
-              size="large"
             />
           </div>
           <div>
@@ -278,7 +278,6 @@ export default function TeamMemberEditPage() {
               value={formData.whatsapp}
               onChange={(e) => handleChange('whatsapp', e.target.value)}
               placeholder="050-123-4567"
-              size="large"
             />
           </div>
           <div>
@@ -289,7 +288,6 @@ export default function TeamMemberEditPage() {
               value={formData.fax}
               onChange={(e) => handleChange('fax', e.target.value)}
               placeholder="03-123-4567"
-              size="large"
             />
           </div>
           <div>
@@ -301,25 +299,24 @@ export default function TeamMemberEditPage() {
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="example@example.com"
-              size="large"
             />
           </div>
         </div>
       </Card>
 
       {/* Display Settings */}
-      <Card title={t.displaySettingsCard} style={{ marginBottom: '24px' }}>
+      <Card className="p-6" style={{ marginBottom: '24px' }}>
+        <CardTitle className="mb-4">{t.displaySettingsCard}</CardTitle>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
               {t.displayOrderLabel}
             </label>
-            <InputNumber
-              value={formData.order}
-              onChange={(value) => handleChange('order', value || 0)}
+            <Input
+              type="number"
               min={0}
-              size="large"
-              style={{ width: '100%' }}
+              value={formData.order}
+              onChange={(e) => handleChange('order', e.target.value === '' ? 0 : Number(e.target.value))}
             />
             <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>
               {t.orderHint}
@@ -329,12 +326,15 @@ export default function TeamMemberEditPage() {
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
               {t.fieldStatus}
             </label>
-            <Switch
-              checked={formData.isActive}
-              onChange={(value) => handleChange('isActive', value)}
-              checkedChildren={t.statusActive}
-              unCheckedChildren={t.statusInactive}
-            />
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={formData.isActive}
+                onCheckedChange={(value) => handleChange('isActive', value)}
+              />
+              <span className="text-sm text-muted-foreground">
+                {formData.isActive ? t.statusActive : t.statusInactive}
+              </span>
+            </div>
           </div>
         </div>
       </Card>

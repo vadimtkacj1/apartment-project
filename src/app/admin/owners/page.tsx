@@ -1,33 +1,25 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { BRAND } from '@/lib/adminTheme';
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Input,
-  Select,
-  Modal,
-  App,
-  Statistic,
-  Space,
-  Switch,
-  Table,
-  Skeleton,
-} from 'antd';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  UserOutlined,
-  SearchOutlined,
-  CheckCircleOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
-import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import { Plus, Pencil, Trash2, User as UserIcon, Search, CheckCircle2, Ban } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from '@/components/shadcn/sonner';
+import { Card } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Switch } from '@/components/shadcn/switch';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from '@/components/shadcn/select';
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '@/components/shadcn/alert-dialog';
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from '@/components/shadcn/table';
+import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -49,12 +41,10 @@ interface Owner {
 }
 
 export default function OwnersPage() {
-  const { message } = App.useApp();
   const t = useAdminMessages(ownersMessages);
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedOwner, setSelectedOwner] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -71,7 +61,7 @@ export default function OwnersPage() {
     } catch (error) {
       console.error('Error fetching owners:', error);
       setOwners([]);
-      message.error(t.loadListError);
+      toast.error(t.loadListError);
     } finally {
       setLoading(false);
     }
@@ -98,17 +88,16 @@ export default function OwnersPage() {
   }, [owners, searchTerm, filterStatus]);
 
   const handleDelete = async () => {
-    if (!selectedOwner) return;
+    if (!deleteTarget) return;
     try {
-      const response = await fetch(`/api/admin/owners/${selectedOwner}`, { method: 'DELETE' });
+      const response = await fetch(`/api/admin/owners/${deleteTarget}`, { method: 'DELETE' });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      setDeleteModal(false);
-      setSelectedOwner(null);
+      setDeleteTarget(null);
       fetchOwners();
-      message.success(t.deleteSuccess);
+      toast.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting owner:', error);
-      message.error(t.deleteError);
+      toast.error(t.deleteError);
     }
   };
 
@@ -126,225 +115,136 @@ export default function OwnersPage() {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       fetchOwners();
-      message.success(value ? t.activatedSuccess : t.deactivatedSuccess);
+      toast.success(value ? t.activatedSuccess : t.deactivatedSuccess);
     } catch (error) {
       console.error('Error updating status:', error);
-      message.error(t.statusUpdateError);
+      toast.error(t.statusUpdateError);
     }
   };
 
+  const roundAvatar = (image: string | null, name: string, size = 44) => (
+    image ? (
+      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', border: '1px solid #E4E8F2', flexShrink: 0, background: '#F4F6FB' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt={name}
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+      </div>
+    ) : (
+      <div style={{ width: size, height: size, borderRadius: '50%', background: '#F4F6FB', border: '1px solid #E4E8F2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <UserIcon className="size-5 text-slate-400" />
+      </div>
+    )
+  );
+
   return (
     <div>
-      {/* Header */}
       <AdminPageHeader
         title={t.title}
         extra={
-          <Link href="/admin/owners/new" className="w-full sm:w-auto">
-            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
-              {t.addNew}
-            </Button>
-          </Link>
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link href="/admin/owners/new"><Plus className="size-4" />{t.addNew}</Link>
+          </Button>
         }
       />
 
-      {/* Statistics */}
       <MetricCardGrid
         items={[
-          { icon: <UserOutlined />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <CheckCircleOutlined />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
-          { icon: <StopOutlined />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
+          { icon: <UserIcon className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <CheckCircle2 className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
+          { icon: <Ban className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
         ]}
       />
 
       {/* Filters */}
-      <Card className="mb-6">
-        <Space vertical style={{ width: '100%' }} size="middle">
-          <Input
-            placeholder={t.searchPlaceholder}
-            prefix={<SearchOutlined />}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="large"
-          />
-          <Select
-            value={filterStatus}
-            onChange={setFilterStatus}
-            style={{ minWidth: 120, width: '100%', maxWidth: '200px' }}
-            size="large"
-          >
-            <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
-            <Select.Option value="active">{t.statusActive}</Select.Option>
-            <Select.Option value="inactive">{t.statusInactive}</Select.Option>
+      <Card className="mb-6 p-4">
+        <div className="flex w-full flex-col gap-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={t.searchPlaceholder}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="ps-9"
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
+              <SelectItem value="active">{t.statusActive}</SelectItem>
+              <SelectItem value="inactive">{t.statusInactive}</SelectItem>
+            </SelectContent>
           </Select>
-        </Space>
+        </div>
       </Card>
 
-      {/* Owners Table — desktop */}
+      {/* Desktop table */}
       <div className="admin-only-desktop">
-      <Card>
-        <Table
-          dataSource={filteredOwners}
-          loading={loading}
-          rowKey="id"
-          size="middle"
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total) => t.paginationTotal(total),
-          }}
-          scroll={{ x: 'max-content' }}
-          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} /> }}
-          columns={[
-            {
-              title: t.fieldName,
-              key: 'owner',
-              width: 260,
-              render: (_, record: Owner) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                  {record.image ? (
-                    <div
-                      style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        border: '1px solid #E4E8F2',
-                        flexShrink: 0,
-                        background: '#F4F6FB',
-                      }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={record.image}
-                        alt={record.name}
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '50%',
-                        background: '#F4F6FB',
-                        border: '1px solid #E4E8F2',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <UserOutlined style={{ fontSize: 20, color: '#94A3B8' }} />
-                    </div>
-                  )}
-                  <div style={{ minWidth: 0 }}>
-                    <Link
-                      href={`/admin/owners/${record.id}`}
-                      style={{
-                        display: 'block',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: '#354AC4',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {record.name}
-                    </Link>
-                    <div
-                      style={{
-                        fontSize: 12.5,
-                        color: '#64748B',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {record.title}
-                    </div>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: t.fieldEmail,
-              dataIndex: 'email',
-              key: 'email',
-              width: 200,
-              render: (email: string | null) => email || '-',
-            },
-            {
-              title: t.fieldPhone,
-              dataIndex: 'phone',
-              key: 'phone',
-              width: 120,
-              render: (phone: string | null) => phone || '-',
-            },
-            {
-              title: 'WhatsApp',
-              dataIndex: 'whatsapp',
-              key: 'whatsapp',
-              width: 120,
-              render: (whatsapp: string | null) => whatsapp || '-',
-            },
-            {
-              title: t.fieldOrder,
-              dataIndex: 'order',
-              key: 'order',
-              width: 80,
-              align: 'center',
-            },
-            {
-              title: t.fieldStatus,
-              key: 'status',
-              width: 100,
-              align: 'center',
-              render: (_, record: Owner) => (
-                <Switch
-                  checked={record.isActive}
-                  onChange={(v) => handleStatusChange(record.id, v)}
-                  checkedChildren={t.statusActive}
-                  unCheckedChildren={t.switchOff}
-                />
-              ),
-            },
-            {
-              title: t.colActions,
-              key: 'actions',
-              width: 150,
-              render: (_, record: Owner) => (
-                <Space size={4}>
-                  <Link href={`/admin/owners/${record.id}`}>
-                    <Button type="primary" icon={<EditOutlined />} size="small">
-                      {t.edit}
-                    </Button>
-                  </Link>
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    onClick={() => {
-                      setSelectedOwner(record.id);
-                      setDeleteModal(true);
-                    }}
-                  >
-                    {t.delete}
-                  </Button>
-                </Space>
-              ),
-            },
-          ]}
-        />
-      </Card>
+        <Card className="p-2">
+          {loading ? (
+            <div className="p-4"><Skeleton className="h-64 w-full" /></div>
+          ) : filteredOwners.length === 0 ? (
+            <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t.fieldName}</TableHead>
+                  <TableHead>{t.fieldEmail}</TableHead>
+                  <TableHead>{t.fieldPhone}</TableHead>
+                  <TableHead>WhatsApp</TableHead>
+                  <TableHead className="text-center">{t.fieldOrder}</TableHead>
+                  <TableHead className="text-center">{t.fieldStatus}</TableHead>
+                  <TableHead>{t.colActions}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredOwners.map((record) => (
+                  <TableRow key={record.id}>
+                    <TableCell>
+                      <div className="flex min-w-0 items-center gap-3">
+                        {roundAvatar(record.image, record.name)}
+                        <div className="min-w-0">
+                          <Link href={`/admin/owners/${record.id}`} className="block truncate text-sm font-semibold text-[#354AC4]">
+                            {record.name}
+                          </Link>
+                          <div className="truncate text-[12.5px] text-slate-500">{record.title}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{record.email || '-'}</TableCell>
+                    <TableCell>{record.phone || '-'}</TableCell>
+                    <TableCell>{record.whatsapp || '-'}</TableCell>
+                    <TableCell className="text-center">{record.order}</TableCell>
+                    <TableCell className="text-center">
+                      <Switch checked={record.isActive} onCheckedChange={(v) => handleStatusChange(record.id, v)} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1.5">
+                        <Button asChild size="sm">
+                          <Link href={`/admin/owners/${record.id}`}><Pencil className="size-4" />{t.edit}</Link>
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(record.id)}>
+                          <Trash2 className="size-4" />{t.delete}
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
       </div>
 
-      {/* Owners — mobile card list */}
+      {/* Mobile card list */}
       <div className="admin-only-mobile">
         {loading ? (
-          <Skeleton active paragraph={{ rows: 6 }} />
+          <Skeleton className="h-64 w-full" />
         ) : filteredOwners.length === 0 ? (
           <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} />
         ) : (
@@ -355,16 +255,8 @@ export default function OwnersPage() {
                   {owner.image ? (
                     <img className="admin-card__thumb admin-card__thumb--round" src={owner.image} alt={owner.name} />
                   ) : (
-                    <div
-                      className="admin-card__thumb admin-card__thumb--round"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: '#F4F6FB',
-                      }}
-                    >
-                      <UserOutlined style={{ fontSize: '22px', color: '#94A3B8' }} />
+                    <div className="admin-card__thumb admin-card__thumb--round" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F4F6FB' }}>
+                      <UserIcon className="size-6 text-slate-400" />
                     </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -379,27 +271,14 @@ export default function OwnersPage() {
                   <span><b>{t.fieldOrder}</b> {owner.order}</span>
                 </div>
                 <div className="admin-card__actions">
-                  <Switch
-                    checked={owner.isActive}
-                    onChange={(v) => handleStatusChange(owner.id, v)}
-                    checkedChildren={t.statusActive}
-                    unCheckedChildren={t.switchOff}
-                  />
+                  <Switch checked={owner.isActive} onCheckedChange={(v) => handleStatusChange(owner.id, v)} />
                   <span className="admin-card__grow">
-                    <Link href={`/admin/owners/${owner.id}`}>
-                      <Button type="primary" icon={<EditOutlined />}>{t.edit}</Button>
-                    </Link>
+                    <Button asChild size="sm">
+                      <Link href={`/admin/owners/${owner.id}`}><Pencil className="size-4" />{t.edit}</Link>
+                    </Button>
                   </span>
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => {
-                      setSelectedOwner(owner.id);
-                      setDeleteModal(true);
-                    }}
-                  >
-                    {t.delete}
+                  <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(owner.id)}>
+                    <Trash2 className="size-4" />{t.delete}
                   </Button>
                 </div>
               </div>
@@ -408,21 +287,19 @@ export default function OwnersPage() {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title={t.deleteConfirmTitle}
-        open={deleteModal}
-        onOk={handleDelete}
-        onCancel={() => {
-          setDeleteModal(false);
-          setSelectedOwner(null);
-        }}
-        okText={t.delete}
-        cancelText={t.cancel}
-        okButtonProps={{ danger: true }}
-      >
-        <p>{t.deleteConfirmBody}</p>
-      </Modal>
+      {/* Delete confirm */}
+      <AlertDialog open={deleteTarget !== null} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.deleteConfirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{t.deleteConfirmBody}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>{t.delete}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

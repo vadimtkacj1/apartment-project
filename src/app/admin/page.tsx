@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Row, Col, Card, Skeleton } from 'antd';
-import { ArrowLeftOutlined, ArrowRightOutlined, PictureOutlined } from '@ant-design/icons';
+import { ArrowLeft, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   AreaChart,
   Area,
@@ -104,13 +104,32 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: DEEP }}>{children}</span>
 );
 
-const cardBody: { body: React.CSSProperties } = { body: { padding: 22 } };
+/** Local card shell replacing antd Card — optional head (title/extra) + padded body; styled via .ec-card* CSS. */
+function ECard({ title, extra, style, children }: { title?: React.ReactNode; extra?: React.ReactNode; style?: React.CSSProperties; children: React.ReactNode }) {
+  return (
+    <div className="ec-card" style={style}>
+      {(title || extra) && <div className="ec-card-head">{title}{extra}</div>}
+      <div className="ec-card-body">{children}</div>
+    </div>
+  );
+}
+
+/** Skeleton paragraph — a stack of full-width lines (replaces antd `Skeleton active paragraph`). */
+function SkelLines({ rows }: { rows: number }) {
+  return (
+    <div className="flex flex-col gap-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <Skeleton key={i} className="h-4 w-full" />
+      ))}
+    </div>
+  );
+}
 
 /* ===== page ===== */
 export default function AdminDashboard() {
   const t = useAdminMessages(dashboardMessages);
   const { dir } = useAdminI18n();
-  const Fwd = dir === 'rtl' ? ArrowLeftOutlined : ArrowRightOutlined;
+  const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const [props, setProps] = useState<PropertyRow[] | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [propsLoading, setPropsLoading] = useState(true);
@@ -256,7 +275,7 @@ export default function AdminDashboard() {
         </div>
 
         {propsLoading ? (
-          <Skeleton.Button active style={{ width: 340, height: 22, borderRadius: 6, marginTop: 14 }} />
+          <Skeleton className="h-5 w-[340px] mt-3.5" />
         ) : (
           <>
             <div className="ec-mast-line">
@@ -274,7 +293,7 @@ export default function AdminDashboard() {
               {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
                 <Link href="/admin/inquiries" className="ec-mast-cta">
                   <Num style={{ fontWeight: 700 }}>{summary?.newInquiries}</Num> {t.newInquiries}
-                  <Fwd style={{ fontSize: 11 }} />
+                  <Fwd className="size-3" />
                 </Link>
               )}
             </div>
@@ -288,18 +307,17 @@ export default function AdminDashboard() {
       </div>
 
       {/* ── Traffic at a glance — headline KPIs + sparkline; full, filterable analytics lives on /admin/analytics ── */}
-      <Card
-        styles={cardBody}
+      <ECard
         style={{ marginBottom: 24 }}
         title={<SectionTitle>{t.siteTraffic}</SectionTitle>}
         extra={
           <Link href="/admin/analytics" className="ec-viewall">
-            {t.fullAnalytics} <Fwd style={{ fontSize: 11 }} />
+            {t.fullAnalytics} <Fwd className="size-3" />
           </Link>
         }
       >
         {trafficLoading ? (
-          <Skeleton active paragraph={{ rows: 3 }} />
+          <SkelLines rows={3} />
         ) : (
           <div className="ec-traffic">
             {/* Funnel order (visitors → views → interactions → leads) reads like a story,
@@ -356,14 +374,13 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
-      </Card>
+      </ECard>
 
       {/* ── Composition + Attention queue ── */}
-      <Row gutter={[24, 24]} style={{ marginBottom: 24 }} align="stretch">
-        <Col xs={24} lg={13}>
-          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>{t.portfolioComposition}</SectionTitle>}>
+      <div className="grid grid-cols-1 lg:grid-cols-[13fr_11fr] gap-6" style={{ marginBottom: 24 }}>
+        <ECard style={{ height: '100%' }} title={<SectionTitle>{t.portfolioComposition}</SectionTitle>}>
             {propsLoading ? (
-              <Skeleton active paragraph={{ rows: 5 }} />
+              <SkelLines rows={5} />
             ) : portfolio.total === 0 ? (
               <EmptyBlock height={160} text={t.noPropertiesInSystem} />
             ) : (
@@ -407,13 +424,11 @@ export default function AdminDashboard() {
                 )}
               </>
             )}
-          </Card>
-        </Col>
+        </ECard>
 
-        <Col xs={24} lg={11}>
-          <Card style={{ height: '100%' }} styles={cardBody} title={<SectionTitle>{t.needsAttention}</SectionTitle>}>
+        <ECard style={{ height: '100%' }} title={<SectionTitle>{t.needsAttention}</SectionTitle>}>
             {propsLoading ? (
-              <Skeleton active paragraph={{ rows: 4 }} />
+              <SkelLines rows={4} />
             ) : (
               <div>
                 <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} />
@@ -424,14 +439,13 @@ export default function AdminDashboard() {
                 {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} muted />}
               </div>
             )}
-          </Card>
-        </Col>
-      </Row>
+        </ECard>
+      </div>
 
       {/* ── Recent listings ── */}
-      <Card styles={cardBody} title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd style={{ fontSize: 11 }} /></Link>}>
+      <ECard title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd className="size-3" /></Link>}>
         {propsLoading ? (
-          <Skeleton active paragraph={{ rows: 4 }} />
+          <SkelLines rows={4} />
         ) : portfolio.recentListings.length === 0 ? (
           <EmptyBlock height={120} text={t.noProperties} />
         ) : (
@@ -443,7 +457,7 @@ export default function AdminDashboard() {
                   <img src={x.images[0]} alt={x.title} className="ec-thumb" loading="lazy" />
                 ) : (
                   <span className="ec-thumb ec-thumb-empty">
-                    <PictureOutlined style={{ color: 'rgba(255,255,255,.7)', fontSize: 16 }} />
+                    <ImageIcon style={{ color: 'rgba(255,255,255,.7)' }} className="size-4" />
                   </span>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -460,7 +474,7 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
-      </Card>
+      </ECard>
 
       <DashboardStyles />
     </div>
@@ -483,7 +497,7 @@ function Kpi({ label, value, text, accent, delta }: { label: string; value?: num
 function AttentionRow({ label, count, muted }: { label: string; count: number; muted?: boolean }) {
   const t = useAdminMessages(dashboardMessages);
   const { dir } = useAdminI18n();
-  const Fwd = dir === 'rtl' ? ArrowLeftOutlined : ArrowRightOutlined;
+  const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const ok = count === 0;
   return (
     <Link href="/admin/properties" className="ec-row ec-attrow">
@@ -494,7 +508,7 @@ function AttentionRow({ label, count, muted }: { label: string; count: number; m
       ) : (
         <>
           <Num style={{ fontWeight: 700, color: muted ? '#6B7280' : NAVY, fontSize: 15, marginInlineEnd: 10 }}>{count}</Num>
-          <span className="ec-att-cta">{t.view} <Fwd style={{ fontSize: 10 }} /></span>
+          <span className="ec-att-cta">{t.view} <Fwd className="size-2.5" /></span>
         </>
       )}
     </Link>
@@ -518,8 +532,10 @@ function DashboardStyles() {
 .ec-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
 /* Cards: a single hairline (no border+shadow stacking) on cream — flat & editorial */
-.layout-dashboard .estate-console .ant-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
-.layout-dashboard .estate-console .ant-card-head{border-bottom:none;}
+.layout-dashboard .estate-console .ec-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
+.layout-dashboard .estate-console .ec-card-head{border-bottom:none;}
+.estate-console .ec-card-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0;}
+.estate-console .ec-card-body{padding:22px;}
 
 /* Masthead — the brand's möbius gradient (deep-navy -> indigo) with a bright-blue
    corner glow as the signature "ribbon light". Multi-layer background so the glow

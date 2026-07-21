@@ -59,4 +59,5 @@ export interface PropertyForm {
 export interface PropertyFormSectionProps {
   formData: PropertyForm;
   handleChange: (field: keyof PropertyForm, value: any) => void;
+  errors?: Record<string, string>;
 }

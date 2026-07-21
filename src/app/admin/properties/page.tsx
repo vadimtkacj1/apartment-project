@@ -1,43 +1,42 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { BRAND } from '@/lib/adminTheme';
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Input,
-  Select,
-  Modal,
-  App,
-  Statistic,
-  Space,
-  Switch,
-  Spin,
-  Table,
-  Image,
-  Skeleton,
-} from 'antd';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  HomeOutlined,
-  SearchOutlined,
-  TagOutlined,
-  KeyOutlined,
-  CheckCircleOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
-import MetricCard from '@/components/admin/MetricCard';
 import Link from 'next/link';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Home,
+  Search,
+  Tag,
+  Key,
+  CheckCircle2,
+  Ban,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { toast } from '@/components/shadcn/sonner';
+import { Card } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Switch } from '@/components/shadcn/switch';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import {
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+} from '@/components/shadcn/select';
+import {
+  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
+} from '@/components/shadcn/table';
+import {
+  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
+} from '@/components/shadcn/alert-dialog';
+import MetricCard from '@/components/admin/MetricCard';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import { useAdminMessages } from '@/lib/adminI18n';
+import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { propertiesMessages } from '@/lib/adminI18n/messages/properties';
-import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
-import type { ColumnsType } from 'antd/es/table';
+import type { DealType } from '@/types/property.types';
 import { getCityLabel } from '@/data/cities';
 
 interface Property {
@@ -90,6 +89,8 @@ interface Property {
 // Persist table view (page + filters) so editing/toggling a property keeps your place
 const TABLE_STATE_KEY = 'admin-properties-table-state';
 
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+
 // Shared ₪ formatting used by both the desktop table and the mobile card list
 function formatPropertyPrice(price: string): string {
   const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
@@ -97,8 +98,8 @@ function formatPropertyPrice(price: string): string {
 }
 
 export default function PropertiesPage() {
-  const { message } = App.useApp();
   const t = useAdminMessages(propertiesMessages);
+  const { dir } = useAdminI18n();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -155,7 +156,7 @@ export default function PropertiesPage() {
     } catch (error) {
       console.error('Error fetching properties:', error);
       setProperties([]);
-      message.error(t.loadError);
+      toast.error(t.loadError);
     } finally {
       setLoading(false);
     }
@@ -197,6 +198,11 @@ export default function PropertiesPage() {
     if (currentPage > maxPage) setCurrentPage(maxPage);
   }, [filteredProperties.length, pageSize, currentPage]);
 
+  // Client-side pagination (replaces antd Table's built-in pager)
+  const totalItems = filteredProperties.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const pageItems = filteredProperties.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
   const handleDelete = async () => {
     if (!selectedProperty) return;
     try {
@@ -205,10 +211,10 @@ export default function PropertiesPage() {
       setDeleteModal(false);
       setSelectedProperty(null);
       fetchProperties();
-      message.success(t.deleteSuccess);
+      toast.success(t.deleteSuccess);
     } catch (error) {
       console.error('Error deleting property:', error);
-      message.error(t.deleteError);
+      toast.error(t.deleteError);
     }
   };
 
@@ -245,10 +251,10 @@ export default function PropertiesPage() {
         isPinned: value ? t.pinnedToHome : t.unpinnedFromHome,
         isActive: value ? t.activated : t.deactivated,
       };
-      message.success(msgs[field]);
+      toast.success(msgs[field]);
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
-      message.error(t.statusUpdateError);
+      toast.error(t.statusUpdateError);
       // Revert optimistic update on error
       setProperties((prev) =>
         prev.map((property) =>
@@ -258,245 +264,264 @@ export default function PropertiesPage() {
     }
   };
 
+  // Labelled toggle — replaces antd Switch's checkedChildren/unCheckedChildren text
+  const statusToggle = (
+    p: Property,
+    field: 'isActive' | 'isSold',
+    onLabel: string,
+    offLabel: string
+  ) => {
+    const checked = p[field];
+    return (
+      <span className="flex items-center gap-2">
+        <Switch checked={checked} onCheckedChange={(v) => handleStatusChange(p.id, field, v)} />
+        <span className="text-xs font-medium text-muted-foreground">{checked ? onLabel : offLabel}</span>
+      </span>
+    );
+  };
+
+  const openDelete = (id: number) => {
+    setSelectedProperty(id);
+    setDeleteModal(true);
+  };
+
   return (
     <div>
       {/* Header */}
       <AdminPageHeader
         title={t.pageTitle}
         extra={
-          <Link href="/admin/properties/new" className="w-full sm:w-auto">
-            <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
+          <Button asChild size="lg" className="w-full sm:w-auto">
+            <Link href="/admin/properties/new">
+              <Plus className="size-4" />
               {t.addNewProperty}
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         }
       />
 
       {/* Statistics */}
-      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {[
-          { label: t.statTotal, value: stats.total, icon: <HomeOutlined />, accent: '#354AC4' },
-          { label: t.statForSale, value: stats.forSale, icon: <TagOutlined />, accent: '#354AC4' },
-          { label: t.statForRent, value: stats.forRent, icon: <KeyOutlined />, accent: '#5594F1' },
-          { label: t.statActive, value: stats.active, icon: <CheckCircleOutlined />, accent: '#2A69C4' },
-          { label: t.statSold, value: stats.sold, icon: <StopOutlined />, accent: '#64748B' },
+          { label: t.statTotal, value: stats.total, icon: <Home className="size-5" />, accent: '#354AC4' },
+          { label: t.statForSale, value: stats.forSale, icon: <Tag className="size-5" />, accent: '#354AC4' },
+          { label: t.statForRent, value: stats.forRent, icon: <Key className="size-5" />, accent: '#5594F1' },
+          { label: t.statActive, value: stats.active, icon: <CheckCircle2 className="size-5" />, accent: '#2A69C4' },
+          { label: t.statSold, value: stats.sold, icon: <Ban className="size-5" />, accent: '#64748B' },
         ].map((s) => (
-          <Col key={String(s.label)} flex="1 1 180px">
-            <MetricCard icon={s.icon} label={s.label} value={s.value} accent={s.accent} />
-          </Col>
+          <MetricCard key={String(s.label)} icon={s.icon} label={s.label} value={s.value} accent={s.accent} />
         ))}
-      </Row>
+      </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <Space vertical style={{ width: '100%' }} size="middle">
-          <Input
-            placeholder={t.searchPlaceholder}
-            prefix={<SearchOutlined />}
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            size="large"
-          />
-          <Space wrap className="admin-filter-full" style={{ width: '100%' }}>
+      <Card className="mb-6 p-4">
+        <div className="flex w-full flex-col gap-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder={t.searchPlaceholder}
+              className="h-11 ps-9"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
+          <div className="admin-filter-full flex w-full flex-wrap gap-3">
             <Select
               value={filterDealType}
-              onChange={(v) => {
+              onValueChange={(v) => {
                 setFilterDealType(v);
                 setCurrentPage(1);
               }}
-              style={{ minWidth: 150 }}
-              size="large"
             >
-              <Select.Option value="all">{t.filterAllDealTypes}</Select.Option>
-              <Select.Option value="sale">{t.dealSale}</Select.Option>
-              <Select.Option value="rent">{t.dealRent}</Select.Option>
+              <SelectTrigger className="h-11 min-w-[150px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t.filterAllDealTypes}</SelectItem>
+                <SelectItem value="sale">{t.dealSale}</SelectItem>
+                <SelectItem value="rent">{t.dealRent}</SelectItem>
+              </SelectContent>
             </Select>
             <Select
               value={filterStatus}
-              onChange={(v) => {
+              onValueChange={(v) => {
                 setFilterStatus(v);
                 setCurrentPage(1);
               }}
-              style={{ minWidth: 120 }}
-              size="large"
             >
-              <Select.Option value="all">{t.filterAllStatuses}</Select.Option>
-              <Select.Option value="active">{t.statusActive}</Select.Option>
-              <Select.Option value="inactive">{t.statusInactive}</Select.Option>
-              <Select.Option value="sold">{t.statusSold}</Select.Option>
-              <Select.Option value="available">{t.statusAvailable}</Select.Option>
+              <SelectTrigger className="h-11 min-w-[120px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
+                <SelectItem value="active">{t.statusActive}</SelectItem>
+                <SelectItem value="inactive">{t.statusInactive}</SelectItem>
+                <SelectItem value="sold">{t.statusSold}</SelectItem>
+                <SelectItem value="available">{t.statusAvailable}</SelectItem>
+              </SelectContent>
             </Select>
-          </Space>
-        </Space>
+          </div>
+        </div>
       </Card>
 
       {/* Property Table — desktop (≥768px) */}
       <div className="admin-only-desktop">
-      <Card>
-        <Table
-          dataSource={filteredProperties}
-          loading={loading}
-          rowKey="id"
-          size="middle"
-          pagination={{
-            current: currentPage,
-            pageSize,
-            showSizeChanger: true,
-            showTotal: (total) => t.tableTotal(total),
-            onChange: (page, size) => {
-              setCurrentPage(page);
-              setPageSize(size);
-            },
-          }}
-          scroll={{ x: 'max-content' }}
-          locale={{ emptyText: <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} /> }}
-          rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
-          columns={[
-            {
-              title: t.colTitle,
-              key: 'property',
-              width: 300,
-              render: (_, record: Property) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                  <Image
-                    src={record.images[0] || '/images/hero/sales.jpg'}
-                    alt={record.title}
-                    width={40}
-                    height={40}
-                    preview={false}
-                    style={{
-                      objectFit: 'cover',
-                      borderRadius: 8,
-                      display: 'block',
-                      width: 40,
-                      height: 40,
-                      flexShrink: 0,
-                    }}
-                    fallback="/images/hero/sales.jpg"
-                  />
-                  <div style={{ minWidth: 0 }}>
-                    <Link
-                      href={`/admin/properties/${record.id}`}
-                      style={{
-                        display: 'block',
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: '#354AC4',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {record.title}
-                    </Link>
-                    <div
-                      style={{
-                        fontSize: 12.5,
-                        color: '#64748B',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {`${getCityLabel(record.city) || record.location} · ${t.roomsShort(record.rooms)} · ${t.sqm(record.area)}`}
-                    </div>
-                  </div>
-                </div>
-              ),
-            },
-            {
-              title: t.colDealType,
-              dataIndex: 'dealType',
-              key: 'dealType',
-              width: 100,
-              render: (dealType: string) => (
-                <span className={`admin-pill admin-pill--${dealType === 'sale' ? 'sale' : 'rent'}`}>
-                  {dealType === 'sale' ? t.dealSale : t.dealRent}
-                </span>
-              ),
-            },
-            {
-              title: t.colPrice,
-              dataIndex: 'price',
-              key: 'price',
-              width: 120,
-              render: (price: string) => (
-                <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block', color: '#051150', fontWeight: 600 }}>
-                  {formatPropertyPrice(price)}
-                </span>
-              ),
-            },
-            {
-              title: t.colFloor,
-              key: 'floor',
-              width: 80,
-              align: 'center',
-              render: (_, record: Property) =>
-                record.floor && record.totalFloors
-                  ? `${record.floor}/${record.totalFloors}`
-                  : record.floor || '-',
-            },
-            {
-              title: t.colStatus,
-              key: 'status',
-              width: 120,
-              render: (_, record: Property) => (
-                <Space vertical size={4}>
-                  <Switch
-                    size="small"
-                    checked={record.isActive}
-                    onChange={(v) => handleStatusChange(record.id, 'isActive', v)}
-                    checkedChildren={t.statusActive}
-                    unCheckedChildren={t.switchOff}
-                  />
-                  <Switch
-                    size="small"
-                    checked={record.isSold}
-                    onChange={(v) => handleStatusChange(record.id, 'isSold', v)}
-                    checkedChildren={record.dealType === 'rent' ? t.statusRented : t.statusSold}
-                    unCheckedChildren={t.switchVacant}
-                  />
-                </Space>
-              ),
-            },
-            {
-              title: t.colActions,
-              key: 'actions',
-              width: 150,
-              render: (_, record: Property) => (
-                <Space size={4}>
-                  <Link href={`/admin/properties/${record.id}`}>
-                    <Button type="primary" icon={<EditOutlined />} size="small">
-                      {t.edit}
-                    </Button>
-                  </Link>
-                  <Button
-                    type="primary"
-                    danger
-                    icon={<DeleteOutlined />}
-                    size="small"
-                    onClick={() => {
-                      setSelectedProperty(record.id);
-                      setDeleteModal(true);
+        <Card className="p-2">
+          {loading ? (
+            <div className="p-4"><Skeleton className="h-64 w-full" /></div>
+          ) : totalItems === 0 ? (
+            <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} />
+          ) : (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[300px]">{t.colTitle}</TableHead>
+                    <TableHead className="w-[100px]">{t.colDealType}</TableHead>
+                    <TableHead className="w-[120px]">{t.colPrice}</TableHead>
+                    <TableHead className="w-[80px] text-center">{t.colFloor}</TableHead>
+                    <TableHead className="w-[130px]">{t.colStatus}</TableHead>
+                    <TableHead className="w-[160px]">{t.colActions}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pageItems.map((record) => (
+                    <TableRow key={record.id} className={record.isSold ? 'sold-property-row' : ''}>
+                      <TableCell>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={record.images[0] || '/images/hero/sales.jpg'}
+                            alt={record.title}
+                            width={40}
+                            height={40}
+                            className="block size-10 shrink-0 rounded-lg object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg';
+                            }}
+                          />
+                          <div style={{ minWidth: 0 }}>
+                            <Link
+                              href={`/admin/properties/${record.id}`}
+                              style={{
+                                display: 'block',
+                                fontSize: 14,
+                                fontWeight: 600,
+                                color: '#354AC4',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {record.title}
+                            </Link>
+                            <div
+                              style={{
+                                fontSize: 12.5,
+                                color: '#64748B',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}
+                            >
+                              {`${getCityLabel(record.city) || record.location} · ${t.roomsShort(record.rooms)} · ${t.sqm(record.area)}`}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`admin-pill admin-pill--${record.dealType === 'sale' ? 'sale' : 'rent'}`}>
+                          {record.dealType === 'sale' ? t.dealSale : t.dealRent}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block', color: '#051150', fontWeight: 600 }}>
+                          {formatPropertyPrice(record.price)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {record.floor && record.totalFloors
+                          ? `${record.floor}/${record.totalFloors}`
+                          : record.floor || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1.5">
+                          {statusToggle(record, 'isActive', t.statusActive, t.switchOff)}
+                          {statusToggle(record, 'isSold', record.dealType === 'rent' ? t.statusRented : t.statusSold, t.switchVacant)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button asChild size="sm">
+                            <Link href={`/admin/properties/${record.id}`}>
+                              <Pencil className="size-4" />
+                              {t.edit}
+                            </Link>
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={() => openDelete(record.id)}>
+                            <Trash2 className="size-4" />
+                            {t.delete}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              {/* Pagination */}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-2 py-1">
+                <span className="text-sm text-muted-foreground">{t.tableTotal(totalItems)}</span>
+                <div className="flex items-center gap-2">
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(v) => {
+                      setPageSize(Number(v));
+                      setCurrentPage(1);
                     }}
                   >
-                    {t.delete}
-                  </Button>
-                </Space>
-              ),
-            },
-          ]}
-        />
-      </Card>
+                    <SelectTrigger className="h-9 w-[90px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {PAGE_SIZE_OPTIONS.map((n) => (
+                        <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-9"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      aria-label="Previous page"
+                    >
+                      {dir === 'rtl' ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+                    </Button>
+                    <span dir="ltr" className="min-w-[64px] text-center text-sm tabular-nums text-muted-foreground">
+                      {currentPage} / {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-9"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      aria-label="Next page"
+                    >
+                      {dir === 'rtl' ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </Card>
       </div>
 
       {/* Property list — mobile (<768px) card view */}
       <div className="admin-only-mobile">
         {loading ? (
-          <Skeleton active paragraph={{ rows: 6 }} />
+          <Skeleton className="h-64 w-full" />
         ) : filteredProperties.length === 0 ? (
           <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} />
         ) : (
@@ -551,34 +576,21 @@ export default function PropertiesPage() {
                     </span>
                   </div>
                   <div className="admin-card__actions">
-                    <Switch
-                      checked={property.isActive}
-                      onChange={(v) => handleStatusChange(property.id, 'isActive', v)}
-                      checkedChildren={t.statusActive}
-                      unCheckedChildren={t.switchOff}
-                    />
-                    <Switch
-                      checked={property.isSold}
-                      onChange={(v) => handleStatusChange(property.id, 'isSold', v)}
-                      checkedChildren={property.dealType === 'rent' ? t.statusRented : t.statusSold}
-                      unCheckedChildren={t.switchVacant}
-                    />
+                    {statusToggle(property, 'isActive', t.statusActive, t.switchOff)}
+                    {statusToggle(property, 'isSold', property.dealType === 'rent' ? t.statusRented : t.statusSold, t.switchVacant)}
                     <span className="admin-card__grow" style={{ display: 'flex', gap: 8 }}>
-                      <Link href={`/admin/properties/${property.id}`} style={{ flex: 1 }}>
-                        <Button type="primary" icon={<EditOutlined />} block>
+                      <Button asChild className="flex-1">
+                        <Link href={`/admin/properties/${property.id}`}>
+                          <Pencil className="size-4" />
                           {t.edit}
-                        </Button>
-                      </Link>
+                        </Link>
+                      </Button>
                       <Button
-                        type="primary"
-                        danger
-                        icon={<DeleteOutlined />}
+                        variant="destructive"
                         style={{ marginInlineStart: 'auto' }}
-                        onClick={() => {
-                          setSelectedProperty(property.id);
-                          setDeleteModal(true);
-                        }}
+                        onClick={() => openDelete(property.id)}
                       >
+                        <Trash2 className="size-4" />
                         {t.delete}
                       </Button>
                     </span>
@@ -590,21 +602,29 @@ export default function PropertiesPage() {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        title={t.deleteModalTitle}
+      {/* Delete Confirmation */}
+      <AlertDialog
         open={deleteModal}
-        onOk={handleDelete}
-        onCancel={() => {
-          setDeleteModal(false);
-          setSelectedProperty(null);
+        onOpenChange={(o) => {
+          if (!o) {
+            setDeleteModal(false);
+            setSelectedProperty(null);
+          }
         }}
-        okText={t.delete}
-        cancelText={t.cancel}
-        okButtonProps={{ danger: true }}
       >
-        <p>{t.deleteModalContent}</p>
-      </Modal>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.deleteModalTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{t.deleteModalContent}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              {t.delete}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
