@@ -37,8 +37,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
+  // Auto-close the overlay after a navigation on phones. Read the viewport
+  // directly (not the isMobile state) so this never fires on the initial mount
+  // with a stale value and wrongly collapses the permanent desktop sidebar.
   useEffect(() => {
-    if (isMobile) setCollapsed(true);
+    if (window.matchMedia('(max-width: 991px)').matches) setCollapsed(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 

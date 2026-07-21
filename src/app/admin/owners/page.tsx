@@ -225,12 +225,16 @@ export default function OwnersPage() {
                       <Switch checked={record.isActive} onCheckedChange={(v) => handleStatusChange(record.id, v)} />
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-1.5">
-                        <Button asChild size="sm">
-                          <Link href={`/admin/owners/${record.id}`}><Pencil className="size-4" />{t.edit}</Link>
+                      <div className="flex gap-1">
+                        <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
+                          <Link href={`/admin/owners/${record.id}`}><Pencil className="size-4" /></Link>
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(record.id)}>
-                          <Trash2 className="size-4" />{t.delete}
+                        <Button
+                          variant="ghost" size="icon"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => setDeleteTarget(record.id)} aria-label={t.delete}
+                        >
+                          <Trash2 className="size-4" />
                         </Button>
                       </div>
                     </TableCell>

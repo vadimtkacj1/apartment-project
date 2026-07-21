@@ -400,8 +400,9 @@ export default function HomepagePage() {
               <TableCell className="text-center">{t.areaSqm(record.area)}</TableCell>
               <TableCell>
                 <Button
-                  variant="destructive"
+                  variant="ghost"
                   size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => handleRemove(record.id, type)}
                 >
                   <Trash2 className="size-4" />
@@ -448,7 +449,8 @@ export default function HomepagePage() {
           </div>
           <div className="admin-card__actions">
             <Button
-              variant="destructive"
+              variant="outline"
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={() => handleRemove(property.id, type)}
             >
               <Trash2 className="size-4" />

@@ -451,16 +451,20 @@ export default function PropertiesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
-                          <Button asChild size="sm">
+                        <div className="flex gap-1">
+                          <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
                             <Link href={`/admin/properties/${record.id}`}>
                               <Pencil className="size-4" />
-                              {t.edit}
                             </Link>
                           </Button>
-                          <Button variant="destructive" size="sm" onClick={() => openDelete(record.id)}>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() => openDelete(record.id)}
+                            aria-label={t.delete}
+                          >
                             <Trash2 className="size-4" />
-                            {t.delete}
                           </Button>
                         </div>
                       </TableCell>
@@ -580,14 +584,16 @@ export default function PropertiesPage() {
                     {statusToggle(property, 'isActive', t.statusActive, t.switchOff)}
                     {statusToggle(property, 'isSold', property.dealType === 'rent' ? t.statusRented : t.statusSold, t.switchVacant)}
                     <span className="admin-card__grow" style={{ display: 'flex', gap: 8 }}>
-                      <Button asChild className="flex-1">
+                      <Button asChild variant="outline" size="sm" className="flex-1">
                         <Link href={`/admin/properties/${property.id}`}>
                           <Pencil className="size-4" />
                           {t.edit}
                         </Link>
                       </Button>
                       <Button
-                        variant="destructive"
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                         style={{ marginInlineStart: 'auto' }}
                         onClick={() => openDelete(property.id)}
                       >
