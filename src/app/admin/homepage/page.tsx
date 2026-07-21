@@ -97,7 +97,6 @@ export default function HomepagePage() {
   const [hotProperties, setHotProperties] = useState<Property[]>([]);
   const [noCommissionProperties, setNoCommissionProperties] = useState<Property[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [previewKey, setPreviewKey] = useState(0);
   const [modalType, setModalType] = useState<'hot' | 'noCommission'>('hot');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
@@ -337,7 +336,6 @@ export default function HomepagePage() {
   const handleSaveEverything = async () => {
     await Promise.all([handleSaveTitles(), handleSaveAll()]);
     setDirty(false);
-    setPreviewKey((k) => k + 1);
   };
 
   const availableProperties = allProperties.filter(p => {
@@ -577,8 +575,6 @@ export default function HomepagePage() {
         </div>
       </div>
 
-      <div className="hp-split">
-        <div className="hp-settings">
       {/* A. Section titles & content */}
       <section className="section-card">
         <div className="section-card__head">
@@ -627,20 +623,6 @@ export default function HomepagePage() {
         emptyText: t.noPropertyChosen,
         addDisabled: noCommissionProperties.length >= 1,
       })}
-        </div>
-
-        <aside className="hp-preview">
-          <div className="hp-preview-head">
-            <span className="hp-preview-title">{isHe ? 'תצוגה מקדימה' : 'Live preview'}</span>
-            <button type="button" className="hp-preview-refresh" onClick={() => setPreviewKey((k) => k + 1)}>
-              {isHe ? 'רענן' : 'Refresh'}
-            </button>
-          </div>
-          <div className="hp-preview-frame-wrap">
-            <iframe key={previewKey} src="/" title="Homepage preview" className="hp-preview-frame" loading="lazy" />
-          </div>
-        </aside>
-      </div>
 
       {/* C. Property-picker */}
       <Dialog open={isModalVisible} onOpenChange={(o) => { if (!o) setIsModalVisible(false); }}>
