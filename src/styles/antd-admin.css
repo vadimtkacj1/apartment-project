@@ -49,7 +49,7 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background: #fff !important;
+  background: #0b1030 !important;
   /* No hard edge against the content — the white rail meets the blue-grey
      canvas directly (Fernand/Anam pattern); the tone shift IS the divider. */
   border-inline-end: none;

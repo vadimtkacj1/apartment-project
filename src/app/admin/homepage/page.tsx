@@ -1,27 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Pencil, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Loader2 } from 'lucide-react';
 import type { DealType } from '@/types/property.types';
 import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
-import { Label } from '@/components/shadcn/label';
+import { Textarea } from '@/components/shadcn/textarea';
 import { Badge } from '@/components/shadcn/badge';
 import { Checkbox } from '@/components/shadcn/checkbox';
 import { Skeleton } from '@/components/shadcn/skeleton';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/shadcn/tabs';
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/shadcn/table';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/shadcn/dialog';
-import { useAdminMessages } from '@/lib/adminI18n';
+import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import MetricCard from '@/components/admin/MetricCard';
 
 interface Property {
   id: number;
@@ -72,10 +68,31 @@ interface Property {
   isNoCommission: boolean;
 }
 
+const FALLBACK_IMG = '/images/hero/sales.jpg';
+
 export default function HomepagePage() {
   const t = useAdminMessages(homepageMessages);
+  const { locale } = useAdminI18n();
+  const isHe = locale === 'he';
+
+  // New microcopy introduced by the settings redesign. Kept locale-aware here
+  // (rather than in the messages file) so no other file is touched.
+  const ui = {
+    settingsTitle: isHe ? 'הגדרות דף הבית' : 'Homepage Settings',
+    saveChanges: isHe ? 'שמור שינויים' : 'Save changes',
+    allSaved: isHe ? 'כל השינויים נשמרו' : 'All changes saved',
+    unsaved: isHe ? 'יש שינויים שלא נשמרו' : 'Unsaved changes',
+    contentCard: isHe ? 'כותרות ותוכן' : 'Titles & content',
+    contentHelper: isHe
+      ? 'הכותרות ותתי-הכותרות המוצגות בסעיפי דף הבית'
+      : 'Headings and subheadings shown across the homepage sections',
+    addProperty: isHe ? 'הוסף נכס' : 'Add property',
+    addSelected: (n: number) => (isHe ? `הוסף נבחרים (${n})` : `Add selected (${n})`),
+  };
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [hotProperties, setHotProperties] = useState<Property[]>([]);
   const [noCommissionProperties, setNoCommissionProperties] = useState<Property[]>([]);
@@ -102,8 +119,10 @@ export default function HomepagePage() {
   const [titlesLoading, setTitlesLoading] = useState(true);
   const [titlesSaving, setTitlesSaving] = useState(false);
 
-  const setTitle = (key: keyof typeof sectionTitles, value: string) =>
+  const setTitle = (key: keyof typeof sectionTitles, value: string) => {
     setSectionTitles((prev) => ({ ...prev, [key]: value }));
+    setDirty(true);
+  };
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -217,6 +236,12 @@ export default function HomepagePage() {
     setSelectedIds([id]);
   };
 
+  const togglePick = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  };
+
   const handleSelectAll = () => {
     if (selectedIds.length === availableProperties.length) {
       setSelectedIds([]);
@@ -241,6 +266,7 @@ export default function HomepagePage() {
       toast.success(t.propertySelected);
     }
 
+    setDirty(true);
     setIsModalVisible(false);
   };
 
@@ -250,6 +276,7 @@ export default function HomepagePage() {
     } else {
       setNoCommissionProperties(prev => prev.filter(p => p.id !== id));
     }
+    setDirty(true);
   };
 
   const handleSaveAll = async () => {
@@ -305,6 +332,12 @@ export default function HomepagePage() {
     }
   };
 
+  // Single dirty-tracked save: runs BOTH existing save flows (titles + selection).
+  const handleSaveEverything = async () => {
+    await Promise.all([handleSaveTitles(), handleSaveAll()]);
+    setDirty(false);
+  };
+
   const availableProperties = allProperties.filter(p => {
     // Filter out sold properties
     if (p.isSold) return false;
@@ -328,138 +361,187 @@ export default function HomepagePage() {
     return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
   };
 
-  // Desktop table mirroring the previous antd columns (same filtered data, same handlers)
-  const renderTable = (rows: Property[], type: 'hot' | 'noCommission') => (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">{t.colImage}</TableHead>
-            <TableHead className="w-[250px]">{t.colTitle}</TableHead>
-            <TableHead className="w-[150px]">{t.colLocation}</TableHead>
-            <TableHead className="w-[120px]">{t.colPrice}</TableHead>
-            <TableHead className="w-[80px] text-center">{t.colRooms}</TableHead>
-            <TableHead className="w-[80px] text-center">{t.colArea}</TableHead>
-            <TableHead className="w-[150px]">{t.colActions}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((record) => (
-            <TableRow key={record.id}>
-              <TableCell>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  padding: '4px',
-                  width: '80px',
-                  height: '80px',
-                }}>
-                  <img
-                    src={record.images[0] || '/images/hero/sales.jpg'}
-                    alt={t.propertyAlt}
-                    width={80}
-                    height={80}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg'; }}
-                    style={{
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      display: 'block',
-                      width: '80px',
-                      height: '80px',
-                    }}
-                  />
-                </div>
-              </TableCell>
-              <TableCell>
-                <div style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: '230px',
-                }}>
-                  {record.title}
-                  {record.isSold && (
-                    <Badge variant="destructive" className="ms-2">
-                      {record.dealType === 'rent' ? t.rented : t.sold}
-                    </Badge>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block', maxWidth: '150px' }}>
-                  {record.location}
-                </span>
-              </TableCell>
-              <TableCell>
-                <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
-                  {formatPrice(record.price)}
-                </span>
-              </TableCell>
-              <TableCell className="text-center">{record.rooms}</TableCell>
-              <TableCell className="text-center">{t.areaSqm(record.area)}</TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => handleRemove(record.id, type)}
-                >
-                  <Trash2 className="size-4" />
-                  {t.remove}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+  const isSaving = saving || titlesSaving;
+
+  /* ---- Section-titles field row (label inline-start / control inline-end) ---- */
+  const renderTitleField = (
+    fieldKey: keyof typeof sectionTitles,
+    label: string,
+    placeholder: string,
+    multiline = false,
+  ) => (
+    <div className="field-row" key={fieldKey}>
+      <div>
+        <div className="fr-label">{label}</div>
+      </div>
+      <div className="fr-control">
+        {multiline ? (
+          <Textarea
+            value={sectionTitles[fieldKey]}
+            onChange={(e) => setTitle(fieldKey, e.target.value)}
+            placeholder={placeholder}
+            rows={2}
+          />
+        ) : (
+          <Input
+            value={sectionTitles[fieldKey]}
+            onChange={(e) => setTitle(fieldKey, e.target.value)}
+            placeholder={placeholder}
+          />
+        )}
+      </div>
     </div>
   );
 
-  // Mobile card list mirroring the desktop table (same filtered data, same handlers)
-  const renderMobileCards = (rows: Property[], type: 'hot' | 'noCommission') => (
-    <div className="admin-card-list">
-      {rows.map((property) => (
-        <div key={property.id} className="admin-card">
-          <div className="admin-card__head">
-            <img
-              className="admin-card__thumb"
-              src={property.images[0] || '/images/hero/sales.jpg'}
-              alt={property.title}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg'; }}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div className="admin-card__title">
-                {property.title}
-                {property.isSold && (
-                  <Badge variant="destructive" className="ms-2">
-                    {property.dealType === 'rent' ? t.rented : t.sold}
-                  </Badge>
-                )}
-              </div>
-              <div className="admin-card__meta">{property.location}</div>
-            </div>
-            <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', fontWeight: 600, whiteSpace: 'nowrap' }}>
-              {formatPrice(property.price)}
-            </span>
-          </div>
-          <div className="admin-card__fields">
-            <span><b>{t.colRooms}</b> {property.rooms}</span>
-            <span><b>{t.colArea}</b> {t.areaSqm(property.area)}</span>
-          </div>
-          <div className="admin-card__actions">
-            <Button
-              variant="outline"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => handleRemove(property.id, type)}
-            >
-              <Trash2 className="size-4" />
-              {t.remove}
-            </Button>
-          </div>
+  /* ---- One chosen property as a .pick-row (thumb + title + quiet trash) ---- */
+  const renderPickRow = (p: Property, type: 'hot' | 'noCommission') => (
+    <div className="pick-row" key={p.id}>
+      <img
+        className="thumb"
+        src={p.images[0] || FALLBACK_IMG}
+        alt={p.title}
+        onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
+      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            font: '500 14px/1.35 var(--font-assistant), system-ui',
+            color: 'var(--text-ink)',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</span>
+          {p.isSold && (
+            <Badge variant="muted" style={{ flexShrink: 0 }}>
+              {p.dealType === 'rent' ? t.rented : t.sold}
+            </Badge>
+          )}
         </div>
-      ))}
+        <div
+          style={{
+            marginBlockStart: 3,
+            font: '400 12px/1.3 var(--font-assistant), system-ui',
+            color: 'var(--text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            minWidth: 0,
+          }}
+        >
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {p.location}
+          </span>
+          <span style={{ color: 'var(--text-faint)' }}>·</span>
+          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            {formatPrice(p.price)}
+          </bdi>
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        onClick={() => handleRemove(p.id, type)}
+        aria-label={t.remove}
+      >
+        <Trash2 className="size-4" />
+      </Button>
     </div>
+  );
+
+  /* ---- One "Manage properties" section-card ---- */
+  const renderManageCard = (opts: {
+    title: string;
+    count: React.ReactNode;
+    items: Property[];
+    type: 'hot' | 'noCommission';
+    emptyText: string;
+    addDisabled?: boolean;
+    showMode?: boolean;
+  }) => (
+    <section className="section-card">
+      <div className="section-card__head">
+        <div className="section-card__title">{opts.title}</div>
+        <Badge variant="muted" className="tabular-nums">
+          <bdi dir="ltr">{opts.count}</bdi>
+        </Badge>
+      </div>
+
+      <div style={{ padding: '16px 20px' }}>
+        {opts.showMode && (
+          <div className="inset-well" style={{ marginBlockEnd: 14 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 20px' }}>
+              <label className="inline-flex items-center gap-2 cursor-pointer" style={{ color: 'var(--text-body)' }}>
+                <input
+                  type="radio"
+                  name="hotPropositionsMode"
+                  checked={hotPropositionsMode === 'manual'}
+                  onChange={() => { setHotPropositionsMode('manual'); setDirty(true); }}
+                  style={{ accentColor: 'var(--brand)' }}
+                />
+                <span>{t.manualSelection}</span>
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer" style={{ color: 'var(--text-body)' }}>
+                <input
+                  type="radio"
+                  name="hotPropositionsMode"
+                  checked={hotPropositionsMode === 'price'}
+                  onChange={() => { setHotPropositionsMode('price'); setDirty(true); }}
+                  style={{ accentColor: 'var(--brand)' }}
+                />
+                <span>{t.priceFilter}</span>
+              </label>
+            </div>
+
+            {hotPropositionsMode === 'price' && (
+              <div style={{ marginBlockStart: 10, paddingBlockStart: 10, borderBlockStart: '1px solid var(--border)' }}>
+                <Input
+                  type="number"
+                  value={hotPropositionsMaxPrice}
+                  onChange={(e) => { setHotPropositionsMaxPrice(Number(e.target.value) || 0); setDirty(true); }}
+                  min={0}
+                  step={100000}
+                  placeholder={t.maxPricePlaceholder}
+                  style={{ maxInlineSize: 260 }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {opts.items.length === 0 ? (
+          <div
+            style={{
+              padding: '18px 4px',
+              textAlign: 'center',
+              font: '400 14px/1.4 var(--font-assistant), system-ui',
+              color: 'var(--text-muted)',
+            }}
+          >
+            {opts.emptyText}
+          </div>
+        ) : (
+          <div>{opts.items.map((p) => renderPickRow(p, opts.type))}</div>
+        )}
+
+        <div style={{ marginBlockStart: 12 }}>
+          <Button
+            variant="ghost"
+            onClick={() => openModal(opts.type)}
+            disabled={opts.addDisabled}
+            style={{ color: 'var(--brand)' }}
+          >
+            <Plus className="size-4" />
+            {ui.addProperty}
+          </Button>
+        </div>
+      </div>
+    </section>
   );
 
   if (loading) {
@@ -472,351 +554,181 @@ export default function HomepagePage() {
 
   return (
     <div>
-        {/* Header */}
-        <AdminPageHeader title={t.pageTitle} subtitle={t.pageSubtitle} />
-
-        {/* Section Titles Editor */}
-        <Card className="p-5" style={{ marginBottom: '24px' }}>
-          <div className="mb-4" style={{ fontSize: '18px', fontWeight: 600, color: '#051150' }}>
-            {t.sectionTitlesCard}
-          </div>
-
-          {titlesLoading ? (
-            <div className="flex flex-col gap-3">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : (
-            <>
-              <Tabs defaultValue="main">
-                <TabsList>
-                  <TabsTrigger value="main">{t.tabMain}</TabsTrigger>
-                  <TabsTrigger value="secondary">{t.tabSecondary}</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="main">
-                  <div className="flex w-full flex-col gap-5 pt-2">
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelHotTitle}</Label>
-                      <Input
-                        value={sectionTitles.hotPropositionsTitle}
-                        onChange={(e) => setTitle('hotPropositionsTitle', e.target.value)}
-                        placeholder={t.phHotTitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelFeaturedTitle}</Label>
-                      <Input
-                        value={sectionTitles.featuredPropertiesTitle}
-                        onChange={(e) => setTitle('featuredPropertiesTitle', e.target.value)}
-                        placeholder={t.phFeaturedTitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelFeaturedSubtitle}</Label>
-                      <Input
-                        value={sectionTitles.featuredPropertiesSubtitle}
-                        onChange={(e) => setTitle('featuredPropertiesSubtitle', e.target.value)}
-                        placeholder={t.phFeaturedSubtitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelValuesTitle}</Label>
-                      <Input
-                        value={sectionTitles.valuesSectionTitle}
-                        onChange={(e) => setTitle('valuesSectionTitle', e.target.value)}
-                        placeholder={t.phValuesTitle}
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="secondary">
-                  <div className="flex w-full flex-col gap-5 pt-2">
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelAboutTitle}</Label>
-                      <Input
-                        value={sectionTitles.aboutSectionTitle}
-                        onChange={(e) => setTitle('aboutSectionTitle', e.target.value)}
-                        placeholder={t.phAboutTitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelProcessTitle}</Label>
-                      <Input
-                        value={sectionTitles.processSectionTitle}
-                        onChange={(e) => setTitle('processSectionTitle', e.target.value)}
-                        placeholder={t.phProcessTitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelTestimonialsTitle}</Label>
-                      <Input
-                        value={sectionTitles.testimonialsTitle}
-                        onChange={(e) => setTitle('testimonialsTitle', e.target.value)}
-                        placeholder={t.phTestimonialsTitle}
-                      />
-                    </div>
-                    <div>
-                      <Label className="mb-1.5 block">{t.labelNoCommissionTitle}</Label>
-                      <Input
-                        value={sectionTitles.noCommissionTitle}
-                        onChange={(e) => setTitle('noCommissionTitle', e.target.value)}
-                        placeholder={t.phNoCommissionTitle}
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-
-              <div style={{ marginTop: '24px', textAlign: 'start' }}>
-                <Button
-                  size="lg"
-                  disabled={titlesSaving}
-                  onClick={handleSaveTitles}
-                  style={{ minWidth: '150px' }}
-                >
-                  {titlesSaving ? <Loader2 className="size-4 animate-spin" /> : <Pencil className="size-4" />}
-                  {t.saveTitles}
-                </Button>
-              </div>
-            </>
-          )}
-        </Card>
-
-        {/* Properties Section Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ marginTop: '24px', marginBottom: '16px' }}>
-          <div>
-            <h3 style={{ margin: 0, marginBottom: '4px', fontSize: '20px', fontWeight: 700, color: '#051150' }}>{t.managePropertiesTitle}</h3>
-            <p className="text-muted-foreground" style={{ margin: 0 }}>{t.managePropertiesSubtitle}</p>
-          </div>
+      {/* Sticky single-save settings bar */}
+      <div className="settings-bar">
+        <h1 style={{ margin: 0, font: '600 24px/1.25 var(--font-assistant), system-ui', color: 'var(--text-ink)' }}>
+          {ui.settingsTitle}
+        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <span className={`settings-bar__status${dirty ? ' dirty' : ''}`}>
+            {dirty ? ui.unsaved : ui.allSaved}
+          </span>
           <Button
-            disabled={saving}
-            onClick={handleSaveAll}
-            style={{ width: '100%', maxWidth: '180px' }}
+            onClick={handleSaveEverything}
+            disabled={!dirty || isSaving}
+            variant={dirty ? 'default' : 'ghost'}
+            style={{ minWidth: 150 }}
           >
-            {saving && <Loader2 className="size-4 animate-spin" />}
-            {t.savePropertySelection}
+            {isSaving && <Loader2 className="size-4 animate-spin" />}
+            {ui.saveChanges}
           </Button>
         </div>
+      </div>
 
-        {/* Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5" style={{ marginBottom: '24px' }}>
-          <MetricCard label={t.hotDeals} value={hotProperties.length} suffix={` ${t.statPropertiesSuffix}`} />
-          <MetricCard label={t.statNoCommissionTitle} value={`${noCommissionProperties.length}/1`} suffix={` ${t.statPropertySuffix}`} />
+      {/* A. Section titles & content */}
+      <section className="section-card">
+        <div className="section-card__head">
+          <div>
+            <div className="section-card__title">{ui.contentCard}</div>
+            <div className="section-card__helper">{ui.contentHelper}</div>
+          </div>
         </div>
 
-        {/* Sections */}
-        <div className="grid grid-cols-1 gap-6">
-          {/* Hot Propositions Section */}
-          <Card className="p-5">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="flex items-center gap-2">
-                <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.hotDeals}</span>
-              </div>
-              <Button onClick={() => openModal('hot')}>
-                <Plus className="size-4" />
-                {t.addProperties}
-              </Button>
-            </div>
+        {titlesLoading ? (
+          <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        ) : (
+          <div>
+            {renderTitleField('hotPropositionsTitle', t.labelHotTitle, t.phHotTitle)}
+            {renderTitleField('featuredPropertiesTitle', t.labelFeaturedTitle, t.phFeaturedTitle)}
+            {renderTitleField('featuredPropertiesSubtitle', t.labelFeaturedSubtitle, t.phFeaturedSubtitle, true)}
+            {renderTitleField('valuesSectionTitle', t.labelValuesTitle, t.phValuesTitle)}
+            {renderTitleField('aboutSectionTitle', t.labelAboutTitle, t.phAboutTitle)}
+            {renderTitleField('processSectionTitle', t.labelProcessTitle, t.phProcessTitle)}
+            {renderTitleField('testimonialsTitle', t.labelTestimonialsTitle, t.phTestimonialsTitle)}
+            {renderTitleField('noCommissionTitle', t.labelNoCommissionTitle, t.phNoCommissionTitle)}
+          </div>
+        )}
+      </section>
 
-            {/* Price Filter Settings */}
-            <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #E4E8F2' }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px' }}>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hotPropositionsMode"
-                    checked={hotPropositionsMode === 'manual'}
-                    onChange={() => setHotPropositionsMode('manual')}
-                  />
-                  <span>{t.manualSelection}</span>
-                </label>
-                <label className="inline-flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hotPropositionsMode"
-                    checked={hotPropositionsMode === 'price'}
-                    onChange={() => setHotPropositionsMode('price')}
-                  />
-                  <span>{t.priceFilter}</span>
-                </label>
-              </div>
+      {/* B. Manage displayed properties */}
+      {renderManageCard({
+        title: t.hotDeals,
+        count: hotProperties.length,
+        items: hotProperties,
+        type: 'hot',
+        emptyText: t.noPropertiesShown,
+        showMode: true,
+      })}
 
-              {hotPropositionsMode === 'price' && (
-                <div className="mt-2 pt-2 admin-filter-full" style={{ borderTop: '1px solid #E4E8F2' }}>
-                  <Input
-                    type="number"
-                    value={hotPropositionsMaxPrice}
-                    onChange={(e) => setHotPropositionsMaxPrice(Number(e.target.value) || 0)}
-                    min={0}
-                    step={100000}
-                    placeholder={t.maxPricePlaceholder}
-                    className="w-full"
-                  />
-                </div>
-              )}
-            </div>
+      {renderManageCard({
+        title: t.noCommissionSection,
+        count: `${noCommissionProperties.length}/1`,
+        items: noCommissionProperties,
+        type: 'noCommission',
+        emptyText: t.noPropertyChosen,
+        addDisabled: noCommissionProperties.length >= 1,
+      })}
 
-            {hotProperties.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground" style={{ marginBottom: '12px' }}>{t.noPropertiesShown}</p>
-                <Button size="sm" onClick={() => openModal('hot')}>
-                  <Plus className="size-4" />
-                  {t.addProperties}
-                </Button>
-              </div>
-            ) : (
-              <>
-                {/* desktop — table */}
-                <div className="admin-only-desktop">
-                  {renderTable(hotProperties, 'hot')}
-                </div>
-                {/* mobile — card list */}
-                <div className="admin-only-mobile">
-                  {renderMobileCards(hotProperties, 'hot')}
-                </div>
-              </>
+      {/* C. Property-picker */}
+      <Dialog open={isModalVisible} onOpenChange={(o) => { if (!o) setIsModalVisible(false); }}>
+        <DialogContent className="w-[96vw] max-w-[900px]">
+          <DialogHeader>
+            <DialogTitle>
+              {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
+            </DialogTitle>
+            {modalType === 'noCommission' && (
+              <DialogDescription>{t.modalNoteOnlyOne}</DialogDescription>
             )}
-          </Card>
+          </DialogHeader>
 
-          {/* No Commission Section */}
-          <Card className="p-5">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span style={{ fontSize: '18px', fontWeight: 600 }}>{t.noCommissionSection}</span>
-                </div>
-                <div style={{ fontSize: '12px', fontWeight: 'normal', color: '#64748B' }}>
-                  {t.onlyOneNote}
-                </div>
-              </div>
-              <Button
-                onClick={() => openModal('noCommission')}
-                disabled={noCommissionProperties.length >= 1}
-              >
-                {noCommissionProperties.length >= 1 ? <Pencil className="size-4" /> : <Plus className="size-4" />}
-                {noCommissionProperties.length >= 1 ? t.propertyChosen : t.chooseProperty}
-              </Button>
-            </div>
-
-            {noCommissionProperties.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground" style={{ marginBottom: '12px' }}>{t.noPropertyChosen}</p>
-                <Button size="sm" onClick={() => openModal('noCommission')}>
-                  <Plus className="size-4" />
-                  {t.chooseProperty}
-                </Button>
-              </div>
-            ) : (
-              <>
-                {/* desktop — table */}
-                <div className="admin-only-desktop">
-                  {renderTable(noCommissionProperties, 'noCommission')}
-                </div>
-                {/* mobile — card list */}
-                <div className="admin-only-mobile">
-                  {renderMobileCards(noCommissionProperties, 'noCommission')}
-                </div>
-              </>
-            )}
-          </Card>
-        </div>
-
-        {/* Property Selector Modal */}
-        <Dialog open={isModalVisible} onOpenChange={(o) => { if (!o) setIsModalVisible(false); }}>
-          <DialogContent className="w-[96vw] max-w-[900px]">
-            <DialogHeader>
-              <DialogTitle>
-                {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
-              </DialogTitle>
-              {modalType === 'noCommission' && (
-                <DialogDescription>{t.modalNoteOnlyOne}</DialogDescription>
-              )}
-            </DialogHeader>
-
-            <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-              {modalType === 'hot' && (
-                <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #E4E8F2' }}>
-                  <label className="inline-flex items-center gap-2 cursor-pointer">
-                    <Checkbox
-                      checked={
-                        selectedIds.length === availableProperties.length && availableProperties.length > 0
-                          ? true
-                          : selectedIds.length > 0
-                            ? 'indeterminate'
-                            : false
-                      }
-                      onCheckedChange={handleSelectAll}
-                    />
-                    <strong>{t.selectAll(selectedIds.length, availableProperties.length)}</strong>
-                  </label>
-                </div>
-              )}
-
-              <div className="flex w-full flex-col gap-2">
-                {modalType === 'noCommission'
-                  ? availableProperties.map((property) => (
-                      <label
-                        key={property.id}
-                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border p-2"
-                      >
-                        <input
-                          type="radio"
-                          name="noCommissionPick"
-                          checked={selectedIds[0] === property.id}
-                          onChange={() => handleRadioChange(property.id)}
-                        />
-                        <img
-                          src={property.images[0] || '/images/placeholder.jpg'}
-                          alt={property.title}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">{property.title}</div>
-                          <div className="text-xs text-gray-500">{property.location}</div>
-                          <div className="text-xs font-bold text-primary">{property.price}</div>
-                        </div>
-                      </label>
-                    ))
-                  : availableProperties.map((property) => (
-                      <label
-                        key={property.id}
-                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg border border-border p-2"
-                      >
+          <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-tile)', overflow: 'hidden' }}>
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ background: 'var(--surface-sunken)' }}>
+                    <TableHead className="h-11 normal-case tracking-normal" style={{ inlineSize: 48 }}>
+                      {modalType === 'hot' && (
                         <Checkbox
-                          checked={selectedIds.includes(property.id)}
-                          onCheckedChange={(v) =>
-                            setSelectedIds((prev) =>
-                              v
-                                ? [...prev.filter((id) => id !== property.id), property.id]
-                                : prev.filter((id) => id !== property.id),
-                            )
+                          checked={
+                            selectedIds.length === availableProperties.length && availableProperties.length > 0
+                              ? true
+                              : selectedIds.length > 0
+                                ? 'indeterminate'
+                                : false
                           }
+                          onCheckedChange={handleSelectAll}
+                          aria-label={t.selectAll(selectedIds.length, availableProperties.length)}
                         />
-                        <img
-                          src={property.images[0] || '/images/placeholder.jpg'}
-                          alt={property.title}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">{property.title}</div>
-                          <div className="text-xs text-gray-500">{property.location}</div>
-                          <div className="text-xs font-bold text-primary">{property.price}</div>
-                        </div>
-                      </label>
-                    ))}
-              </div>
+                      )}
+                    </TableHead>
+                    <TableHead className="h-11 normal-case tracking-normal">{t.colTitle}</TableHead>
+                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colPrice}</TableHead>
+                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colRooms}</TableHead>
+                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colArea}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {availableProperties.map((p) => {
+                    const checked = modalType === 'hot'
+                      ? selectedIds.includes(p.id)
+                      : selectedIds[0] === p.id;
+                    const toggle = () => (modalType === 'hot' ? togglePick(p.id) : handleRadioChange(p.id));
+                    return (
+                      <TableRow
+                        key={p.id}
+                        onClick={toggle}
+                        data-state={checked ? 'selected' : undefined}
+                        style={{ height: 64, cursor: 'pointer', background: checked ? 'var(--brand-wash)' : undefined }}
+                      >
+                        <TableCell>
+                          {modalType === 'hot' ? (
+                            <Checkbox checked={checked} tabIndex={-1} style={{ pointerEvents: 'none' }} />
+                          ) : (
+                            <input
+                              type="radio"
+                              checked={checked}
+                              readOnly
+                              tabIndex={-1}
+                              style={{ pointerEvents: 'none', accentColor: 'var(--brand)' }}
+                            />
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                            <img
+                              src={p.images[0] || FALLBACK_IMG}
+                              alt={p.title}
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
+                              style={{ inlineSize: 56, blockSize: 42, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: 'var(--surface-sunken)' }}
+                            />
+                            <div style={{ minWidth: 0 }}>
+                              <div style={{ font: '600 15px/1.3 var(--font-assistant), system-ui', color: 'var(--text-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {p.title}
+                              </div>
+                              <div style={{ marginBlockStart: 2, font: '400 13px/1.3 var(--font-assistant), system-ui', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {p.location}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-end">
+                          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.price)}</bdi>
+                        </TableCell>
+                        <TableCell className="text-end">
+                          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums' }}>{p.rooms}</bdi>
+                        </TableCell>
+                        <TableCell className="text-end">
+                          <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{t.areaSqm(p.area)}</span>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </div>
+          </div>
 
-            <DialogFooter className="mt-2 gap-2">
-              <Button variant="outline" onClick={() => setIsModalVisible(false)}>{t.cancel}</Button>
-              <Button onClick={handleModalOk}>{t.ok}</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          <DialogFooter className="mt-2 gap-2">
+            <Button variant="outline" onClick={() => setIsModalVisible(false)}>{t.cancel}</Button>
+            <Button onClick={handleModalOk}>{ui.addSelected(selectedIds.length)}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

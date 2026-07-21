@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   AreaChart,
   Area,
+  CartesianGrid,
   XAxis,
   YAxis,
   Tooltip,
@@ -17,17 +18,18 @@ import { getCityLabel } from '@/data/cities';
 import { useAdminI18n, useAdminMessages, type MessagesShape } from '@/lib/adminI18n';
 import { dashboardMessages } from '@/lib/adminI18n/messages/dashboard';
 
-/* ===== palette (matches src/lib/adminTheme.ts) — Aiterra: indigo · sky · deep navy ===== */
-const NAVY = '#354AC4'; // brand indigo — primary
-const DEEP = '#051150'; // brand's darkest navy — masthead / logo surfaces
-const GOLD = '#5594F1'; // sky-blue accent on dark surfaces / chart / pills
-const GOLD_TEXT = '#2A69C4'; // accent blue that clears WCAG AA on light surfaces
-const HAIRLINE = '#E4E8F2'; // neutral slate hairline (single enclosure method)
-const INK = '#1F2733';
-const MUTED = '#64748B';
-const HOVER_BG = '#F4F6FB'; // slate page tint
+/* ===== palette — tokens from src/styles/admin-design.css (single source of truth).
+   Indigo (BRAND / BRAND_SKY) is rationed to DATA MARKS ONLY (chart lines, composition
+   bar fills) and to CTAs/active states. Every resting figure is ink. ===== */
+const BRAND = '#354AC4';      // --brand — primary data line + composition fill + CTAs
+const BRAND_SKY = '#5594F1';  // --brand-sky — secondary data line + composition fill
+const BRAND_WASH = '#EEF1FB'; // --brand-wash — chart area fill
+const INK = '#051150';        // --text-ink — every KPI / static figure
+const MUTED = '#6C76A0';      // --text-muted — labels / axis
+const DIVIDER = '#EEF1F7';    // --divider — gridlines / hairlines
+const BORDER = '#E3E8F2';     // --border — tooltip hairline
 
-const WINDOW_DAYS = 14; // sparkline window; the full, filterable trend lives on /admin/analytics
+const WINDOW_DAYS = 14; // trend window; the full, filterable analytics lives on /admin/analytics
 
 /** Resolved dashboard message record for the active locale. */
 type DashboardT = MessagesShape<(typeof dashboardMessages)['he']>;
@@ -95,19 +97,20 @@ const Num: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> 
   </span>
 );
 
-/** Quiet section label — no gold/uppercase "eyebrow" trope; hierarchy via size + whitespace. */
+/** Quiet section micro-label — hierarchy via size + whitespace, no eyebrow trope. */
 const Label: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
-  <div style={{ fontSize: 12.5, fontWeight: 600, color: MUTED, ...style }}>{children}</div>
+  <div style={{ fontSize: 12, fontWeight: 600, color: MUTED, ...style }}>{children}</div>
 );
 
+/** Section title — 15/600 ink, no letter-spacing (RTL hierarchy = weight + color). */
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em', color: DEEP }}>{children}</span>
+  <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>{children}</span>
 );
 
-/** Local card shell replacing antd Card — optional head (title/extra) + padded body; styled via .ec-card* CSS. */
-function ECard({ title, extra, style, children }: { title?: React.ReactNode; extra?: React.ReactNode; style?: React.CSSProperties; children: React.ReactNode }) {
+/** Local card shell — quiet by default (`--shadow-card` + hairline); pass `className="ec-card--hero"` for the one data hero. */
+function ECard({ title, extra, style, className, children }: { title?: React.ReactNode; extra?: React.ReactNode; style?: React.CSSProperties; className?: string; children: React.ReactNode }) {
   return (
-    <div className="ec-card" style={style}>
+    <div className={`ec-card${className ? ' ' + className : ''}`} style={style}>
       {(title || extra) && <div className="ec-card-head">{title}{extra}</div>}
       <div className="ec-card-body">{children}</div>
     </div>
@@ -243,140 +246,121 @@ export default function AdminDashboard() {
     };
   }, [series]);
 
-  // Bidi-isolated delta chip rendered under a KPI value; null when there's no prior week.
-  const deltaChip = (d: number | null): React.ReactNode =>
+  // Bidi-isolated delta line under a KPI value; ▲/▼ carry direction (not color alone),
+  // token classes carry the pos/neg color. null when there's no prior week.
+  const deltaEl = (d: number | null): React.ReactNode =>
     d === null ? null : (
-      <span
-        dir="ltr"
-        aria-label={t.vsPrev7}
-        style={{
-          display: 'inline-block',
-          unicodeBidi: 'isolate',
-          fontSize: 11.5,
-          fontWeight: 600,
-          color: d > 0 ? '#2A69C4' : d < 0 ? '#64748B' : '#94A3B8',
-        }}
-      >
-        {(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + Math.abs(d) + '%'}
-      </span>
+      <div className={`delta ${d > 0 ? 'up' : d < 0 ? 'down' : ''}`} aria-label={t.vsPrev7}>
+        <bdi dir="ltr">{(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + Math.abs(d) + '%'}</bdi>
+      </div>
     );
 
   /* ===== render ===== */
   return (
     <div className="estate-console">
-      <h1 className="ec-sr-only">{t.pageTitle}</h1>
-
-      {/* ── Masthead — a slim navy bar (brand + date, one honest stat line, thin detail),
-              with the new-leads CTA folded in. No billboard number, no separate strip. ── */}
-      <div className="ec-masthead">
-        <div className="ec-mast-top">
-          <span className="ec-mast-title">{t.mastheadTitle}</span>
-          <span className="ec-mast-date">{formatLongDate(dayjs(), t)}</span>
+      {/* ── 0. Page header — plain, on page bg (no gradient band). Title + faint date;
+              the actionable new-leads count folds in at inline-end as a brand CTA. ── */}
+      <header className="ec-pagehead">
+        <div>
+          <h1 className="ec-h1">{t.pageTitle}</h1>
+          <p className="ec-subtitle">{formatLongDate(dayjs(), t)}</p>
         </div>
-
-        {propsLoading ? (
-          <Skeleton className="h-5 w-[340px] mt-3.5" />
-        ) : (
-          <>
-            <div className="ec-mast-line">
-              <span className="ec-mast-stat">
-                <Num style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{ils(portfolio.portfolioValue)}</Num>
-                <span className="ec-mast-cap">{t.portfolioValue}</span>
-              </span>
-              <span className="ec-mast-sep">·</span>
-              <span className="ec-mast-stat"><Num style={{ fontWeight: 700 }}>{portfolio.activeCount}</Num> {t.activeProperties}</span>
-              <span className="ec-mast-sep">·</span>
-              <span className="ec-mast-stat">
-                <Num style={{ fontWeight: 600 }}>{portfolio.saleCount}</Num> {t.forSaleLower} · <Num style={{ fontWeight: 600 }}>{portfolio.rentCount}</Num> {t.forRentLower}
-              </span>
-
-              {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
-                <Link href="/admin/inquiries" className="ec-mast-cta">
-                  <Num style={{ fontWeight: 700 }}>{summary?.newInquiries}</Num> {t.newInquiries}
-                  <Fwd className="size-3" />
-                </Link>
-              )}
-            </div>
-
-            <div className="ec-mast-detail">
-              {t.mostExpensive} <Num>{ils(portfolio.maxPrice)}</Num> · {t.averageLabel} <Num>{ils(portfolio.avgPrice)}</Num>
-              {portfolio.newThisWeek > 0 && <> · {t.addedThisWeek} <Num>{portfolio.newThisWeek}</Num></>}
-            </div>
-          </>
+        {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
+          <Link href="/admin/inquiries" className="ec-newleads">
+            <bdi dir="ltr">{summary?.newInquiries}</bdi> {t.newInquiries}
+            <Fwd className="size-3.5" />
+          </Link>
         )}
+      </header>
+
+      {/* ── 1. Context ribbon — borderless label/value facts from the old band ── */}
+      {propsLoading ? (
+        <Skeleton className="h-6 w-105 max-w-full" style={{ marginBlock: '6px 26px' }} />
+      ) : (
+        <div className="admin-ribbon">
+          <div>
+            <span className="k">{t.portfolioValue}</span>
+            <span className="v"><bdi dir="ltr">{ils(portfolio.portfolioValue)}</bdi></span>
+          </div>
+          <div>
+            <span className="k">{t.activeProperties}</span>
+            <span className="v"><bdi dir="ltr">{portfolio.activeCount}</bdi></span>
+          </div>
+          <div>
+            <span className="k">{t.mostExpensive}</span>
+            <span className="v"><bdi dir="ltr">{ils(portfolio.maxPrice)}</bdi></span>
+          </div>
+          <div>
+            <span className="k">{t.averageLabel}</span>
+            <span className="v"><bdi dir="ltr">{ils(portfolio.avgPrice)}</bdi></span>
+          </div>
+        </div>
+      )}
+
+      {/* ── 2. KPI strip — one card, 4 hairline-divided tiles. Numbers = ink, no icons ── */}
+      <div className="ec-kpi-strip" style={{ marginBottom: 24 }}>
+        <KpiTile label={t.kpiUniqueVisitors} value={uniqueVisitors} loading={trafficLoading} />
+        <KpiTile label={t.kpiViews} value={totalViews} delta={deltaEl(viewsDelta)} loading={trafficLoading} />
+        <KpiTile label={t.kpiInteractions} value={totalClicks} delta={deltaEl(interactionsDelta)} loading={trafficLoading} />
+        <KpiTile label={t.kpiInquiries} value={leadSignals} loading={trafficLoading} />
       </div>
 
-      {/* ── Traffic at a glance — headline KPIs + sparkline; full, filterable analytics lives on /admin/analytics ── */}
+      {/* ── 3. Traffic chart — the ONE data hero (--shadow-hero, radius 16) ── */}
       <ECard
+        className="ec-card--hero"
         style={{ marginBottom: 24 }}
-        title={<SectionTitle>{t.siteTraffic}</SectionTitle>}
+        title={
+          <div>
+            <SectionTitle>{t.siteTraffic}</SectionTitle>
+            <div className="ec-card-subtitle">{t.lastDays(WINDOW_DAYS)}</div>
+          </div>
+        }
         extra={
-          <Link href="/admin/analytics" className="ec-viewall">
-            {t.fullAnalytics} <Fwd className="size-3" />
-          </Link>
+          <div className="ec-chart-tools">
+            <span className="ec-spark-legend">
+              <span className="ec-legend-item"><span className="ec-dot" style={{ background: BRAND }} />{t.chartViews}</span>
+              <span className="ec-legend-item"><span className="ec-dot" style={{ background: BRAND_SKY }} />{t.chartInteractions}</span>
+            </span>
+            <Link href="/admin/analytics" className="ec-viewall">
+              {t.fullAnalytics} <Fwd className="size-3" />
+            </Link>
+          </div>
         }
       >
         {trafficLoading ? (
-          <SkelLines rows={3} />
+          <SkelLines rows={5} />
         ) : (
-          <div className="ec-traffic">
-            {/* Funnel order (visitors → views → interactions → leads) reads like a story,
-                not an even grid of interchangeable numbers. Rates live in the foot, honest. */}
-            <div className="ec-kpis">
-              <Kpi label={t.kpiUniqueVisitors} value={uniqueVisitors} />
-              <Kpi label={t.kpiViews} value={totalViews} delta={deltaChip(viewsDelta)} />
-              <Kpi label={t.kpiInteractions} value={totalClicks} delta={deltaChip(interactionsDelta)} />
-              <Kpi label={t.kpiInquiries} value={leadSignals} accent />
+          <>
+            {trendEmpty ? (
+              <EmptyBlock height={240} text={t.noTrafficData} />
+            ) : (
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={series} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke={DIVIDER} />
+                  <XAxis dataKey="date" reversed={dir === 'rtl'} tick={{ fontSize: 11, fill: MUTED }} axisLine={{ stroke: DIVIDER }} tickLine={false} minTickGap={24} />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 10, border: `1px solid ${BORDER}`, direction: dir, textAlign: 'start', boxShadow: '0 6px 20px -8px rgba(5,17,80,.10)', fontSize: 12 }}
+                    labelStyle={{ fontWeight: 600, marginBottom: 4, color: INK }}
+                  />
+                  <Area type="monotone" dataKey="views" name={t.chartViews} stroke={BRAND} strokeWidth={2} fill={BRAND_WASH} fillOpacity={1} activeDot={{ r: 4 }} isAnimationActive={false} />
+                  <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={BRAND_SKY} strokeWidth={2} fill="transparent" activeDot={{ r: 4 }} isAnimationActive={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+            <div className="ec-chart-foot">
+              <span>
+                {t.conversionRate} <Num style={{ color: INK, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: INK, fontWeight: 600 }}>{engagement}%</Num>
+              </span>
+              <span>
+                {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: INK, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
+              </span>
             </div>
-
-            <div className="ec-spark">
-              <div className="ec-spark-head">
-                <span className="ec-spark-eyebrow">{t.lastDays(WINDOW_DAYS)}</span>
-                <span className="ec-spark-legend">
-                  <span className="ec-legend-item"><span className="ec-dot" style={{ background: NAVY }} />{t.chartViews}</span>
-                  <span className="ec-legend-item"><span className="ec-dot" style={{ background: GOLD }} />{t.chartInteractions}</span>
-                </span>
-              </div>
-              {trendEmpty ? (
-                <EmptyBlock height={72} text={t.noTrafficData} />
-              ) : (
-                <ResponsiveContainer width="100%" height={72}>
-                  <AreaChart data={series} margin={{ top: 6, right: 4, left: 4, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="ecSparkViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={GOLD} stopOpacity={0.34} />
-                        <stop offset="95%" stopColor={NAVY} stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="ecSparkClicks" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={GOLD} stopOpacity={0.22} />
-                        <stop offset="95%" stopColor={GOLD} stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="date" reversed={dir === 'rtl'} hide />
-                    <YAxis hide />
-                    <Tooltip
-                      contentStyle={{ borderRadius: 10, border: `1px solid ${HAIRLINE}`, direction: dir, textAlign: 'start', boxShadow: '0 6px 18px rgba(0,0,0,.06)', fontSize: 12 }}
-                      labelStyle={{ fontWeight: 700, marginBottom: 4, color: NAVY }}
-                    />
-                    <Area type="monotone" dataKey="views" name={t.chartViews} stroke={NAVY} strokeWidth={2} fill="url(#ecSparkViews)" activeDot={{ r: 4 }} isAnimationActive={false} />
-                    <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={GOLD} strokeWidth={1.5} strokeDasharray="3 3" fill="transparent" activeDot={{ r: 4 }} isAnimationActive={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
-              <div className="ec-spark-foot">
-                <div className="ec-spark-rates">
-                  {t.conversionRate} <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: '#1E293B', fontWeight: 600 }}>{engagement}%</Num>
-                </div>
-                <div className="ec-spark-window">
-                  {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: GOLD_TEXT, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
-                </div>
-              </div>
-            </div>
-          </div>
+          </>
         )}
       </ECard>
 
-      {/* ── Composition + Attention queue ── */}
+      {/* ── 4. Composition + Attention queue ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[13fr_11fr] gap-6" style={{ marginBottom: 24 }}>
         <ECard style={{ height: '100%' }} title={<SectionTitle>{t.portfolioComposition}</SectionTitle>}>
             {propsLoading ? (
@@ -386,26 +370,26 @@ export default function AdminDashboard() {
             ) : (
               <>
                 <div className="ec-splitbar" role="img" aria-label={t.splitBarAria}>
-                  {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ width: `${portfolio.salePct}%`, background: 'linear-gradient(90deg, #354AC4, #4A5FD6)' }} />}
-                  {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ width: `${100 - portfolio.salePct}%`, background: 'linear-gradient(90deg, #5594F1, #7FB4F5)' }} />}
+                  {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ inlineSize: `${portfolio.salePct}%`, background: BRAND }} />}
+                  {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ inlineSize: `${100 - portfolio.salePct}%`, background: BRAND_SKY }} />}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 13 }}>
-                  <span style={{ color: NAVY, fontWeight: 600 }}>
-                    <span className="ec-dot" style={{ background: NAVY }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
+                  <span className="ec-comp-legend">
+                    <span className="ec-dot" style={{ background: BRAND }} />
                     <Num>{portfolio.salePct}%</Num> · <Num>{portfolio.saleCount}</Num> {t.forSaleLower}
                   </span>
-                  <span style={{ color: GOLD_TEXT, fontWeight: 600 }}>
-                    <span className="ec-dot" style={{ background: GOLD }} />
+                  <span className="ec-comp-legend">
+                    <span className="ec-dot" style={{ background: BRAND_SKY }} />
                     <Num>{100 - portfolio.salePct}%</Num> · <Num>{portfolio.rentCount}</Num> {t.forRentLower}
                   </span>
                 </div>
 
                 <Label style={{ marginTop: 22, marginBottom: 8 }}>{t.byPropertyType}</Label>
                 <div>
-                  {portfolio.typeCounts.map((t) => (
-                    <div key={t.type} className="ec-typerow">
-                      <span style={{ color: INK, fontSize: 13.5 }}>{t.label}</span>
-                      <span className="ec-countbadge"><Num>{t.count}</Num></span>
+                  {portfolio.typeCounts.map((tc) => (
+                    <div key={tc.type} className="ec-typerow">
+                      <span className="ec-typelabel">{tc.label}</span>
+                      <span className="ec-countbadge"><Num>{tc.count}</Num></span>
                     </div>
                   ))}
                 </div>
@@ -416,7 +400,7 @@ export default function AdminDashboard() {
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {portfolio.cityCounts.map((c) => (
                         <span key={c.label} className="ec-citychip">
-                          {c.label} <Num style={{ color: GOLD_TEXT, fontWeight: 700, marginInlineStart: 4 }}>{c.count}</Num>
+                          {c.label} <Num style={{ color: INK, fontWeight: 600, marginInlineStart: 4 }}>{c.count}</Num>
                         </span>
                       ))}
                     </div>
@@ -431,18 +415,20 @@ export default function AdminDashboard() {
               <SkelLines rows={4} />
             ) : (
               <div>
-                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} />
-                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} />
-                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} />
-                <AttentionRow label={t.soldProperties} count={portfolio.soldCount} muted />
-                {portfolio.hotCount > 0 && <AttentionRow label={t.hotOffers} count={portfolio.hotCount} muted />}
-                {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} muted />}
+                {/* Actionable rows lead with a warn/neg dot; informational rows a muted dot.
+                    Whole row is the click target; chevron surfaces on hover. */}
+                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} tone="warn" />
+                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} tone="neg" />
+                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} tone="warn" />
+                <AttentionRow label={t.soldProperties} count={portfolio.soldCount} tone="muted" />
+                {portfolio.hotCount > 0 && <AttentionRow label={t.hotOffers} count={portfolio.hotCount} tone="muted" />}
+                {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} tone="muted" />}
               </div>
             )}
         </ECard>
       </div>
 
-      {/* ── Recent listings ── */}
+      {/* ── 6. Recent listings ── */}
       <ECard title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd className="size-3" /></Link>}>
         {propsLoading ? (
           <SkelLines rows={4} />
@@ -457,16 +443,16 @@ export default function AdminDashboard() {
                   <img src={x.images[0]} alt={x.title} className="ec-thumb" loading="lazy" />
                 ) : (
                   <span className="ec-thumb ec-thumb-empty">
-                    <ImageIcon style={{ color: 'rgba(255,255,255,.7)' }} className="size-4" />
+                    <ImageIcon style={{ color: 'var(--text-faint)' }} className="size-4" />
                   </span>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, color: DEEP, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.title}</div>
-                  <div style={{ fontSize: 12.5, color: MUTED }}>
+                  <div className="ec-listtitle">{x.title}</div>
+                  <div className="ec-listmeta">
                     {getCityLabel(x.city) || x.location} · <Num>{x.rooms}</Num> {t.roomsAbbr} · <Num>{x.area}</Num> {t.sqmAbbr} · {relDaysLabel(x.createdAt, t)}
                   </div>
                 </div>
-                <Num style={{ fontWeight: 700, color: INK, fontSize: 14 }}>{ils(parseMoney(x.price))}</Num>
+                <span className="ec-listprice"><Num>{ils(parseMoney(x.price))}</Num></span>
                 <span className={`ec-dealpill ${x.dealType === 'sale' ? 'sale' : 'rent'}`}>
                   {x.dealType === 'sale' ? t.dealSale : t.dealRent}
                 </span>
@@ -482,33 +468,42 @@ export default function AdminDashboard() {
 }
 
 /* ===== sub-components ===== */
-function Kpi({ label, value, text, accent, delta }: { label: string; value?: number; text?: string; accent?: boolean; delta?: React.ReactNode }) {
+/** One KPI tile inside `.ec-kpi-strip`: muted label → ink tabular value → optional delta. */
+function KpiTile({ label, value, delta, loading }: { label: string; value: number; delta?: React.ReactNode; loading?: boolean }) {
   return (
-    <div className="ec-kpi">
-      <div className="ec-kpi-label">{label}</div>
-      <Num style={{ fontSize: 24, fontWeight: 700, color: accent ? GOLD_TEXT : NAVY }}>
-        {text ?? (value ?? 0).toLocaleString('en-US')}
-      </Num>
-      {delta}
+    <div className="ec-kpi-tile">
+      <div className="lbl">{label}</div>
+      <div className="val">
+        {loading ? <Skeleton className="h-7 w-16" /> : <bdi dir="ltr">{value.toLocaleString('en-US')}</bdi>}
+      </div>
+      {!loading && delta}
     </div>
   );
 }
 
-function AttentionRow({ label, count, muted }: { label: string; count: number; muted?: boolean }) {
+/** Attention row — whole-row click target, tone-coded dot, neutral count badge, hover chevron. */
+function AttentionRow({ label, count, tone }: { label: string; count: number; tone: 'warn' | 'neg' | 'muted' }) {
   const t = useAdminMessages(dashboardMessages);
   const { dir } = useAdminI18n();
   const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const ok = count === 0;
+  const dotColor = ok
+    ? 'var(--text-faint)'
+    : tone === 'neg'
+      ? 'var(--neg)'
+      : tone === 'warn'
+        ? 'var(--warn)'
+        : 'var(--text-faint)';
   return (
     <Link href="/admin/properties" className="ec-row ec-attrow">
-      <span className="ec-attdot" style={{ background: ok ? '#CBD5E1' : muted ? '#C9CDD6' : '#354AC4' }} />
-      <span style={{ flex: 1, color: ok ? '#64748B' : INK, fontSize: 14 }}>{label}</span>
+      <span className="ec-attdot" style={{ background: dotColor }} />
+      <span className="ec-attlabel" style={{ color: ok ? 'var(--text-muted)' : 'var(--text-body)' }}>{label}</span>
       {ok ? (
-        <span style={{ color: '#64748B', fontSize: 13 }}>{t.allClear}</span>
+        <span className="ec-att-clear">{t.allClear}</span>
       ) : (
         <>
-          <Num style={{ fontWeight: 700, color: muted ? '#6B7280' : NAVY, fontSize: 15, marginInlineEnd: 10 }}>{count}</Num>
-          <span className="ec-att-cta">{t.view} <Fwd className="size-2.5" /></span>
+          <span className="ec-att-count"><bdi dir="ltr">{count}</bdi></span>
+          <Fwd className="ec-att-chev size-4" />
         </>
       )}
     </Link>
@@ -517,96 +512,78 @@ function AttentionRow({ label, count, muted }: { label: string; count: number; m
 
 function EmptyBlock({ height, text }: { height: number; text: string }) {
   return (
-    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748B', fontSize: 13.5, textAlign: 'center', padding: 16 }}>
+    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13.5, textAlign: 'center', padding: 16 }}>
       {text}
     </div>
   );
 }
 
-/* ===== scoped styles — one enclosure method per element, brand palette only ===== */
+/* ===== scoped styles — tokens only (var(--…)); RTL logical properties throughout ===== */
 function DashboardStyles() {
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: `
-.ec-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+/* Page header */
+.estate-console .ec-pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.estate-console .ec-h1{font-size:24px;line-height:1.25;font-weight:600;color:var(--text-ink);}
+.estate-console .ec-subtitle{font-size:13px;line-height:1.4;color:var(--text-muted);margin-block-start:4px;}
+.estate-console .ec-newleads{display:inline-flex;align-items:center;gap:7px;background:var(--brand);color:#fff;font-weight:600;font-size:13px;line-height:1;padding:9px 16px;border-radius:var(--r-pill);text-decoration:none;white-space:nowrap;transition:background .15s ease;}
+.estate-console .ec-newleads:hover{background:var(--brand-hover);}
 
-/* Cards: a single hairline (no border+shadow stacking) on cream — flat & editorial */
-.layout-dashboard .estate-console .ec-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
-.layout-dashboard .estate-console .ec-card-head{border-bottom:none;}
-.estate-console .ec-card-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 0;}
+/* Cards — quiet by default (hairline + soft shadow); ONE hero variant */
+.estate-console .ec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow-card);}
+.estate-console .ec-card--hero{border-radius:var(--r-hero);box-shadow:var(--shadow-hero);}
+.estate-console .ec-card-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px 0;}
+.estate-console .ec-card--hero .ec-card-head{align-items:flex-start;}
 .estate-console .ec-card-body{padding:22px;}
+.estate-console .ec-card-subtitle{font-size:12.5px;line-height:1.4;color:var(--text-muted);margin-block-start:3px;}
 
-/* Masthead — the brand's möbius gradient (deep-navy -> indigo) with a bright-blue
-   corner glow as the signature "ribbon light". Multi-layer background so the glow
-   always sits BEHIND the white text (which stays AA on the navy->indigo sweep). */
-.estate-console .ec-masthead{
-  position:relative;overflow:hidden;
-  background:
-    radial-gradient(340px 300px at 90% -40%, rgba(85,148,241,.55) 0%, rgba(85,148,241,0) 70%),
-    linear-gradient(120deg, #051150 0%, #1B2670 55%, #28389B 100%);
-  border-radius:12px;padding:18px 26px;margin-bottom:22px;
-  box-shadow:0 8px 24px rgba(5,17,80,.22);
-}
-.estate-console .ec-mast-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}
-.estate-console .ec-mast-title{color:#fff;font-size:15.5px;font-weight:700;letter-spacing:-.02em;}
-.estate-console .ec-mast-date{color:rgba(255,255,255,.62);font-size:12.5px;white-space:nowrap;}
-.estate-console .ec-mast-line{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:13px;color:rgba(255,255,255,.9);font-size:14px;}
-.estate-console .ec-mast-stat{display:inline-flex;align-items:baseline;gap:6px;}
-.estate-console .ec-mast-cap{color:rgba(255,255,255,.55);font-size:12px;}
-.estate-console .ec-mast-sep{color:rgba(255,255,255,.28);}
-.estate-console .ec-mast-cta{margin-inline-start:auto;display:inline-flex;align-items:center;gap:7px;background:${GOLD};color:${DEEP};font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;text-decoration:none;white-space:nowrap;transition:filter .15s ease;}
-.estate-console .ec-mast-cta:hover{filter:brightness(1.06);}
-.estate-console .ec-mast-detail{color:rgba(255,255,255,.5);font-size:12px;margin-top:9px;}
-
-/* Traffic at a glance — compact KPI strip + sparkline (deep analytics on /admin/analytics) */
-.estate-console .ec-traffic{display:flex;gap:32px;align-items:center;flex-wrap:wrap;}
-.estate-console .ec-kpis{display:flex;gap:30px;flex-wrap:wrap;flex:1;min-width:240px;}
-.estate-console .ec-kpi{display:flex;flex-direction:column;gap:3px;}
-.estate-console .ec-kpi-label{font-size:12.5px;font-weight:600;color:${MUTED};}
-.estate-console .ec-spark{width:320px;max-width:100%;flex-shrink:0;}
-.estate-console .ec-spark-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:5px;}
-.estate-console .ec-spark-eyebrow{font-size:11.5px;color:#64748B;}
-.estate-console .ec-spark-legend{display:inline-flex;align-items:center;gap:12px;font-size:11.5px;color:#64748B;}
+/* Chart card tools (legend + link) + honest rate foot */
+.estate-console .ec-chart-tools{display:inline-flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.estate-console .ec-spark-legend{display:inline-flex;align-items:center;gap:14px;font-size:12px;color:var(--text-muted);}
 .estate-console .ec-legend-item{display:inline-flex;align-items:center;}
-.estate-console .ec-spark-foot{margin-top:8px;text-align:start;}
-.estate-console .ec-spark-rates{font-size:12px;color:#475569;}
-.estate-console .ec-spark-window{font-size:11.5px;color:#64748B;margin-top:3px;}
-@media (max-width:767px){.estate-console .ec-spark{width:100%;}}
+.estate-console .ec-chart-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-block-start:16px;padding-block-start:14px;border-block-start:1px solid var(--divider);font-size:12.5px;color:var(--text-muted);}
 
-/* Composition */
-.estate-console .ec-splitbar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:#EAEDF5;}
-.estate-console .ec-bar-fill{height:100%;transition:width .8s cubic-bezier(.22,1,.36,1);}
-.estate-console .ec-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:6px;vertical-align:middle;}
-.estate-console .ec-typerow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #F0F3FA;}
-.estate-console .ec-typerow:last-child{border-bottom:none;}
-.estate-console .ec-countbadge{background:rgba(85,148,241,.14);color:${GOLD_TEXT};font-weight:700;font-size:12.5px;min-width:26px;text-align:center;padding:1px 8px;border-radius:7px;}
-.estate-console .ec-citychip{background:#F0F4FC;border:1px solid ${HAIRLINE};border-radius:8px;padding:4px 10px;font-size:12.5px;color:${INK};}
+/* Composition — horizontal stacked bar (data marks keep brand) */
+.estate-console .ec-splitbar{display:flex;block-size:12px;border-radius:6px;overflow:hidden;background:var(--surface-sunken);}
+.estate-console .ec-bar-fill{block-size:100%;transition:inline-size .8s cubic-bezier(.22,1,.36,1);}
+.estate-console .ec-dot{display:inline-block;inline-size:8px;block-size:8px;border-radius:50%;margin-inline-end:6px;vertical-align:middle;}
+.estate-console .ec-comp-legend{display:inline-flex;align-items:center;color:var(--text-body);font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;}
+.estate-console .ec-typerow{display:flex;align-items:center;justify-content:space-between;padding-block:8px;border-block-end:1px solid var(--divider);}
+.estate-console .ec-typerow:last-child{border-block-end:none;}
+.estate-console .ec-typelabel{color:var(--text-body);font-size:13.5px;}
+.estate-console .ec-countbadge{background:var(--surface-sunken);color:var(--text-body);font-weight:600;font-size:12.5px;min-inline-size:26px;text-align:center;padding:1px 9px;border-radius:var(--r-pill);font-variant-numeric:tabular-nums;}
+.estate-console .ec-citychip{display:inline-flex;align-items:center;background:var(--surface-sunken);border:1px solid var(--divider);border-radius:var(--r-tile);padding:4px 10px;font-size:12.5px;color:var(--text-body);}
 
-/* Rows (attention / listings) — hover via background, no extra borders */
+/* Rows (attention / listings) — full-bleed hover, hairline separators, no zebra */
 .estate-console .ec-row{transition:background .15s ease;}
-.estate-console .ec-row:hover{background:${HOVER_BG};}
-.estate-console .ec-attrow{display:flex;align-items:center;gap:10px;padding:12px 8px;margin-inline:-8px;border-radius:8px;text-decoration:none;border-bottom:1px solid #F0F3FA;}
-.estate-console .ec-attrow:last-child{border-bottom:none;}
-.estate-console .ec-attdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;transition:transform .15s ease;}
-.estate-console .ec-attrow:hover .ec-attdot{transform:scale(1.25);}
-.estate-console .ec-att-cta{color:${GOLD_TEXT};font-size:12.5px;font-weight:600;white-space:nowrap;}
+.estate-console .ec-row:hover{background:var(--surface-hover);}
+.estate-console .ec-attrow{display:flex;align-items:center;gap:10px;padding:12px 22px;margin-inline:-22px;text-decoration:none;border-block-end:1px solid var(--divider);}
+.estate-console .ec-attrow:last-child{border-block-end:none;}
+.estate-console .ec-attdot{inline-size:9px;block-size:9px;border-radius:50%;flex-shrink:0;}
+.estate-console .ec-attlabel{flex:1;font-size:14px;}
+.estate-console .ec-att-count{background:var(--surface-sunken);color:var(--text-body);font-weight:600;font-size:12.5px;min-inline-size:24px;text-align:center;padding:2px 9px;border-radius:var(--r-pill);font-variant-numeric:tabular-nums;}
+.estate-console .ec-att-clear{color:var(--text-muted);font-size:13px;}
+.estate-console .ec-att-chev{color:var(--text-faint);opacity:0;flex-shrink:0;transition:opacity .15s ease;}
+.estate-console .ec-attrow:hover .ec-att-chev,.estate-console .ec-attrow:focus-visible .ec-att-chev{opacity:1;}
 
-/* Recent listings */
-.estate-console .ec-listrow{display:flex;align-items:center;gap:14px;padding:11px 8px;margin-inline:-8px;border-radius:10px;text-decoration:none;border-bottom:1px solid #F0F3FA;}
-.estate-console .ec-listrow:last-child{border-bottom:none;}
-.estate-console .ec-thumb{width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0;}
-.estate-console .ec-thumb-empty{display:inline-flex;align-items:center;justify-content:center;background:${NAVY};}
-.estate-console .ec-dealpill{font-size:11.5px;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap;}
-.estate-console .ec-dealpill.sale{background:rgba(53,74,196,.08);color:${NAVY};}
-.estate-console .ec-dealpill.rent{background:rgba(85,148,241,.16);color:${GOLD_TEXT};}
-.estate-console .ec-viewall{color:${GOLD_TEXT};font-weight:600;font-size:13px;text-decoration:none;}
-.estate-console .ec-viewall:hover{color:${NAVY};}
+/* Recent listings — calm 64px rows */
+.estate-console .ec-listrow{display:flex;align-items:center;gap:14px;min-block-size:64px;padding:11px 22px;margin-inline:-22px;text-decoration:none;border-block-end:1px solid var(--divider);}
+.estate-console .ec-listrow:last-child{border-block-end:none;}
+.estate-console .ec-thumb{inline-size:56px;block-size:42px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--surface-sunken);}
+.estate-console .ec-thumb-empty{display:inline-flex;align-items:center;justify-content:center;background:var(--surface-sunken);}
+.estate-console .ec-listtitle{font-weight:600;color:var(--text-ink);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.estate-console .ec-listmeta{font-size:12.5px;color:var(--text-muted);margin-block-start:2px;}
+.estate-console .ec-listprice{font-weight:600;color:var(--text-ink);font-size:14px;font-variant-numeric:tabular-nums;}
+.estate-console .ec-dealpill{font-size:11.5px;font-weight:600;padding:3px 11px;border-radius:var(--r-pill);white-space:nowrap;}
+.estate-console .ec-dealpill.sale{background:var(--brand-tint);color:var(--brand);}
+.estate-console .ec-dealpill.rent{background:#e8f1fe;color:#2f6fd0;}
 
-@media (max-width:575px){
-  .estate-console .ec-masthead{padding:16px 18px;}
-  .estate-console .ec-mast-cta{margin-inline-start:0;margin-top:2px;}
-}
+/* Links / CTAs — brand is allowed here */
+.estate-console .ec-viewall{color:var(--brand);font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+.estate-console .ec-viewall:hover{color:var(--brand-hover);}
+
 @media (prefers-reduced-motion: reduce){
   .estate-console .ec-bar-fill{transition:none;}
 }

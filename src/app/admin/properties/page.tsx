@@ -265,19 +265,35 @@ export default function PropertiesPage() {
     }
   };
 
-  // Labelled toggle — replaces antd Switch's checkedChildren/unCheckedChildren text
-  const statusToggle = (
-    p: Property,
-    field: 'isActive' | 'isSold',
-    onLabel: string,
-    offLabel: string
-  ) => {
-    const checked = p[field];
-    return (
-      <span className="flex items-center gap-2">
-        <Switch checked={checked} onCheckedChange={(v) => handleStatusChange(p.id, field, v)} />
-        <span className="text-xs font-medium text-muted-foreground">{checked ? onLabel : offLabel}</span>
+  // One featured active/hidden Switch per row (replaces the old double toggle).
+  const activeSwitch = (p: Property) => (
+    <span className="flex items-center gap-2">
+      <Switch
+        checked={p.isActive}
+        onCheckedChange={(v) => handleStatusChange(p.id, 'isActive', v)}
+        aria-label={t.statusActive}
+      />
+      <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)' }}>
+        {p.isActive ? t.statusActive : t.switchOff}
       </span>
+    </span>
+  );
+
+  // Sold/active lifecycle as a quiet dot+word (live = --pos, sold/rented = muted).
+  // Stays interactive so the sold state can still be toggled inline — mutation
+  // logic (handleStatusChange) is unchanged.
+  const lifecycleStatus = (p: Property) => {
+    const soldWord = p.dealType === 'rent' ? t.statusRented : t.statusSold;
+    return (
+      <button
+        type="button"
+        onClick={() => handleStatusChange(p.id, 'isSold', !p.isSold)}
+        className={`status ${p.isSold ? 'status--sold' : 'status--live'}`}
+        style={{ background: 'transparent', border: 0, padding: 0, cursor: 'pointer' }}
+        title={p.isSold ? t.unmarkedAs(soldWord) : t.markedAs(soldWord)}
+      >
+        {p.isSold ? soldWord : t.statusAvailable}
+      </button>
     );
   };
 
@@ -314,10 +330,10 @@ export default function PropertiesPage() {
         ))}
       </div>
 
-      {/* Filters */}
+      {/* Filters — one calm row: search grows, selects sit at inline-end (stack on mobile) */}
       <Card className="mb-6 p-4">
-        <div className="flex w-full flex-col gap-3">
-          <div className="relative">
+        <div className="admin-filter-full flex w-full flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative sm:min-w-0 sm:flex-1">
             <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t.searchPlaceholder}
@@ -329,44 +345,42 @@ export default function PropertiesPage() {
               }}
             />
           </div>
-          <div className="admin-filter-full flex w-full flex-wrap gap-3">
-            <Select
-              value={filterDealType}
-              onValueChange={(v) => {
-                setFilterDealType(v);
-                setCurrentPage(1);
-              }}
-            >
-              <SelectTrigger className="h-11 min-w-[150px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.filterAllDealTypes}</SelectItem>
-                <SelectItem value="sale">{t.dealSale}</SelectItem>
-                <SelectItem value="rent">{t.dealRent}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={filterStatus}
-              onValueChange={(v) => {
-                setFilterStatus(v);
-                setCurrentPage(1);
-              }}
-            >
-              <SelectTrigger className="h-11 min-w-[120px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
-                <SelectItem value="active">{t.statusActive}</SelectItem>
-                <SelectItem value="inactive">{t.statusInactive}</SelectItem>
-                <SelectItem value="sold">{t.statusSold}</SelectItem>
-                <SelectItem value="available">{t.statusAvailable}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select
+            value={filterDealType}
+            onValueChange={(v) => {
+              setFilterDealType(v);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="h-11 w-full sm:w-auto sm:min-w-[160px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t.filterAllDealTypes}</SelectItem>
+              <SelectItem value="sale">{t.dealSale}</SelectItem>
+              <SelectItem value="rent">{t.dealRent}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={filterStatus}
+            onValueChange={(v) => {
+              setFilterStatus(v);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="h-11 w-full sm:w-auto sm:min-w-[150px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
+              <SelectItem value="active">{t.statusActive}</SelectItem>
+              <SelectItem value="inactive">{t.statusInactive}</SelectItem>
+              <SelectItem value="sold">{t.statusSold}</SelectItem>
+              <SelectItem value="available">{t.statusAvailable}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </Card>
 
       {/* Property Table — desktop (≥768px) */}
       <div className="admin-only-desktop">
-        <Card className="p-2">
+        <Card className="overflow-hidden p-0">
           {loading ? (
             <div className="p-4"><Skeleton className="h-64 w-full" /></div>
           ) : totalItems === 0 ? (
@@ -375,27 +389,31 @@ export default function PropertiesPage() {
             <>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[300px]">{t.colTitle}</TableHead>
-                    <TableHead className="w-[100px]">{t.colDealType}</TableHead>
-                    <TableHead className="w-[120px]">{t.colPrice}</TableHead>
-                    <TableHead className="w-[80px] text-center">{t.colFloor}</TableHead>
-                    <TableHead className="w-[130px]">{t.colStatus}</TableHead>
-                    <TableHead className="w-[160px]">{t.colActions}</TableHead>
+                  <TableRow className="h-11 bg-[var(--surface-sunken)] hover:bg-[var(--surface-sunken)]">
+                    <TableHead className="h-11 w-[320px] normal-case tracking-normal">{t.colTitle}</TableHead>
+                    <TableHead className="h-11 w-[110px] normal-case tracking-normal">{t.colDealType}</TableHead>
+                    <TableHead className="h-11 w-[130px] text-end normal-case tracking-normal">{t.colPrice}</TableHead>
+                    <TableHead className="h-11 w-[90px] text-end normal-case tracking-normal">{t.colFloor}</TableHead>
+                    <TableHead className="h-11 w-[160px] normal-case tracking-normal">{t.colStatus}</TableHead>
+                    <TableHead className="h-11 w-[110px] normal-case tracking-normal">{t.colActions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pageItems.map((record) => (
-                    <TableRow key={record.id} className={record.isSold ? 'sold-property-row' : ''}>
+                    <TableRow
+                      key={record.id}
+                      className={`group h-16 border-b border-[var(--divider)] hover:bg-[var(--surface-hover)]${record.isSold ? ' sold-property-row' : ''}`}
+                    >
                       <TableCell>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={record.images[0] || '/images/hero/sales.jpg'}
                             alt={record.title}
-                            width={40}
-                            height={40}
-                            className="block size-10 shrink-0 rounded-lg object-cover"
+                            width={56}
+                            height={42}
+                            className="block shrink-0 object-cover"
+                            style={{ width: 56, height: 42, borderRadius: 8 }}
                             onError={(e) => {
                               (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg';
                             }}
@@ -405,9 +423,9 @@ export default function PropertiesPage() {
                               href={`/admin/properties/${record.id}`}
                               style={{
                                 display: 'block',
-                                fontSize: 14,
+                                fontSize: 15,
                                 fontWeight: 600,
-                                color: '#354AC4',
+                                color: 'var(--text-ink)',
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -417,8 +435,9 @@ export default function PropertiesPage() {
                             </Link>
                             <div
                               style={{
-                                fontSize: 12.5,
-                                color: '#64748B',
+                                fontSize: 13,
+                                fontWeight: 400,
+                                color: 'var(--text-muted)',
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -430,28 +449,40 @@ export default function PropertiesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className={`admin-pill admin-pill--${record.dealType === 'sale' ? 'sale' : 'rent'}`}>
+                        <span
+                          className="admin-pill"
+                          style={
+                            record.dealType === 'sale'
+                              ? { background: 'var(--brand-tint)', color: 'var(--brand)' }
+                              : { background: '#e8f1fe', color: '#2f6fd0' }
+                          }
+                        >
                           {record.dealType === 'sale' ? t.dealSale : t.dealRent}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block', color: '#051150', fontWeight: 600 }}>
+                      <TableCell className="text-end">
+                        <bdi
+                          dir="ltr"
+                          style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-ink)', fontWeight: 600 }}
+                        >
                           {formatPropertyPrice(record.price)}
-                        </span>
+                        </bdi>
                       </TableCell>
-                      <TableCell className="text-center">
-                        {record.floor && record.totalFloors
-                          ? `${record.floor}/${record.totalFloors}`
-                          : record.floor || '-'}
+                      <TableCell className="text-end">
+                        <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', color: 'var(--text-body)' }}>
+                          {record.floor && record.totalFloors
+                            ? `${record.floor}/${record.totalFloors}`
+                            : record.floor || '-'}
+                        </bdi>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col gap-1.5">
-                          {statusToggle(record, 'isActive', t.statusActive, t.switchOff)}
-                          {statusToggle(record, 'isSold', record.dealType === 'rent' ? t.statusRented : t.statusSold, t.switchVacant)}
+                        <div className="flex flex-col items-start gap-2">
+                          {activeSwitch(record)}
+                          {lifecycleStatus(record)}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100">
                           <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
                             <Link href={`/admin/properties/${record.id}`}>
                               <Pencil className="size-4" />
@@ -474,7 +505,7 @@ export default function PropertiesPage() {
               </Table>
 
               {/* Pagination */}
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-2 py-1">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--divider)] px-4 py-3">
                 <span className="text-sm text-muted-foreground">{t.tableTotal(totalItems)}</span>
                 <div className="flex items-center gap-2">
                   <Select
@@ -581,8 +612,8 @@ export default function PropertiesPage() {
                     </span>
                   </div>
                   <div className="admin-card__actions">
-                    {statusToggle(property, 'isActive', t.statusActive, t.switchOff)}
-                    {statusToggle(property, 'isSold', property.dealType === 'rent' ? t.statusRented : t.statusSold, t.switchVacant)}
+                    {activeSwitch(property)}
+                    {lifecycleStatus(property)}
                     <span className="admin-card__grow" style={{ display: 'flex', gap: 8 }}>
                       <Button asChild variant="outline" size="sm" className="flex-1">
                         <Link href={`/admin/properties/${property.id}`}>

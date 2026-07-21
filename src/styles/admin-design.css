@@ -1,0 +1,108 @@
+/* =========================================================================
+ * Aiterra Admin — "Calm Navy Data Console" design system
+ * Grounded in Refero refs (Seline / Fingerprint / Resend / Airbnb / Monarch).
+ * Loaded admin-only (imported in src/app/admin/layout.tsx). Tokens are the
+ * single source of truth; indigo appears ONLY where the user acts or data lives.
+ * ========================================================================= */
+
+:root {
+  /* Surfaces */
+  --page-bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-sunken: #eef1f8;
+  --surface-hover: #f7f9fd;
+
+  /* Hairlines */
+  --border: #e3e8f2;
+  --border-strong: #d5dcec;
+  --divider: #eef1f7;
+
+  /* Text — navy-graded, never pure black */
+  --text-ink: #051150;
+  --text-body: #333e66;
+  --text-muted: #6c76a0;
+  --text-faint: #9aa2c4;
+
+  /* Brand — indigo family */
+  --brand: #354ac4;
+  --brand-hover: #2c3ea6;
+  --brand-press: #051150;
+  --brand-sky: #5594f1;
+  --brand-tint: #e7ecff;
+  --brand-wash: #eef1fb;
+
+  /* Semantic — data/status ONLY, muted */
+  --pos: #1f7d57;  --pos-bg: #e5f4ed;
+  --neg: #c0392b;  --neg-bg: #fdecea;
+  --warn: #9a6a06; --warn-bg: #fbf1db;
+
+  /* Geometry */
+  --r-card: 14px;  --r-hero: 16px;  --r-tile: 10px;  --r-control: 10px;  --r-pill: 9999px;
+
+  /* Elevation — single-layer, navy-tinted, 3 levels max */
+  --shadow-card:  0 1px 2px rgba(5, 17, 80, 0.04);
+  --shadow-raise: 0 4px 16px rgba(5, 17, 80, 0.06);
+  --shadow-hero:  0 6px 20px -8px rgba(5, 17, 80, 0.10);
+  --shadow-pop:   0 12px 32px rgba(5, 17, 80, 0.12);
+  --focus-ring:   0 0 0 3px rgba(85, 148, 241, 0.40);
+}
+
+/* ---- Context ribbon (borderless label/value row on page bg) ---- */
+.admin-ribbon { display: flex; flex-wrap: wrap; gap: 22px; margin-block: 6px 26px; }
+.admin-ribbon > * + * { border-inline-start: 1px solid var(--divider); padding-inline-start: 22px; }
+.admin-ribbon .k { display: block; font: 600 12px/1.3 var(--font-assistant), system-ui; color: var(--text-muted); margin-block-end: 2px; }
+.admin-ribbon .v { font: 500 14px/1.3 var(--font-assistant), system-ui; color: var(--text-ink); font-variant-numeric: tabular-nums; }
+
+/* ---- KPI strip: one card, hairline-divided tiles, NO icons ---- */
+.ec-kpi-strip {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-card); box-shadow: var(--shadow-card); overflow: hidden;
+}
+.ec-kpi-tile { padding: 18px 22px; min-width: 0; }
+.ec-kpi-tile + .ec-kpi-tile { border-inline-start: 1px solid var(--divider); }
+.ec-kpi-tile .lbl { font: 500 13px/1.4 var(--font-assistant), system-ui; color: var(--text-muted); }
+.ec-kpi-tile .val { font: 600 30px/1.1 var(--font-assistant), system-ui; color: var(--text-ink); font-variant-numeric: tabular-nums; margin-block-start: 6px; letter-spacing: -0.01em; }
+.ec-kpi-tile .val .suf { font-size: 16px; color: var(--text-muted); font-weight: 600; margin-inline-start: 2px; }
+.ec-kpi-tile .delta { margin-block-start: 6px; font: 600 12px/1.3 var(--font-assistant), system-ui; font-variant-numeric: tabular-nums; }
+.ec-kpi-tile .delta.up { color: var(--pos); }
+.ec-kpi-tile .delta.down { color: var(--neg); }
+.ec-kpi-tile .delta .cmp { color: var(--text-faint); font-weight: 500; margin-inline-start: 4px; }
+@media (max-width: 767px) { .ec-kpi-strip { grid-template-columns: repeat(2, 1fr); } .ec-kpi-tile:nth-child(3) { border-inline-start: 0; } }
+
+/* ---- Status dot + word ---- */
+.status { display: inline-flex; align-items: center; gap: 8px; font: 500 13px/1 var(--font-assistant), system-ui; color: var(--text-body); white-space: nowrap; }
+.status::before { content: ""; inline-size: 8px; block-size: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-faint); }
+.status--live::before { background: var(--pos); }
+.status--sold::before { background: var(--text-faint); }
+.status--attention { color: var(--neg); }
+.status--attention::before { background: var(--neg); }
+
+/* ---- Field row (Lemon Squeezy anatomy) ---- */
+.field-row { display: grid; grid-template-columns: minmax(0, 38%) minmax(0, 1fr); gap: 24px; padding: 16px 20px; border-block-end: 1px solid var(--divider); align-items: start; }
+.field-row:last-child { border-block-end: 0; }
+.field-row .fr-label { font: 600 14px/1.4 var(--font-assistant), system-ui; color: var(--text-ink); }
+.field-row .fr-label .req { color: var(--brand); margin-inline-start: 2px; }
+.field-row .fr-helper { font: 400 12px/1.4 var(--font-assistant), system-ui; color: var(--text-muted); margin-block-start: 4px; }
+.field-row .fr-control { max-inline-size: 460px; inline-size: 100%; }
+@media (max-width: 639px) { .field-row { grid-template-columns: 1fr; gap: 8px; } }
+
+/* ---- Section card (padding:0 shell with titled header) ---- */
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-card); box-shadow: var(--shadow-card); overflow: hidden; margin-block-end: 20px; }
+.section-card__head { padding: 16px 20px; border-block-end: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.section-card__title { font: 600 15px/1.3 var(--font-assistant), system-ui; color: var(--text-ink); }
+.section-card__helper { font: 400 13px/1.4 var(--font-assistant), system-ui; color: var(--text-muted); margin-block-start: 2px; }
+
+/* ---- Sticky settings save bar ---- */
+.settings-bar { position: sticky; inset-block-start: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; background: color-mix(in srgb, var(--page-bg) 90%, transparent); backdrop-filter: blur(8px); padding-block: 12px; margin-block-end: 8px; }
+.settings-bar__status { font: 500 13px/1.4 var(--font-assistant), system-ui; color: var(--text-muted); }
+.settings-bar__status.dirty { color: var(--warn); }
+
+/* ---- Reorderable picker rows ---- */
+.pick-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-block-end: 1px solid var(--divider); }
+.pick-row:last-child { border-block-end: 0; }
+.pick-row .handle { color: var(--text-faint); cursor: grab; flex-shrink: 0; }
+.pick-row .thumb { inline-size: 48px; block-size: 36px; border-radius: 8px; object-fit: cover; background: var(--surface-sunken); flex-shrink: 0; }
+
+/* ---- Inset well (radio groups / secondary controls inside a card) ---- */
+.inset-well { background: var(--surface-sunken); border-radius: var(--r-tile); padding: 12px 14px; }

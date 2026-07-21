@@ -9,6 +9,7 @@ import MainLayout from '@/components/admin/antd/MainLayout';
 import { AdminI18nProvider, useAdminI18n } from '@/lib/adminI18n';
 import { AdminToaster } from '@/components/shadcn/sonner';
 import '@/styles/antd-admin.css';
+import '@/styles/admin-design.css';
 import '@/styles/admin-rtl-fix.css';
 import '@/styles/admin-a11y.css';
 
