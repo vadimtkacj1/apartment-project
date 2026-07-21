@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Tooltip } from 'antd';
-import { CloseOutlined, LogoutOutlined } from '@ant-design/icons';
+import { X, LogOut } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
@@ -21,7 +21,6 @@ const SECTION_GROUP: Record<string, string> = {
 };
 
 interface SidenavProps {
-  color: string;
   onClose: () => void;
 }
 
@@ -64,14 +63,18 @@ export default function Sidenav({ onClose }: SidenavProps) {
             <span className="estate-brand-sub">{t.adminPanel}</span>
           </span>
         </Link>
-        <Tooltip title={t.closeMenu} placement={locale === 'he' ? 'left' : 'right'}>
-          <Button
-            type="text"
-            icon={<CloseOutlined />}
-            onClick={onClose}
-            aria-label={t.closeMenu}
-            className="estate-close-btn"
-          />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={t.closeMenu}
+              className="estate-close-btn"
+            >
+              <X className="size-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side={locale === 'he' ? 'left' : 'right'}>{t.closeMenu}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -100,14 +103,14 @@ export default function Sidenav({ onClose }: SidenavProps) {
 
       {/* Sign out */}
       <div className="estate-user">
-        <Button
-          type="text"
-          icon={<LogoutOutlined />}
+        <button
+          type="button"
           className="estate-logout"
           onClick={() => signOut({ callbackUrl: '/admin/login' })}
         >
-          {t.signOut}
-        </Button>
+          <LogOut className="size-4" />
+          <span>{t.signOut}</span>
+        </button>
       </div>
 
       <style jsx global>{`
@@ -181,12 +184,22 @@ export default function Sidenav({ onClose }: SidenavProps) {
           position: absolute;
           inset-inline-end: 10px;
           top: 12px;
-          color: #94a3b8 !important;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          cursor: pointer;
+          color: #94a3b8;
           border-radius: 8px;
+          transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-close-btn:hover {
-          background: #f1f3f5 !important;
-          color: #354ac4 !important;
+          background: #f1f3f5;
+          color: #354ac4;
         }
 
         /* --- Navigation --- */
@@ -251,7 +264,6 @@ export default function Sidenav({ onClose }: SidenavProps) {
         .estate-nav-icon svg {
           width: 20px;
           height: 20px;
-          fill: currentColor;
         }
         .estate-nav-label {
           flex: 1 1 auto;
@@ -267,24 +279,33 @@ export default function Sidenav({ onClose }: SidenavProps) {
           flex: 0 0 auto;
           padding: 12px 16px 16px;
         }
-        .estate-logout.ant-btn {
+        .estate-logout {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
           width: 100%;
           height: 38px;
-          justify-content: center;
+          border: 0;
+          background: transparent;
+          cursor: pointer;
           border-radius: 9px;
+          font-family: inherit;
+          font-size: 14px;
           font-weight: 600;
           color: #64748b;
+          transition: background-color 0.15s ease, color 0.15s ease;
         }
-        .estate-logout.ant-btn:hover {
-          background: rgba(53, 74, 196, 0.07) !important;
-          color: #354ac4 !important;
+        .estate-logout:hover {
+          background: rgba(53, 74, 196, 0.07);
+          color: #354ac4;
         }
 
         /* The ✕ only makes sense for the mobile overlay. On desktop the
            sidebar is permanent and the header hamburger collapses/expands it,
            so a second close control here is redundant — hide it. */
         @media (min-width: 992px) {
-          .estate-close-btn.ant-btn {
+          .estate-close-btn {
             display: none !important;
           }
         }

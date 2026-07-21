@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from 'antd';
+import { Card } from '@/components/shadcn/card';
 
 /**
  * Shared admin KPI tile — one identical stat-card language on every admin page
@@ -23,9 +23,7 @@ export default function MetricCard({
   accent?: string;
 }) {
   return (
-    <Card style={{ height: '100%' }}>
-      {/* Text at the inline-start, icon chip in the opposite corner — fills the
-          tile's width instead of clustering everything at one edge. */}
+    <Card className="h-full p-5 shadow-[0_4px_16px_rgba(5,17,80,0.05)] transition-shadow hover:shadow-[0_8px_24px_rgba(5,17,80,0.09)]">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ minWidth: 0 }}>
           <div style={{ color: '#64748B', fontSize: 12.5, fontWeight: 600, marginBottom: 3 }}>{label}</div>

@@ -1,53 +1,39 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SessionProvider } from 'next-auth/react';
-import MainLayout from '@/components/admin/antd/MainLayout';
 import { usePathname } from 'next/navigation';
-import { ConfigProvider, App } from 'antd';
-import heIL from 'antd/locale/he_IL';
-import enUS from 'antd/locale/en_US';
-import dayjs from 'dayjs';
-import 'dayjs/locale/he';
-import { adminTheme } from '@/lib/adminTheme';
+import { DirectionProvider } from '@radix-ui/react-direction';
+import { TooltipProvider } from '@/components/shadcn/tooltip';
+import MainLayout from '@/components/admin/antd/MainLayout';
 import { AdminI18nProvider, useAdminI18n } from '@/lib/adminI18n';
+import { AdminToaster } from '@/components/shadcn/sonner';
 import '@/styles/antd-admin.css';
 import '@/styles/admin-rtl-fix.css';
 import '@/styles/admin-a11y.css';
 
-/** antd + dayjs follow the admin locale: Hebrew = RTL (default), English = LTR. */
-function AdminAntdProvider({ children }: { children: React.ReactNode }) {
-  const { locale, dir } = useAdminI18n();
-
-  useEffect(() => {
-    dayjs.locale(locale === 'he' ? 'he' : 'en');
-  }, [locale]);
-
-  return (
-    <ConfigProvider direction={dir} locale={locale === 'he' ? heIL : enUS} theme={adminTheme}>
-      {/* antd v6 enables cssVar by default — App needs a real wrapper element
-          to host the component CSS variables (message/modal/notification), so
-          `component={false}` is invalid. Keep a div but take it out of the
-          layout flow with display:contents to preserve the existing layout. */}
-      <App style={{ display: 'contents' }}>{children}</App>
-    </ConfigProvider>
-  );
-}
-
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+/** Radix components read direction from <DirectionProvider>; the admin locale
+ *  (Hebrew = RTL default, English = LTR) drives it. Toasts live here too. */
+function AdminShell({ children }: { children: React.ReactNode }) {
+  const { dir } = useAdminI18n();
   const pathname = usePathname();
   const isLogin = pathname === '/admin/login';
 
   return (
+    <DirectionProvider dir={dir}>
+      <TooltipProvider delayDuration={200}>
+        {isLogin ? children : <MainLayout>{children}</MainLayout>}
+        <AdminToaster />
+      </TooltipProvider>
+    </DirectionProvider>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
     <SessionProvider>
       <AdminI18nProvider>
-        <AdminAntdProvider>
-          {isLogin ? children : <MainLayout>{children}</MainLayout>}
-        </AdminAntdProvider>
+        <AdminShell>{children}</AdminShell>
       </AdminI18nProvider>
     </SessionProvider>
   );

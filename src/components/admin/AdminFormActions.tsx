@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from 'antd';
+import { Button } from '@/components/shadcn/button';
 
 /**
  * Shared save/cancel row for admin edit forms — start-aligned with the form
@@ -19,10 +19,10 @@ export default function AdminFormActions({
   saveLabel: React.ReactNode;
   cancelLabel: React.ReactNode;
   saving?: boolean;
-  /** Omit when `submit` is true and the surrounding <Form> handles submission. */
+  /** Omit when `submit` is true and the surrounding <form> handles submission. */
   onSave?: () => void;
   onCancel: () => void;
-  /** Render the save button as a form submit (for pages using antd <Form>). */
+  /** Render the save button as a form submit (for pages using a <form>). */
   submit?: boolean;
 }) {
   return (
@@ -37,15 +37,14 @@ export default function AdminFormActions({
       }}
     >
       <Button
-        type="primary"
-        size="large"
-        loading={saving}
-        htmlType={submit ? 'submit' : 'button'}
+        size="lg"
+        disabled={saving}
+        type={submit ? 'submit' : 'button'}
         onClick={onSave}
       >
-        {saveLabel}
+        {saving ? '…' : saveLabel}
       </Button>
-      <Button size="large" onClick={onCancel}>
+      <Button size="lg" variant="outline" type="button" onClick={onCancel}>
         {cancelLabel}
       </Button>
     </div>

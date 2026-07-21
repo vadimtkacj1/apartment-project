@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 :root {
   color-scheme: light;
@@ -10,6 +11,54 @@
   --warm-cream: #fbfcfe;
   --warm-light: #f9fbfe;
   --warm-lighter: #fcfdff;
+
+  /* ===== shadcn/ui design tokens — Aiterra admin (indigo #354AC4) =====
+     Additive: the public site never uses bg-primary/bg-card/border-border, so
+     these only feed the admin's shadcn primitives (src/components/shadcn/*). */
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
+  --primary: #354ac4;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2fb;
+  --secondary-foreground: #354ac4;
+  --muted: #f4f6fb;
+  --muted-foreground: #64748b;
+  --accent: #e8f0fd;
+  --accent-foreground: #354ac4;
+  --destructive: #c0392b;
+  --destructive-foreground: #ffffff;
+  --border: #e4e8f2;
+  --input: #d8deec;
+  --ring: #354ac4;
+  --radius: 0.625rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 /* Завжди використовуємо світлу тему */

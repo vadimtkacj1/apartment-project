@@ -14,6 +14,14 @@ export function formatDate(date: Date): string {
   }).format(date);
 }
 
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(" ");
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+/**
+ * Merge class names with Tailwind conflict-resolution (shadcn convention).
+ * Backwards-compatible with the previous varargs signature: clsx accepts the
+ * same `(...strings | false | null | undefined)` plus objects/arrays.
+ */
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }

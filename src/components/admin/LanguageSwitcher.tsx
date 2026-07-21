@@ -1,7 +1,7 @@
 'use client';
 
-import { Segmented, Tooltip } from 'antd';
-import { GlobalOutlined } from '@ant-design/icons';
+import { Globe } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useAdminI18n, type AdminLocale } from '@/lib/adminI18n';
 
 /**
@@ -11,24 +11,41 @@ import { useAdminI18n, type AdminLocale } from '@/lib/adminI18n';
 export default function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
   const { locale, setLocale } = useAdminI18n();
 
+  const options: { label: string; value: AdminLocale }[] = [
+    { label: 'עברית', value: 'he' },
+    { label: 'English', value: 'en' },
+  ];
+
   const control = (
-    <Segmented<AdminLocale>
-      size="small"
-      value={locale}
-      onChange={(v) => setLocale(v)}
-      options={[
-        { label: 'עברית', value: 'he' },
-        { label: 'English', value: 'en' },
-      ]}
+    <div
+      role="group"
       aria-label={locale === 'he' ? 'שפת ממשק' : 'Interface language'}
-    />
+      className="inline-flex items-center gap-0.5 rounded-lg bg-muted p-0.5"
+    >
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          onClick={() => setLocale(o.value)}
+          aria-pressed={locale === o.value}
+          className={cn(
+            'rounded-md px-2.5 py-1 text-xs font-semibold transition-colors',
+            locale === o.value
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 
   if (compact) return control;
 
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-      <GlobalOutlined style={{ color: '#8c8c8c', fontSize: 14 }} aria-hidden="true" />
+    <span className="inline-flex items-center gap-2">
+      <Globe className="size-3.5 text-muted-foreground" aria-hidden="true" />
       {control}
     </span>
   );

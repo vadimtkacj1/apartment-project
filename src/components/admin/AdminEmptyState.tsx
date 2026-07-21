@@ -1,14 +1,13 @@
 'use client';
 
-import { Empty, Button } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Inbox, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/shadcn/button';
 
 /**
- * Branded empty state for admin tables. Replaces antd's bare "No data" /
- * plain-text `emptyText` with an icon, a clear message and an optional
- * "add new" call-to-action — so an empty list guides the next step instead
- * of being a dead end (NN/g empty-state guidance).
+ * Branded empty state for admin tables. Replaces antd's bare "No data" with an
+ * icon, a clear message and an optional "add new" call-to-action — so an empty
+ * list guides the next step instead of being a dead end (NN/g guidance).
  */
 export default function AdminEmptyState({
   message,
@@ -20,18 +19,19 @@ export default function AdminEmptyState({
   addLabel?: string;
 }) {
   return (
-    <Empty
-      image={Empty.PRESENTED_IMAGE_SIMPLE}
-      description={<span style={{ color: '#8c8c8c' }}>{message}</span>}
-      style={{ padding: '36px 0' }}
-    >
+    <div className="flex flex-col items-center justify-center gap-3 py-9 text-center">
+      <span className="flex size-14 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        <Inbox className="size-7" aria-hidden="true" />
+      </span>
+      <p className="m-0 text-sm text-muted-foreground">{message}</p>
       {addHref && addLabel && (
-        <Link href={addHref}>
-          <Button type="primary" icon={<PlusOutlined />}>
+        <Button asChild className="mt-1">
+          <Link href={addHref}>
+            <Plus className="size-4" />
             {addLabel}
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       )}
-    </Empty>
+    </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col } from 'antd';
+import { cn } from '@/lib/utils';
 import MetricCard from './MetricCard';
 
 export interface MetricItem {
@@ -25,12 +25,13 @@ export default function MetricCardGrid({
 }) {
   const four = items.length >= 4;
   return (
-    <Row gutter={[20, 20]} style={{ marginBottom: 28, ...style }}>
+    <div
+      className={cn('grid gap-5', four ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-3')}
+      style={{ marginBottom: 28, ...style }}
+    >
       {items.map((m, i) => (
-        <Col key={m.key ?? i} xs={four ? 12 : 24} sm={four ? 12 : 8} lg={four ? 6 : 8}>
-          <MetricCard icon={m.icon} label={m.label} value={m.value} suffix={m.suffix} accent={m.accent} />
-        </Col>
+        <MetricCard key={m.key ?? i} icon={m.icon} label={m.label} value={m.value} suffix={m.suffix} accent={m.accent} />
       ))}
-    </Row>
+    </div>
   );
 }

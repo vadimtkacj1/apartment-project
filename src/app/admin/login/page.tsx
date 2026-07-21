@@ -3,8 +3,11 @@
 import React, { useMemo, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Form, Input, Button, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/shadcn/button';
+import { Label } from '@/components/shadcn/label';
+import { Alert, AlertDescription } from '@/components/shadcn/alert';
 import { useAdminI18n, useAdminMessages, DEFAULT_ADMIN_LOCALE, dirOf } from '@/lib/adminI18n';
 import { loginMessages } from '@/lib/adminI18n/messages/login';
 import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
@@ -29,16 +32,23 @@ function LoginForm() {
 
   const nextUrl = useMemo(() => search.get('next') || '/admin', [search]);
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
 
-  const onFinish = async (values: { username: string; password: string }) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTouched(true);
+    if (!username || !password) return;
     setError(null);
     setLoading(true);
     try {
       const result = await signIn('credentials', {
-        username: values.username,
-        password: values.password,
+        username,
+        password,
         redirect: false,
         callbackUrl: nextUrl,
       });
@@ -47,7 +57,6 @@ function LoginForm() {
         setError(t.invalidCredentials);
         return;
       }
-
       if (result?.ok) {
         router.push(nextUrl);
         router.refresh();
@@ -95,76 +104,78 @@ function LoginForm() {
                 justifyContent: 'center',
                 width: 76,
                 height: 76,
-                borderRadius: 20,
-                background: '#ffffff',
-                boxShadow: '0 10px 24px rgba(53, 74, 196, 0.30)',
               }}
             >
               <AiterraLogo size={48} />
             </div>
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
-            {t.title}
-          </h1>
-          <p style={{ color: '#8c8c8c', marginTop: '8px' }}>
-            {t.subtitle}
-          </p>
+          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0, color: '#051150' }}>{t.title}</h1>
+          <p style={{ color: '#8c8c8c', marginTop: '8px' }}>{t.subtitle}</p>
         </div>
 
         {error && (
-          <Alert
-            title={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: 24 }}
-          />
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
-        <Form
-          onFinish={onFinish}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            label={t.username}
-            name="username"
-            rules={[{ required: true, message: t.usernameRequired }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder={t.usernamePlaceholder}
-              disabled={loading}
-              dir="ltr"
-              style={{ textAlign: 'left' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={t.password}
-            name="password"
-            rules={[{ required: true, message: t.passwordRequired }]}
-          >
-            <div dir="ltr">
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder={t.passwordPlaceholder}
+        <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="login-username">
+              {t.username} <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative" dir="ltr">
+              <User className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="login-username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={t.usernamePlaceholder}
                 disabled={loading}
-                style={{ textAlign: 'left' }}
+                autoComplete="username"
+                className="ps-9 text-left"
               />
             </div>
-          </Form.Item>
+            {touched && !username && (
+              <span className="text-xs font-medium text-destructive">{t.usernameRequired}</span>
+            )}
+          </div>
 
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-            >
-              {t.submit}
-            </Button>
-          </Form.Item>
-        </Form>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="login-password">
+              {t.password} <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative" dir="ltr">
+              <Lock className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t.passwordPlaceholder}
+                disabled={loading}
+                autoComplete="current-password"
+                className="px-9 text-left"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
+            {touched && !password && (
+              <span className="text-xs font-medium text-destructive">{t.passwordRequired}</span>
+            )}
+          </div>
+
+          <Button type="submit" size="lg" disabled={loading} className="w-full">
+            {loading ? '…' : t.submit}
+          </Button>
+        </form>
       </div>
     </div>
   );
