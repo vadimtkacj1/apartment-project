@@ -312,7 +312,7 @@ export default function AdminDashboard() {
 
       {/* ── 3. Traffic chart — the ONE data hero (--shadow-hero, radius 16) ── */}
       <ECard
-        className="ec-card--hero"
+        className={trendEmpty ? '' : 'ec-card--hero'}
         style={{ marginBottom: 24 }}
         title={
           <div>
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
         ) : (
           <>
             {trendEmpty ? (
-              <EmptyBlock height={130} text={t.noTrafficData} />
+              <EmptyBlock height={72} text={t.noTrafficData} />
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={series} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
