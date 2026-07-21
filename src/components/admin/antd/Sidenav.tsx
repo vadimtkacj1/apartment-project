@@ -135,7 +135,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
           display: flex;
           flex-direction: column;
           height: 100%;
-          background: #0b1030;
+          background: #051150;
           font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
         }
 
@@ -160,11 +160,9 @@ export default function Sidenav({ onClose }: SidenavProps) {
           width: 42px;
           height: 42px;
           flex-shrink: 0;
-          border-radius: 11px;
-          background: rgba(255, 255, 255, 0.06);
         }
         .estate-brand-logo img {
-          width: 30px;
+          width: 36px;
           height: auto;
           display: block;
         }
