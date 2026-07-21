@@ -33,11 +33,6 @@ export default function Sidenav({ onClose }: SidenavProps) {
     | { name?: string; email?: string; username?: string; role?: string }
     | undefined;
   const role = user?.role;
-  const displayName = user?.name || user?.username || 'Admin';
-  const initials = (displayName.trim().charAt(0) || 'A').toUpperCase();
-  const roleLabel =
-    role === 'admin' ? (locale === 'he' ? 'מנהל מערכת' : 'Administrator') : locale === 'he' ? 'סוכן' : 'Agent';
-  const showRole = roleLabel.toLowerCase() !== displayName.toLowerCase();
 
   // Nav items derive from the single source of truth (src/config/adminSections.tsx),
   // filtered by the current user's role (admin-only sections hidden from agents).
@@ -106,24 +101,16 @@ export default function Sidenav({ onClose }: SidenavProps) {
         ))}
       </div>
 
-      {/* User chip + sign out */}
+      {/* Sign out */}
       <div className="estate-user">
-        <div className="estate-userchip">
-          <span className="estate-avatar" aria-hidden="true">{initials}</span>
-          <span className="estate-usermeta">
-            <span className="estate-username" title={displayName}>{displayName}</span>
-            {showRole && <span className="estate-userrole">{roleLabel}</span>}
-          </span>
-          <button
-            type="button"
-            className="estate-logout"
-            aria-label={t.signOut}
-            title={t.signOut}
-            onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          >
-            <LogOut className="size-[18px]" />
-          </button>
-        </div>
+        <button
+          type="button"
+          className="estate-logout"
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
+        >
+          <LogOut className="size-[18px]" />
+          <span>{t.signOut}</span>
+        </button>
       </div>
 
       <style jsx global>{`
@@ -300,69 +287,27 @@ export default function Sidenav({ onClose }: SidenavProps) {
           color: inherit;
         }
 
-        /* --- User chip footer --- */
+        /* --- Sign-out footer --- */
         .estate-user {
           flex: 0 0 auto;
           padding: 10px 12px 14px;
           border-block-start: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .estate-userchip {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 8px 10px;
-          border-radius: 12px;
-          transition: background-color 0.15s ease;
-        }
-        .estate-userchip:hover {
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .estate-avatar {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          flex-shrink: 0;
-          background: rgba(85, 148, 241, 0.22);
-          color: #b9d3fb;
-          font-size: 14px;
-          font-weight: 700;
-        }
-        .estate-usermeta {
-          display: flex;
-          flex-direction: column;
-          min-width: 0;
-          flex: 1 1 auto;
-          line-height: 1.25;
-        }
-        .estate-username {
-          font-size: 13.5px;
-          font-weight: 600;
-          color: #ffffff;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .estate-userrole {
-          font-size: 12px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.5);
-        }
         .estate-logout {
           display: inline-flex;
           align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          padding: 0;
-          flex-shrink: 0;
+          gap: 10px;
+          width: 100%;
+          height: 40px;
+          padding: 0 12px;
           border: 0;
           background: transparent;
           cursor: pointer;
-          border-radius: 8px;
-          color: rgba(255, 255, 255, 0.55);
+          border-radius: 10px;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.7);
           transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-logout:hover {
