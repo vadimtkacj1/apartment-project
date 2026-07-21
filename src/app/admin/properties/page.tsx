@@ -482,7 +482,7 @@ export default function PropertiesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100">
+                        <div className="flex gap-1">
                           <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
                             <Link href={`/admin/properties/${record.id}`}>
                               <Pencil className="size-4" />
