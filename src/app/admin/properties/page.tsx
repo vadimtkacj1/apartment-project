@@ -32,6 +32,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
 } from '@/components/shadcn/alert-dialog';
 import MetricCard from '@/components/admin/MetricCard';
+import { IcBuilding, IcTag, IcKey, IcCheckCircle, IcBan } from '@/components/admin/AdminIcons';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
@@ -303,11 +304,11 @@ export default function PropertiesPage() {
       {/* Statistics */}
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {[
-          { label: t.statTotal, value: stats.total, icon: <Home className="size-5" />, accent: '#354AC4' },
-          { label: t.statForSale, value: stats.forSale, icon: <Tag className="size-5" />, accent: '#354AC4' },
-          { label: t.statForRent, value: stats.forRent, icon: <Key className="size-5" />, accent: '#5594F1' },
-          { label: t.statActive, value: stats.active, icon: <CheckCircle2 className="size-5" />, accent: '#2A69C4' },
-          { label: t.statSold, value: stats.sold, icon: <Ban className="size-5" />, accent: '#64748B' },
+          { label: t.statTotal, value: stats.total, icon: <IcBuilding className="size-5" />, accent: '#354AC4' },
+          { label: t.statForSale, value: stats.forSale, icon: <IcTag className="size-5" />, accent: '#354AC4' },
+          { label: t.statForRent, value: stats.forRent, icon: <IcKey className="size-5" />, accent: '#5594F1' },
+          { label: t.statActive, value: stats.active, icon: <IcCheckCircle className="size-5" />, accent: '#2A69C4' },
+          { label: t.statSold, value: stats.sold, icon: <IcBan className="size-5" />, accent: '#64748B' },
         ].map((s) => (
           <MetricCard key={String(s.label)} icon={s.icon} label={s.label} value={s.value} accent={s.accent} />
         ))}

@@ -37,6 +37,7 @@ import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import { IcEye, IcCursor, IcTrendUp, IcUser, IcChat, IcPhone, IcMail } from '@/components/admin/AdminIcons';
 import SectionHeading from '@/components/admin/SectionHeading';
 import {
   BarChart,
@@ -516,10 +517,10 @@ export default function AnalyticsPage() {
       {/* Key Metrics Cards */}
       <MetricCardGrid
         items={[
-          { icon: <Eye className="size-5" />, label: t.totalViews, value: summary?.totalViews || 0, accent: NAVY },
-          { icon: <MousePointerClick className="size-5" />, label: t.totalClicks, value: summary?.totalClicks || 0, accent: NAVY },
-          { icon: <TrendingUp className="size-5" />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: GOLD },
-          { icon: <User className="size-5" />, label: t.uniqueUsers, value: summary?.uniqueVisitors || 0, accent: NAVY },
+          { icon: <IcEye className="size-5" />, label: t.totalViews, value: summary?.totalViews || 0, accent: NAVY },
+          { icon: <IcCursor className="size-5" />, label: t.totalClicks, value: summary?.totalClicks || 0, accent: NAVY },
+          { icon: <IcTrendUp className="size-5" />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: GOLD },
+          { icon: <IcUser className="size-5" />, label: t.uniqueUsers, value: summary?.uniqueVisitors || 0, accent: NAVY },
         ]}
       />
 
@@ -528,10 +529,10 @@ export default function AnalyticsPage() {
       <SectionHeading>{t.inquiriesSection}</SectionHeading>
       <MetricCardGrid
         items={[
-          { icon: <MessageSquare className="size-5" />, label: t.totalInquiries, value: summary?.totalInquiries || 0, accent: NAVY },
-          { icon: <TrendingUp className="size-5" />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: GOLD },
-          { icon: <Phone className="size-5" />, label: t.inquiriesToday, value: summary?.inquiriesToday || 0, accent: NAVY },
-          { icon: <Mail className="size-5" />, label: t.inquiriesLast7Days, value: summary?.inquiriesLast7Days || 0, accent: NAVY },
+          { icon: <IcChat className="size-5" />, label: t.totalInquiries, value: summary?.totalInquiries || 0, accent: NAVY },
+          { icon: <IcTrendUp className="size-5" />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: GOLD },
+          { icon: <IcPhone className="size-5" />, label: t.inquiriesToday, value: summary?.inquiriesToday || 0, accent: NAVY },
+          { icon: <IcMail className="size-5" />, label: t.inquiriesLast7Days, value: summary?.inquiriesLast7Days || 0, accent: NAVY },
         ]}
       />
 

@@ -20,6 +20,7 @@ import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/shadcn/table';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import { IcUsers, IcUserCheck, IcUserX } from '@/components/admin/AdminIcons';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -145,9 +146,9 @@ export default function TeamPage() {
       {/* Statistics */}
       <MetricCardGrid
         items={[
-          { icon: <Users className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <UserCheck className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
-          { icon: <UserX className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
+          { icon: <IcUsers className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <IcUserCheck className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
+          { icon: <IcUserX className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
         ]}
       />
 

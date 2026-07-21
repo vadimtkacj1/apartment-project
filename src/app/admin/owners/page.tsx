@@ -20,6 +20,7 @@ import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from '@/components/shadcn/table';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import { IcUser, IcCheckCircle, IcBan } from '@/components/admin/AdminIcons';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -153,9 +154,9 @@ export default function OwnersPage() {
 
       <MetricCardGrid
         items={[
-          { icon: <UserIcon className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <CheckCircle2 className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
-          { icon: <Ban className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
+          { icon: <IcUser className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <IcCheckCircle className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
+          { icon: <IcBan className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
         ]}
       />
 

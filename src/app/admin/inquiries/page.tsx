@@ -24,6 +24,7 @@ import {
 } from '@/components/shadcn/table';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/shadcn/tooltip';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
+import { IcInbox, IcStar, IcClock, IcCheckCircle } from '@/components/admin/AdminIcons';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
@@ -217,10 +218,10 @@ export default function InquiriesPage() {
 
       <MetricCardGrid
         items={[
-          { icon: <Inbox className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <Star className="size-5" />, label: t.statNew, value: stats.new, accent: '#5594F1' },
-          { icon: <Clock className="size-5" />, label: t.statInProgress, value: stats.in_progress, accent: '#354AC4' },
-          { icon: <CheckCircle2 className="size-5" />, label: t.statClosed, value: stats.closed, accent: '#2A69C4' },
+          { icon: <IcInbox className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
+          { icon: <IcStar className="size-5" />, label: t.statNew, value: stats.new, accent: '#5594F1' },
+          { icon: <IcClock className="size-5" />, label: t.statInProgress, value: stats.in_progress, accent: '#354AC4' },
+          { icon: <IcCheckCircle className="size-5" />, label: t.statClosed, value: stats.closed, accent: '#2A69C4' },
         ]}
       />
 
