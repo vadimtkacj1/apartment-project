@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { m, useInView } from 'framer-motion';
 import { Building2, Users, ThumbsUp, Award } from 'lucide-react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 interface StatItemProps {
   icon: React.ReactNode;
@@ -71,9 +72,9 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
       className="flex flex-col items-center justify-center p-4 group transition-all duration-300"
     >
       <m.div
-        whileHover={{ scale: 1.1, rotate: 5 }}
-        transition={{ type: "spring", stiffness: 300 }}
-        className="mb-4 text-[#051150]"
+        whileHover={{ y: -3 }}
+        transition={{ type: "spring", stiffness: 260, damping: 22 }}
+        className="mb-4 text-[#354AC4]"
       >
         {icon}
       </m.div>
@@ -88,13 +89,13 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
           type: "spring",
           stiffness: 100
         }}
-        className="text-3xl font-black text-gray-900 mb-2 tracking-tight"
+        className="text-5xl md:text-6xl font-black text-[#051150] mb-3 tracking-tight"
         style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
       >
         <CountUp value={value} />
       </m.div>
 
-      <div className="text-base md:text-lg font-bold text-gray-600 text-center">
+      <div className="text-lg md:text-xl font-semibold text-[#475569] text-center">
         {label}
       </div>
     </m.div>
@@ -104,22 +105,22 @@ const StatItem: React.FC<StatItemProps> = ({ icon, value, label, index }) => {
 const Stats: React.FC = () => {
   const stats = [
     {
-      icon: <Award size={56} strokeWidth={1.5} />,
+      icon: <Award size={36} strokeWidth={1.6} />,
       value: "+24",
       label: "שנות ניסיון בתחום"
     },
     {
-      icon: <ThumbsUp size={56} strokeWidth={1.5} />,
+      icon: <ThumbsUp size={36} strokeWidth={1.6} />,
       value: "+1,200",
       label: "לקוחות מרוצים"
     },
     {
-      icon: <Users size={56} strokeWidth={1.5} />,
+      icon: <Users size={36} strokeWidth={1.6} />,
       value: "4",
       label: "סוכנים מוסמכים"
     },
     {
-      icon: <Building2 size={56} strokeWidth={1.5} />,
+      icon: <Building2 size={36} strokeWidth={1.6} />,
       value: "47",
       label: "נכסים בבלעדיות"
     }
@@ -133,9 +134,7 @@ const Stats: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Eyebrow */}
         <div className="text-center mb-12 md:mb-14">
-          <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
-            במספרים
-          </span>
+          <SectionEyebrow>במספרים</SectionEyebrow>
         </div>
 
         {/* Stats Grid */}

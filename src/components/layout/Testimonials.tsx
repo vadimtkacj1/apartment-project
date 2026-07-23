@@ -5,6 +5,7 @@ import { Navigation, Autoplay, Pagination, EffectCoverflow } from 'swiper/module
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import type { Swiper as SwiperType } from 'swiper';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -83,12 +84,10 @@ const Testimonials: React.FC = () => {
 
         <div className="text-center">
           <div className="inline-block mb-4">
-            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
-              חוות דעת
-            </span>
+            <SectionEyebrow>חוות דעת</SectionEyebrow>
           </div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title || 'מה הלקוחות שלנו אומרים'}
           </h2>
         </div>

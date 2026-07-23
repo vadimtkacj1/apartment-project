@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Phone, Mail, Trash2, Eye, Home, Inbox, Star, Clock, CheckCircle2 } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Trash2, Eye, Home, Inbox, Star, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
@@ -10,7 +10,7 @@ import { Button } from '@/components/shadcn/button';
 import { Textarea } from '@/components/shadcn/textarea';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
+  Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel,
 } from '@/components/shadcn/select';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
@@ -48,7 +48,16 @@ interface Inquiry {
 interface TeamOption {
   id: number;
   name: string;
+  isActive?: boolean;
 }
+
+/** wa.me needs an international number with no leading zeros/symbols (IL default). */
+const waHref = (phone: string) => {
+  let digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  if (digits.startsWith('0')) digits = `972${digits.slice(1)}`;
+  return `https://wa.me/${digits}`;
+};
 
 const STATUSES: Inquiry['status'][] = ['new', 'in_progress', 'closed'];
 
@@ -76,8 +85,19 @@ export default function InquiriesPage() {
       {statusLabels[status]}
     </span>
   );
+  // Localized labels for known lead sources; unknown values fall back to the raw string.
+  const sourceLabels: Record<string, string> = {
+    contact_form: t.sourceContactForm,
+    property_page: t.sourcePropertyPage,
+    whatsapp: t.sourceWhatsapp,
+  };
+  const sourcePill = (source: string | null) =>
+    source ? (
+      <span className="admin-pill admin-pill--neutral">{sourceLabels[source] ?? source}</span>
+    ) : null;
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [team, setTeam] = useState<TeamOption[]>([]);
+  const [owners, setOwners] = useState<TeamOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | Inquiry['status']>('all');
   const [deleteTarget, setDeleteTarget] = useState<Inquiry | null>(null);
@@ -91,6 +111,7 @@ export default function InquiriesPage() {
   useEffect(() => {
     fetchInquiries();
     fetchTeam();
+    fetchOwners();
   }, []);
 
   const fetchInquiries = async () => {
@@ -111,10 +132,23 @@ export default function InquiriesPage() {
       const res = await fetch('/api/admin/team');
       if (res.ok) {
         const data = await res.json();
-        setTeam((data || []).map((tm: any) => ({ id: tm.id, name: tm.name })));
+        setTeam((data || []).map((tm: any) => ({ id: tm.id, name: tm.name, isActive: tm.isActive })));
       }
     } catch {
       /* non-fatal — agent assignment just won't have options */
+    }
+  };
+
+  // Same source the property form uses for its agentIds options (see AgentSection).
+  const fetchOwners = async () => {
+    try {
+      const res = await fetch('/api/admin/owners');
+      if (res.ok) {
+        const data = await res.json();
+        setOwners((data || []).map((o: any) => ({ id: o.id, name: o.name, isActive: o.isActive })));
+      }
+    } catch {
+      /* non-fatal — agent assignment just won't have owner options */
     }
   };
 
@@ -188,9 +222,61 @@ export default function InquiriesPage() {
 
   const agentName = (agentId: string | null) => {
     if (!agentId) return null;
+    if (agentId.startsWith('owner-')) {
+      const id = Number(agentId.slice('owner-'.length));
+      return owners.find((o) => o.id === id)?.name || agentId;
+    }
     const id = Number(agentId.replace(/^team-/, ''));
     return team.find((tm) => tm.id === id)?.name || agentId;
   };
+
+  // tel / WhatsApp / mailto quick actions — icon-ghost, only for fields that exist.
+  // stopPropagation keeps the row/card click (open details) from firing too.
+  const quickActions = (r: Inquiry) => (
+    <>
+      {r.phone && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild variant="ghost" size="icon" aria-label={t.actionCall}>
+              <a href={`tel:${r.phone}`} onClick={(e) => e.stopPropagation()}>
+                <Phone className="size-4" />
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t.actionCall}</TooltipContent>
+        </Tooltip>
+      )}
+      {r.phone && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild variant="ghost" size="icon" aria-label={t.actionWhatsapp}>
+              <a
+                href={waHref(r.phone)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MessageCircle className="size-4" />
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t.actionWhatsapp}</TooltipContent>
+        </Tooltip>
+      )}
+      {r.email && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button asChild variant="ghost" size="icon" aria-label={t.actionEmail}>
+              <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()}>
+                <Mail className="size-4" />
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t.actionEmail}</TooltipContent>
+        </Tooltip>
+      )}
+    </>
+  );
 
   const dash = <span className="text-slate-400">—</span>;
 
@@ -255,7 +341,7 @@ export default function InquiriesPage() {
           ) : filtered.length === 0 ? (
             <AdminEmptyState message={t.empty} />
           ) : (
-            <Table className="min-w-[760px]">
+            <Table className="min-w-[860px]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[130px]">{t.colStatus}</TableHead>
@@ -264,30 +350,39 @@ export default function InquiriesPage() {
                   <TableHead className="w-[150px]">{t.colProperty}</TableHead>
                   <TableHead className="w-[110px]">{t.colAgent}</TableHead>
                   <TableHead className="w-[120px]">{t.colDate}</TableHead>
-                  <TableHead className="w-[100px]" />
+                  <TableHead className="w-[200px]" />
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell>{statusSelect(r, 'h-8 w-[120px]')}</TableCell>
+                  <TableRow key={r.id} onClick={() => openDetails(r)} className="cursor-pointer">
+                    <TableCell onClick={(e) => e.stopPropagation()}>{statusSelect(r, 'h-8 w-[120px]')}</TableCell>
                     <TableCell>
                       <button
                         type="button"
                         onClick={() => openDetails(r)}
-                        className="cursor-pointer border-0 bg-transparent p-0 text-start font-semibold text-[#051150]"
+                        className="cursor-pointer border-0 bg-transparent p-0 text-start font-semibold text-foreground"
                       >
                         {r.name}
                       </button>
-                      <div className="mt-1 flex flex-wrap gap-3 text-[13px]">
+                      <div className="mt-1 flex flex-wrap items-center gap-3 text-sm">
+                        {sourcePill(r.source)}
                         {r.phone && (
-                          <a href={`tel:${r.phone}`} className="inline-flex items-center gap-1 text-[#354AC4]">
-                            <Phone className="size-3.5" /> {r.phone}
+                          <a
+                            href={`tel:${r.phone}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-primary"
+                          >
+                            <Phone className="size-3.5" /> <span dir="ltr">{r.phone}</span>
                           </a>
                         )}
                         {r.email && (
-                          <a href={`mailto:${r.email}`} className="inline-flex items-center gap-1 text-[#354AC4]">
-                            <Mail className="size-3.5" /> {r.email}
+                          <a
+                            href={`mailto:${r.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center gap-1 text-primary"
+                          >
+                            <Mail className="size-3.5" /> <bdi>{r.email}</bdi>
                           </a>
                         )}
                       </div>
@@ -308,7 +403,8 @@ export default function InquiriesPage() {
                       {r.property ? (
                         <Link
                           href={`/admin/properties/${r.property.id}`}
-                          className="inline-flex items-center gap-1 text-[#354AC4]"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 text-primary"
                         >
                           <Home className="size-3.5" /> {r.property.title}
                         </Link>
@@ -318,8 +414,9 @@ export default function InquiriesPage() {
                     </TableCell>
                     <TableCell>{agentName(r.agentId) || dash}</TableCell>
                     <TableCell>{new Date(r.createdAt).toLocaleDateString(dateLocale)}</TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <div className="flex gap-1">
+                        {quickActions(r)}
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
@@ -364,7 +461,7 @@ export default function InquiriesPage() {
               {filtered.map((r) => (
                 <div key={r.id} className="admin-card">
                   <div className="admin-card__head">
-                    <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="flex-1 min-w-0">
                       <div className="admin-card__title">{r.name}</div>
                       <div className="admin-card__meta">
                         {new Date(r.createdAt).toLocaleDateString(dateLocale)}
@@ -373,27 +470,29 @@ export default function InquiriesPage() {
                     {statusSelect(r, 'w-[120px]')}
                   </div>
 
+                  {r.source && <div className="mt-2">{sourcePill(r.source)}</div>}
+
                   <div className="admin-card__fields">
                     {r.phone && (
                       <span>
                         <b>{t.fieldPhone}</b>{' '}
-                        <a href={`tel:${r.phone}`} className="text-[#354AC4]">
-                          {r.phone}
+                        <a href={`tel:${r.phone}`} className="text-primary">
+                          <span dir="ltr">{r.phone}</span>
                         </a>
                       </span>
                     )}
                     {r.email && (
                       <span>
                         <b>{t.fieldEmail}</b>{' '}
-                        <a href={`mailto:${r.email}`} className="text-[#354AC4]">
-                          {r.email}
+                        <a href={`mailto:${r.email}`} className="text-primary">
+                          <bdi>{r.email}</bdi>
                         </a>
                       </span>
                     )}
                     {r.property && (
                       <span>
                         <b>{t.fieldProperty}</b>{' '}
-                        <Link href={`/admin/properties/${r.property.id}`} className="text-[#354AC4]">
+                        <Link href={`/admin/properties/${r.property.id}`} className="text-primary">
                           {r.property.title}
                         </Link>
                       </span>
@@ -406,6 +505,7 @@ export default function InquiriesPage() {
                   </div>
 
                   <div className="admin-card__actions">
+                    {quickActions(r)}
                     <Button type="button" variant="outline" size="sm" onClick={() => openDetails(r)}>
                       <Eye className="size-4" />{t.detailsButton}
                     </Button>
@@ -434,12 +534,23 @@ export default function InquiriesPage() {
           </DialogHeader>
           {active && (
             <div className="flex flex-col gap-4">
-              <div>{statusPill(active.status)}</div>
+              <div className="flex flex-wrap items-center gap-2">
+                {statusPill(active.status)}
+                {sourcePill(active.source)}
+                {active.property && (
+                  <Link
+                    href={`/admin/properties/${active.property.id}`}
+                    className="inline-flex items-center gap-1 text-sm text-primary"
+                  >
+                    <Home className="size-3.5" /> {active.property.title}
+                  </Link>
+                )}
+              </div>
 
               {active.message && (
                 <div>
-                  <div className="mb-1 text-[12.5px] text-[#64748B]">{t.messageLabel}</div>
-                  <div className="whitespace-pre-wrap rounded-lg bg-[#F1F3F5] p-3">
+                  <div className="mb-1 text-xs text-muted-foreground">{t.messageLabel}</div>
+                  <div className="whitespace-pre-wrap rounded-lg bg-muted p-3">
                     {active.message}
                   </div>
                 </div>
@@ -447,26 +558,22 @@ export default function InquiriesPage() {
 
               {active.phone && (
                 <div>
-                  <div className="mb-0.5 text-[12.5px] text-[#64748B]">{t.fieldPhone}</div>
-                  <a href={`tel:${active.phone}`} className="inline-flex items-center gap-1 text-[#354AC4]">
-                    <Phone className="size-3.5" /> {active.phone}
+                  <div className="mb-0.5 text-xs text-muted-foreground">{t.fieldPhone}</div>
+                  <a href={`tel:${active.phone}`} className="inline-flex items-center gap-1 text-primary">
+                    <Phone className="size-3.5" /> <span dir="ltr">{active.phone}</span>
                   </a>
                 </div>
               )}
               {active.email && (
                 <div>
-                  <div className="mb-0.5 text-[12.5px] text-[#64748B]">{t.fieldEmail}</div>
-                  <a href={`mailto:${active.email}`} className="inline-flex items-center gap-1 text-[#354AC4]">
-                    <Mail className="size-3.5" /> {active.email}
+                  <div className="mb-0.5 text-xs text-muted-foreground">{t.fieldEmail}</div>
+                  <a href={`mailto:${active.email}`} className="inline-flex items-center gap-1 text-primary">
+                    <Mail className="size-3.5" /> <bdi>{active.email}</bdi>
                   </a>
                 </div>
               )}
-              {active.source && (
-                <div className="text-[13px] text-[#94A3B8]">{t.sourceLabel(active.source)}</div>
-              )}
-
               <div>
-                <div className="mb-1 text-[12.5px] text-[#64748B]">{t.assignedAgent}</div>
+                <div className="mb-1 text-xs text-muted-foreground">{t.assignedAgent}</div>
                 <Select
                   value={draftAgent ?? ''}
                   onValueChange={(v) => setDraftAgent(v === NO_AGENT ? undefined : v)}
@@ -476,14 +583,31 @@ export default function InquiriesPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={NO_AGENT}>{t.assignAgentPlaceholder}</SelectItem>
-                    {team.map((tm) => (
-                      <SelectItem key={tm.id} value={`team-${tm.id}`}>{tm.name}</SelectItem>
-                    ))}
+                    {owners.filter((o) => o.isActive !== false).length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>{t.ownersGroup}</SelectLabel>
+                        {owners
+                          .filter((o) => o.isActive !== false)
+                          .map((o) => (
+                            <SelectItem key={`owner-${o.id}`} value={`owner-${o.id}`}>{o.name}</SelectItem>
+                          ))}
+                      </SelectGroup>
+                    )}
+                    {team.filter((tm) => tm.isActive !== false).length > 0 && (
+                      <SelectGroup>
+                        <SelectLabel>{t.agentsGroup}</SelectLabel>
+                        {team
+                          .filter((tm) => tm.isActive !== false)
+                          .map((tm) => (
+                            <SelectItem key={`team-${tm.id}`} value={`team-${tm.id}`}>{tm.name}</SelectItem>
+                          ))}
+                      </SelectGroup>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <div className="mb-1 text-[12.5px] text-[#64748B]">{t.internalNotes}</div>
+                <div className="mb-1 text-xs text-muted-foreground">{t.internalNotes}</div>
                 <Textarea
                   rows={4}
                   value={draftNotes}
@@ -495,7 +619,10 @@ export default function InquiriesPage() {
           )}
           <DialogFooter className="mt-2 gap-2">
             <Button type="button" variant="outline" onClick={() => setActive(null)}>{t.close}</Button>
-            <Button type="button" disabled={saving} onClick={saveDetails}>{saving ? '…' : t.save}</Button>
+            <Button type="button" disabled={saving} onClick={saveDetails}>
+              {saving && <Loader2 className="size-4 animate-spin" />}
+              {t.save}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

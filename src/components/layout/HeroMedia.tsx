@@ -61,6 +61,10 @@ const HeroMedia: React.FC = () => {
         playsInline
         preload="none"
         poster="/hero-poster.jpg"
+        // The inline script below sets src at HTML parse time (pre-hydration LCP
+        // optimization), so the DOM attribute intentionally differs from React's
+        // render — silence the expected hydration-mismatch warning.
+        suppressHydrationWarning
         style={{
           width: '100%',
           height: '100%',

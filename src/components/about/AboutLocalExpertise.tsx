@@ -2,6 +2,11 @@
 
 import { m } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
+
+const inlineLink =
+  'text-[#354AC4] font-semibold underline underline-offset-4 decoration-[#354AC4]/30 hover:text-[#28389B] hover:decoration-[#28389B] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2';
 
 export default function AboutLocalExpertise() {
   return (
@@ -18,6 +23,9 @@ export default function AboutLocalExpertise() {
             transition={{ duration: 0.6 }}
           >
 
+            <div className="mb-3">
+              <SectionEyebrow tone="light" align="start">היתרון המקומי</SectionEyebrow>
+            </div>
             <h2 className="font-caramel text-3xl md:text-4xl font-black text-[#051150] mb-6">
               מומחיות מקומית בחולון
             </h2>
@@ -32,7 +40,15 @@ export default function AboutLocalExpertise() {
               </p>
 
               <p className="text-lg text-slate-700 leading-relaxed">
-                אם אתם מחפשים דירה למכירה בחולון, דירה להשכרה בחולון או רוצים למכור נכס בעיר – אתם צריכים צוות שמכיר כל רחוב, כל שכונה וכל הזדמנות.
+                אם אתם מחפשים{' '}
+                <Link href="/apartments?dealType=sale" className={inlineLink}>
+                  דירה למכירה בחולון
+                </Link>
+                ,{' '}
+                <Link href="/apartments?dealType=rent" className={inlineLink}>
+                  דירה להשכרה
+                </Link>{' '}
+                בחולון או רוצים למכור נכס בעיר – אתם צריכים צוות שמכיר כל רחוב, כל שכונה וכל הזדמנות.
               </p>
             </div>
           </m.div>

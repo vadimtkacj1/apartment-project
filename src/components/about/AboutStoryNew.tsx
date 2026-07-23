@@ -2,6 +2,7 @@
 
 import { m } from 'framer-motion';
 import Image from 'next/image';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 export default function AboutStoryNew() {
   return (
@@ -18,6 +19,9 @@ export default function AboutStoryNew() {
             transition={{ duration: 0.6 }}
           >
 
+            <div className="mb-3">
+              <SectionEyebrow tone="light" align="start">מאיפה התחלנו</SectionEyebrow>
+            </div>
             <h2 className="font-caramel text-3xl md:text-4xl font-black text-[#051150] mb-6">
               הסיפור שלנו
             </h2>
@@ -26,9 +30,14 @@ export default function AboutStoryNew() {
               דניאל ויואב הקימו את המשרד מתוך מטרה ליצור סטנדרט חדש של תיווך נדל"ן בחולון. לאחר שנים של עבודה בשוק המקומי, הם זיהו את הצורך בשירות אישי, שקוף ומקצועי יותר עבור בעלי נכסים וקונים.
             </p>
 
-            {/* Editorial pull-quote */}
-            <blockquote className="font-caramel border-s-4 border-[#354AC4] ps-5 my-8 text-2xl font-bold text-[#051150] leading-snug">
-              אנחנו מאמינים ששירות אישי, שקיפות ותמחור מדויק הם ההבדל בין עסקה טובה לעסקה מצוינת.
+            {/* Editorial pull-quote — Assistant (body) face, not the caramel display */}
+            <blockquote className="border-s-4 border-[#354AC4] ps-5 my-8">
+              <p className="text-2xl font-bold text-[#051150] leading-snug">
+                אנחנו מאמינים ששירות אישי, שקיפות ותמחור מדויק הם ההבדל בין עסקה טובה לעסקה מצוינת.
+              </p>
+              <cite className="mt-3 block text-base not-italic text-slate-500">
+                — דניאל שרון ויואב אלמוג, מייסדים
+              </cite>
             </blockquote>
 
             <p className="text-lg text-slate-700 leading-relaxed mb-6">

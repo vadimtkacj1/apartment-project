@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Plus, Pencil, Trash2, Search, Users, UserCheck, UserX } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
@@ -21,6 +21,7 @@ import {
 } from '@/components/shadcn/table';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import { IcUsers, IcUserCheck, IcUserX } from '@/components/admin/AdminIcons';
+import AdminAvatar from '@/components/admin/AdminAvatar';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -126,7 +127,7 @@ export default function TeamPage() {
     }
   };
 
-  const dash = <span style={{ color: '#94A3B8' }}>-</span>;
+  const dash = <span className="text-muted-foreground">—</span>;
 
   return (
     <div>
@@ -154,8 +155,8 @@ export default function TeamPage() {
 
       {/* Filters */}
       <Card className="mb-6 p-5">
-        <div className="flex flex-col gap-4">
-          <div className="relative">
+        <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
             <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t.searchPlaceholder}
@@ -165,7 +166,7 @@ export default function TeamPage() {
             />
           </div>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full max-w-[200px]">
+            <SelectTrigger className="w-full sm:w-50">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -205,46 +206,12 @@ export default function TeamPage() {
                 {filteredMembers.map((member) => (
                   <TableRow key={member.id}>
                     <TableCell>
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        {member.image ? (
-                          <div
-                            style={{
-                              width: 60,
-                              height: 60,
-                              borderRadius: '50%',
-                              overflow: 'hidden',
-                              border: '2px solid #E4E8F2',
-                              flexShrink: 0,
-                              background: '#F4F6FB',
-                            }}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={member.image}
-                              alt={member.name}
-                              onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            style={{
-                              width: '60px',
-                              height: '60px',
-                              borderRadius: '50%',
-                              background: '#E4E8F2',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            <Users className="size-6" style={{ color: '#94A3B8' }} />
-                          </div>
-                        )}
+                      <div className="flex items-center justify-center">
+                        <AdminAvatar src={member.image} name={member.name} />
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Link href={`/admin/team/${member.id}`} style={{ fontWeight: 600, color: '#354AC4' }}>
+                      <Link href={`/admin/team/${member.id}`} className="font-semibold text-primary">
                         {member.name}
                       </Link>
                     </TableCell>
@@ -258,14 +225,14 @@ export default function TeamPage() {
                       {member.propertiesCount > 0 ? (
                         <span className="admin-pill admin-pill--sale">{member.propertiesCount}</span>
                       ) : (
-                        <span style={{ color: '#94A3B8' }}>0</span>
+                        <span className="text-muted-foreground">0</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">
                       {member.soldCount > 0 ? (
                         <span className="admin-pill admin-pill--closed">{member.soldCount}</span>
                       ) : (
-                        <span style={{ color: '#94A3B8' }}>0</span>
+                        <span className="text-muted-foreground">0</span>
                       )}
                     </TableCell>
                     <TableCell className="text-center">{member.order}</TableCell>
@@ -285,7 +252,7 @@ export default function TeamPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => setDeleteTarget(member)}
                           aria-label={t.delete}
                         >
@@ -312,25 +279,11 @@ export default function TeamPage() {
             {filteredMembers.map((member) => (
               <div key={member.id} className="admin-card">
                 <div className="admin-card__head">
-                  {member.image ? (
-                    <img className="admin-card__thumb admin-card__thumb--round" src={member.image} alt={member.name} />
-                  ) : (
-                    <div
-                      className="admin-card__thumb admin-card__thumb--round"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: '#E4E8F2',
-                      }}
-                    >
-                      <Users className="size-6" style={{ color: '#94A3B8' }} />
-                    </div>
-                  )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <AdminAvatar src={member.image} name={member.name} />
+                  <div className="min-w-0 flex-1">
                     <div className="admin-card__title">{member.name}</div>
                     {member.role ? (
-                      <div style={{ marginTop: 4 }}>
+                      <div className="mt-1">
                         <span className="admin-pill admin-pill--neutral">{member.role}</span>
                       </div>
                     ) : null}

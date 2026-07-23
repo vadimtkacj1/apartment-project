@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 interface Property {
   id: number;
@@ -124,7 +126,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       <section
         className="relative py-16 md:py-20 w-full overflow-hidden"
         dir="rtl"
-        style={{ background: '#28389B' }}
+        style={{ background: '#051150' }}
       >
         <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '1200px' }}>
           <div className="text-center">
@@ -157,23 +159,31 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
           }
         }
         .btn-no-commission {
-          box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+          box-shadow: 0 6px 18px rgba(2, 8, 40, 0.35);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-no-commission:hover {
           transform: translateY(-2px);
-          box-shadow: 0 12px 28px rgba(0,0,0,0.28);
+          box-shadow: 0 10px 26px rgba(2, 8, 40, 0.45);
         }
         .btn-no-commission:active {
           transform: scale(0.98);
         }
+        /* One cohesive panel on the navy band — a faint white-tinted surface with
+           a hairline border (dark-band language: borders + surface tints, not
+           heavy black shadows). The image and info column live INSIDE it. */
         .no-commission-card {
           overflow: hidden;
           animation: fadeInUp 0.6s ease-out;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 16px;
+          box-shadow: 0 24px 48px -24px rgba(2, 8, 40, 0.55);
         }
         .no-commission-card:hover {
-          transform: translateY(-8px);
+          transform: translateY(-6px);
+          border-color: rgba(255, 255, 255, 0.18);
         }
         .no-commission-card:hover .property-image {
           transform: scale(1.1);
@@ -210,6 +220,9 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       >
         {/* Header */}
         <div className="text-center mb-4 md:mb-6">
+          <div className="inline-block mb-3">
+            <SectionEyebrow tone="dark">הזדמנות</SectionEyebrow>
+          </div>
           <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
@@ -223,19 +236,19 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
           <div className="no-commission-card transition-all duration-300 max-w-2xl mx-auto">
             <div className="grid md:grid-cols-5 gap-0 md:min-h-96">
 
-              {/* Image — 3/5 width */}
-              <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+              {/* Image — 3/5 width, flush inside the panel (the panel clips corners) */}
+              <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden">
                 <Image
                   src={property.image || '/images/hero/sales.jpg'}
                   alt={property.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 60vw"
-                  className="property-image object-cover transition-transform duration-700 rounded-2xl"
+                  className="property-image object-cover transition-transform duration-700"
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">
                   <span
-                    className="text-sm font-bold px-4 py-1.5 rounded-lg shadow-lg"
+                    className="text-sm font-bold px-4 py-1.5 rounded-lg shadow-[0_4px_14px_rgba(2,8,40,0.4)]"
                     style={{ background: '#5594F1', color: '#051150' }}
                   >
                     ללא עמלה
@@ -350,7 +363,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
 
                 {/* CTA */}
                 <div
-                  className="btn-no-commission group relative text-center py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
+                  className="btn-no-commission group relative inline-flex items-center justify-center gap-2 py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
                   style={{
                     background: '#5594F1',
                     color: '#051150',
@@ -358,7 +371,8 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                     minWidth: '180px',
                   }}
                 >
-                  <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים ←</span>
+                  <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים</span>
+                  <ArrowLeft size={16} className="relative z-10 transition-transform duration-300 group-hover:-translate-x-1" aria-hidden="true" />
                 </div>
 
                 <p className="text-xs font-semibold mt-3" style={{ color: 'rgba(255,255,255,0.75)' }}>

@@ -31,12 +31,14 @@ export function PropertyDescription({ description, bedrooms, floor, totalFloors,
           <LayoutDashboard size={20} className="text-[#354AC4]" aria-hidden="true"/>
           {bedrooms} חדרים
         </div>
-        {!!floor && (
+        {floor !== null && floor !== undefined && (
           <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
             <ArrowUpFromLine size={20} className="text-[#354AC4]" aria-hidden="true"/>
-            {(totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
-              ? `קומה ${floor} מתוך ${totalFloors}`
-              : `קומה ${floor}`}
+            {floor === 0
+              ? 'קומת קרקע'
+              : (totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+                ? `קומה ${floor} מתוך ${totalFloors}`
+                : `קומה ${floor}`}
           </div>
         )}
         <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">

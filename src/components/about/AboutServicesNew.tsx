@@ -2,7 +2,9 @@
 
 import { m } from 'framer-motion';
 import Image from 'next/image';
-import { Check } from 'lucide-react';
+import Link from 'next/link';
+import { Check, ArrowLeft } from 'lucide-react';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 const services = [
   'שיווק דירות למכירה בחולון',
@@ -26,6 +28,9 @@ export default function AboutServicesNew() {
             transition={{ duration: 0.6 }}
           >
 
+            <div className="mb-3">
+              <SectionEyebrow tone="light" align="start">השירותים שלנו</SectionEyebrow>
+            </div>
             <h2 className="font-caramel text-3xl md:text-4xl font-black text-[#051150] mb-6">
               השכרה, מכירה וניהול נכסים
             </h2>
@@ -42,6 +47,14 @@ export default function AboutServicesNew() {
                 </li>
               ))}
             </ul>
+
+            <Link
+              href="/apartments"
+              className="group inline-flex items-center gap-2 mb-6 text-lg font-semibold text-[#354AC4] hover:text-[#28389B] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
+            >
+              <span>לכל הנכסים</span>
+              <ArrowLeft size={18} aria-hidden="true" className="transition-transform group-hover:-translate-x-0.5 motion-reduce:transform-none" />
+            </Link>
 
             <p className="text-lg text-slate-700 leading-relaxed">
               המטרה שלנו היא להקל על בעלי הנכסים ולחסוך להם זמן, טעויות וכסף. אנחנו מטפלים בכל שלבי התהליך – מצילום ושיווק הנכס, דרך סינון פניות וקביעת פגישות ועד לסגירת עסקה בתנאים הטובים ביותר.

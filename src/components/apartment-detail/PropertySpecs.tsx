@@ -13,6 +13,8 @@ interface PropertySpecsProps {
 }
 
 export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
+  if (!specs || specs.length === 0) return null;
+
   return (
     <m.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,10 +32,10 @@ export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
         {specs.map((spec, index) => {
           const Icon = spec.icon;
           return (
-            <div key={index} className={`flex items-center justify-between p-5 rounded-xl border transition-colors ${
+            <div key={index} className={`flex items-center justify-between p-5 rounded-xl border ${
               isSold
                 ? 'bg-gray-200 border-gray-300'
-                : 'bg-gray-50 border-gray-100 hover:border-[#354AC4]/30'
+                : 'bg-gray-50 border-gray-100'
             }`}>
               <div className="flex items-center gap-3">
                 <div className={`p-2.5 rounded-full shadow-sm ${

@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function MortgageGuideContent() {
@@ -60,6 +63,8 @@ export default function MortgageGuideContent() {
                 במדריך הזה ריכזנו את מה שכל רוכש צריך לדעת לפני שנכנס לסניף: מה להוציא קודם, כמה הון עצמי צריך, איך עובדים המסלולים, ואיך משיגים תנאים טובים יותר. <strong>בלי ז׳רגון בנקאי — רק מה שחשוב באמת.</strong>
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -170,6 +175,10 @@ export default function MortgageGuideContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="mortgage-guide" />
+            <RelatedArticles currentId="mortgage-guide" />
           </div>
         </article>
       </div>

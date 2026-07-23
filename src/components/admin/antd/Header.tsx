@@ -1,7 +1,14 @@
 'use client';
 
 import React from 'react';
-import { PanelLeftClose, PanelLeftOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/shadcn/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
@@ -22,6 +29,10 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
   const t = useAdminMessages(navMessages);
   const crumbs = buildAdminCrumbs(name, locale);
   const Sep = dir === 'rtl' ? ChevronLeft : ChevronRight;
+  // The sidebar sits at the inline-start edge — right in RTL — so the panel
+  // icon must mirror with direction to point at the actual sidebar side.
+  const PanelOpen = dir === 'rtl' ? PanelRightOpen : PanelLeftOpen;
+  const PanelClose = dir === 'rtl' ? PanelRightClose : PanelLeftClose;
 
   return (
     <div className="admin-header-row flex w-full items-center justify-between gap-3">
@@ -36,7 +47,7 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
               aria-label={collapsed ? t.openMenu : t.collapseMenu}
               className="text-slate-600"
             >
-              {collapsed ? <PanelLeftOpen className="!size-[18px]" /> : <PanelLeftClose className="!size-[18px]" />}
+              {collapsed ? <PanelOpen className="!size-[18px]" /> : <PanelClose className="!size-[18px]" />}
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">{collapsed ? t.openMenu : t.collapseMenu}</TooltipContent>
@@ -54,11 +65,11 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
             <React.Fragment key={i}>
               {i > 0 && <Sep className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />}
               {!isLast && c.href ? (
-                <Link href={c.href} className="shrink-0 text-slate-500 hover:text-[#354AC4]">
+                <Link href={c.href} className="shrink-0 text-muted-foreground hover:text-primary">
                   {c.title}
                 </Link>
               ) : (
-                <span className={isLast ? 'truncate font-semibold text-[#051150]' : 'shrink-0 text-slate-500'}>
+                <span className={isLast ? 'truncate font-semibold text-[var(--text-ink)]' : 'shrink-0 text-muted-foreground'}>
                   {c.title}
                 </span>
               )}

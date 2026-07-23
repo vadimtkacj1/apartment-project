@@ -8,20 +8,12 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="ant-layout-footer" style={{ background: 'transparent', padding: '12px 24px' }}>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-          color: '#64748B',
-          fontSize: 12.5,
-        }}
-      >
+    // .ant-layout-footer is the load-bearing shell class (see antd-admin.css:
+    // transparent bg, 12px/24px padding, flush margins on phones).
+    <footer className="ant-layout-footer">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
         <span>{t.footerRights(year)}</span>
-        <span style={{ color: '#64748B', fontWeight: 600 }}>{t.footerSystem}</span>
+        <span className="font-semibold">{t.footerSystem}</span>
       </div>
     </footer>
   );

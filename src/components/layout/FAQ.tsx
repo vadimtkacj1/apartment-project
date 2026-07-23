@@ -4,6 +4,11 @@ import { m } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { faqData } from '@/data/faqData';
 
+// Company line (Organization schema): +972-52-384-7291.
+const whatsappUrl = `https://wa.me/972523847291?text=${encodeURIComponent(
+  'שלום, הגעתי מעמוד השאלות והתשובות ואשמח לייעוץ',
+)}`;
+
 const FAQ: React.FC = () => {
   const [openId, setOpenId] = useState<number | null>(null);
   const faqItems = faqData;
@@ -45,9 +50,10 @@ const FAQ: React.FC = () => {
             </span>
           </m.div>
 
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
+          {/* h2, not h1 — the page's SecondaryHero already renders the h1. */}
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6">
             שאלות ותשובות
-          </h1>
+          </h2>
 
           <p className="text-xl md:text-2xl text-gray-600 font-semibold max-w-3xl mx-auto">
             מצאנו עבורכם את התשובות לשאלות הנפוצות ביותר בתחום הנדל&quot;ן
@@ -122,13 +128,22 @@ const FAQ: React.FC = () => {
             <p className="text-lg md:text-xl text-white/90 mb-6">
               צרו איתנו קשר ונשמח לענות על כל שאלה
             </p>
-            <a
-              href="/#contact"
-              className="inline-block bg-white text-[#354ac4] font-bold text-lg px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors duration-200"
-              style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
-            >
-              צור קשר
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <a
+                href="/#contact"
+                className="inline-block bg-white text-[#354ac4] font-bold text-lg px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                צור קשר
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-[#5594F1] text-white font-bold text-lg px-8 py-4 rounded-xl hover:bg-[#354AC4] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                וואטסאפ
+              </a>
+            </div>
           </div>
         </m.div>
       </div>

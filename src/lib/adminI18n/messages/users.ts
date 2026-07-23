@@ -28,6 +28,8 @@ export const usersMessages = defineMessages({
     fullName: 'שם מלא',
 
     deleteConfirm: 'למחוק את המשתמש?',
+    deleteConfirmBody: (username: string) =>
+      `המשתמש "${username}" יימחק לצמיתות. לא ניתן לבטל פעולה זו.`,
     deleteOk: 'מחק',
     cancel: 'ביטול',
     save: 'שמירה',
@@ -37,6 +39,8 @@ export const usersMessages = defineMessages({
 
     password: 'סיסמה',
     newPasswordLabel: 'סיסמה חדשה (להשארת ריק — ללא שינוי)',
+    showPassword: 'הצגת סיסמה',
+    hidePassword: 'הסתרת סיסמה',
     invalidEmail: 'אימייל לא תקין',
     minChars: (n: number) => `לפחות ${n} תווים`,
   },
@@ -66,6 +70,8 @@ export const usersMessages = defineMessages({
     fullName: 'Full Name',
 
     deleteConfirm: 'Delete this user?',
+    deleteConfirmBody: (username: string) =>
+      `The user "${username}" will be permanently deleted. This action cannot be undone.`,
     deleteOk: 'Delete',
     cancel: 'Cancel',
     save: 'Save',
@@ -75,6 +81,8 @@ export const usersMessages = defineMessages({
 
     password: 'Password',
     newPasswordLabel: 'New password (leave blank to keep unchanged)',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     invalidEmail: 'Invalid email address',
     minChars: (n: number) => `At least ${n} characters`,
   },

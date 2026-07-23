@@ -78,7 +78,7 @@ const ProcessSection: React.FC = () => {
             </span>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
         </m.div>

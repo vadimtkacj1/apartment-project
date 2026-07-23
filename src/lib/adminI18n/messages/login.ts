@@ -14,6 +14,8 @@ export const loginMessages = defineMessages({
     invalidCredentials: 'שם משתמש או סיסמה שגויים',
     loginError: 'שגיאה בהתחברות',
     loading: 'טוען...',
+    showPassword: 'הצג סיסמה',
+    hidePassword: 'הסתר סיסמה',
   },
   en: {
     title: 'Admin Panel',
@@ -28,5 +30,7 @@ export const loginMessages = defineMessages({
     invalidCredentials: 'Incorrect username or password',
     loginError: 'Sign-in error',
     loading: 'Loading...',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
 });

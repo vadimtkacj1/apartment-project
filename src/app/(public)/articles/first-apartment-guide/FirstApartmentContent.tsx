@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function FirstApartmentContent() {
@@ -60,6 +63,8 @@ export default function FirstApartmentContent() {
                 ריכזנו כאן את כל מה שלמדנו מליווי מאות זוגות צעירים בחולון ובסביבה — שלב אחרי שלב, בלי ז׳רגון ובלי הפחדות. <strong>המטרה: שתגיעו לחתימה בטוחים, מוכנים, ועם הדירה הנכונה.</strong>
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -189,6 +194,10 @@ export default function FirstApartmentContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="first-apartment-guide" />
+            <RelatedArticles currentId="first-apartment-guide" />
           </div>
         </article>
       </div>

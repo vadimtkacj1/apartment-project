@@ -16,7 +16,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/shadcn/dialog';
-import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
+import { useAdminMessages } from '@/lib/adminI18n';
 import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
 
 interface Property {
@@ -70,25 +70,20 @@ interface Property {
 
 const FALLBACK_IMG = '/images/hero/sales.jpg';
 
+/** Property image with shared fallback handling — the single place the raw <img> lives. */
+function PropertyThumb({ src, alt, className }: { src?: string; alt: string; className?: string }) {
+  return (
+    <img
+      className={className}
+      src={src || FALLBACK_IMG}
+      alt={alt}
+      onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
+    />
+  );
+}
+
 export default function HomepagePage() {
   const t = useAdminMessages(homepageMessages);
-  const { locale } = useAdminI18n();
-  const isHe = locale === 'he';
-
-  // New microcopy introduced by the settings redesign. Kept locale-aware here
-  // (rather than in the messages file) so no other file is touched.
-  const ui = {
-    settingsTitle: isHe ? 'הגדרות דף הבית' : 'Homepage Settings',
-    saveChanges: isHe ? 'שמור שינויים' : 'Save changes',
-    allSaved: isHe ? 'כל השינויים נשמרו' : 'All changes saved',
-    unsaved: isHe ? 'יש שינויים שלא נשמרו' : 'Unsaved changes',
-    contentCard: isHe ? 'כותרות ותוכן' : 'Titles & content',
-    contentHelper: isHe
-      ? 'הכותרות ותתי-הכותרות המוצגות בסעיפי דף הבית'
-      : 'Headings and subheadings shown across the homepage sections',
-    addProperty: isHe ? 'הוסף נכס' : 'Add property',
-    addSelected: (n: number) => (isHe ? `הוסף נבחרים (${n})` : `Add selected (${n})`),
-  };
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -173,15 +168,15 @@ export default function HomepagePage() {
     }
   };
 
+  // Toast-free: success/error feedback belongs to handleSaveEverything (one toast total).
   const handleSaveTitles = async () => {
+    setTitlesSaving(true);
     try {
-      setTitlesSaving(true);
-      const values = sectionTitles;
       const response = await fetch('/api/admin/homepage-titles', {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify(sectionTitles),
       });
 
       if (!response.ok) {
@@ -195,11 +190,6 @@ export default function HomepagePage() {
       } else if (data) {
         setSectionTitles(data);
       }
-      toast.success(t.titlesSaved);
-    } catch (error) {
-      console.error('Error saving titles:', error);
-      const errorMessage = error instanceof Error ? error.message : t.unknownError;
-      toast.error(t.titlesSaveError(errorMessage));
     } finally {
       setTitlesSaving(false);
     }
@@ -279,10 +269,10 @@ export default function HomepagePage() {
     setDirty(true);
   };
 
+  // Toast-free: success/error feedback belongs to handleSaveEverything (one toast total).
   const handleSaveAll = async () => {
+    setSaving(true);
     try {
-      setSaving(true);
-
       const resetPromises = allProperties.map(prop =>
         fetch(`/api/admin/properties/${prop.id}`, {
           method: 'PUT',
@@ -322,20 +312,23 @@ export default function HomepagePage() {
 
       await Promise.all(noCommissionPromises);
 
-      toast.success(t.allChangesSaved);
       fetchProperties();
-    } catch (error) {
-      console.error('Error saving:', error);
-      toast.error(t.changesSaveError);
     } finally {
       setSaving(false);
     }
   };
 
-  // Single dirty-tracked save: runs BOTH existing save flows (titles + selection).
+  // Single dirty-tracked save: runs BOTH existing save flows (titles + selection)
+  // and reports exactly ONE success or error toast for the whole operation.
   const handleSaveEverything = async () => {
-    await Promise.all([handleSaveTitles(), handleSaveAll()]);
-    setDirty(false);
+    try {
+      await Promise.all([handleSaveTitles(), handleSaveAll()]);
+      toast.success(t.allChangesSaved);
+      setDirty(false);
+    } catch (error) {
+      console.error('Error saving homepage settings:', error);
+      toast.error(t.changesSaveError);
+    }
   };
 
   const availableProperties = allProperties.filter(p => {
@@ -396,12 +389,7 @@ export default function HomepagePage() {
   /* ---- One chosen property as a .pick-row (thumb + title + quiet trash) ---- */
   const renderPickRow = (p: Property, type: 'hot' | 'noCommission') => (
     <div className="pick-row" key={p.id}>
-      <img
-        className="thumb"
-        src={p.images[0] || FALLBACK_IMG}
-        alt={p.title}
-        onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
-      />
+      <PropertyThumb className="thumb" src={p.images[0]} alt={p.title} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -480,9 +468,9 @@ export default function HomepagePage() {
                 <input
                   type="radio"
                   name="hotPropositionsMode"
+                  className="size-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   checked={hotPropositionsMode === 'manual'}
-                  onChange={() => { setHotPropositionsMode('manual'); setDirty(true); }}
-                  style={{ accentColor: 'var(--brand)' }}
+                  onChange={() => setHotPropositionsMode('manual')}
                 />
                 <span>{t.manualSelection}</span>
               </label>
@@ -490,9 +478,9 @@ export default function HomepagePage() {
                 <input
                   type="radio"
                   name="hotPropositionsMode"
+                  className="size-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   checked={hotPropositionsMode === 'price'}
-                  onChange={() => { setHotPropositionsMode('price'); setDirty(true); }}
-                  style={{ accentColor: 'var(--brand)' }}
+                  onChange={() => setHotPropositionsMode('price')}
                 />
                 <span>{t.priceFilter}</span>
               </label>
@@ -503,7 +491,7 @@ export default function HomepagePage() {
                 <Input
                   type="number"
                   value={hotPropositionsMaxPrice}
-                  onChange={(e) => { setHotPropositionsMaxPrice(Number(e.target.value) || 0); setDirty(true); }}
+                  onChange={(e) => setHotPropositionsMaxPrice(Number(e.target.value) || 0)}
                   min={0}
                   step={100000}
                   placeholder={t.maxPricePlaceholder}
@@ -515,14 +503,7 @@ export default function HomepagePage() {
         )}
 
         {opts.items.length === 0 ? (
-          <div
-            style={{
-              padding: '18px 4px',
-              textAlign: 'center',
-              font: '400 14px/1.4 var(--font-assistant), system-ui',
-              color: 'var(--text-muted)',
-            }}
-          >
+          <div className="py-4 text-center text-sm text-muted-foreground">
             {opts.emptyText}
           </div>
         ) : (
@@ -537,7 +518,7 @@ export default function HomepagePage() {
             style={{ color: 'var(--brand)' }}
           >
             <Plus className="size-4" />
-            {ui.addProperty}
+            {t.addProperty}
           </Button>
         </div>
       </div>
@@ -557,11 +538,11 @@ export default function HomepagePage() {
       {/* Sticky single-save settings bar */}
       <div className="settings-bar">
         <h1 style={{ margin: 0, font: '600 24px/1.25 var(--font-assistant), system-ui', color: 'var(--text-ink)' }}>
-          {ui.settingsTitle}
+          {t.settingsTitle}
         </h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <span className={`settings-bar__status${dirty ? ' dirty' : ''}`}>
-            {dirty ? ui.unsaved : ui.allSaved}
+            {dirty ? t.unsaved : t.allSaved}
           </span>
           <Button
             onClick={handleSaveEverything}
@@ -570,7 +551,7 @@ export default function HomepagePage() {
             style={{ minWidth: 150 }}
           >
             {isSaving && <Loader2 className="size-4 animate-spin" />}
-            {ui.saveChanges}
+            {t.saveChanges}
           </Button>
         </div>
       </div>
@@ -579,17 +560,17 @@ export default function HomepagePage() {
       <section className="section-card">
         <div className="section-card__head">
           <div>
-            <div className="section-card__title">{ui.contentCard}</div>
-            <div className="section-card__helper">{ui.contentHelper}</div>
+            <div className="section-card__title">{t.contentCard}</div>
+            <div className="section-card__helper">{t.contentHelper}</div>
           </div>
         </div>
 
         {titlesLoading ? (
-          <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
+          <div className="flex flex-col gap-3 px-5 py-4">
+            {/* 8 rows — one per real title field, so the card doesn't jump on load */}
+            {Array.from({ length: 8 }, (_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
           </div>
         ) : (
           <div>
@@ -684,17 +665,16 @@ export default function HomepagePage() {
                               checked={checked}
                               readOnly
                               tabIndex={-1}
-                              style={{ pointerEvents: 'none', accentColor: 'var(--brand)' }}
+                              className="pointer-events-none size-4 accent-primary"
                             />
                           )}
                         </TableCell>
                         <TableCell>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                            <img
-                              src={p.images[0] || FALLBACK_IMG}
+                            <PropertyThumb
+                              className="h-10.5 w-14 shrink-0 rounded-lg bg-muted object-cover"
+                              src={p.images[0]}
                               alt={p.title}
-                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
-                              style={{ inlineSize: 56, blockSize: 42, borderRadius: 8, objectFit: 'cover', flexShrink: 0, background: 'var(--surface-sunken)' }}
                             />
                             <div style={{ minWidth: 0 }}>
                               <div style={{ font: '600 15px/1.3 var(--font-assistant), system-ui', color: 'var(--text-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -725,7 +705,7 @@ export default function HomepagePage() {
 
           <DialogFooter className="mt-2 gap-2">
             <Button variant="outline" onClick={() => setIsModalVisible(false)}>{t.cancel}</Button>
-            <Button onClick={handleModalOk}>{ui.addSelected(selectedIds.length)}</Button>
+            <Button onClick={handleModalOk}>{t.addSelected(selectedIds.length)}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

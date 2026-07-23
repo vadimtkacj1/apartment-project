@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Pencil, Trash2, User as UserIcon, Search, CheckCircle2, Ban } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, CheckCircle2, Ban } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
@@ -21,6 +21,7 @@ import {
 } from '@/components/shadcn/table';
 import MetricCardGrid from '@/components/admin/MetricCardGrid';
 import { IcUser, IcCheckCircle, IcBan } from '@/components/admin/AdminIcons';
+import AdminAvatar from '@/components/admin/AdminAvatar';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { useAdminMessages } from '@/lib/adminI18n';
@@ -123,23 +124,7 @@ export default function OwnersPage() {
     }
   };
 
-  const roundAvatar = (image: string | null, name: string, size = 44) => (
-    image ? (
-      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', border: '1px solid #E4E8F2', flexShrink: 0, background: '#F4F6FB' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image}
-          alt={name}
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden'; }}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
-      </div>
-    ) : (
-      <div style={{ width: size, height: size, borderRadius: '50%', background: '#F4F6FB', border: '1px solid #E4E8F2', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <UserIcon className="size-5 text-slate-400" />
-      </div>
-    )
-  );
+  const dash = <span className="text-muted-foreground">—</span>;
 
   return (
     <div>
@@ -161,9 +146,9 @@ export default function OwnersPage() {
       />
 
       {/* Filters */}
-      <Card className="mb-6 p-4">
-        <div className="flex w-full flex-col gap-3">
-          <div className="relative">
+      <Card className="mb-6 p-5">
+        <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="relative flex-1">
             <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t.searchPlaceholder}
@@ -173,7 +158,7 @@ export default function OwnersPage() {
             />
           </div>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full max-w-[200px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-50"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
               <SelectItem value="active">{t.statusActive}</SelectItem>
@@ -208,18 +193,18 @@ export default function OwnersPage() {
                   <TableRow key={record.id}>
                     <TableCell>
                       <div className="flex min-w-0 items-center gap-3">
-                        {roundAvatar(record.image, record.name)}
+                        <AdminAvatar src={record.image} name={record.name} />
                         <div className="min-w-0">
-                          <Link href={`/admin/owners/${record.id}`} className="block truncate text-sm font-semibold text-[#354AC4]">
+                          <Link href={`/admin/owners/${record.id}`} className="block truncate text-sm font-semibold text-primary">
                             {record.name}
                           </Link>
-                          <div className="truncate text-[12.5px] text-slate-500">{record.title}</div>
+                          <div className="truncate text-[12.5px] text-muted-foreground">{record.title}</div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{record.email || '-'}</TableCell>
-                    <TableCell>{record.phone || '-'}</TableCell>
-                    <TableCell>{record.whatsapp || '-'}</TableCell>
+                    <TableCell>{record.email ? <bdi>{record.email}</bdi> : dash}</TableCell>
+                    <TableCell>{record.phone ? <span dir="ltr">{record.phone}</span> : dash}</TableCell>
+                    <TableCell>{record.whatsapp ? <span dir="ltr">{record.whatsapp}</span> : dash}</TableCell>
                     <TableCell className="text-center">{record.order}</TableCell>
                     <TableCell className="text-center">
                       <Switch checked={record.isActive} onCheckedChange={(v) => handleStatusChange(record.id, v)} />
@@ -231,7 +216,7 @@ export default function OwnersPage() {
                         </Button>
                         <Button
                           variant="ghost" size="icon"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => setDeleteTarget(record.id)} aria-label={t.delete}
                         >
                           <Trash2 className="size-4" />
@@ -257,14 +242,8 @@ export default function OwnersPage() {
             {filteredOwners.map((owner) => (
               <div key={owner.id} className="admin-card">
                 <div className="admin-card__head">
-                  {owner.image ? (
-                    <img className="admin-card__thumb admin-card__thumb--round" src={owner.image} alt={owner.name} />
-                  ) : (
-                    <div className="admin-card__thumb admin-card__thumb--round" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F4F6FB' }}>
-                      <UserIcon className="size-6 text-slate-400" />
-                    </div>
-                  )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <AdminAvatar src={owner.image} name={owner.name} />
+                  <div className="min-w-0 flex-1">
                     <div className="admin-card__title">{owner.name}</div>
                     <div className="admin-card__meta">{owner.title}</div>
                   </div>
@@ -277,14 +256,19 @@ export default function OwnersPage() {
                 </div>
                 <div className="admin-card__actions">
                   <Switch checked={owner.isActive} onCheckedChange={(v) => handleStatusChange(owner.id, v)} />
-                  <span className="admin-card__grow">
-                    <Button asChild size="sm">
+                  <span className="admin-card__grow flex gap-2">
+                    <Button asChild variant="outline" size="sm">
                       <Link href={`/admin/owners/${owner.id}`}><Pencil className="size-4" />{t.edit}</Link>
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setDeleteTarget(owner.id)}
+                    >
+                      <Trash2 className="size-4" />{t.delete}
+                    </Button>
                   </span>
-                  <Button variant="destructive" size="sm" onClick={() => setDeleteTarget(owner.id)}>
-                    <Trash2 className="size-4" />{t.delete}
-                  </Button>
                 </div>
               </div>
             ))}

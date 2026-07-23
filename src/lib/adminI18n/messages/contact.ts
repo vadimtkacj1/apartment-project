@@ -49,6 +49,7 @@ export const contactMessages = defineMessages({
     instagramName1Label: 'שם Instagram 1',
     instagramName2Label: 'שם Instagram 2',
     saveButton: 'שמור שינויים',
+    infoTooltipAria: 'מידע נוסף',
   },
   en: {
     title: 'Contact Info Management',
@@ -98,5 +99,6 @@ export const contactMessages = defineMessages({
     instagramName1Label: 'Instagram 1 Name',
     instagramName2Label: 'Instagram 2 Name',
     saveButton: 'Save Changes',
+    infoTooltipAria: 'More info',
   },
 });

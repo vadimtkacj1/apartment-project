@@ -80,7 +80,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 
   return (
     <div
-      className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E4E8F2] shadow-[0_4px_20px_rgba(5,17,80,0.08)] space-y-5"
+      className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E4E8F2] shadow-elev-1 space-y-5"
       dir="rtl"
     >
       {/* --- SECTION: LOCATION --- */}
@@ -365,7 +365,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
       <div className="flex flex-col sm:flex-row gap-3 justify-end pt-1">
         <button
           onClick={onReset}
-          className="px-6 py-3 bg-white text-[#354AC4] font-bold text-base rounded-2xl border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
+          className="px-6 py-3 bg-white text-[#354AC4] font-bold text-base rounded-xl border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
         >
           אפס
         </button>

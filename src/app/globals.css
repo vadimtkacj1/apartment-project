@@ -33,6 +33,14 @@
   --input: #d8deec;
   --ring: #354ac4;
   --radius: 0.625rem;
+
+  /* ===== Unified elevation =====
+     One navy-tinted soft-shadow system shared by every light-surface card/panel,
+     replacing the ~4 ad-hoc shadow recipes scattered across the homepage sections.
+     Calibrated from PropertyCard's "one soft directional shadow, no blue glow":
+     a tight 1px contact shadow + a long, soft, downward ambient shadow. */
+  --elev-1: 0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.16);
+  --elev-2: 0 2px 4px rgba(5, 17, 80, 0.06), 0 22px 44px -18px rgba(5, 17, 80, 0.22);
 }
 
 @theme inline {
@@ -66,6 +74,16 @@ html {
   overflow-y: auto;
   overflow-x: hidden;
   background: #f5f7fb !important;
+  /* Offset in-page anchor scrolls (#contact, #hero-next) so targets clear the
+     68px sticky header instead of hiding beneath it. */
+  scroll-padding-top: 84px;
+}
+
+/* Smooth in-page anchor scrolling, disabled for reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -81,6 +99,25 @@ body {
 
 .font-caramel {
   font-family: var(--font-caramel), cursive, sans-serif !important;
+}
+
+/* HEADING-FONT EXPERIMENT (see layout.tsx): display h1/h2/h3 render the light
+   300 cut of Noto Sans Hebrew — they carry font-black/900 classes, which would
+   otherwise synthesize a fake bold and hide the light face entirely. Small
+   display labels (CTA spans, stat numbers) keep their bold → real 700 cut.
+   Delete this rule when reverting to Carmela. */
+:is(h1, h2, h3)[style*="font-caramel"] {
+  font-weight: 300 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Shared elevation utilities — registered as Tailwind v4 @utility so variants
+   (hover:, md:, …) apply. See --elev-* tokens above. */
+@utility shadow-elev-1 {
+  box-shadow: var(--elev-1);
+}
+@utility shadow-elev-2 {
+  box-shadow: var(--elev-2);
 }
 
 @layer utilities {

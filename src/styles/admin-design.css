@@ -12,8 +12,8 @@
   --surface-sunken: #eef1f8;
   --surface-hover: #f7f9fd;
 
-  /* Hairlines */
-  --border: #e3e8f2;
+  /* Hairlines — --border matches the shadcn --border token (globals.css) */
+  --border: #e4e8f2;
   --border-strong: #d5dcec;
   --divider: #eef1f7;
 
@@ -44,7 +44,9 @@
   --shadow-raise: 0 4px 16px rgba(5, 17, 80, 0.06);
   --shadow-hero:  0 6px 20px -8px rgba(5, 17, 80, 0.10);
   --shadow-pop:   0 12px 32px rgba(5, 17, 80, 0.12);
-  --focus-ring:   0 0 0 3px rgba(85, 148, 241, 0.40);
+  /* Focus spec (single convention, mirrors admin-a11y.css): 2px solid indigo
+     #354ac4 with a 2px offset. Box-shadow equivalent for shadow-based rings: */
+  --focus-ring:   0 0 0 2px #ffffff, 0 0 0 4px #354ac4;
 }
 
 /* ---- Context ribbon (borderless label/value row on page bg) ---- */

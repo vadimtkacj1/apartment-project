@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { X, LogOut } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
 import Link from 'next/link';
@@ -33,6 +34,28 @@ export default function Sidenav({ onClose }: SidenavProps) {
     | { name?: string; email?: string; username?: string; role?: string }
     | undefined;
   const role = user?.role;
+
+  // New-inquiries badge count — refreshed on navigation and every 60s; fails silently.
+  const [newInquiries, setNewInquiries] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/inquiries/new-count');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && typeof data?.count === 'number') setNewInquiries(data.count);
+      } catch {
+        /* silent — badge just stays as-is */
+      }
+    };
+    load();
+    const interval = setInterval(load, 60_000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [pathname]);
 
   // Nav items derive from the single source of truth (src/config/adminSections.tsx),
   // filtered by the current user's role (admin-only sections hidden from agents).
@@ -93,6 +116,14 @@ export default function Sidenav({ onClose }: SidenavProps) {
                   >
                     <span className="estate-nav-icon">{item.icon}</span>
                     <span className="estate-nav-label">{item.label}</span>
+                    {item.key === 'inquiries' && newInquiries > 0 && (
+                      <span
+                        className="estate-nav-badge"
+                        aria-label={t.newInquiriesBadge(newInquiries)}
+                      >
+                        {newInquiries}
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}
@@ -101,28 +132,44 @@ export default function Sidenav({ onClose }: SidenavProps) {
         ))}
       </div>
 
-      {/* Sign out */}
+      {/* User card + sign out */}
       <div className="estate-user">
-        <button
-          type="button"
-          className="estate-logout"
-          onClick={() => signOut({ callbackUrl: '/admin/login' })}
-        >
-          <LogOut className="size-[18px]" />
-          <span>{t.signOut}</span>
-        </button>
+        <div className="estate-user-card">
+          <span className="estate-user-avatar" aria-hidden="true">
+            {(user?.name ?? user?.username ?? 'A').charAt(0).toUpperCase()}
+          </span>
+          <span className="estate-user-info">
+            <span className="estate-user-name">{user?.name ?? user?.username ?? 'Admin'}</span>
+            <span className="estate-user-role">
+              {role === 'admin' ? t.roleAdmin : t.roleAgent}
+            </span>
+          </span>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="estate-logout"
+                aria-label={t.signOut}
+                onClick={() => signOut({ callbackUrl: '/admin/login' })}
+              >
+                <LogOut className="size-[18px]" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side={locale === 'he' ? 'left' : 'right'}>{t.signOut}</TooltipContent>
+          </Tooltip>
+        </div>
       </div>
 
       <style jsx global>{`
-        /* ===== Estate Console sidebar — dark "premium rail" =====
-           Deep-navy rail against the light content canvas (Linear/Vercel/Retool
-           pattern). Light text, sky accent on the active item; icons inherit
-           currentColor so icon + label always share one color. */
+        /* ===== Estate Console sidebar — light rail =====
+           White rail with the system hairline against the blue-grey canvas
+           (Mapbox-console pattern). Ink text, indigo accent on the active item;
+           icons inherit currentColor so icon + label share one color. */
         .estate-sidenav {
           display: flex;
           flex-direction: column;
           height: 100%;
-          background: #051150;
+          background: #ffffff;
           font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
         }
 
@@ -161,7 +208,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         .estate-brand-title {
           font-size: 16px;
           font-weight: 700;
-          color: #ffffff;
+          color: #051150;
           letter-spacing: -0.02em;
         }
         .estate-brand-sub {
@@ -170,14 +217,14 @@ export default function Sidenav({ onClose }: SidenavProps) {
           gap: 6px;
           font-size: 12px;
           font-weight: 500;
-          color: rgba(255, 255, 255, 0.5);
+          color: #6c76a0;
         }
         .estate-brand-sub::before {
           content: '';
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #5594f1; /* sky accent pops on dark */
+          background: #5594f1; /* sky brand dot */
           flex-shrink: 0;
         }
         .estate-close-btn {
@@ -193,13 +240,13 @@ export default function Sidenav({ onClose }: SidenavProps) {
           background: transparent;
           border: 0;
           cursor: pointer;
-          color: rgba(255, 255, 255, 0.55);
+          color: #6c76a0;
           border-radius: 8px;
           transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-close-btn:hover {
-          background: rgba(255, 255, 255, 0.08);
-          color: #ffffff;
+          background: #f4f6fb;
+          color: #051150;
         }
 
         /* --- Navigation --- */
@@ -215,7 +262,7 @@ export default function Sidenav({ onClose }: SidenavProps) {
         .estate-nav-group-label {
           font-size: 11px;
           font-weight: 700;
-          color: rgba(255, 255, 255, 0.4);
+          color: #9aa2c4;
           padding: 12px 14px 6px;
         }
         .estate-nav-list {
@@ -236,20 +283,20 @@ export default function Sidenav({ onClose }: SidenavProps) {
           box-sizing: border-box;
           padding: 0 14px;
           border-radius: 11px;
-          color: rgba(255, 255, 255, 0.72);
+          color: #333e66;
           font-size: 14.5px;
           font-weight: 500;
           text-decoration: none !important;
           transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-nav-item:hover {
-          background: rgba(255, 255, 255, 0.06);
-          color: #ffffff;
+          background: #f4f6fb;
+          color: #051150;
         }
-        /* Active: soft sky wash + white text + a leading sky accent bar. */
+        /* Active: brand wash + indigo text + a leading indigo accent bar. */
         .estate-nav-item.active {
-          background: rgba(85, 148, 241, 0.15);
-          color: #ffffff;
+          background: #eef1fb;
+          color: #354ac4;
           font-weight: 600;
         }
         .estate-nav-item.active::before {
@@ -261,10 +308,10 @@ export default function Sidenav({ onClose }: SidenavProps) {
           width: 3px;
           height: 18px;
           border-radius: 3px;
-          background: #5594f1;
+          background: #354ac4;
         }
         .estate-nav-item.active .estate-nav-icon {
-          color: #78a9f5;
+          color: #354ac4;
         }
         .estate-nav-icon {
           display: inline-flex;
@@ -286,33 +333,89 @@ export default function Sidenav({ onClose }: SidenavProps) {
           text-overflow: ellipsis;
           color: inherit;
         }
+        /* New-inquiries count chip — sky pill with ink text. */
+        .estate-nav-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          border-radius: 9999px;
+          background: #5594f1;
+          color: #051150;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1;
+          flex-shrink: 0;
+        }
 
-        /* --- Sign-out footer --- */
+        /* --- User footer: avatar + name/role card, sign-out as end icon --- */
         .estate-user {
           flex: 0 0 auto;
           padding: 10px 12px 14px;
-          border-block-start: 1px solid rgba(255, 255, 255, 0.08);
+          border-block-start: 1px solid #e4e8f2;
+        }
+        .estate-user-card {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 10px;
+          border-radius: 11px;
+          background: #f4f6fb;
+          border: 1px solid #e4e8f2;
+        }
+        .estate-user-avatar {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          inline-size: 32px;
+          block-size: 32px;
+          border-radius: 50%;
+          background: #eef1fb;
+          color: #354ac4;
+          font-size: 14px;
+          font-weight: 700;
+          flex-shrink: 0;
+        }
+        .estate-user-info {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+          min-inline-size: 0;
+          flex: 1;
+        }
+        .estate-user-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: #051150;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .estate-user-role {
+          font-size: 11px;
+          font-weight: 500;
+          color: #6c76a0;
         }
         .estate-logout {
           display: inline-flex;
           align-items: center;
-          gap: 10px;
-          width: 100%;
-          height: 40px;
-          padding: 0 12px;
+          justify-content: center;
+          inline-size: 32px;
+          block-size: 32px;
+          padding: 0;
           border: 0;
           background: transparent;
           cursor: pointer;
-          border-radius: 10px;
-          font-family: inherit;
-          font-size: 14px;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.7);
+          border-radius: 9px;
+          color: #6c76a0;
+          flex-shrink: 0;
           transition: background-color 0.15s ease, color 0.15s ease;
         }
         .estate-logout:hover {
-          background: rgba(239, 68, 68, 0.16);
-          color: #fca5a5;
+          background: #fdecec;
+          color: #c0392b;
         }
 
         /* The ✕ only makes sense for the mobile overlay. On desktop the

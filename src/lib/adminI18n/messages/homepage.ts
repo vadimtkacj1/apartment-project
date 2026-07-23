@@ -6,6 +6,16 @@ export const homepageMessages = defineMessages({
     pageTitle: 'ניהול עמוד הבית',
     pageSubtitle: 'ערוך כותרות וניהול נכסים מוצגים בדף הבית',
 
+    // Settings bar (single-save redesign)
+    settingsTitle: 'הגדרות דף הבית',
+    saveChanges: 'שמור שינויים',
+    allSaved: 'כל השינויים נשמרו',
+    unsaved: 'יש שינויים שלא נשמרו',
+    contentCard: 'כותרות ותוכן',
+    contentHelper: 'הכותרות ותתי-הכותרות המוצגות בסעיפי דף הבית',
+    addProperty: 'הוסף נכס',
+    addSelected: (n: number) => `הוסף נבחרים (${n})`,
+
     // Section titles editor
     sectionTitlesCard: 'עריכת כותרות סעיפים',
     tabMain: 'סעיפים ראשיים',
@@ -89,6 +99,16 @@ export const homepageMessages = defineMessages({
   en: {
     pageTitle: 'Homepage Management',
     pageSubtitle: 'Edit titles and manage the properties displayed on the homepage',
+
+    // Settings bar (single-save redesign)
+    settingsTitle: 'Homepage Settings',
+    saveChanges: 'Save changes',
+    allSaved: 'All changes saved',
+    unsaved: 'Unsaved changes',
+    contentCard: 'Titles & content',
+    contentHelper: 'Headings and subheadings shown across the homepage sections',
+    addProperty: 'Add property',
+    addSelected: (n: number) => `Add selected (${n})`,
 
     // Section titles editor
     sectionTitlesCard: 'Edit Section Titles',

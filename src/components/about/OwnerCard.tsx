@@ -92,17 +92,17 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.name}
         </h3>
 
-        {/* License Number */}
-        {owner.licenceNumber && (
-          <p className="text-xl text-[#2A69C4] font-bold mb-4 tracking-wide">
-            {owner.licenceNumber}
-          </p>
-        )}
-
-        {/* Title / Position */}
-        <p className="text-xl text-[#2A69C4] font-bold mb-4">
+        {/* Title / Position — the single accent line */}
+        <p className={`text-xl text-[#354ac4] font-bold ${owner.licenceNumber ? 'mb-1' : 'mb-4'}`}>
           {owner.title}
         </p>
+
+        {/* License Number — quiet, under the role */}
+        {owner.licenceNumber && (
+          <p className="text-sm text-slate-500 mb-4">
+            רישיון מס׳ {owner.licenceNumber}
+          </p>
+        )}
 
         {/* Description */}
         {owner.description && (
@@ -116,7 +116,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.phone && (
             <a
               href={`tel:${owner.phone}`}
-              className="flex items-center gap-2 px-8 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-colors"
+              className="flex items-center gap-2 px-8 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
             >
               <Phone size={18} />
               <span dir="ltr" className="font-medium">{owner.phone}</span>
@@ -126,7 +126,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.email && (
             <button
               onClick={handleCopyEmail}
-              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#354AC4] text-[#354AC4] rounded-full hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#354AC4] text-[#354ac4] rounded-full hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
               title="לחצו להעתקת האימייל"
             >
               {copied ? (
@@ -148,7 +148,8 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
               href={`https://wa.me/${owner.whatsapp.replace(/[^0-9]/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-colors"
+              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
+              aria-label={`וואטסאפ אל ${owner.name}`}
             >
               <FaWhatsapp size={20} />
               <span className="font-medium">WhatsApp</span>

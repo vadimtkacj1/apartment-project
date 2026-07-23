@@ -1,6 +1,7 @@
 import React from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { DealType } from '@/types/property.types';
+import { analytics } from '@/lib/analytics';
 
 interface PriceCardProps {
   price: string;
@@ -8,6 +9,9 @@ interface PriceCardProps {
   area?: number;
   isSold: boolean;
   dealType?: DealType;
+  /** Primary contact phone — renders the call CTA when present (and not sold). */
+  phone?: string;
+  propertyId?: string;
 }
 
 /**
@@ -29,16 +33,17 @@ export function formatShekelPrice(raw?: string): string {
   return numeric.toLocaleString('en-US');
 }
 
-export function PriceCard({ price, originalPrice, area, isSold, dealType }: PriceCardProps) {
+export function PriceCard({ price, originalPrice, area, isSold, dealType, phone, propertyId }: PriceCardProps) {
   const numericPrice = parseFloat(String(price ?? '').replace(/[^\d.]/g, ''));
   const isRent = dealType === 'rent';
   const pricePerSqm =
     !isRent && area && area > 0 && Number.isFinite(numericPrice) && numericPrice > 0
       ? Math.round(numericPrice / area)
       : null;
+  const telHref = phone ? `tel:${phone.replace(/\D/g, '')}` : null;
 
   return (
-    <div className={`rounded-2xl p-8 mb-6 shadow-2xl ${
+    <div className={`rounded-2xl p-8 mb-6 shadow-elev-2 ${
       isSold
         ? 'bg-gray-400 text-white opacity-75'
         : 'bg-[#051150] text-white'
@@ -57,9 +62,18 @@ export function PriceCard({ price, originalPrice, area, isSold, dealType }: Pric
           מחיר מקורי: <span dir="ltr">{formatShekelPrice(originalPrice)} ₪</span>
         </div>
       )}
+      {!isSold && telHref && (
+        <a
+          href={telHref}
+          onClick={() => propertyId && analytics.trackPhoneClick(propertyId)}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 font-black text-[#051150] transition-colors hover:bg-[#f5f7fb] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#051150]"
+        >
+          <Phone size={18} aria-hidden="true" />
+          <span>התקשרו</span>
+        </a>
+      )}
       {isSold && (
-        <div className="mt-4 flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-bold">
-          <CheckCircle2 size={20} aria-hidden="true" />
+        <div className="mt-4 inline-flex items-center bg-[#64748B] text-white px-4 py-2 rounded-lg font-bold">
           <span>{dealType === 'rent' ? 'מושכר' : 'נמכר'}</span>
         </div>
       )}

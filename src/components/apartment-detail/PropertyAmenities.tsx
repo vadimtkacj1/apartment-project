@@ -46,7 +46,7 @@ export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps)
                 <div className="w-12 h-12 rounded-full flex items-center justify-center transition-colors text-[#354AC4] bg-[#354AC4]/10">
                   <IconComponent size={24} strokeWidth={2.5} aria-hidden="true" />
                 </div>
-                <span className="font-bold text-base text-[#1a1a1a]">
+                <span className="font-bold text-base text-[#051150]">
                   {item.label}
                 </span>
               </div>

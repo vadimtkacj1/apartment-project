@@ -2,24 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Eye,
-  MousePointerClick,
   User,
-  Phone,
-  Mail,
-  MessageSquare,
   Trash2,
   RotateCw,
-  TrendingUp,
   Smartphone,
   Monitor,
-  Loader2,
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import { cn } from '@/lib/utils';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/shadcn/select';
@@ -114,11 +108,10 @@ interface ChartDataPoint {
   uniqueUsers: number;
 }
 
-/* Brand palette (matches src/lib/adminTheme.ts) — Aiterra: indigo · sky · deep navy, no rainbow */
+/* Brand palette — Aiterra: indigo · sky · deep navy, no rainbow */
 const NAVY = '#354AC4';
-const GOLD = '#5594F1'; // sky-blue accent
-const GOLD_TEXT = '#2A69C4'; // AA-safe accent blue for text on light surfaces
-const HAIRLINE = '#E4E8F2';
+const SKY = '#5594F1'; // sky-blue accent
+const SKY_TEXT = '#2A69C4'; // AA-safe accent blue for text on light surfaces
 // Categorical sequence kept within the indigo/sky family + neutrals
 const COLORS = ['#354AC4', '#5594F1', '#051150', '#2A69C4', '#7BAAF5', '#8F9BD8', '#9AA0AA', '#C9CDD6'];
 
@@ -127,14 +120,14 @@ const COLORS = ['#354AC4', '#5594F1', '#051150', '#2A69C4', '#7BAAF5', '#8F9BD8'
 // Matches STATUS_META in /admin/inquiries, tinted to the estate palette.
 // Labels live in analyticsMessages (t.statusLabels).
 const LEAD_STATUS_STYLES: Record<string, { color: string; bg: string }> = {
-  new: { color: '#2A69C4', bg: 'rgba(85,148,241,.16)' },
+  new: { color: SKY_TEXT, bg: 'rgba(85,148,241,.16)' },
   in_progress: { color: NAVY, bg: 'rgba(53,74,196,.08)' },
   closed: { color: '#051150', bg: 'rgba(5,17,80,.07)' },
 };
 
 // Compact ranked bar list — used for both traffic sources and lead sources.
 // One hairline-separated row per bucket: label · count · share, with a proportional
-// bar (top bucket in gold). Deliberately not another pie chart.
+// bar (top bucket in sky). Deliberately not another pie chart.
 function SourceBars({ items, labels }: { items?: Array<{ source: string; count: number }>; labels: Record<string, string> }) {
   const t = useAdminMessages(analyticsMessages);
   const data = (items || []).slice(0, 8);
@@ -145,13 +138,13 @@ function SourceBars({ items, labels }: { items?: Array<{ source: string; count: 
       {data.map((d, i) => {
         const pct = Math.round((d.count / total) * 100);
         return (
-          <div key={d.source} style={{ padding: '9px 0', borderBottom: i === data.length - 1 ? 'none' : `1px solid ${HAIRLINE}` }}>
+          <div key={d.source} style={{ padding: '9px 0', borderBottom: i === data.length - 1 ? 'none' : '1px solid var(--border)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
               <span style={{ fontWeight: 600, color: '#334155' }}>{labels[d.source] || d.source}</span>
               <span style={{ color: '#475569' }}>{d.count} · {pct}%</span>
             </div>
             <div style={{ position: 'relative', height: 6, borderRadius: 4, background: '#F0F1F3' }}>
-              <div style={{ position: 'absolute', insetInlineStart: 0, top: 0, height: 6, borderRadius: 4, width: `${pct}%`, background: i === 0 ? GOLD : NAVY }} />
+              <div style={{ position: 'absolute', insetInlineStart: 0, top: 0, height: 6, borderRadius: 4, width: `${pct}%`, background: i === 0 ? SKY : NAVY }} />
             </div>
           </div>
         );
@@ -331,16 +324,16 @@ export default function AnalyticsPage() {
     return labels[eventType] || eventType;
   };
 
-  // Restrained, brand-aligned chip: leads in gold, views in navy, the rest neutral —
-  // replaces the previous rainbow of antd tag presets.
+  // Restrained, brand-aligned chip: leads in sky, views in indigo, the rest neutral —
+  // replaces the previous rainbow of antd tag presets. Text colors are AA on their tints.
   const LEAD_EVENTS = ['click_phone', 'click_whatsapp', 'click_email', 'contact_form'];
   const getEventChipStyle = (eventType: string): React.CSSProperties => {
     const lead = LEAD_EVENTS.includes(eventType);
     const isView = eventType === 'property_view';
     return {
       background: lead ? 'rgba(85,148,241,.14)' : isView ? 'rgba(53,74,196,.08)' : '#EEF1F7',
-      color: lead ? GOLD_TEXT : isView ? NAVY : '#475569',
-      borderRadius: 6,
+      color: lead ? SKY_TEXT : isView ? NAVY : '#475569',
+      borderRadius: 9999,
       padding: '2px 9px',
       fontSize: 12,
       fontWeight: 600,
@@ -375,10 +368,15 @@ export default function AnalyticsPage() {
   const recentViews = Array.isArray(views) ? views.slice(0, 10) : [];
 
   if (loading && !summary) {
+    // Same skeleton vocabulary as /admin: one hero-sized block + a stack of lines.
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 16, height: '400px' }}>
-        <Loader2 className="size-9 animate-spin" style={{ color: '#354AC4' }} />
-        <span style={{ color: '#64748B' }}>{t.loadingData}</span>
+      <div className="analytics-console" role="status" aria-busy="true" aria-label={t.loadingData}>
+        <Skeleton className="w-full" style={{ height: 108, marginBlock: '6px 24px', borderRadius: 16 }} />
+        <div className="flex flex-col gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-4 w-full" />
+          ))}
+        </div>
       </div>
     );
   }
@@ -428,7 +426,7 @@ export default function AnalyticsPage() {
       <Card className="ec-card p-6" style={{ marginBottom: 28 }}>
         <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.dateRangeLabel}</div>
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.dateRangeLabel}</div>
             <div className="admin-filter-full flex flex-wrap items-center gap-2">
               <input
                 type="date"
@@ -453,7 +451,7 @@ export default function AnalyticsPage() {
             </div>
           </div>
           <div>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.filterByProperty}</div>
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.filterByProperty}</div>
             <Select value={selectedProperty} onValueChange={setSelectedProperty}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t.selectProperty} />
@@ -469,7 +467,7 @@ export default function AnalyticsPage() {
             </Select>
           </div>
           <div>
-            <div style={{ marginBottom: '8px', fontWeight: 500 }}>{t.filterByVisitor}</div>
+            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.filterByVisitor}</div>
             <Select value={selectedIP} onValueChange={setSelectedIP}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={t.selectVisitor} />
@@ -491,10 +489,10 @@ export default function AnalyticsPage() {
       {selectedIP !== 'all' && (
         <Card className="ec-card p-6" style={{ marginBottom: 28 }}>
           <div className="flex flex-wrap items-center gap-4">
-            <User className="size-8 shrink-0" style={{ color: '#354AC4' }} />
+            <User className="size-8 shrink-0" style={{ color: 'var(--brand)' }} />
             <div className="min-w-0 flex-1">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                {t.userActivity} <span style={{ fontWeight: 700, color: '#354AC4' }}>{getVisitorNumber(selectedIP)}</span>
+                {t.userActivity} <span style={{ fontWeight: 700, color: 'var(--brand)' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
               <div style={{ color: '#64748B' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
@@ -504,12 +502,10 @@ export default function AnalyticsPage() {
                 )}
               </div>
             </div>
-            <div className="w-full">
-              <Button type="button" onClick={() => setSelectedIP('all')}>
-                <RotateCw className="size-4" />
-                {t.clearFilter}
-              </Button>
-            </div>
+            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setSelectedIP('all')}>
+              <RotateCw className="size-4" />
+              {t.clearFilter}
+            </Button>
           </div>
         </Card>
       )}
@@ -519,7 +515,7 @@ export default function AnalyticsPage() {
         items={[
           { icon: <IcEye className="size-5" />, label: t.totalViews, value: summary?.totalViews || 0, accent: NAVY },
           { icon: <IcCursor className="size-5" />, label: t.totalClicks, value: summary?.totalClicks || 0, accent: NAVY },
-          { icon: <IcTrendUp className="size-5" />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: GOLD },
+          { icon: <IcTrendUp className="size-5" />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: SKY },
           { icon: <IcUser className="size-5" />, label: t.uniqueUsers, value: summary?.uniqueVisitors || 0, accent: NAVY },
         ]}
       />
@@ -530,7 +526,7 @@ export default function AnalyticsPage() {
       <MetricCardGrid
         items={[
           { icon: <IcChat className="size-5" />, label: t.totalInquiries, value: summary?.totalInquiries || 0, accent: NAVY },
-          { icon: <IcTrendUp className="size-5" />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: GOLD },
+          { icon: <IcTrendUp className="size-5" />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: SKY },
           { icon: <IcPhone className="size-5" />, label: t.inquiriesToday, value: summary?.inquiriesToday || 0, accent: NAVY },
           { icon: <IcMail className="size-5" />, label: t.inquiriesLast7Days, value: summary?.inquiriesLast7Days || 0, accent: NAVY },
         ]}
@@ -578,8 +574,8 @@ export default function AnalyticsPage() {
                     <stop offset="95%" stopColor="#354AC4" stopOpacity={0.1}/>
                   </linearGradient>
                   <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={GOLD} stopOpacity={0.7}/>
-                    <stop offset="95%" stopColor={GOLD} stopOpacity={0.05}/>
+                    <stop offset="5%" stopColor={SKY} stopOpacity={0.7}/>
+                    <stop offset="95%" stopColor={SKY} stopOpacity={0.05}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -598,7 +594,7 @@ export default function AnalyticsPage() {
                 />
                 <Legend verticalAlign="top" height={36} />
                 <Area type="monotone" dataKey="views" stroke="#354AC4" fillOpacity={1} fill="url(#colorViews)" name={t.viewsLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
-                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
+                <Area type="monotone" dataKey="clicks" stroke={SKY} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
               </AreaChart>
             </ResponsiveContainer>
           )}
@@ -642,12 +638,20 @@ export default function AnalyticsPage() {
           <Card className="ec-card h-full p-6">
             <div className="mb-4" style={{ fontWeight: 600 }}>{t.topProperties}</div>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              {/* RTL mirror — same approach as the AreaChart above: reverse the value
+                  axis so bars grow from the inline-start edge, move category labels to
+                  the inline-start side, and swap the asymmetric margins. */}
+              <BarChart
+                data={barChartData}
+                layout="vertical"
+                margin={dir === 'rtl' ? { top: 5, right: 20, left: 30, bottom: 5 } : { top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" />
+                <XAxis type="number" reversed={dir === 'rtl'} />
                 <YAxis
                   dataKey="name"
                   type="category"
+                  orientation={dir === 'rtl' ? 'right' : 'left'}
                   width={isMobile ? 90 : 150}
                   tick={{ fontSize: 12 }}
                 />
@@ -657,18 +661,18 @@ export default function AnalyticsPage() {
                       if (active && payload && payload.length) {
                           const data = payload[0].payload;
                           return (
-                              <div style={{ backgroundColor: '#fff', padding: '10px 12px', border: '1px solid #E4E8F2', borderRadius: 10, boxShadow: '0 6px 18px rgba(5,17,80,0.08)' }}>
+                              <div style={{ backgroundColor: '#fff', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 6px 18px rgba(5,17,80,0.08)' }}>
                                   <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
-                                  <p style={{ margin: 0, color: GOLD_TEXT }}>{t.clicksCount(data.clicks)}</p>
+                                  <p style={{ margin: 0, color: SKY_TEXT }}>{t.clicksCount(data.clicks)}</p>
                               </div>
                           );
                       }
                       return null;
                   }}
                 />
-                <Bar dataKey="clicks" name={t.clicksLegend} radius={[0, 4, 4, 0]} barSize={24} isAnimationActive={!reduced}>
+                <Bar dataKey="clicks" name={t.clicksLegend} radius={(dir === 'rtl' ? [4, 0, 0, 4] : [0, 4, 4, 0]) as [number, number, number, number]} barSize={24} isAnimationActive={!reduced}>
                   {barChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? GOLD : NAVY} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? SKY : NAVY} />
                   ))}
                 </Bar>
               </BarChart>
@@ -700,7 +704,7 @@ export default function AnalyticsPage() {
                       color: 'inherit',
                       font: 'inherit',
                       padding: '12px 16px',
-                      borderBottom: `1px solid ${HAIRLINE}`,
+                      borderBottom: '1px solid var(--border)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -711,7 +715,7 @@ export default function AnalyticsPage() {
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <span className="admin-pill admin-pill--neutral">#{index + 1}</span>
-                        <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#354AC4' }}>
+                        <span style={{ fontSize: '0.95em', fontWeight: 700, color: 'var(--brand)' }}>
                           {getVisitorNumber(user.ipAddress)}
                         </span>
                         {isSelected && (
@@ -726,12 +730,12 @@ export default function AnalyticsPage() {
                     <div style={{
                       fontSize: '1.5em',
                       fontWeight: 'bold',
-                      color: '#354AC4',
+                      color: 'var(--brand)',
                       minWidth: '60px',
                       textAlign: 'center',
                     }}>
                       {user.clicks}
-                      <div style={{ fontSize: '0.4em', color: '#64748B', fontWeight: 'normal' }}>{t.clicksLegend}</div>
+                      <div className="text-xs font-normal text-muted-foreground">{t.clicksLegend}</div>
                     </div>
                   </button>
                 );
@@ -846,14 +850,15 @@ export default function AnalyticsPage() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-/* Flatten cards: one hairline enclosure, no border+shadow stacking — matches the dashboard */
-.layout-dashboard .analytics-console .ec-card{box-shadow:0 2px 10px rgba(53,74,196,.06);border:1px solid ${HAIRLINE};border-radius:12px;}
+/* Flatten cards: one hairline enclosure, no border+shadow stacking — same values as
+   the /admin dashboard's .ec-card (--border / --r-card 14px / --shadow-card). */
+.layout-dashboard .analytics-console .ec-card{box-shadow:0 1px 2px rgba(5,17,80,0.04);border:1px solid var(--border,#e4e8f2);border-radius:14px;}
 .analytics-console .recharts-default-legend{font-size:12px;}
 /* Active-visitors rows are real buttons; background lives here so :hover isn't overridden by inline styles */
 .analytics-console .analytics-visitor-row{background:transparent;}
 .analytics-console .analytics-visitor-row:hover{background:rgba(53,74,196,.05);}
 .analytics-console .analytics-visitor-row.is-selected{background:rgba(53,74,196,.07);}
-.analytics-console .analytics-visitor-row:focus-visible{outline:2px solid ${NAVY};outline-offset:-2px;}
+.analytics-console .analytics-visitor-row:focus-visible{outline:2px solid var(--brand,#354ac4);outline-offset:-2px;}
 `,
         }}
       />

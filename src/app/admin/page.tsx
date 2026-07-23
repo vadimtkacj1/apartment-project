@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, ArrowRight, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, ExternalLink } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   AreaChart,
@@ -131,6 +132,17 @@ function SkelLines({ rows }: { rows: number }) {
 /* ===== page ===== */
 export default function AdminDashboard() {
   const t = useAdminMessages(dashboardMessages);
+  const { data: session } = useSession();
+  const userName = (session?.user as { name?: string; username?: string } | undefined)?.name
+    ?? (session?.user as { username?: string } | undefined)?.username;
+
+  // Time-of-day greeting. Computed after mount (client clock) so SSR/CSR never
+  // disagree; until then the header shows the neutral page title.
+  const [greeting, setGreeting] = useState<string | null>(null);
+  useEffect(() => {
+    const h = new Date().getHours();
+    setGreeting(h < 12 ? t.greetingMorning : h < 18 ? t.greetingAfternoon : t.greetingEvening);
+  }, [t]);
   const { dir } = useAdminI18n();
   const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const [props, setProps] = useState<PropertyRow[] | null>(null);
@@ -250,8 +262,8 @@ export default function AdminDashboard() {
   // token classes carry the pos/neg color. null when there's no prior week.
   const deltaEl = (d: number | null): React.ReactNode =>
     d === null ? null : (
-      <div className={`delta ${d > 0 ? 'up' : d < 0 ? 'down' : ''}`} aria-label={t.vsPrev7}>
-        <bdi dir="ltr">{(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + Math.abs(d) + '%'}</bdi>
+      <div className={`delta ${d > 0 ? 'up' : d < 0 ? 'down' : 'ec-delta-flat'}`} aria-label={t.vsPrev7}>
+        <bdi dir="ltr">{(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '±') + Math.abs(d) + '%'}</bdi>
       </div>
     );
 
@@ -262,8 +274,20 @@ export default function AdminDashboard() {
               the actionable new-leads count folds in at inline-end as a brand CTA. ── */}
       <header className="ec-pagehead">
         <div>
-          <h1 className="ec-h1">{t.pageTitle}</h1>
-          <p className="ec-subtitle">{formatLongDate(dayjs(), t)}</p>
+          <h1 className="ec-h1">
+            {greeting ? (userName ? `${greeting}, ${userName}` : greeting) : t.pageTitle}
+          </h1>
+          <p className="ec-subtitle">{formatLongDate(dayjs(), t)} · {t.pageTitle}</p>
+        </div>
+        <div className="ec-quick">
+          <a href="/" target="_blank" rel="noopener" className="ec-quick-ghost">
+            <ExternalLink className="size-4" aria-hidden="true" />
+            {t.quickViewSite}
+          </a>
+          <Link href="/admin/properties/new" className="ec-quick-primary">
+            <Plus className="size-4" aria-hidden="true" />
+            {t.quickAddProperty}
+          </Link>
         </div>
       </header>
 
@@ -422,9 +446,9 @@ export default function AdminDashboard() {
               <div>
                 {/* Actionable rows lead with a warn/neg dot; informational rows a muted dot.
                     Whole row is the click target; chevron surfaces on hover. */}
-                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} tone="warn" />
-                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} tone="neg" />
-                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} tone="warn" />
+                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} tone="warn" href="/admin/properties?attention=price-drop" />
+                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} tone="neg" href="/admin/properties?attention=no-photos" />
+                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} tone="warn" href="/admin/properties?attention=hidden" />
                 <AttentionRow label={t.soldProperties} count={portfolio.soldCount} tone="muted" />
                 {portfolio.hotCount > 0 && <AttentionRow label={t.hotOffers} count={portfolio.hotCount} tone="muted" />}
                 {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} tone="muted" />}
@@ -433,7 +457,7 @@ export default function AdminDashboard() {
         </ECard>
       </div>
 
-      {/* ── 6. Recent listings ── */}
+      {/* ── 5. Recent listings ── */}
       <ECard title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd className="size-3" /></Link>}>
         {propsLoading ? (
           <SkelLines rows={4} />
@@ -479,7 +503,7 @@ function KpiTile({ label, value, delta, loading }: { label: string; value: numbe
     <div className="ec-kpi-tile">
       <div className="lbl">{label}</div>
       <div className="val">
-        {loading ? <Skeleton className="h-7 w-16" /> : <bdi dir="ltr">{value.toLocaleString('en-US')}</bdi>}
+        {loading ? <Skeleton className="h-8.25 w-16" /> : <bdi dir="ltr">{value.toLocaleString('en-US')}</bdi>}
       </div>
       {!loading && delta}
     </div>
@@ -487,7 +511,7 @@ function KpiTile({ label, value, delta, loading }: { label: string; value: numbe
 }
 
 /** Attention row — whole-row click target, tone-coded dot, neutral count badge, hover chevron. */
-function AttentionRow({ label, count, tone }: { label: string; count: number; tone: 'warn' | 'neg' | 'muted' }) {
+function AttentionRow({ label, count, tone, href = '/admin/properties' }: { label: string; count: number; tone: 'warn' | 'neg' | 'muted'; href?: string }) {
   const t = useAdminMessages(dashboardMessages);
   const { dir } = useAdminI18n();
   const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
@@ -500,7 +524,7 @@ function AttentionRow({ label, count, tone }: { label: string; count: number; to
         ? 'var(--warn)'
         : 'var(--text-faint)';
   return (
-    <Link href="/admin/properties" className="ec-row ec-attrow">
+    <Link href={href} className="ec-row ec-attrow">
       <span className="ec-attdot" style={{ background: dotColor }} />
       <span className="ec-attlabel" style={{ color: ok ? 'var(--text-muted)' : 'var(--text-body)' }}>{label}</span>
       {ok ? (
@@ -531,10 +555,17 @@ function DashboardStyles() {
         __html: `
 /* Page header */
 .estate-console .ec-pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-.estate-console .ec-h1{font-size:24px;line-height:1.25;font-weight:600;color:var(--text-ink);}
+.estate-console .ec-h1{font-size:26px;line-height:1.25;font-weight:700;letter-spacing:-.01em;color:var(--text-ink);}
 .estate-console .ec-subtitle{font-size:13px;line-height:1.4;color:var(--text-muted);margin-block-start:4px;}
-.estate-console .ec-newleads{display:inline-flex;align-items:center;gap:7px;background:var(--brand);color:#fff;font-weight:600;font-size:13px;line-height:1;padding:9px 16px;border-radius:var(--r-pill);text-decoration:none;white-space:nowrap;transition:background .15s ease;}
-.estate-console .ec-newleads:hover{background:var(--brand-hover);}
+
+/* Quick actions at the header's inline-end */
+.estate-console .ec-quick{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.estate-console .ec-quick-primary,.estate-console .ec-quick-ghost{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:var(--r-control);font-size:13.5px;font-weight:600;line-height:1;text-decoration:none;transition:background-color .15s ease,border-color .15s ease,color .15s ease;white-space:nowrap;}
+.estate-console .ec-quick-primary{background:var(--brand);color:#fff;}
+.estate-console .ec-quick-primary:hover{background:var(--brand-deep,#2c3ea6);}
+.estate-console .ec-quick-ghost{background:var(--surface);color:var(--text-soft,#333e66);border:1px solid var(--border);}
+.estate-console .ec-quick-ghost:hover{border-color:rgba(53,74,196,.4);color:var(--brand);}
+.estate-console .ec-kpi-tile .delta.ec-delta-flat{color:var(--text-muted);}
 
 /* Focal hero — the one dark premium card on the light page (Runey cashflow-card move) */
 .estate-console .ec-focal{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:#051150;border-radius:var(--r-hero);box-shadow:var(--shadow-hero);padding:22px 26px;margin-block:6px 24px;}

@@ -374,8 +374,8 @@ em {
    the generic coloured-side-bar callout card. */
 .definition-block {
   position: relative;
-  background: #fbf8f2;
-  border: 1px solid #e7dcc6;
+  background: #f5f7fb;
+  border: 1px solid #E4E8F2;
   border-radius: 3px;
   padding: 1.9rem 2rem 1.6rem;
   margin: 2.25rem 0 2.5rem;
@@ -439,7 +439,7 @@ em {
 }
 .geo-table tbody td {
   color: #374151;
-  border-bottom: 1px solid #e7dcc6;
+  border-bottom: 1px solid #E4E8F2;
 }
 .geo-table tbody td:first-child {
   color: #051150;
@@ -536,4 +536,162 @@ em {
 .article-section > .geo-table-wrap {
   max-width: 1000px;
   margin-inline: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "בעמוד הזה" — compact table of contents (ArticleToc.tsx)
+   Collapsed <details> below lg; open <nav> list on lg+.
+   ───────────────────────────────────────────────────────────────────────── */
+.article-toc {
+  max-width: 760px;
+  margin: 0 auto 2.5rem;
+}
+.article-toc-mobile,
+.article-toc-desktop {
+  background: #ffffff;
+  border: 1px solid #E4E8F2;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+.article-toc-desktop {
+  display: none;
+}
+.article-toc-mobile summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #051150;
+}
+.article-toc-mobile summary:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.article-toc-heading {
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+  color: #051150;
+  font-size: 1rem;
+}
+.article-toc-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.article-toc-desktop .article-toc-list {
+  margin-top: 0;
+}
+.article-toc-list a {
+  color: #354AC4;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.article-toc-list a:hover {
+  color: #28389B;
+  text-decoration: underline;
+}
+.article-toc-list a:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (min-width: 1024px) {
+  .article-toc-mobile {
+    display: none;
+  }
+  .article-toc-desktop {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "מאמרים נוספים" — related-article cards (RelatedArticles.tsx)
+   Scoped mirror of the hub card idiom: white card, hairline border,
+   navy-tinted shadow, calm lift on hover. (The hub's articles.css is not
+   imported here because its .article-content rules clash with the article
+   shell's class of the same name.)
+   ───────────────────────────────────────────────────────────────────────── */
+.related-articles {
+  max-width: 1000px;
+  margin: 3.5rem auto 0;
+}
+.related-articles-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #051150;
+  margin: 0 0 1.5rem;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.related-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #E4E8F2;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(5, 17, 80, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+.related-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(53, 74, 196, 0.3);
+  box-shadow: 0 12px 28px rgba(5, 17, 80, 0.12);
+}
+.related-card:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+}
+.related-card-image {
+  position: relative;
+  aspect-ratio: 1200 / 630;
+  background: #f5f7fb;
+}
+.related-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.related-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  flex-grow: 1;
+}
+.related-card-category {
+  color: #354AC4;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.related-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #1f2937;
+  transition: color 0.2s ease;
+}
+.related-card:hover .related-card-title {
+  color: #354AC4;
+}
+.related-card-meta {
+  margin-top: auto;
+  padding-top: 0.35rem;
+  color: #64748B;
+  font-size: 0.8125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .related-card,
+  .related-card:hover {
+    transform: none;
+    transition: none;
+  }
 }

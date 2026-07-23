@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChevronDown, Phone } from "lucide-react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { Menu, X, ChevronDown, Phone, MessageCircle } from "lucide-react";
 
 interface NavLink {
   label: string;
@@ -33,20 +33,24 @@ const NAV_LINKS: NavLink[] = [
   { label: "אודות", href: "/about" },
 ];
 
-export default function Header() {
+export default function Header({ initialPhone }: { initialPhone?: string | null }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [activeDesktopSubmenu, setActiveDesktopSubmenu] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [ownerPhone, setOwnerPhone] = useState<string | null>(null);
+  const [ownerPhone, setOwnerPhone] = useState<string | null>(initialPhone ?? null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const menuWasOpen = useRef(false);
 
-  // Same owner data the footer/WhatsApp button use — fetched client-side so the
-  // header CTA can click-to-call the office without turning Header into a
-  // server component.
+  // Phone normally arrives server-side via initialPhone (layout reads the same
+  // owners table /api/owners exposes). The client fetch is only a fallback for
+  // callers that render <Header/> without the prop.
   useEffect(() => {
+    if (initialPhone) return;
     let cancelled = false;
     fetch("/api/owners", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : []))
@@ -59,7 +63,41 @@ export default function Header() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialPhone]);
+
+  // Mobile menu open: lock page scroll + close on Escape.
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const prevOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.documentElement.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isMobileMenuOpen]);
+
+  // Focus management: close button on open, back to the burger on close.
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      menuWasOpen.current = true;
+      closeButtonRef.current?.focus();
+    } else if (menuWasOpen.current) {
+      menuWasOpen.current = false;
+      burgerRef.current?.focus();
+    }
+  }, [isMobileMenuOpen]);
+
+  // wa.me expects an international number: strip formatting, 0-prefix → 972.
+  const waPhone = (() => {
+    if (!ownerPhone) return null;
+    const digits = ownerPhone.replace(/\D/g, "");
+    if (!digits) return null;
+    return digits.startsWith("0") ? `972${digits.slice(1)}` : digits;
+  })();
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 30);
@@ -103,7 +141,7 @@ export default function Header() {
         WebkitBackdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
         borderBottom: shouldBeTransparent
           ? "1px solid transparent"
-          : "1px solid #E9EDF5",
+          : "1px solid #E4E8F2",
         boxShadow: shouldBeTransparent
           ? "none"
           : "0 8px 24px -20px rgba(5,17,80,0.12)",
@@ -127,9 +165,7 @@ export default function Header() {
           <Link
             href="/"
             aria-label="Aiterra"
-            style={{ display: "flex", alignItems: "center", gap: 10, transition: "transform 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
-            onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+            style={{ display: "flex", alignItems: "center", gap: 10 }}
           >
             <img
               src="/aiterra-logo.png"
@@ -168,7 +204,10 @@ export default function Header() {
         {!isMobile && (
           <div dir="rtl" style={{ display: "flex", alignItems: "center", gap: 20 }}>
             {/* Contact CTA — the single strong accent (solid indigo, white text
-                7.17:1). Reading-start/right corner of the cluster. Click-to-call. */}
+                7.17:1). Reading-start/right corner of the cluster. Click-to-call.
+                Width is reserved even before the phone resolves (client-fetch
+                fallback path) so the nav cluster never shifts. */}
+            <div style={{ minWidth: 122, display: "flex", justifyContent: "flex-start" }}>
             {ownerPhone && (
               <a
                 href={`tel:${ownerPhone}`}
@@ -221,6 +260,7 @@ export default function Header() {
                 צור קשר
               </a>
             )}
+            </div>
 
             {/* Hairline divider — editorial separation of the one action from
                 the navigation links. */}
@@ -238,12 +278,15 @@ export default function Header() {
             {/* Links group — free-floating, clean sans, even rhythm. */}
             <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
             {NAV_LINKS.map((link) => {
-              // Dropdown parents use href="#", so pathname never matches them —
-              // fall back to "is any of my sub-routes the current page?" so
-              // /faq, /links, /selling-apartment, /buying-apartment light their parent.
-              const isActive = link.href !== "#"
-                ? pathname === link.href
-                : !!link.submenu?.some((s) => s.href === pathname);
+              // Section-aware active state: '/' matches exactly, real routes
+              // match themselves and their sub-pages (startsWith). Dropdown
+              // parents use href="#", so they light up when any sub-route is
+              // the current section.
+              const isActive = link.href === "/"
+                ? pathname === "/"
+                : link.href !== "#"
+                  ? pathname.startsWith(link.href)
+                  : !!link.submenu?.some((s) => pathname.startsWith(s.href));
               const isOpen = activeDesktopSubmenu === link.label;
 
               // Resting color for the current header state (3-tier brand ramp).
@@ -254,65 +297,92 @@ export default function Header() {
               // An open dropdown parent reads in the hover color even off-hover.
               const displayColor = (isOpen && !isActive) ? hoverColor : restColor;
 
+              const parentStyle: CSSProperties = {
+                fontSize: 15,
+                fontWeight: 500,
+                color: displayColor,
+                textShadow: shouldBeTransparent
+                  ? "0 1px 3px rgba(0,0,0,0.45)"
+                  : "none",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "6px 2px",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                position: "relative",
+                letterSpacing: 0,
+                lineHeight: 1,
+                transition: "color 0.18s ease",
+                fontFamily: "var(--font-assistant), system-ui, sans-serif",
+              };
+
+              // Active underline — grows from the reading-start (right) for RTL
+              const activeUnderline = (
+                <span style={{
+                  position: "absolute",
+                  insetInlineStart: 0, insetInlineEnd: 0,
+                  bottom: 0,
+                  height: 2,
+                  borderRadius: 0,
+                  background: shouldBeTransparent ? "#ffffff" : "#354AC4",
+                  transform: isActive ? "scaleX(1)" : "scaleX(0)",
+                  transformOrigin: "right",
+                  transition: "transform 0.22s ease",
+                }} />
+              );
+
               return (
                 <div
                   key={link.label}
                   style={{ position: "relative" }}
                   onMouseEnter={() => link.submenu && handleMenuEnter(link.label)}
                   onMouseLeave={() => link.submenu && handleMenuLeave()}
+                  onKeyDown={(e) => {
+                    if (link.submenu && e.key === "Escape") setActiveDesktopSubmenu(null);
+                  }}
+                  onBlur={(e) => {
+                    // Focus left the parent+dropdown group entirely → close.
+                    if (link.submenu && !e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                      setActiveDesktopSubmenu(null);
+                    }
+                  }}
                 >
-                  <Link
-                    href={link.href}
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 500,
-                      color: displayColor,
-                      textShadow: shouldBeTransparent
-                        ? "0 1px 3px rgba(0,0,0,0.45)"
-                        : "none",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "6px 2px",
-                      textDecoration: "none",
-                      whiteSpace: "nowrap",
-                      position: "relative",
-                      letterSpacing: 0,
-                      lineHeight: 1,
-                      transition: "color 0.18s ease",
-                      fontFamily: "var(--font-assistant), system-ui, sans-serif",
-                    }}
-                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = hoverColor; }}
-                    onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = restColor; }}
-                    onClick={e => {
-                      if (link.submenu && link.href === "#") {
-                        e.preventDefault();
-                        setActiveDesktopSubmenu(isOpen ? null : link.label);
-                      }
-                    }}
-                  >
-                    {link.label}
-                    {link.submenu && (
-                      <ChevronDown size={15} strokeWidth={2} style={{
+                  {link.submenu ? (
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-haspopup="true"
+                      style={{ ...parentStyle, background: "none", border: "none", cursor: "pointer" }}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = hoverColor; }}
+                      onMouseLeave={e => { if (!isActive && !isOpen) e.currentTarget.style.color = restColor; }}
+                      onFocus={e => {
+                        // Keyboard focus opens the menu; mouse clicks (not
+                        // :focus-visible) go through onClick's toggle instead.
+                        if (e.currentTarget.matches(":focus-visible")) handleMenuEnter(link.label);
+                      }}
+                      onClick={() => setActiveDesktopSubmenu(isOpen ? null : link.label)}
+                    >
+                      {link.label}
+                      <ChevronDown size={15} strokeWidth={2} aria-hidden="true" style={{
                         color: "currentColor",
                         marginInlineStart: 2,
                         transition: "transform 0.25s",
                         transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
                       }} />
-                    )}
-                    {/* Active underline — grows from the reading-start (right) for RTL */}
-                    <span style={{
-                      position: "absolute",
-                      insetInlineStart: 0, insetInlineEnd: 0,
-                      bottom: 0,
-                      height: 2,
-                      borderRadius: 0,
-                      background: shouldBeTransparent ? "#ffffff" : "#354AC4",
-                      transform: isActive ? "scaleX(1)" : "scaleX(0)",
-                      transformOrigin: "right",
-                      transition: "transform 0.22s ease",
-                    }} />
-                  </Link>
+                      {activeUnderline}
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      style={parentStyle}
+                      onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = hoverColor; }}
+                      onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = restColor; }}
+                    >
+                      {link.label}
+                      {activeUnderline}
+                    </Link>
+                  )}
 
                   {/* Dropdown */}
                   {link.submenu && (
@@ -340,7 +410,7 @@ export default function Header() {
                       }}
                     >
                       {link.submenu.map((sub) => {
-                        const subActive = pathname === sub.href;
+                        const subActive = pathname.startsWith(sub.href);
                         return (
                         <Link
                           key={sub.label}
@@ -398,7 +468,7 @@ export default function Header() {
                   textDecoration: "none",
                   boxShadow: shouldBeTransparent
                     ? "0 6px 18px rgba(0,0,0,0.4)"
-                    : "0 6px 18px rgba(5,17,80,0.3)",
+                    : "0 4px 12px rgba(5,17,80,0.16)",
                   WebkitTapHighlightColor: "transparent",
                   touchAction: "manipulation",
                 }}
@@ -407,6 +477,7 @@ export default function Header() {
               </a>
             )}
           <button
+            ref={burgerRef}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
             aria-expanded={isMobileMenuOpen}
@@ -432,7 +503,7 @@ export default function Header() {
               justifyContent: "center",
               boxShadow: shouldBeTransparent
                 ? "0 6px 18px rgba(0,0,0,0.4)"
-                : "0 6px 18px rgba(5,17,80,0.3)",
+                : "0 4px 12px rgba(5,17,80,0.16)",
               transition: "transform 0.15s ease, box-shadow 0.3s ease, background 0.3s ease",
               WebkitTapHighlightColor: "transparent",
               touchAction: "manipulation",
@@ -452,6 +523,9 @@ export default function Header() {
       <div
         id="mobile-menu"
         dir="rtl"
+        role="dialog"
+        aria-modal="true"
+        aria-label="תפריט ניווט"
         style={{
           position: "fixed",
           top: 0,
@@ -460,16 +534,16 @@ export default function Header() {
           bottom: 0,
           background: "#ffffff",
           zIndex: 2000,
-          overflowY: "auto",
-          paddingTop: "1.5rem",
-          paddingLeft: "1.5rem",
-          paddingRight: "1.5rem",
-          paddingBottom: "1.5rem",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
+        {/* Scrollable content — the CTA bar below stays pinned. */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "1.5rem" }}>
         {/* Close button */}
         <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "1rem" }}>
           <button
+            ref={closeButtonRef}
             onClick={() => setIsMobileMenuOpen(false)}
             aria-label="סגור תפריט"
             style={{
@@ -488,32 +562,58 @@ export default function Header() {
           </button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {NAV_LINKS.map((link) => (
+          {NAV_LINKS.map((link) => {
+            const isSubOpen = openSubmenu === link.label;
+            const isActive = link.href === "/"
+              ? pathname === "/"
+              : link.href !== "#"
+                ? pathname.startsWith(link.href)
+                : !!link.submenu?.some((s) => pathname.startsWith(s.href));
+            return (
             <div key={link.label} style={{ borderBottom: "1px solid #EEF1F8" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0" }}>
-                <Link
-                  href={link.href}
-                  onClick={() => !link.submenu && setIsMobileMenuOpen(false)}
-                  style={{ fontSize: 18, fontWeight: 600, color: pathname === link.href ? "#354AC4" : "#051150", textDecoration: "none", flex: 1, fontFamily: "var(--font-assistant), system-ui, sans-serif" }}
+              {link.submenu ? (
+                // Whole row toggles the accordion — a far bigger tap target
+                // than the old chevron-only button.
+                <button
+                  onClick={() => setOpenSubmenu(isSubOpen ? null : link.label)}
+                  aria-expanded={isSubOpen}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    padding: "16px 0",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: 18,
+                    fontWeight: 600,
+                    color: isActive ? "#354AC4" : "#051150",
+                    textAlign: "start",
+                    fontFamily: "var(--font-assistant), system-ui, sans-serif",
+                  }}
                 >
-                  {link.label}
-                </Link>
-                {link.submenu && (
-                  <button
-                    onClick={() => setOpenSubmenu(openSubmenu === link.label ? null : link.label)}
-                    aria-label={openSubmenu === link.label ? `סגור ${link.label}` : `פתח ${link.label}`}
-                    aria-expanded={openSubmenu === link.label}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: 6, color: "#354ac4" }}
+                  <span>{link.label}</span>
+                  <ChevronDown size={22} aria-hidden="true" style={{
+                    color: "#354ac4",
+                    flexShrink: 0,
+                    transform: isSubOpen ? "rotate(180deg)" : "rotate(0)",
+                    transition: "transform 0.25s",
+                  }} />
+                </button>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", padding: "16px 0" }}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    style={{ fontSize: 18, fontWeight: 600, color: isActive ? "#354AC4" : "#051150", textDecoration: "none", flex: 1, fontFamily: "var(--font-assistant), system-ui, sans-serif" }}
                   >
-                    <ChevronDown size={22} style={{
-                      transform: openSubmenu === link.label ? "rotate(180deg)" : "rotate(0)",
-                      transition: "transform 0.25s",
-                    }} />
-                  </button>
-                )}
-              </div>
+                    {link.label}
+                  </Link>
+                </div>
+              )}
 
-              {link.submenu && openSubmenu === link.label && (
+              {link.submenu && isSubOpen && (
                 <div style={{ background: "#F4F6FB", borderRadius: 10, marginBottom: 12, overflow: "hidden" }}>
                   {link.submenu.map((sub) => (
                     <Link
@@ -537,8 +637,74 @@ export default function Header() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
+        </div>
+
+        {/* Pinned bottom CTA bar — call + WhatsApp always reachable while the
+            menu is open. */}
+        {ownerPhone && (
+          <div
+            style={{
+              flexShrink: 0,
+              display: "flex",
+              gap: 10,
+              padding: "12px 1.5rem",
+              paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
+              borderTop: "1px solid #E4E8F2",
+              background: "#ffffff",
+              boxShadow: "0 -8px 24px -20px rgba(5,17,80,0.25)",
+            }}
+          >
+            <a
+              href={`tel:${ownerPhone}`}
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "14px 20px",
+                borderRadius: 12,
+                background: "#354AC4",
+                color: "#ffffff",
+                fontSize: 16,
+                fontWeight: 600,
+                textDecoration: "none",
+                boxShadow: "0 2px 6px rgba(5,17,80,0.10)",
+                fontFamily: "var(--font-assistant), system-ui, sans-serif",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <Phone size={18} strokeWidth={2.25} aria-hidden="true" />
+              התקשרו אלינו
+            </a>
+            {waPhone && (
+              <a
+                href={`https://wa.me/${waPhone}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="שלחו הודעת וואטסאפ"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 52,
+                  borderRadius: 12,
+                  background: "#ffffff",
+                  border: "1px solid #E4E8F2",
+                  color: "#051150",
+                  textDecoration: "none",
+                  boxShadow: "0 2px 6px rgba(5,17,80,0.06)",
+                  WebkitTapHighlightColor: "transparent",
+                }}
+              >
+                <MessageCircle size={22} strokeWidth={2.25} aria-hidden="true" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     )}
     </>

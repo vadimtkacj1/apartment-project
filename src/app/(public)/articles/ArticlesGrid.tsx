@@ -41,7 +41,7 @@ export default function ArticlesGrid() {
 
       <div className="articles-grid">
         {visible.map((article, index) => (
-          <article key={article.id} className="article-card" style={{ animationDelay: `${index * 0.1}s` }}>
+          <article key={article.id} className="article-card" style={{ animationDelay: `${Math.min(index, 5) * 0.08}s` }}>
             <div className="card-accent"></div>
             <Link href={`/articles/${article.id}`} className="article-image" aria-label={article.title}>
               <Image
@@ -63,8 +63,8 @@ export default function ArticlesGrid() {
               <div className="article-meta">
                 <span className="article-date">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="meta-icon">
-                    <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M7 3.5V7L9.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M2 3h10a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M4 1v2M10 1v2M1 6h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                   {new Date(article.date).toLocaleDateString('he-IL', {
                     year: 'numeric',
@@ -75,8 +75,8 @@ export default function ArticlesGrid() {
                 <span className="separator">•</span>
                 <span className="read-time">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="meta-icon">
-                    <path d="M2 3h10a1 1 0 011 1v7a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M4 1v2M10 1v2M1 6h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.5"/>
+                    <path d="M7 3.5V7L9.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
                   {article.readTime}
                 </span>

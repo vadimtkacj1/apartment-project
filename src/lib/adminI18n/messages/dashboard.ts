@@ -5,6 +5,12 @@ export const dashboardMessages = defineMessages({
   he: {
     pageTitle: 'לוח בקרה',
     mastheadTitle: 'Aiterra · לוח בקרה',
+    // Time-of-day greeting in the page header; name appended when known.
+    greetingMorning: 'בוקר טוב',
+    greetingAfternoon: 'צהריים טובים',
+    greetingEvening: 'ערב טוב',
+    quickAddProperty: 'הוסף נכס',
+    quickViewSite: 'צפה באתר',
     /** Long date, e.g. "1 ביולי 2026" / "1 July 2026" (day-first). monthIndex is 0-based; self-contained month names (no dayjs locale dependency). */
     longDate: (day: number, monthIndex: number, year: number) =>
       `${day} ב${['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'][monthIndex]} ${year}`,
@@ -87,6 +93,12 @@ export const dashboardMessages = defineMessages({
   en: {
     pageTitle: 'Dashboard',
     mastheadTitle: 'Aiterra · Dashboard',
+    // Time-of-day greeting in the page header; name appended when known.
+    greetingMorning: 'Good morning',
+    greetingAfternoon: 'Good afternoon',
+    greetingEvening: 'Good evening',
+    quickAddProperty: 'Add property',
+    quickViewSite: 'View site',
     longDate: (day: number, monthIndex: number, year: number) =>
       `${day} ${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][monthIndex]} ${year}`,
 

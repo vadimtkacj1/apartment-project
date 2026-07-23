@@ -128,21 +128,19 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     }
   };
 
-  const cardClasses = `group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
-    isSold ? 'bg-[#F8FAFC] border border-[#E4E8F2] opacity-80' : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40'
+  // Shared elevation tokens (globals.css): rest at --elev-1, lift to --elev-2 on
+  // hover alongside the y:-4 translate — one calm, navy-tinted system across the
+  // whole site. Sold cards stay flat at elev-1 (no lift).
+  const cardClasses = `group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full shadow-elev-1 ${
+    isSold
+      ? 'bg-[#F8FAFC] border border-[#E4E8F2] opacity-80'
+      : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40 hover:shadow-elev-2'
   }`;
-
-  // Calm, grounded elevation: one soft directional shadow (light from above) plus
-  // the hairline border — no omnidirectional blue glow. Matches HotPropositionCard.
-  const cardShadow = isSold
-    ? '0 1px 2px rgba(5, 17, 80, 0.05), 0 6px 14px -10px rgba(5, 17, 80, 0.12)'
-    : '0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.20)';
 
   const cardInner = (
       <m.div
         whileHover={isSold ? {} : { y: -4 }}
         className={cardClasses}
-        style={{ boxShadow: cardShadow }}
         dir="rtl"
       >
         {showImage && (
@@ -181,14 +179,14 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             )}
 
             {/* Бейдж типа сделки */}
-            <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm bg-[#051150]/90 text-white border border-white/20">
+            <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-[0_4px_14px_rgba(5,17,80,0.35)] backdrop-blur-sm bg-[#051150]/90 text-white border border-white/20">
               <Tag size={13} />
               <span>{dealTypeLabel}</span>
             </div>
 
             {/* Бейдж статуса */}
             {status && !isSold && (
-              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md ${
+              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-[0_2px_8px_rgba(5,17,80,0.20)] ${
                 STATUS_STYLES[status] || 'bg-white/90 text-[#051150]'
               }`}>
                 {STATUS_LABELS[status] || status}
@@ -265,7 +263,10 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
                 <CheckCircle2 size={18} />
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#354AC4] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#28389B] transition-colors w-full sm:w-auto justify-center whitespace-nowrap">
+              <div
+                className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 text-white font-bold text-sm sm:text-base rounded-xl transition-[filter] duration-200 group-hover:brightness-110 hover:brightness-110 w-full sm:w-auto justify-center whitespace-nowrap"
+                style={{ background: 'linear-gradient(135deg, #4A5FD6 0%, #354AC4 55%, #28389B 120%)' }}
+              >
                 <span>לפרטים נוספים</span>
                 <ArrowLeft size={18} className="hidden sm:block" />
                 <ArrowLeft size={16} className="sm:hidden" />

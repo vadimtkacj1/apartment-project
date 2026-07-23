@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Home, Key, HelpCircle, FileText, ArrowLeft } from 'lucide-react';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 // Compact internal-link band (server component — plain crawlable <Link>s in the
 // SSR HTML). Keeps the homepage-body crawl links to the guide/knowledge pages —
@@ -30,9 +31,12 @@ export default function GuidesSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-350">
         <div className="flex flex-col items-center text-center gap-6">
           {/* Heading */}
-          <h2 className="text-2xl md:text-3xl font-black text-[#051150]">
-            מדריכים ומידע שימושי
-          </h2>
+          <div className="flex flex-col items-center gap-3">
+            <SectionEyebrow>מרכז הידע</SectionEyebrow>
+            <h2 className="text-3xl md:text-4xl font-black text-[#051150]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+              מדריכים ומידע שימושי
+            </h2>
+          </div>
 
           {/* Hub + guide links in one wrapped pill row */}
           <ul className="flex flex-wrap justify-center gap-2.5">
@@ -63,7 +67,7 @@ export default function GuidesSection() {
           {/* Link to the full guides hub */}
           <Link
             href="/articles"
-            className="inline-flex items-center gap-1.5 text-[#2a69c4] font-bold hover:text-[#354ac4] transition-colors"
+            className="inline-flex items-center gap-1.5 text-[#354ac4] font-bold hover:text-[#28389b] transition-colors"
           >
             כל המדריכים
             <ArrowLeft className="w-4 h-4" />

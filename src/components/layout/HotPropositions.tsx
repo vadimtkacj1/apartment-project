@@ -5,6 +5,7 @@ import { m } from "framer-motion";
 import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import PropertyCard from "@/components/properties/PropertyCard";
+import SectionEyebrow from "@/components/ui/SectionEyebrow";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
@@ -238,12 +239,10 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
-              מבחר נכסים
-            </span>
+            <SectionEyebrow>מבחר נכסים</SectionEyebrow>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
         </m.div>

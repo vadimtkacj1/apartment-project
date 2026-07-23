@@ -3,6 +3,7 @@
 import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Check } from 'lucide-react';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 const marketingPoints = [
   'פרסום ממוקד באינטרנט וברשתות חברתיות',
@@ -26,6 +27,9 @@ export default function AboutMarketing() {
             transition={{ duration: 0.6 }}
           >
 
+            <div className="mb-3">
+              <SectionEyebrow tone="light" align="start">איך אנחנו עובדים</SectionEyebrow>
+            </div>
             <h2 className="font-caramel text-3xl md:text-4xl font-black text-[#051150] mb-6">
               שיווק נדל"ן בגישה מתקדמת
             </h2>

@@ -85,28 +85,16 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     ),
   },
   {
-    key: 'owners',
-    segment: 'owners',
-    label: { he: 'בעלים', en: 'Owners' },
-    href: '/admin/owners',
-    isActive: (p) => p.includes('/owners'),
-    addHref: '/admin/owners/new',
-    addLabel: { he: 'הוספת בעלים', en: 'Add Owner' },
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9Z" />
-        <path d="M3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18H3Z" />
-      </svg>
-    ),
-  },
-  {
-    key: 'team',
-    segment: 'team',
-    label: { he: 'צוות', en: 'Team' },
-    href: '/admin/team',
-    isActive: (p) => p.includes('/team'),
-    addHref: '/admin/team/new',
-    addLabel: { he: 'הוספת חבר צוות', en: 'Add Team Member' },
+    // Owners / Team / Users merged into one tabbed page (/admin/people?tab=…).
+    // The Users tab is gated to admins inside the page itself, so the section
+    // is visible to everyone. Old routes stay live for deep links (see
+    // LEGACY_CRUMB_SECTIONS below) and keep this section highlighted.
+    key: 'people',
+    segment: 'people',
+    label: { he: 'אנשים', en: 'People' },
+    href: '/admin/people',
+    isActive: (p) =>
+      p.includes('/people') || p.includes('/owners') || p.includes('/team') || p.includes('/users'),
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M13 6C13 7.65685 11.6569 9 10 9C8.34315 9 7 7.65685 7 6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6Z" />
@@ -154,22 +142,31 @@ export const ADMIN_SECTIONS: AdminSection[] = [
       </svg>
     ),
   },
+];
+
+/**
+ * Sections that used to live in the sidebar but were merged into /admin/people.
+ * Their routes remain live for deep links / bookmarks; these entries exist ONLY
+ * so buildAdminCrumbs still resolves them (list, /new and edit pages) properly.
+ */
+type LegacyCrumbSection = Pick<AdminSection, 'segment' | 'label' | 'href' | 'addLabel'>;
+const LEGACY_CRUMB_SECTIONS: LegacyCrumbSection[] = [
   {
-    key: 'users',
+    segment: 'owners',
+    label: { he: 'בעלים', en: 'Owners' },
+    href: '/admin/owners',
+    addLabel: { he: 'הוספת בעלים', en: 'Add Owner' },
+  },
+  {
+    segment: 'team',
+    label: { he: 'צוות', en: 'Team' },
+    href: '/admin/team',
+    addLabel: { he: 'הוספת חבר צוות', en: 'Add Team Member' },
+  },
+  {
     segment: 'users',
     label: { he: 'משתמשים', en: 'Users' },
     href: '/admin/users',
-    isActive: (p) => p.includes('/users'),
-    roles: ['admin'], // only admins manage system users
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path
-          fillRule="evenodd"
-          clipRule="evenodd"
-          d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.53 1.53 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.53 1.53 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.53 1.53 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.53 1.53 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.53 1.53 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.53 1.53 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-        />
-      </svg>
-    ),
   },
 ];
 
@@ -188,7 +185,9 @@ export function buildAdminCrumbs(name: string, locale: AdminLocale = 'he'): Crum
   const f = CRUMB_FALLBACKS[locale];
   const root: Crumb = { title: f.root, href: '/admin' };
   const base = name.split('/')[0]; // '' for the dashboard root
-  const section = ADMIN_SECTIONS.find((s) => s.segment === base);
+  const section =
+    ADMIN_SECTIONS.find((s) => s.segment === base) ??
+    LEGACY_CRUMB_SECTIONS.find((s) => s.segment === base);
 
   if (!section) return [root, { title: name }];
 

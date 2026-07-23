@@ -68,7 +68,7 @@ function FloorPlansSection() {
             </span>
           </div>
           <h2
-            className="text-5xl md:text-6xl font-black text-gray-900 mb-5 uppercase tracking-tight"
+            className="text-5xl md:text-6xl font-black text-[#051150] mb-5 uppercase tracking-tight"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
             תוכניות הדירות והמסחר

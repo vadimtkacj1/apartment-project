@@ -166,7 +166,7 @@
   width: 100%;
   aspect-ratio: 1200 / 630;
   overflow: hidden;
-  background: #efe9e0;
+  background: #f5f7fb;
 }
 
 .article-image-img {
@@ -323,7 +323,7 @@
   border-radius: 15px;
   font-size: 0.8125rem;
   font-weight: 500;
-  border: 1px solid #e5dfd5;
+  border: 1px solid #E4E8F2;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;

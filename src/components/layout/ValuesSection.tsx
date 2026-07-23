@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -140,12 +141,10 @@ const ValuesSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
-              היתרונות שלנו
-            </span>
+            <SectionEyebrow>היתרונות שלנו</SectionEyebrow>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
 
@@ -166,11 +165,11 @@ const ValuesSection: React.FC = () => {
           >
             {values.map((value) => (
               <SwiperSlide key={value.id}>
-                <div className="flex flex-col items-center text-center px-4">
-                  <div className="flex justify-center mb-6">
-                    <Image src={value.image} alt={value.title} width={256} height={256} className="object-contain" loading="lazy" />
+                <div className="flex flex-col items-center text-center bg-white rounded-2xl border border-[#E9EDF5] shadow-elev-1 p-7 mx-1 mb-2">
+                  <div className="w-full flex justify-center mb-6 rounded-xl bg-[#F4F6FB] py-6">
+                    <Image src={value.image} alt={value.title} width={200} height={200} className="object-contain" loading="lazy" />
                   </div>
-                  <h3 className="text-2xl font-bold text-[#051150] mb-4">{value.title}</h3>
+                  <h3 className="text-2xl font-bold text-[#051150] mb-3">{value.title}</h3>
                   <p className="text-base text-slate-600 leading-relaxed">{value.description}</p>
                 </div>
               </SwiperSlide>
@@ -179,7 +178,7 @@ const ValuesSection: React.FC = () => {
         </div>
 
         {/* Desktop View */}
-        <div className="hidden lg:grid lg:grid-cols-3 gap-12">
+        <div className="hidden lg:grid lg:grid-cols-3 gap-8">
           {values.map((value, index) => (
             <m.div
               key={value.id}
@@ -187,10 +186,11 @@ const ValuesSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="text-center"
+              whileHover={reduced ? {} : { y: -6 }}
+              className="h-full flex flex-col items-center text-center bg-white rounded-2xl border border-[#E9EDF5] shadow-elev-1 hover:shadow-elev-2 transition-shadow duration-300 p-10"
             >
-              <div className="flex justify-center mb-8">
-                <div className="w-64 h-64 relative">
+              <div className="w-full flex justify-center mb-8 rounded-xl bg-[#F4F6FB] py-8">
+                <div className="w-52 h-52 relative">
                   <Image src={value.image} alt={value.title} fill className="object-contain" loading="lazy" />
                 </div>
               </div>

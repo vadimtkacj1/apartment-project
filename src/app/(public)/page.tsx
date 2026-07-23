@@ -174,7 +174,7 @@ export default async function Home() {
       </div>
 
       {/* Content below hero - lazy loaded */}
-      <div className="relative bg-warm">
+      <div id="hero-next" className="relative bg-warm">
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <HotPropositions
             initialProperties={hotProperties}

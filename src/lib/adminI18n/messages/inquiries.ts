@@ -55,12 +55,25 @@ export const inquiriesMessages = defineMessages({
     fieldProperty: 'נכס',
     fieldAgent: 'סוכן',
 
+    // Quick actions
+    actionCall: 'התקשרות',
+    actionWhatsapp: 'שליחת וואטסאפ',
+    actionEmail: 'שליחת אימייל',
+
+    // Source badge labels
+    sourceContactForm: 'טופס יצירת קשר',
+    sourcePropertyPage: 'עמוד נכס',
+    sourceWhatsapp: 'וואטסאפ',
+
+    // Agent select groups
+    ownersGroup: 'בעלים',
+    agentsGroup: 'סוכנים',
+
     // Details modal
     modalTitle: (name: string) => `פנייה — ${name}`,
     save: 'שמירה',
     close: 'סגירה',
     messageLabel: 'הודעה',
-    sourceLabel: (source: string) => `מקור: ${source}`,
     assignedAgent: 'סוכן מטפל',
     assignAgentPlaceholder: 'שייך סוכן',
     internalNotes: 'הערות פנימיות',
@@ -119,12 +132,25 @@ export const inquiriesMessages = defineMessages({
     fieldProperty: 'Property',
     fieldAgent: 'Agent',
 
+    // Quick actions
+    actionCall: 'Call',
+    actionWhatsapp: 'Send WhatsApp',
+    actionEmail: 'Send email',
+
+    // Source badge labels
+    sourceContactForm: 'Contact form',
+    sourcePropertyPage: 'Property page',
+    sourceWhatsapp: 'WhatsApp',
+
+    // Agent select groups
+    ownersGroup: 'Owners',
+    agentsGroup: 'Agents',
+
     // Details modal
     modalTitle: (name: string) => `Inquiry — ${name}`,
     save: 'Save',
     close: 'Close',
     messageLabel: 'Message',
-    sourceLabel: (source: string) => `Source: ${source}`,
     assignedAgent: 'Assigned Agent',
     assignAgentPlaceholder: 'Assign agent',
     internalNotes: 'Internal Notes',

@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function SellingAloneContent() {
@@ -74,6 +77,8 @@ export default function SellingAloneContent() {
                 אנחנו במשרד חיים את השטח בחולון, בת ים וראשל&quot;צ כבר 24 שנים. אנחנו יודעים בדיוק למה הדירה שלכם עדיין לא נמכרה, והחדשות הטובות? בהרבה מהמקרים, שינוי אסטרטגיה קטן יכול להביא את הקונה הנכון במחיר המקסימלי.
               </p>
             </section>
+
+            <ArticleToc />
 
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה הדירה &quot;נשרפת&quot; בשוק?</h2>
@@ -155,8 +160,9 @@ export default function SellingAloneContent() {
             </section>
 
             {/* Conversion CTA — funnels the DIY-intent reader to a free valuation
-                rather than enabling a self-sale. */}
-            <section className="article-section">
+                rather than enabling a self-sale. Excluded from the TOC (not a
+                content section). */}
+            <section className="article-section" data-toc-exclude>
               <div dir="rtl" className="my-6 rounded-2xl bg-[#051150] p-8 text-center">
                 <h2 className="text-3xl font-bold mb-3 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                   רוצים לדעת כמה הדירה שלכם באמת שווה?
@@ -176,6 +182,10 @@ export default function SellingAloneContent() {
             </section>
 
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="selling-alone" />
+            <RelatedArticles currentId="selling-alone" />
           </div>
         </article>
       </div>

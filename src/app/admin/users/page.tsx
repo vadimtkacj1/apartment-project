@@ -185,13 +185,17 @@ export default function UsersPage() {
     }
   };
 
-  const dash = <span className="text-slate-300">—</span>;
+  const dash = <span className="text-muted-foreground">—</span>;
 
   return (
     <div>
       <AdminPageHeader
         title={t.title}
-        extra={<Button onClick={openCreate}><Plus className="size-4" />{t.addUser}</Button>}
+        extra={
+          <Button size="lg" className="w-full sm:w-auto" onClick={openCreate}>
+            <Plus className="size-4" />{t.addUser}
+          </Button>
+        }
       />
 
       {/* desktop — table */}
@@ -217,7 +221,7 @@ export default function UsersPage() {
                 {users.map((u) => (
                   <TableRow key={u.id}>
                     <TableCell>
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-[#141414]">
+                      <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
                         <UserIcon className="size-4 text-muted-foreground" /> {u.username}
                       </span>
                     </TableCell>
@@ -232,7 +236,7 @@ export default function UsersPage() {
                         </Button>
                         <Button
                           variant="ghost" size="icon"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                           onClick={() => setDeleteTarget(u)} aria-label={t.deleteAction}
                         >
                           <Trash2 className="size-4" />
@@ -258,7 +262,7 @@ export default function UsersPage() {
             {users.map((u) => (
               <div key={u.id} className="admin-card">
                 <div className="admin-card__head">
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div className="min-w-0 flex-1">
                     <div className="admin-card__title">
                       <UserIcon className="inline size-4" /> {u.username}
                     </div>
@@ -266,8 +270,8 @@ export default function UsersPage() {
                   <span className={ROLE_META[u.role].pill}>{ROLE_META[u.role].label}</span>
                 </div>
                 <div className="admin-card__fields">
-                  <span><b>{t.name}</b> {u.name || '—'}</span>
-                  <span><b>{t.email}</b> {u.email ? <bdi>{u.email}</bdi> : '—'}</span>
+                  <span><b>{t.name}</b> {u.name || dash}</span>
+                  <span><b>{t.email}</b> {u.email ? <bdi>{u.email}</bdi> : dash}</span>
                 </div>
                 <div className="admin-card__actions">
                   <Switch checked={u.isActive} onCheckedChange={(v) => toggleActive(u, v)} />
@@ -380,14 +384,16 @@ export default function UsersPage() {
                           className="pe-9"
                           {...field}
                         />
-                        <button
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="icon"
                           onClick={() => setShowPassword((s) => !s)}
-                          className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-                          aria-label={showPassword ? 'Hide' : 'Show'}
+                          className="absolute end-1 top-1/2 size-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label={showPassword ? t.hidePassword : t.showPassword}
                         >
                           {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                        </button>
+                        </Button>
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -408,7 +414,9 @@ export default function UsersPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t.deleteConfirm}</AlertDialogTitle>
-            <AlertDialogDescription>{deleteTarget?.username}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {deleteTarget ? t.deleteConfirmBody(deleteTarget.username) : null}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t.cancel}</AlertDialogCancel>

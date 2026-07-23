@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save, Info } from 'lucide-react';
+import { Save, Info, Loader2 } from 'lucide-react';
 import LocationPicker from '@/components/admin/LocationPicker';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
 import { toast } from '@/components/shadcn/sonner';
@@ -72,6 +72,59 @@ const INITIAL_FORM: Omit<ContactInfoForm, 'weekdayHours' | 'fridayHours'> = {
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Module scope so the components keep a stable identity across renders
+// (defining them inside the page remounts every field on each keystroke).
+const FieldLabel = ({
+  htmlFor,
+  tooltip,
+  tooltipAriaLabel,
+  required,
+  children,
+}: {
+  htmlFor?: string;
+  tooltip?: string;
+  tooltipAriaLabel?: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) => (
+  <Label htmlFor={htmlFor} className="flex items-center gap-1.5">
+    <span>
+      {children}
+      {required && <span className="ms-0.5 text-destructive">*</span>}
+    </span>
+    {tooltip && (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label={tooltipAriaLabel}
+            className="inline-flex text-muted-foreground hover:text-foreground"
+          >
+            <Info className="size-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    )}
+  </Label>
+);
+
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <Card className="mb-4 p-5">
+    <div className="mb-4 border-b border-border pb-3">
+      <CardTitle className="text-base font-semibold">{title}</CardTitle>
+    </div>
+    <div className="space-y-4">{children}</div>
+  </Card>
+);
 
 export default function ContactInfoPage() {
   const t = useAdminMessages(contactMessages);
@@ -195,40 +248,6 @@ export default function ContactInfoPage() {
     }
   };
 
-  const FieldLabel = ({
-    htmlFor,
-    tooltip,
-    required,
-    children,
-  }: {
-    htmlFor?: string;
-    tooltip?: string;
-    required?: boolean;
-    children: React.ReactNode;
-  }) => (
-    <Label htmlFor={htmlFor} className="flex items-center gap-1.5">
-      <span>
-        {children}
-        {required && <span className="ms-0.5 text-destructive">*</span>}
-      </span>
-      {tooltip && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              tabIndex={-1}
-              aria-label="info"
-              className="inline-flex text-muted-foreground hover:text-foreground"
-            >
-              <Info className="size-3.5" />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{tooltip}</TooltipContent>
-        </Tooltip>
-      )}
-    </Label>
-  );
-
   const renderText = (
     name: keyof ContactInfoForm,
     label: React.ReactNode,
@@ -241,7 +260,12 @@ export default function ContactInfoPage() {
     } = {},
   ) => (
     <div className={cn('space-y-2', opts.className)}>
-      <FieldLabel htmlFor={name} tooltip={opts.tooltip} required={opts.required}>
+      <FieldLabel
+        htmlFor={name}
+        tooltip={opts.tooltip}
+        tooltipAriaLabel={t.infoTooltipAria}
+        required={opts.required}
+      >
         {label}
       </FieldLabel>
       <Input
@@ -255,21 +279,6 @@ export default function ContactInfoPage() {
         <p className="text-sm font-medium text-destructive">{errors[name]}</p>
       )}
     </div>
-  );
-
-  const SectionCard = ({
-    title,
-    children,
-  }: {
-    title: React.ReactNode;
-    children: React.ReactNode;
-  }) => (
-    <Card className="mb-4 p-5">
-      <div className="mb-4 border-b border-border pb-3">
-        <CardTitle className="text-base font-semibold">{title}</CardTitle>
-      </div>
-      <div className="space-y-4">{children}</div>
-    </Card>
   );
 
   return (
@@ -287,7 +296,8 @@ export default function ContactInfoPage() {
                 tooltip: t.phoneName1Tooltip,
               })}
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
               {renderText('email', t.email1Label, {
                 placeholder: 'info@example.com',
                 type: 'email',
@@ -315,7 +325,8 @@ export default function ContactInfoPage() {
                 tooltip: t.phoneName2Tooltip,
               })}
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
               {renderText('email2', t.email2Label, {
                 placeholder: 'info2@example.com',
                 type: 'email',
@@ -425,26 +436,27 @@ export default function ContactInfoPage() {
 
           {/* Social Media */}
           <SectionCard title={t.socialCard1}>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {renderText('facebook', 'Facebook 1 URL', { placeholder: 'https://facebook.com/...' })}
               {renderText('facebookName', t.facebookName1Label, { placeholder: t.personPlaceholder1 })}
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {renderText('instagram', 'Instagram 1 URL', { placeholder: 'https://instagram.com/...' })}
               {renderText('instagramName', t.instagramName1Label, { placeholder: t.personPlaceholder1 })}
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
               {renderText('linkedin', 'LinkedIn', { placeholder: 'https://linkedin.com/...' })}
             </div>
           </SectionCard>
 
           {/* Second Social Media */}
           <SectionCard title={t.socialCard2}>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {renderText('facebook2', 'Facebook 2 URL', { placeholder: 'https://facebook.com/...' })}
               {renderText('facebookName2', t.facebookName2Label, { placeholder: t.personPlaceholder2 })}
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {renderText('instagram2', 'Instagram 2 URL', { placeholder: 'https://instagram.com/...' })}
               {renderText('instagramName2', t.instagramName2Label, { placeholder: t.personPlaceholder2 })}
             </div>
@@ -453,8 +465,12 @@ export default function ContactInfoPage() {
           {/* Submit */}
           <div className="flex justify-end gap-2 pt-2">
             <Button type="submit" size="lg" disabled={saving}>
-              <Save className="size-4" />
-              {saving ? '…' : t.saveButton}
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {t.saveButton}
             </Button>
           </div>
         </fieldset>

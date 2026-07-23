@@ -2,9 +2,9 @@ import { defineMessages } from '@/lib/adminI18n';
 
 /**
  * Property create/edit form (admin/properties/[id]) — page shell, save/load
- * feedback, every option label used by the form sections, and the per-section
- * strings (nested groups: `agent`, `basicInfo`, `location`, `details`,
- * `features`, `map`, `images`, `seo`). Option labels are consumed through the
+ * feedback, every option label used by the form sections, the anchor-nav
+ * strings (`nav`), and the per-section strings (nested groups: `agent`,
+ * `basicInfo`, `location`, `details`, `features`, `map`, `images`, `seo`). Option labels are consumed through the
  * build*Options(t) helpers in src/app/admin/properties/[id]/constants.ts.
  */
 export const propertyFormMessages = defineMessages({
@@ -20,6 +20,9 @@ export const propertyFormMessages = defineMessages({
       loadError: 'שגיאה בטעינת הנכס',
       saveSuccess: 'הנכס נשמר בהצלחה',
       saveError: 'שגיאה בשמירת הנכס',
+    },
+    nav: {
+      ariaLabel: 'ניווט בטופס',
     },
     options: {
       dealType: {
@@ -213,6 +216,9 @@ export const propertyFormMessages = defineMessages({
       loadError: 'Failed to load the property',
       saveSuccess: 'Property saved successfully',
       saveError: 'Failed to save the property',
+    },
+    nav: {
+      ariaLabel: 'Form navigation',
     },
     options: {
       dealType: {

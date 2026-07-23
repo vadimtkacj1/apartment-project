@@ -47,25 +47,69 @@ const Hero: React.FC = () => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0.85rem 2.4rem;
+          gap: 0.5rem;
+          padding: 0.85rem 2.2rem;
           border-radius: 12px;
-          background: #ffffff;
-          color: #051150;
           font-weight: 700;
           font-size: 1.05rem;
           text-decoration: none;
-          transition: background-color 0.2s ease, transform 0.2s ease;
-        }
-        .hero-cta:hover {
-          background: rgba(255,255,255,0.88);
-          transform: translateY(-1px);
+          transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
         .hero-cta:active { transform: none; }
         .hero-cta:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+        /* Primary: solid white on the dark video, with a soft navy lift-shadow. */
+        .hero-cta--primary {
+          background: #ffffff;
+          color: #051150;
+          box-shadow: 0 6px 20px rgba(5,17,80,0.28);
+        }
+        .hero-cta--primary:hover {
+          background: rgba(255,255,255,0.92);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(5,17,80,0.34);
+        }
+        /* Secondary: glass ghost — a restrained second path (contact). */
+        .hero-cta--ghost {
+          background: rgba(255,255,255,0.06);
+          color: #ffffff;
+          border: 1px solid rgba(255,255,255,0.55);
+          backdrop-filter: blur(2px);
+        }
+        .hero-cta--ghost:hover {
+          background: rgba(255,255,255,0.16);
+          border-color: #ffffff;
+          transform: translateY(-2px);
+        }
+
+        /* Scroll affordance for the full-height hero. */
+        .hero-scroll {
+          position: absolute;
+          bottom: 1.6rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 20;
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+          color: rgba(255,255,255,0.82);
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-decoration: none;
+        }
+        .hero-scroll:hover { color: #ffffff; }
+        .hero-scroll:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; border-radius: 6px; }
+        .hero-scroll svg { animation: heroBob 1.8s ease-in-out infinite; }
+        @keyframes heroBob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(6px); }
+        }
 
         @media (prefers-reduced-motion: reduce) {
           .hero-fade { animation: none; }
           .hero-cta { transition: none; }
+          .hero-scroll svg { animation: none; }
         }
       `}</style>
 
@@ -109,16 +153,27 @@ const Hero: React.FC = () => {
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </p>
 
-          <a
-            href="/apartments"
-            className="hero-cta hero-fade mt-2"
+          <div
+            className="hero-fade mt-2 flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
             style={{ animationDelay: '0.34s' }}
           >
-            לצפייה בנכסים
-          </a>
+            <a href="/apartments" className="hero-cta hero-cta--primary">
+              לצפייה בנכסים
+            </a>
+            <a href="#contact" className="hero-cta hero-cta--ghost">
+              דברו איתנו
+            </a>
+          </div>
 
         </div>
       </div>
+
+      {/* Scroll affordance → first content section below the hero */}
+      <a href="#hero-next" className="hero-scroll hero-fade" style={{ animationDelay: '0.5s' }} aria-label="גלול למטה">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </a>
     </section>
   );
 };

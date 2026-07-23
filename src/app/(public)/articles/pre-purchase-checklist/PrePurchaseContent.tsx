@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function PrePurchaseContent() {
@@ -60,6 +63,8 @@ export default function PrePurchaseContent() {
                 החדשות הטובות: כמעט כל הבעיות ניתנות לגילוי מראש, אם יודעים מה לבדוק. ריכזנו את הצ׳קליסט המלא שאנחנו עוברים עם הקונים שלנו — <strong>ארבע קבוצות בדיקה, לפי הסדר הנכון.</strong>
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -122,6 +127,10 @@ export default function PrePurchaseContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="pre-purchase-checklist" />
+            <RelatedArticles currentId="pre-purchase-checklist" />
           </div>
         </article>
       </div>

@@ -6,30 +6,17 @@
 
 /* ---- Visible keyboard focus (WCAG 2.4.7) ----
  * :focus-visible highlights keyboard / assistive-tech users only — mouse
- * clicks stay clean. Brand-navy ring with offset so it reads on white cards
- * and the cream layout background. antd ships subtle focus styles; this makes
- * them unmistakable for keyboard navigation. */
+ * clicks stay clean. Single admin focus spec: 2px solid indigo #354ac4,
+ * 2px offset (mirrored by --focus-ring in admin-design.css) so it reads on
+ * white cards and the blue-grey canvas alike. */
 .layout-dashboard a:focus-visible,
 .layout-dashboard button:focus-visible,
 .layout-dashboard [role="button"]:focus-visible,
 .layout-dashboard [tabindex]:focus-visible,
-.layout-dashboard .ant-btn:focus-visible,
-.layout-dashboard .ant-input:focus-visible,
-.layout-dashboard .ant-input-affix-wrapper:focus-within,
-.layout-dashboard .ant-input-number:focus-within,
-.layout-dashboard .ant-select-focused .ant-select-selector,
-.layout-dashboard .ant-picker-focused,
-.layout-dashboard .ant-switch:focus-visible,
-.layout-dashboard .ant-checkbox-wrapper:focus-within,
-.layout-dashboard .ant-radio-wrapper:focus-within,
-.layout-dashboard .ant-pagination-item:focus-visible,
 .layout-dashboard .estate-nav-item:focus-visible,
 .layout-dashboard .estate-brand-link:focus-visible,
 .layout-signin a:focus-visible,
-.layout-signin button:focus-visible,
-.layout-signin .ant-btn:focus-visible,
-.layout-signin .ant-input:focus-visible,
-.layout-signin .ant-input-affix-wrapper:focus-within {
+.layout-signin button:focus-visible {
   outline: 2px solid #354ac4 !important;
   outline-offset: 2px !important;
 }
@@ -41,7 +28,7 @@
   outline: none !important;
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px #354AC4;
 }
-.estate-console .ec-mast-cta:focus-visible {
+.estate-console .ec-focal-cta:focus-visible {
   outline-color: #fff !important;
 }
 

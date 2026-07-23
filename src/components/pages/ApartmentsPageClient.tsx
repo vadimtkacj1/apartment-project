@@ -384,7 +384,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
               <button
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.value)}
-                className={`px-8 py-3 rounded-2xl font-bold transition-all ${selectedCategory === cat.value ? 'bg-[#354AC4] text-white shadow-lg scale-105' : 'bg-white text-gray-600 border border-gray-200'}`}
+                className={`px-8 py-3 rounded-xl font-bold transition-all duration-200 ${selectedCategory === cat.value ? 'bg-[#354AC4] text-white shadow-elev-1' : 'bg-white text-[#475569] border border-[#E4E8F2] hover:border-[#354AC4]/40 hover:text-[#354AC4]'}`}
               >
                 {cat.label}
               </button>
@@ -394,19 +394,19 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-200 rounded-2xl font-bold shadow-sm"
+              className="flex items-center gap-2 px-6 py-3 bg-white border border-[#E4E8F2] rounded-xl font-bold text-[#475569] hover:border-[#354AC4]/40 hover:text-[#354AC4] transition-colors duration-200"
             >
               <SlidersHorizontal size={18} />
               <span>{showFilters ? 'הסתר פילטרים' : 'הצג פילטרים'}</span>
             </button>
 
             <div className="flex items-center gap-3">
-              <span className="text-gray-600 font-bold">מיון לפי:</span>
+              <span className="text-[#475569] font-bold">מיון לפי:</span>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
                 aria-label="מיון נכסים"
-                className="pr-4 pl-10 py-3 bg-white border border-gray-200 rounded-2xl font-bold outline-none shadow-sm appearance-none cursor-pointer"
+                className="pr-4 pl-10 py-3 bg-white border border-[#E4E8F2] rounded-xl font-bold text-[#475569] outline-none appearance-none cursor-pointer hover:border-[#354AC4]/40 transition-colors duration-200"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23354AC4' stroke-width='3'%3E%3Cpath d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                   backgroundRepeat: 'no-repeat',
@@ -466,7 +466,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                 </button>
                 <button
                   onClick={() => setIsContactPopupOpen(true)}
-                  className="px-6 py-3 rounded-2xl font-bold text-[#354AC4] bg-white border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
+                  className="px-6 py-3 rounded-xl font-bold text-[#354AC4] bg-white border border-[#E4E8F2] hover:bg-[#f5f7fb] transition-all duration-300"
                 >
                   דברו איתנו
                 </button>

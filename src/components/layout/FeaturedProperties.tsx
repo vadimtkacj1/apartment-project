@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { m } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { DealType, PropertyType } from '@/types/property.types';
@@ -152,12 +153,6 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
   dir="rtl"
   className="relative w-full py-16 md:py-20 bg-warm overflow-hidden"
 >
-      {/* Decorative background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-[#051150] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#051150] rounded-full blur-3xl"></div>
-      </div>
-
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
         <m.div
@@ -174,12 +169,10 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="block text-[13px] md:text-sm font-semibold text-[#354AC4]">
-              נכסים נבחרים
-            </span>
+            <SectionEyebrow>נכסים נבחרים</SectionEyebrow>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {titles.featuredPropertiesTitle}
           </h2>
 

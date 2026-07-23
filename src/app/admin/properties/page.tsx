@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Plus,
   Pencil,
@@ -14,12 +15,16 @@ import {
   Ban,
   ChevronLeft,
   ChevronRight,
+  Copy,
+  ExternalLink,
+  X,
 } from 'lucide-react';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
 import { Input } from '@/components/shadcn/input';
 import { Switch } from '@/components/shadcn/switch';
+import { Checkbox } from '@/components/shadcn/checkbox';
 import { Skeleton } from '@/components/shadcn/skeleton';
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
@@ -98,9 +103,29 @@ function formatPropertyPrice(price: string): string {
   return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
 }
 
+// Numeric price for comparisons (mirrors the dashboard's parseMoney)
+const parseMoney = (s: string | null | undefined): number =>
+  parseInt(String(s ?? '0').replace(/[^0-9]/g, ''), 10) || 0;
+
+// Deep-link "attention" filters — definitions mirror the dashboard's attention queue:
+// price-drop = originalPrice > price, no-photos = no images, hidden = !isActive, sold = isSold
+const ATTENTION_FILTERS = ['no-photos', 'price-drop', 'hidden', 'sold'] as const;
+type AttentionFilter = (typeof ATTENTION_FILTERS)[number];
+
+// useSearchParams requires a Suspense boundary at the page level
 export default function PropertiesPage() {
+  return (
+    <Suspense fallback={null}>
+      <PropertiesPageInner />
+    </Suspense>
+  );
+}
+
+function PropertiesPageInner() {
   const t = useAdminMessages(propertiesMessages);
   const { dir } = useAdminI18n();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -110,6 +135,10 @@ export default function PropertiesPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [attentionFilter, setAttentionFilter] = useState<AttentionFilter | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkDeleteModal, setBulkDeleteModal] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   // Skip persisting on the very first render (before saved state is restored)
   const skipFirstPersist = useRef(true);
@@ -129,8 +158,23 @@ export default function PropertiesPage() {
     } catch {
       // ignore malformed/blocked storage
     }
+    // Deep-link from the dashboard attention queue — the URL param wins on first
+    // load and applies its client-side filter on top of the restored view.
+    const att = searchParams.get('attention');
+    if (att && (ATTENTION_FILTERS as readonly string[]).includes(att)) {
+      setAttentionFilter(att as AttentionFilter);
+      setCurrentPage(1);
+    }
     fetchProperties();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const clearAttentionFilter = () => {
+    setAttentionFilter(null);
+    setCurrentPage(1);
+    // Drop the ?attention= param without a navigation so the rest of the view state stays put
+    window.history.replaceState(null, '', window.location.pathname);
+  };
 
   // Persist the table view whenever it changes
   useEffect(() => {
@@ -185,19 +229,35 @@ export default function PropertiesPage() {
         (filterStatus === 'inactive' && !property.isActive) ||
         (filterStatus === 'sold' && property.isSold) ||
         (filterStatus === 'available' && !property.isSold);
-      return matchesSearch && matchesDealType && matchesStatus;
+      const matchesAttention =
+        !attentionFilter ||
+        (attentionFilter === 'no-photos' && (!property.images || property.images.length === 0)) ||
+        (attentionFilter === 'price-drop' &&
+          !!property.originalPrice &&
+          parseMoney(property.originalPrice) > parseMoney(property.price)) ||
+        (attentionFilter === 'hidden' && !property.isActive) ||
+        (attentionFilter === 'sold' && property.isSold);
+      return matchesSearch && matchesDealType && matchesStatus && matchesAttention;
     });
 
     // Push sold / rented-out properties (isSold) to the bottom of the list.
     // Array.sort is stable, so within each group the createdAt-desc order is kept.
     return filtered.sort((a, b) => Number(a.isSold) - Number(b.isSold));
-  }, [properties, searchTerm, filterDealType, filterStatus]);
+  }, [properties, searchTerm, filterDealType, filterStatus, attentionFilter]);
 
   // Keep the current page within range when filtering shrinks the result set
   useEffect(() => {
     const maxPage = Math.max(1, Math.ceil(filteredProperties.length / pageSize));
     if (currentPage > maxPage) setCurrentPage(maxPage);
   }, [filteredProperties.length, pageSize, currentPage]);
+
+  // Drop selections that no longer exist (e.g. after a delete + refetch)
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const next = prev.filter((id) => properties.some((p) => p.id === id));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [properties]);
 
   // Client-side pagination (replaces antd Table's built-in pager)
   const totalItems = filteredProperties.length;
@@ -302,6 +362,124 @@ export default function PropertiesPage() {
     setDeleteModal(true);
   };
 
+  // ── Bulk selection (desktop table only) ──
+  const pageIds = pageItems.map((p) => p.id);
+  const selectedOnPage = pageIds.filter((id) => selectedIds.includes(id));
+  const allPageSelected = pageIds.length > 0 && selectedOnPage.length === pageIds.length;
+  const somePageSelected = selectedOnPage.length > 0 && !allPageSelected;
+
+  const toggleSelectAll = (checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked ? Array.from(new Set([...prev, ...pageIds])) : prev.filter((id) => !pageIds.includes(id))
+    );
+  };
+
+  const toggleSelectRow = (id: number, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((x) => x !== id)));
+  };
+
+  // Bulk activate/deactivate via the existing per-item PATCH endpoint — optimistic,
+  // one summary toast (partial failures re-sync from the server).
+  const handleBulkStatus = async (value: boolean) => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const prev = properties;
+    setProperties((ps) => ps.map((p) => (ids.includes(p.id) ? { ...p, isActive: value } : p)));
+    try {
+      const results = await Promise.all(
+        ids.map(async (id) => {
+          const r = await fetch(`/api/admin/properties/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isActive: value }),
+          });
+          return r.ok;
+        })
+      );
+      const failed = results.filter((ok) => !ok).length;
+      if (failed > 0) {
+        toast.error(t.bulkPartialError(failed));
+        fetchProperties();
+      } else {
+        toast.success(t.bulkUpdateSuccess(ids.length));
+      }
+      setSelectedIds([]);
+    } catch (error) {
+      console.error('Error bulk-updating properties:', error);
+      setProperties(prev);
+      toast.error(t.statusUpdateError);
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  // Bulk delete via the existing per-item DELETE endpoint — one summary toast.
+  const handleBulkDelete = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    try {
+      const results = await Promise.all(
+        ids.map(async (id) => {
+          const r = await fetch(`/api/admin/properties/${id}`, { method: 'DELETE' });
+          return r.ok;
+        })
+      );
+      const failed = results.filter((ok) => !ok).length;
+      setBulkDeleteModal(false);
+      setSelectedIds([]);
+      fetchProperties();
+      if (failed > 0) toast.error(t.bulkPartialError(failed));
+      else toast.success(t.bulkDeleteSuccess(ids.length));
+    } catch (error) {
+      console.error('Error bulk-deleting properties:', error);
+      toast.error(t.deleteError);
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  // Duplicate: fetch the full record (the list payload is a subset), strip identity
+  // fields, save as an inactive/unflagged copy via the existing create endpoint.
+  const handleDuplicate = async (id: number) => {
+    try {
+      const res = await fetch(`/api/admin/properties/${id}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const full = await res.json();
+      const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } = full;
+      const response = await fetch('/api/admin/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...rest,
+          title: `${full.title}${t.copySuffix}`,
+          isActive: false,
+          isPinned: false,
+          isHotProposition: false,
+          isNoCommission: false,
+          isSold: false,
+        }),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const created = await response.json();
+      fetchProperties();
+      toast.success(t.duplicateSuccess, {
+        action: { label: t.edit, onClick: () => router.push(`/admin/properties/${created.id}`) },
+      });
+    } catch (error) {
+      console.error('Error duplicating property:', error);
+      toast.error(t.duplicateError);
+    }
+  };
+
+  const attentionChipLabels: Record<AttentionFilter, string> = {
+    'price-drop': t.attentionPriceDrop,
+    'no-photos': t.attentionNoPhotos,
+    hidden: t.attentionHidden,
+    sold: t.attentionSold,
+  };
+
   return (
     <div>
       {/* Header */}
@@ -378,8 +556,56 @@ export default function PropertiesPage() {
         </div>
       </Card>
 
+      {/* Active attention deep-link filter — chip with clear (×) */}
+      {attentionFilter && (
+        <div className="mb-4 flex items-center gap-2">
+          <span
+            className="admin-pill inline-flex items-center gap-1.5"
+            style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}
+          >
+            {attentionChipLabels[attentionFilter]}
+            <button
+              type="button"
+              onClick={clearAttentionFilter}
+              aria-label={t.filterChipClear}
+              className="inline-flex items-center justify-center rounded-full hover:bg-[#354AC4]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="size-3.5" />
+            </button>
+          </span>
+        </div>
+      )}
+
       {/* Property Table — desktop (≥768px) */}
       <div className="admin-only-desktop">
+        {/* Bulk action bar — appears when rows are selected */}
+        {selectedIds.length > 0 && (
+          <div className="mb-3 flex flex-wrap items-center gap-2 rounded-[10px] border border-border bg-[var(--surface)] px-4 py-2 shadow-sm">
+            <span className="text-sm font-medium text-muted-foreground">
+              {t.selectedCount(selectedIds.length)}
+            </span>
+            <span className="ms-auto flex items-center gap-2">
+              <Button variant="outline" size="sm" disabled={bulkBusy} onClick={() => handleBulkStatus(true)}>
+                <CheckCircle2 className="size-4" />
+                {t.bulkActivate}
+              </Button>
+              <Button variant="outline" size="sm" disabled={bulkBusy} onClick={() => handleBulkStatus(false)}>
+                <Ban className="size-4" />
+                {t.bulkDeactivate}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                disabled={bulkBusy}
+                onClick={() => setBulkDeleteModal(true)}
+              >
+                <Trash2 className="size-4" />
+                {t.delete}
+              </Button>
+            </span>
+          </div>
+        )}
         <Card className="overflow-hidden p-0">
           {loading ? (
             <div className="p-4"><Skeleton className="h-64 w-full" /></div>
@@ -390,12 +616,19 @@ export default function PropertiesPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="h-11 bg-[var(--surface-sunken)] hover:bg-[var(--surface-sunken)]">
+                    <TableHead className="h-11 w-11 normal-case tracking-normal">
+                      <Checkbox
+                        checked={allPageSelected ? true : somePageSelected ? 'indeterminate' : false}
+                        onCheckedChange={(v) => toggleSelectAll(v === true)}
+                        aria-label={t.selectAllAria}
+                      />
+                    </TableHead>
                     <TableHead className="h-11 w-[320px] normal-case tracking-normal">{t.colTitle}</TableHead>
                     <TableHead className="h-11 w-[110px] normal-case tracking-normal">{t.colDealType}</TableHead>
                     <TableHead className="h-11 w-[130px] text-end normal-case tracking-normal">{t.colPrice}</TableHead>
                     <TableHead className="h-11 w-[90px] text-end normal-case tracking-normal">{t.colFloor}</TableHead>
                     <TableHead className="h-11 w-[160px] normal-case tracking-normal">{t.colStatus}</TableHead>
-                    <TableHead className="h-11 w-[110px] normal-case tracking-normal">{t.colActions}</TableHead>
+                    <TableHead className="h-11 w-[170px] normal-case tracking-normal">{t.colActions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -404,6 +637,13 @@ export default function PropertiesPage() {
                       key={record.id}
                       className={`group h-16 border-b border-[var(--divider)] hover:bg-[var(--surface-hover)]${record.isSold ? ' sold-property-row' : ''}`}
                     >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(record.id)}
+                          onCheckedChange={(v) => toggleSelectRow(record.id, v === true)}
+                          aria-label={t.selectRowAria(record.title)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -494,6 +734,25 @@ export default function PropertiesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="text-slate-500 hover:bg-[#354AC4]/10 hover:text-[#354AC4]"
+                            onClick={() => handleDuplicate(record.id)}
+                            aria-label={t.duplicate}
+                          >
+                            <Copy className="size-4" />
+                          </Button>
+                          {record.isActive && (
+                            <Button
+                              asChild variant="ghost" size="icon" aria-label={t.openOnSite}
+                              className="text-slate-500 hover:bg-[#354AC4]/10 hover:text-[#354AC4]"
+                            >
+                              <a href={`/apartments/${record.id}`} target="_blank" rel="noopener">
+                                <ExternalLink className="size-4" />
+                              </a>
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="text-slate-400 hover:bg-destructive/10 hover:text-destructive"
                             onClick={() => openDelete(record.id)}
                             aria-label={t.delete}
@@ -561,11 +820,12 @@ export default function PropertiesPage() {
       <div className="admin-only-mobile">
         {loading ? (
           <Skeleton className="h-64 w-full" />
-        ) : filteredProperties.length === 0 ? (
+        ) : totalItems === 0 ? (
           <AdminEmptyState message={t.emptyMessage} addHref="/admin/properties/new" addLabel={t.emptyAddLabel} />
         ) : (
+          <>
           <div className="admin-card-list">
-            {filteredProperties.map((property) => {
+            {pageItems.map((property) => {
               const cityLabel = getCityLabel(property.city) || property.city;
               const metaParts = [
                 cityLabel || property.location,
@@ -640,6 +900,36 @@ export default function PropertiesPage() {
               );
             })}
           </div>
+
+          {/* Mobile pagination — same slice as desktop, compact prev/next pager */}
+          {totalPages > 1 && (
+            <div className="mt-4 flex items-center justify-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-9"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                aria-label="Previous page"
+              >
+                {dir === 'rtl' ? <ChevronRight className="size-4" /> : <ChevronLeft className="size-4" />}
+              </Button>
+              <span dir="ltr" className="min-w-[64px] text-center text-sm tabular-nums text-muted-foreground">
+                {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-9"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                aria-label="Next page"
+              >
+                {dir === 'rtl' ? <ChevronLeft className="size-4" /> : <ChevronRight className="size-4" />}
+              </Button>
+            </div>
+          )}
+          </>
         )}
       </div>
 
@@ -661,6 +951,22 @@ export default function PropertiesPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete}>
+              {t.delete}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Bulk Delete Confirmation */}
+      <AlertDialog open={bulkDeleteModal} onOpenChange={(o) => !o && setBulkDeleteModal(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.bulkDeleteTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{t.bulkDeleteContent(selectedIds.length)}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={handleBulkDelete}>
               {t.delete}
             </AlertDialogAction>
           </AlertDialogFooter>

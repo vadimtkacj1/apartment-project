@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function UrbanRenewalContent() {
@@ -65,6 +68,8 @@ export default function UrbanRenewalContent() {
             <div className="definition-block">
               <p><span className="definition-term">פינוי-בינוי</span> הוא הליך שבו מפנים מתחם שלם של בניינים ישנים, הורסים אותו ובונים במקומו שכונה חדשה בצפיפות גבוהה יותר — פרויקט רחב היקף וארוך טווח. <span className="definition-term">תמ״א 38</span>, לעומת זאת, חלה על בניין בודד: חיזוקו ותוספת קומות, ממ״דים ומעלית (38/1), או הריסתו ובנייתו מחדש (38/2).</p>
             </div>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -177,6 +182,10 @@ export default function UrbanRenewalContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="urban-renewal-holon" />
+            <RelatedArticles currentId="urban-renewal-holon" />
           </div>
         </article>
       </div>

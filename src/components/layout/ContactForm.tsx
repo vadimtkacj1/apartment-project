@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { m, useInView } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 import dynamic from 'next/dynamic';
 
 const MapPlaceholder = () => (
@@ -111,6 +112,9 @@ const ContactForm: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
+          <div className="inline-block mb-4">
+            <SectionEyebrow>צרו קשר</SectionEyebrow>
+          </div>
           <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             בואו נדבר
           </h2>
@@ -127,7 +131,7 @@ const ContactForm: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-2xl p-6 md:p-8 lg:p-12 shadow-[0_4px_20px_rgba(5,17,80,0.12)] border border-slate-200 lg:order-2 lg:self-start"
+            className="bg-white rounded-2xl p-6 md:p-8 lg:p-12 shadow-elev-1 border border-slate-200 lg:order-2 lg:self-start"
           >
             <ContactFormFields idPrefix="contact-" />
           </m.div>
@@ -141,7 +145,7 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(5,17,80,0.12)] border border-slate-200 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
+              className="bg-white rounded-2xl overflow-hidden shadow-elev-1 border border-slate-200 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
               style={{ isolation: 'isolate' }}
             >
               {mapNearViewport ? (
@@ -162,7 +166,7 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_4px_20px_rgba(5,17,80,0.12)] border border-slate-200 space-y-6"
+              className="bg-white rounded-2xl p-6 md:p-8 shadow-elev-1 border border-slate-200 space-y-6"
             >
               <h3 className="text-2xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                 פרטי התקשרות
@@ -181,7 +185,7 @@ const ContactForm: React.FC = () => {
                     {/* Phone */}
                     {owner.phone && (
                       <div className="flex items-start gap-4 group">
-                        <div className="bg-[#354ac4]/10 p-4 rounded-2xl group-hover:bg-[#354ac4] transition-all duration-300">
+                        <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
                           <Phone size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
@@ -199,7 +203,7 @@ const ContactForm: React.FC = () => {
                     {/* Email */}
                     {owner.email && (
                       <div className="flex items-start gap-4 group">
-                        <div className="bg-[#354ac4]/10 p-4 rounded-2xl group-hover:bg-[#354ac4] transition-all duration-300">
+                        <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
                           <Mail size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
@@ -221,7 +225,7 @@ const ContactForm: React.FC = () => {
 
               {/* Address - Same for all */}
               <div className="flex items-start gap-4 group pt-6 border-t border-slate-200">
-                <div className="bg-[#354ac4]/10 p-4 rounded-2xl group-hover:bg-[#354ac4] transition-all duration-300">
+                <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
                   <MapPin size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                 </div>
                 <div className="flex-1">

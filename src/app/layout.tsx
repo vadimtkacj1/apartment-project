@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import React from "react";
 import localFont from "next/font/local";
+import { Noto_Sans_Hebrew } from "next/font/google";
 import StructuredData from "@/components/SEO/StructuredData";
 import GoogleAnalytics from "@/components/Analytics/GoogleAnalytics";
 import NavigationProgress from "@/components/NavigationProgress";
@@ -24,6 +25,21 @@ const caramel = localFont({
   // font, so headings never flash in an unrelated cursive glyph set.
   fallback: ['var(--font-assistant)', 'Arial', 'sans-serif'],
 });
+
+/* ===== HEADING-FONT EXPERIMENT (2026-07-23) =====
+   Trying Noto Sans Hebrew Light for display headings. It claims the SAME CSS
+   variable (--font-caramel) that every heading already references, so swapping
+   `notoHebrew.variable` ↔ `caramel.variable` on <html> below flips the whole
+   site's display face in one line. 300 = the light display cut (a globals.css
+   rule forces it on h1/h2/h3); 700 keeps wordmark/CTA labels a true bold. */
+const notoHebrew = Noto_Sans_Hebrew({
+  weight: ['300', '700'],
+  subsets: ['hebrew', 'latin'],
+  display: 'swap',
+  variable: '--font-caramel',
+  fallback: ['Arial', 'sans-serif'],
+});
+void caramel; // kept for the one-line revert
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
@@ -114,7 +130,7 @@ export default function RootLayout({
           body { color-scheme: only light !important; background: #f5f7fb !important; color: #171717 !important; }
         `}} />
       </head>
-      <body className={`${assistant.variable} ${caramel.variable} antialiased`}>
+      <body className={`${assistant.variable} ${notoHebrew.variable} antialiased`}>
         <GoogleAnalytics />
         <NavigationProgress />
         <StructuredData />

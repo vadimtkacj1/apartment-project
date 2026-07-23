@@ -3,11 +3,13 @@
 import React, { useMemo, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { User, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { Input } from '@/components/shadcn/input';
 import { Button } from '@/components/shadcn/button';
 import { Label } from '@/components/shadcn/label';
 import { Alert, AlertDescription } from '@/components/shadcn/alert';
+import { Card } from '@/components/shadcn/card';
+import { Skeleton } from '@/components/shadcn/skeleton';
 import { useAdminI18n, useAdminMessages, DEFAULT_ADMIN_LOCALE, dirOf } from '@/lib/adminI18n';
 import { loginMessages } from '@/lib/adminI18n/messages/login';
 import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
@@ -70,47 +72,18 @@ function LoginForm() {
   };
 
   return (
-    <div
-      dir={dir}
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#ffffff',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          background: '#fff',
-          padding: '40px',
-          borderRadius: '12px',
-          border: '1px solid #E4E8F2',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+    <div dir={dir} className="flex min-h-screen items-center justify-center bg-muted p-5">
+      <Card className="w-full max-w-100 p-10 shadow-[0_4px_16px_rgba(5,17,80,0.06)]">
+        <div className="mb-6 flex justify-center">
           <LanguageSwitcher compact />
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 76,
-                height: 76,
-              }}
-            >
-              <AiterraLogo size={48} />
-            </div>
+        <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <AiterraLogo size={48} />
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0, color: '#051150' }}>{t.title}</h1>
-          <p style={{ color: '#8c8c8c', marginTop: '8px' }}>{t.subtitle}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{t.title}</h1>
+          <p className="mt-2 text-muted-foreground">{t.subtitle}</p>
         </div>
 
         {error && (
@@ -120,7 +93,7 @@ function LoginForm() {
           </Alert>
         )}
 
-        <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+        <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate aria-busy={loading}>
           <div className="flex flex-col gap-2">
             <Label htmlFor="login-username">
               {t.username} <span className="text-destructive">*</span>
@@ -134,7 +107,7 @@ function LoginForm() {
                 placeholder={t.usernamePlaceholder}
                 disabled={loading}
                 autoComplete="username"
-                className="ps-9 text-left"
+                className="ps-9 pe-9 text-left"
               />
             </div>
             {touched && !username && (
@@ -156,13 +129,13 @@ function LoginForm() {
                 placeholder={t.passwordPlaceholder}
                 disabled={loading}
                 autoComplete="current-password"
-                className="px-9 text-left"
+                className="ps-9 pe-9 text-left"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                aria-label={showPassword ? t.hidePassword : t.showPassword}
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
@@ -173,10 +146,10 @@ function LoginForm() {
           </div>
 
           <Button type="submit" size="lg" disabled={loading} className="w-full">
-            {loading ? '…' : t.submit}
+            {loading ? <Loader2 className="animate-spin" aria-hidden="true" /> : t.submit}
           </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -186,17 +159,27 @@ export default function AdminLoginPage() {
     <Suspense fallback={
       <div
         dir={dirOf(DEFAULT_ADMIN_LOCALE)}
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-        }}
+        className="flex min-h-screen items-center justify-center bg-muted p-5"
+        aria-busy="true"
+        aria-label={loginMessages[DEFAULT_ADMIN_LOCALE].loading}
       >
-        <div style={{ fontSize: '18px' }}>
-          {loginMessages[DEFAULT_ADMIN_LOCALE].loading}
-        </div>
+        <Card className="w-full max-w-100 p-10 shadow-[0_4px_16px_rgba(5,17,80,0.06)]">
+          <Skeleton className="mx-auto mb-6 h-8 w-20" />
+          <Skeleton className="mx-auto mb-4 size-12 rounded-lg" />
+          <Skeleton className="mx-auto mb-2 h-7 w-32" />
+          <Skeleton className="mx-auto mb-8 h-4 w-40" />
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </Card>
       </div>
     }>
       <LoginForm />

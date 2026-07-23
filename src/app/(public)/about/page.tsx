@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
@@ -11,20 +10,8 @@ import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
 import AboutCTA from '@/components/about/AboutCTA';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
-
-export const metadata: Metadata = {
-  title: 'אודות | Aiterra - תיווך נדל״ן בחולון',
-  description: 'הכירו את צוות Aiterra — משרד תיווך נדל״ן מוביל בחולון. מומחיות מקומית, שיווק מתקדם, ליווי מלא בקנייה ומכירה של דירות בחולון, בת ים וראשון לציון.',
-  alternates: {
-    canonical: `${siteUrl}/about`,
-  },
-  openGraph: {
-    title: 'אודות | Aiterra - תיווך נדל״ן בחולון',
-    description: 'הכירו את צוות Aiterra — משרד תיווך נדל״ן מוביל בחולון עם מומחיות מקומית וניסיון מצטבר.',
-    url: `${siteUrl}/about`,
-  },
-};
+// Metadata lives in ./layout.tsx (richer: keywords, OG image, twitter card).
+// The weaker duplicate export that used to live here shadowed it — removed.
 
 export default function AboutPage() {
   return (
@@ -34,6 +21,8 @@ export default function AboutPage() {
       <SecondaryHero
         img="/images/hero/about-hero.jpg"
         title="אודות"
+        kicker="הכירו את Aiterra"
+        subtitle="משרד תיווך בחולון · 24 שנות ניסיון מצטבר · מכירה, השכרה וניהול נכסים"
         centered={true}
       />
       <Breadcrumbs />

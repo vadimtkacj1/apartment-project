@@ -6,6 +6,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import './styles.css';
 
 export default function ForeignInvestorsContent() {
@@ -64,6 +67,8 @@ export default function ForeignInvestorsContent() {
 
               <div className="definition-block"><p><span className="definition-term">ייפוי כוח נוטריוני</span> הוא מסמך משפטי המאומת על ידי נוטריון, המעניק לנציג מוסמך בישראל — לרוב עורך דין — סמכות לחתום על מסמכי הרכישה והרישום בשם הרוכש. הוא מאפשר לתושב חוץ להשלים עסקה מרחוק, בלי טיסה לארץ.</p></div>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1: Why Foreign Investors Fear */}
             <section className="article-section">
@@ -179,6 +184,10 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 5: FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="foreign-investors" />
+            <RelatedArticles currentId="foreign-investors" />
           </div>
         </article>
       </div>

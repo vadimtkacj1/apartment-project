@@ -4,6 +4,7 @@ import { m, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 const AboutSection: React.FC = memo(() => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -41,7 +42,7 @@ const AboutSection: React.FC = memo(() => {
     <section
       ref={sectionRef}
       dir="rtl"
-      className="relative w-full py-16 md:py-20 overflow-hidden"
+      className="relative w-full py-12 md:py-16 overflow-hidden"
       style={{ background: '#051150' }}
     >
       {/* Скрываем белый фон с паттерном на мобильных (hidden md:block) */}
@@ -87,7 +88,7 @@ const AboutSection: React.FC = memo(() => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
 
           <m.div
             initial={{ opacity: 0, x: 40 }}
@@ -97,21 +98,19 @@ const AboutSection: React.FC = memo(() => {
             className="order-2 lg:order-1 lg:col-span-3 text-white"
           >
             <div className="mb-4">
-              <span className="block text-[13px] md:text-sm font-semibold text-[#7FB4F5]">
-                קצת עלינו
-              </span>
+              <SectionEyebrow tone="dark" align="start">קצת עלינו</SectionEyebrow>
             </div>
-            <m.h2 className="text-5xl md:text-6xl font-black mb-6 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            <m.h2 className="text-4xl md:text-5xl font-black mb-5 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               {title}
             </m.h2>
 
-            <div className="space-y-6">
-              <p className="text-xl sm:text-3xl font-bold leading-tight text-[#5594f1]">
+            <div className="space-y-5">
+              <p className="text-lg sm:text-2xl font-bold leading-tight text-[#5594f1]">
                Aiterra הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ-24 שנה. המשרד מתמחה
 במכירה, השכרה וליווי עסקאות נדל״ן במקצועיות גבוהה, עם פעילות מרכזית בחולון, בת ים וכל אזור המרכז
  
               </p>
-              <p className="text-lg sm:text-xl text-gray-200 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-200 leading-relaxed">
                צוות המשרד כולל ארבעה סוכנים, ומציע גישה אישית ומקצועית לכל לקוח. אנו מלווים את בעלי הנכסים משלב
 האפיון, דרך תמחור נכון, צילום ושיווק ממוקד, ניהול משא ומתן ועד לסגירת העסקה בתנאים הטובים ביותר.
 המשרד מתמחה בהשכרת דירות, מכירת דירות, נכסים להשקעה ופתרונות נדל״ן בהתאמה אישית, תוך היכרות
@@ -119,10 +118,10 @@ const AboutSection: React.FC = memo(() => {
               </p>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-8">
               <Link
                 href="/about"
-                className="inline-flex items-center gap-3 px-10 py-4 bg-[#5594f1] text-[#051150] font-black text-xl rounded-2xl hover:bg-[#78a9f5] transition-all shadow-xl"
+                className="inline-flex items-center gap-3 px-8 py-3.5 bg-[#5594f1] text-[#051150] font-black text-lg rounded-xl hover:bg-[#78a9f5] transition-all shadow-xl"
               >
                 קראו עוד על המשרד
                 <ArrowLeft className="w-6 h-6" />
@@ -137,7 +136,7 @@ const AboutSection: React.FC = memo(() => {
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 lg:col-span-2 flex justify-center"
           >
-            <div className="relative w-full max-w-[420px] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+            <div className="relative w-full max-w-[340px] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
               <Image
                 src="/6.png"
                 alt="אודות המשרד"
@@ -147,7 +146,7 @@ const AboutSection: React.FC = memo(() => {
                 quality={85}
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#051150]/40 to-transparent pointer-events-none" />
             </div>
           </m.div>
 
