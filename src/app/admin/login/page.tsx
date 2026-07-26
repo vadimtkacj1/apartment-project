@@ -17,10 +17,10 @@ import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 function AiterraLogo({ size = 56 }: { size?: number }) {
   return (
     <img
-      src="/aiterra-logo.png"
+      src="/aiterra-dark-logo.png"
       alt="Aiterra"
       width={size}
-      height={Math.round(size * 0.72)}
+      height={Math.round(size * 0.35)}
       style={{ display: 'block' }}
     />
   );

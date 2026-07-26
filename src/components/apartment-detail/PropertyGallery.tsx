@@ -189,10 +189,10 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
           }}
         >
           <img
-            src="/aiterra-logo.png"
+            src="/aiterra-white-logo.png"
             alt="לוגו Aiterra"
-            width={112}
-            height={80}
+            width={160}
+            height={56}
             loading="lazy"
             className="w-full h-auto drop-shadow-2xl"
           />

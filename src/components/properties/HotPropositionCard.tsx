@@ -89,10 +89,10 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
           {/* Logo overlay - positioned left */}
           <div className="absolute top-4 left-4 z-30 pointer-events-none">
             <Image
-              src="/aiterra-logo.png"
+              src="/aiterra-white-logo.png"
               alt="לוגו Aiterra"
-              width={44}
-              height={32}
+              width={96}
+              height={34}
               className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
             />
           </div>

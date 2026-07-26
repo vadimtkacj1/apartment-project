@@ -55,10 +55,10 @@ export default function PageLoader() {
       {/* Logo / Title */}
       <div style={{ marginBottom: '32px', textAlign: 'center' }}>
         <img
-          src="/aiterra-logo.png"
+          src="/aiterra-dark-logo.png"
           alt=""
-          width={52}
-          height={37}
+          width={150}
+          height={53}
           aria-hidden="true"
           style={{ display: 'block', margin: '0 auto 12px' }}
         />

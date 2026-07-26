@@ -167,36 +167,24 @@ export default function Header({ initialPhone }: { initialPhone?: string | null 
             aria-label="Aiterra"
             style={{ display: "flex", alignItems: "center", gap: 10 }}
           >
+            {/* Full brand lockup (mark + wordmark baked in) — white cut over the
+                transparent hero, dark cut once the header goes solid. */}
             <img
-              src="/aiterra-logo.png"
+              src={shouldBeTransparent ? "/aiterra-white-logo.png" : "/aiterra-dark-logo.png"}
               alt=""
-              width={46}
-              height={33}
+              width={150}
+              height={53}
               aria-hidden="true"
               style={{
                 display: "block",
+                height: 40,
+                width: "auto",
                 transition: "filter 0.35s ease",
                 filter: shouldBeTransparent
                   ? "drop-shadow(0 1px 3px rgba(0,0,0,0.40))"
                   : "none",
               }}
             />
-            <span
-              style={{
-                fontFamily: "var(--font-caramel), cursive, sans-serif",
-                fontSize: "clamp(24px, 1.8vw, 30px)",
-                fontWeight: 700,
-                lineHeight: 1,
-                color: brandColor,
-                letterSpacing: "0.06em",
-                textShadow: shouldBeTransparent
-                  ? "0 1px 3px rgba(0,0,0,0.45)"
-                  : "none",
-                transition: "color 0.35s ease",
-              }}
-            >
-              Aiterra
-            </span>
           </Link>
         </div>
 

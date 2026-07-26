@@ -227,7 +227,7 @@ export default function ImageUploader({
                   }}
                 >
                   <img
-                    src="/aiterra-logo.png"
+                    src="/aiterra-white-logo.png"
                     alt="Aiterra logo"
                     style={{
                       maxWidth: '140px',
@@ -342,7 +342,7 @@ export default function ImageUploader({
               }}
             >
               <img
-                src="/aiterra-logo.png"
+                src="/aiterra-white-logo.png"
                 alt="Aiterra logo"
                 style={{
                   maxWidth: '200px',

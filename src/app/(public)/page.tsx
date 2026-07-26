@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { preload } from 'react-dom';
 import Hero from '@/components/layout/Hero';
+import NeighborhoodChips, { type HoodChip } from '@/components/layout/NeighborhoodChips';
+import SoldRecently, { type SoldItem } from '@/components/layout/SoldRecently';
 import GuidesSection from '@/components/layout/GuidesSection';
 import { prisma } from '@/lib/prisma';
 import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
@@ -61,7 +63,7 @@ export default async function Home() {
   // Fetch all homepage section data in parallel — eliminates client-side waterfall
   const HomepageSettings = (prisma as any).homepageSettings;
 
-  const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings] = await Promise.all([
+  const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings, hoodGroups, soldRaw] = await Promise.all([
     prisma.property.findMany({
       where: { isActive: true, isHotProposition: true, isSold: false },
       take: 12,
@@ -96,6 +98,17 @@ export default async function Home() {
       },
     }),
     HomepageSettings ? HomepageSettings.findFirst().catch(() => null) : Promise.resolve(null),
+    prisma.property.groupBy({
+      by: ['neighborhood', 'city'],
+      where: { isActive: true, isSold: false, neighborhood: { not: null } },
+      _count: true,
+    }).catch(() => []),
+    prisma.property.findMany({
+      where: { isSold: true },
+      orderBy: { updatedAt: 'desc' },
+      take: 3,
+      select: { id: true, title: true, location: true, neighborhood: true, price: true, images: true },
+    }).catch(() => []),
   ]);
 
   const hotProperties = hotPropsRaw.map((p: any) => {
@@ -159,6 +172,18 @@ export default async function Home() {
     };
   });
 
+
+  const hoods: HoodChip[] = (hoodGroups as Array<{ neighborhood: string | null; city: string; _count: number }>)
+    .filter((g) => g.neighborhood)
+    .sort((a, b) => b._count - a._count)
+    .slice(0, 6)
+    .map((g) => ({ name: g.neighborhood as string, city: g.city, count: g._count }));
+
+  const sold: SoldItem[] = (soldRaw as Array<{ id: number; title: string; location: string; neighborhood: string | null; price: string; images: string | null }>).map((s0) => ({
+    id: s0.id, title: s0.title, location: s0.location, neighborhood: s0.neighborhood,
+    price: s0.price, image: parseJson(s0.images)[0] || '/images/hero/sales.jpg',
+  }));
+
   const homepageTitles = {
     hotPropositionsTitle: settings?.hotPropositionsTitle || 'הצעות חמות',
     noCommissionTitle: settings?.noCommissionTitle || 'דירה ללא עמלת תיווך',
@@ -181,6 +206,7 @@ export default async function Home() {
             initialTitle={homepageTitles.hotPropositionsTitle}
           />
         </Suspense>
+        <NeighborhoodChips hoods={hoods} />
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
           <NoCommissionSection
             initialProperty={noCommProperty}
@@ -196,6 +222,7 @@ export default async function Home() {
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ValuesSection />
         </Suspense>
+        <SoldRecently items={sold} />
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <Testimonials />
         </Suspense>

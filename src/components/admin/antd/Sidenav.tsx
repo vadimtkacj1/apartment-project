@@ -78,11 +78,9 @@ export default function Sidenav({ onClose }: SidenavProps) {
       {/* Brand */}
       <div className="estate-brand">
         <Link href="/admin" className="estate-brand-link" onClick={onClose}>
-          <span className="estate-brand-logo" aria-hidden="true">
-            <img src="/aiterra-logo.png" alt="" />
-          </span>
           <span className="estate-brand-text">
-            <span className="estate-brand-title">Aiterra</span>
+            {/* full lockup — dark cut on the light rail */}
+            <img src="/aiterra-dark-logo.png" alt="Aiterra" style={{ display: 'block', height: 34, width: 'auto' }} />
             <span className="estate-brand-sub">{t.adminPanel}</span>
           </span>
         </Link>

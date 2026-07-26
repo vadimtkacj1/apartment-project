@@ -1,5 +1,7 @@
 import React from 'react';
+import { Search } from 'lucide-react';
 import HeroMedia from './HeroMedia';
+import { ISRAELI_CITIES } from '@/data/cities';
 
 /**
  * Server component: the headline/subtitle text ships in the initial HTML so LCP
@@ -81,6 +83,80 @@ const Hero: React.FC = () => {
           transform: translateY(-2px);
         }
 
+        /* Search pill — 1:1 the Refero reference spec (segmented white pill):
+           label 12px/600 over value 14px, 1px hairline dividers between
+           segments, circular brand trigger at the end, exact layered shadow
+           stack rgba(0,0,0,.02) ring + .04 mid + .10 drop. */
+        .hero-pill {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          max-width: 560px;
+          background: #ffffff;
+          border-radius: 9999px;
+          padding: 6px;
+          padding-inline-start: 0;
+          box-shadow: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px 0px, rgba(0,0,0,0.1) 0px 4px 8px 0px;
+        }
+        .hero-pill-seg {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1px;
+          min-width: 0;
+          padding-block: 8px;
+          padding-inline: 26px 16px;
+          text-align: start;
+          cursor: pointer;
+        }
+        .hero-pill-seg--grow { flex: 1; }
+        .hero-pill-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #051150;
+          line-height: 1.2;
+        }
+        .hero-pill-seg select {
+          appearance: none;
+          -webkit-appearance: none;
+          border: 0;
+          padding: 0;
+          background: transparent;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748B;
+          cursor: pointer;
+          max-width: 100%;
+        }
+        .hero-pill-seg select:focus-visible { outline: 2px solid #354AC4; outline-offset: 2px; border-radius: 4px; }
+        .hero-pill-div {
+          flex: none;
+          width: 1px;
+          height: 32px;
+          background: #E4E8F2;
+        }
+        .hero-pill-btn {
+          flex: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          border: 0;
+          border-radius: 50%;
+          background: #354AC4;
+          color: #ffffff;
+          cursor: pointer;
+          transition: background-color 0.15s ease;
+          margin-inline-start: 8px;
+        }
+        .hero-pill-btn:hover { background: #28389B; }
+        .hero-pill-btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+        @media (max-width: 420px) {
+          .hero-pill-seg { padding-inline: 18px 10px; }
+        }
+
         /* Scroll affordance for the full-height hero. */
         .hero-scroll {
           position: absolute;
@@ -153,17 +229,37 @@ const Hero: React.FC = () => {
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </p>
 
-          <div
-            className="hero-fade mt-2 flex flex-col sm:flex-row items-center gap-3 sm:gap-4"
-            style={{ animationDelay: '0.34s' }}
+          {/* search pill — 1:1 reference anatomy; server-rendered GET form */}
+          <form action="/apartments" method="GET" className="hero-pill hero-fade mt-3" style={{ animationDelay: '0.34s' }}>
+            <label className="hero-pill-seg">
+              <span className="hero-pill-label">סוג עסקה</span>
+              <select name="dealType" defaultValue="sale">
+                <option value="sale">לקנייה</option>
+                <option value="rent">להשכרה</option>
+              </select>
+            </label>
+            <span aria-hidden="true" className="hero-pill-div" />
+            <label className="hero-pill-seg hero-pill-seg--grow">
+              <span className="hero-pill-label">איפה</span>
+              <select name="city" defaultValue="holon">
+                <option value="">כל הערים</option>
+                {ISRAELI_CITIES.slice(0, 12).map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+            </label>
+            <button type="submit" className="hero-pill-btn" aria-label="חיפוש נכסים">
+              <Search size={19} aria-hidden="true" />
+            </button>
+          </form>
+
+          <a
+            href="#contact"
+            className="hero-fade mt-1 text-[14.5px] font-semibold text-white/85 underline-offset-4 hover:underline"
+            style={{ animationDelay: '0.44s' }}
           >
-            <a href="/apartments" className="hero-cta hero-cta--primary">
-              לצפייה בנכסים
-            </a>
-            <a href="#contact" className="hero-cta hero-cta--ghost">
-              דברו איתנו
-            </a>
-          </div>
+            או דברו איתנו ישירות
+          </a>
 
         </div>
       </div>
