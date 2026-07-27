@@ -60,6 +60,7 @@
     "antd-img-crop": "^4.30.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",

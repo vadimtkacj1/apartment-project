@@ -1,22 +1,21 @@
 import React from 'react';
-import Link from 'next/link';
 
 import { prisma } from '@/lib/prisma';
 import { firstImage, formatPrice } from './kit';
-import MoonlitPropertyForm from './MoonlitPropertyForm';
+import LeadFormBinder from './LeadFormBinder';
+import { extractBody, loadTemplatePage } from './template-html';
 
 /**
- * Property page in the moonlit theme — a port of the template's
- * `room-details-1.html`: page hero, then a two-column `sticky-wrap` with the
- * details on the left (price, title, meta, copy, image pair, amenities,
- * features) and the sticky enquiry form on the right.
+ * Property page — the template's `room-details-1.html` itself, with our data
+ * swapped in. Nothing is re-drawn by hand, so every wrapper, shape and class of
+ * the original page survives; only text, images and repeated items change.
  *
- * Hotel content is swapped for the listing's real data; the markup, classes and
- * icon set are the template's.
+ * The booking sidebar keeps the template's own markup; LeadFormBinder attaches
+ * the submit handler, so the DOM is never cut apart.
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface MoonlitPropertyProps {
-  /** The serialized PropertyData the classic page already loads. */
   property: Record<string, any>;
   title: string;
   description: string;
@@ -25,29 +24,15 @@ export interface MoonlitPropertyProps {
 const FALLBACK = '/images/hero/sales.jpg';
 
 const PARKING_LABELS: Record<string, string> = {
-  none: 'ללא חניה',
-  single: 'חניה אחת',
-  double: 'שתי חניות',
-  multiple: 'מספר חניות',
-  shared: 'חניה משותפת',
+  none: 'ללא חניה', single: 'חניה אחת', double: 'שתי חניות',
+  multiple: 'מספר חניות', shared: 'חניה משותפת',
 };
-
 const FURNITURE_LABELS: Record<string, string> = {
-  none: 'ללא ריהוט',
-  partial: 'ריהוט חלקי',
-  full: 'ריהוט מלא',
+  none: 'ללא ריהוט', partial: 'ריהוט חלקי', full: 'ריהוט מלא',
 };
-
 const PROPERTY_TYPE_LABELS: Record<string, string> = {
-  apartment: 'דירה',
-  penthouse: 'פנטהאוז',
-  garden: 'דירת גן',
-  duplex: 'דופלקס',
-  studio: 'סטודיו',
-  house: 'בית פרטי',
-  cottage: 'קוטג׳',
-  land: 'מגרש',
-  commercial: 'נכס מסחרי',
+  apartment: 'דירה', penthouse: 'פנטהאוז', garden: 'דירת גן', duplex: 'דופלקס',
+  studio: 'סטודיו', house: 'בית פרטי', cottage: 'קוטג׳', land: 'מגרש', commercial: 'נכס מסחרי',
 };
 
 /** Amenity → the closest icon shipped with the template. */
@@ -64,20 +49,17 @@ const AMENITIES: { key: string; label: string; icon: string }[] = [
   { key: 'solarHeater', label: 'דוד חשמלי', icon: 'hot-coffe.svg' },
 ];
 
-function chunk<T>(items: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
-  return out;
-}
-
 export default async function MoonlitProperty({ property, title, description }: MoonlitPropertyProps) {
-  // "Similar Rooms" in the template — the same city, minus this listing.
+  const images: string[] =
+    Array.isArray(property.images) && property.images.length > 0 ? property.images : [FALLBACK];
+
+  const isRent = property.dealType === 'rent' || property.category === 'rentals';
+  const priceLabel = `₪${formatPrice(String(property.price ?? ''))}${isRent ? ' / חודש' : ''}`;
+
   const similarRaw = await prisma.property
     .findMany({
       where: {
-        isActive: true,
-        isSold: false,
-        id: { not: property.id },
+        isActive: true, isSold: false, id: { not: property.id },
         ...(property.city ? { city: property.city } : {}),
       },
       orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
@@ -85,31 +67,68 @@ export default async function MoonlitProperty({ property, title, description }: 
       select: { id: true, title: true, price: true, rooms: true, area: true, images: true },
     })
     .catch(() => []);
-  const similar = similarRaw.map((p) => ({
-    id: p.id,
-    title: p.title,
-    price: p.price,
-    rooms: p.rooms,
-    area: p.area,
-    image: firstImage(p.images),
-  }));
 
-  const images: string[] = Array.isArray(property.images) && property.images.length > 0
-    ? property.images
-    : [FALLBACK];
+  const $ = await loadTemplatePage('room-details-1.html');
 
-  const isRent = property.dealType === 'rent' || property.category === 'rentals';
-  const priceLabel = `₪${formatPrice(String(property.price ?? ''))}${isRent ? ' / חודש' : ''}`;
+  /* ── page hero: the listing's own photo ───────────────────────────────── */
+  $('.page__hero__bg').attr('style', `background-image: url(${images[0]});`);
+  $('.page__hero__content h1').text(title);
+  $('.page__hero__content p').text(
+    [property.neighborhood, property.location].filter(Boolean).join(' · ')
+  );
 
+  /* ── headline block ───────────────────────────────────────────────────── */
+  $('.room__details .price').first().text(priceLabel).addClass('ltr');
+  $('.room__details .room__title').first().text(title);
+
+  const metaHtml = [
+    property.area ? `<span><i class="flaticon-construction"></i>${property.area} מ״ר</span>` : '',
+    property.bedrooms != null ? `<span><i class="flaticon-user"></i>${property.bedrooms} חדרים</span>` : '',
+    property.floor != null ? `<span><i class="flaticon-hotel-room"></i>קומה ${property.floor}</span>` : '',
+  ].join('');
+  $('.room__details .room__meta').first().html(metaHtml);
+
+  // The template's intro paragraph carries the listing description.
+  $('.room__details > p').first().html(
+    (description || '').replace(/\n{2,}/g, '<br><br>').replace(/\n/g, '<br>')
+  );
+
+  /* ── image pair ───────────────────────────────────────────────────────── */
+  const pair = images.slice(1, 3);
+  $('.room__image__group .room__image__item').each((i, el) => {
+    if (pair[i]) $(el).find('img').attr('src', pair[i]).attr('alt', title);
+    else $(el).remove();
+  });
+  if (pair.length === 0) $('.room__image__group').remove();
+
+  /* ── amenities: the template's 3-per-row grid ─────────────────────────── */
   const amenities = AMENITIES.filter((a) => property.amenities?.[a.key]);
+  const amenityBox = $('.room__amenity').first();
+  if (amenities.length === 0) {
+    amenityBox.prev('span.h4').remove();
+    amenityBox.remove();
+  } else {
+    const rows: string[] = [];
+    for (let i = 0; i < amenities.length; i += 3) {
+      const items = amenities
+        .slice(i, i + 3)
+        .map(
+          (a) =>
+            `<div class="single__item"><img src="/moonlit/images/icon/${a.icon}" height="30" width="36" alt=""><span>${a.label}</span></div>`
+        )
+        .join('');
+      rows.push(`<div class="group__row">${items}</div>`);
+    }
+    amenityBox.html(rows.join(''));
+    amenityBox.prev('span.h4').text('מה יש בנכס');
+  }
 
-  const specs: string[] = [
+  /* ── features: photo + spec list ──────────────────────────────────────── */
+  const specs = [
     property.propertyType && PROPERTY_TYPE_LABELS[property.propertyType]
-      ? `סוג הנכס: ${PROPERTY_TYPE_LABELS[property.propertyType]}`
-      : null,
+      ? `סוג הנכס: ${PROPERTY_TYPE_LABELS[property.propertyType]}` : null,
     property.floor != null
-      ? `קומה ${property.floor}${property.totalFloors ? ` מתוך ${property.totalFloors}` : ''}`
-      : null,
+      ? `קומה ${property.floor}${property.totalFloors ? ` מתוך ${property.totalFloors}` : ''}` : null,
     property.bedrooms != null ? `${property.bedrooms} חדרים` : null,
     property.bathrooms != null ? `${property.bathrooms} חדרי רחצה` : null,
     property.area ? `${property.area} מ״ר` : null,
@@ -120,182 +139,83 @@ export default async function MoonlitProperty({ property, title, description }: 
     property.vacancyDate ? `פינוי: ${property.vacancyDate}` : null,
   ].filter(Boolean) as string[];
 
-  const locationLine = [property.neighborhood, property.location].filter(Boolean).join(' · ');
+  const featureBox = $('.room__feature').first();
+  if (images[3]) featureBox.find('.room__feature__image img').attr('src', images[3]).attr('alt', title);
+  else featureBox.find('.room__feature__image').remove();
+  featureBox.find('.list__item').first().html(specs.map((s) => `<li>${s}</li>`).join(''));
+  featureBox.find('.list__item').slice(1).remove();
+  featureBox.prev('span.h4').text('פרטי הנכס');
+
+  // The template closes with a second paragraph — reuse it as the CTA line.
+  $('.room__details > p').slice(1).first().text('רוצים לראות את הנכס? השאירו פרטים בטופס ונחזור אליכם.');
+
+  /* ── booking sidebar → viewing request ────────────────────────────────── */
+  const form = $('.rts__booking__form form').first();
+  form.attr('id', 'moonlit-lead-form').removeAttr('action').removeAttr('method');
+  form.find('h5').text('תיאום ביקור בנכס');
+
+  const field = (id: string, label: string, ph: string, icon: string, type = 'text', dir = '') => `
+    <div class="query__input">
+      <label for="${id}" class="query__label">${label}</label>
+      <div class="query__input__position">
+        <input type="${type}" id="${id}" name="${id}" placeholder="${ph}"${dir ? ` dir="${dir}"` : ''} required>
+        <div class="query__input__icon"><i class="${icon}"></i></div>
+      </div>
+    </div>`;
+
+  const wrapper = form.find('.advance__search__wrapper').first();
+  wrapper.html(
+    field('name', 'שם מלא', 'השם שלכם', 'flaticon-user') +
+      field('phone', 'טלפון', '050-0000000', 'flaticon-phone-flip', 'tel', 'ltr') +
+      `<div class="query__input">
+        <label for="message" class="query__label">הודעה</label>
+        <div class="query__input__position">
+          <input type="text" id="message" name="message" placeholder="מתי נוח לכם לראות את הנכס?">
+          <div class="query__input__icon"><i class="flaticon-envelope"></i></div>
+        </div>
+      </div>` +
+      `<div class="total__price">
+        <span class="total h6 mb-0">מחיר מבוקש</span>
+        <span class="price h6 m-0 ltr">${priceLabel}</span>
+      </div>` +
+      `<button type="submit" class="theme-btn btn-style fill no-border"><span>שלחו לי פרטים</span></button>` +
+      `<p id="moonlit-lead-note" class="mt-15 mb-0"></p>`
+  );
+
+  /* ── similar rooms ────────────────────────────────────────────────────── */
+  const cards = $('.room__card');
+  if (similarRaw.length === 0) {
+    cards.closest('.rts__section').remove();
+  } else {
+    cards.each((i, el) => {
+      const p = similarRaw[i];
+      if (!p) {
+        $(el).closest('[class*="col-"]').remove();
+        return;
+      }
+      const href = `/apartments/${p.id}`;
+      const card = $(el);
+      card.find('a').attr('href', href);
+      card.find('.room__card__image img').attr('src', firstImage(p.images)).attr('alt', p.title);
+      card.find('.room__card__title').text(p.title);
+      card.find('.room__card__meta__info').html(
+        [
+          p.area != null ? `<span><i class="flaticon-construction"></i>${p.area} מ״ר</span>` : '',
+          p.rooms != null ? `<span><i class="flaticon-user"></i>${p.rooms} חדרים</span>` : '',
+        ].join('')
+      );
+      card.find('.room__price__tag span').text(`₪${formatPrice(String(p.price ?? ''))}`).addClass('ltr');
+      card.find('.room__card__link').text('לפרטים נוספים');
+    });
+    const section = cards.first().closest('.rts__section');
+    section.find('.subtitle__icon__three').text('נכסים דומים');
+    section.find('.section__title').text('נכסים דומים');
+  }
 
   return (
     <>
-      {/* page header */}
-      <div
-        className="rts__section page__hero__height page__hero__bg"
-        style={{ backgroundImage: `url(${images[0]})` }}
-      >
-        <div className="container">
-          <div className="row align-items-center justify-content-center">
-            <div className="col-lg-12">
-              <div className="page__hero__content visually-hidden">
-                <h1>{title}</h1>
-                <p className="font-sm">{locationLine}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* page header end */}
-
-      {/* room details area */}
-      <div className="rts__section section__padding">
-        <div className="container">
-          <div className="row g-5 sticky-wrap">
-            <div className="col-xxl-8 col-xl-7">
-              <div className="room__details">
-                <span className="h4 price ltr">{priceLabel}</span>
-                <h2 className="room__title">{title}</h2>
-                <div className="room__meta">
-                  {property.area ? (
-                    <span>
-                      <i className="flaticon-construction" />
-                      {property.area} מ״ר
-                    </span>
-                  ) : null}
-                  {property.bedrooms != null ? (
-                    <span>
-                      <i className="flaticon-user" />
-                      {property.bedrooms} חדרים
-                    </span>
-                  ) : null}
-                  {property.floor != null ? (
-                    <span>
-                      <i className="flaticon-hotel-room" />
-                      קומה {property.floor}
-                    </span>
-                  ) : null}
-                </div>
-
-                {description && <p>{description}</p>}
-
-                {images.length > 1 && (
-                  <div className="room__image__group row row-cols-md-2 row-cols-sm-1 mt-30 mb-50 gap-4 gap-md-0">
-                    {images.slice(1, 3).map((src) => (
-                      <div className="room__image__item" key={src}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img className="rounded-2" src={src} alt={title} />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {amenities.length > 0 && (
-                  <>
-                    <span className="h4 d-block mb-30">מה יש בנכס</span>
-                    <div className="room__amenity mb-50">
-                      {chunk(amenities, 3).map((group, gi) => (
-                        <div className="group__row" key={gi}>
-                          {group.map((a) => (
-                            <div className="single__item" key={a.key}>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={`/moonlit/images/icon/${a.icon}`} height="30" width="36" alt="" />
-                              <span>{a.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-
-                {specs.length > 0 && (
-                  <>
-                    <span className="h4 d-block mb-50">פרטי הנכס</span>
-                    <div className="room__feature mb-30">
-                      {images[3] && (
-                        <div className="room__feature__image mb-50">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img className="rounded-2" src={images[3]} alt={title} />
-                        </div>
-                      )}
-                      <div className="group__row">
-                        <ul className="list__item">
-                          {specs.map((s) => (
-                            <li key={s}>{s}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <p>
-                  רוצים לראות את הנכס? השאירו פרטים בטופס — נחזור אליכם ונתאם ביקור בזמן שנוח לכם.{' '}
-                  <Link href="/apartments">חזרה לכל הנכסים</Link>
-                </p>
-              </div>
-            </div>
-
-            <div className="col-xxl-4 col-xl-5 sticky-item">
-              <MoonlitPropertyForm propertyId={property.id} title={title} price={priceLabel} />
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* room details area end */}
-
-      {/* similar rooms */}
-      {similar.length > 0 && (
-        <div className="rts__section pb-120">
-          <div className="container">
-            <div className="row justify-content-center text-center mb-40">
-              <div className="col-lg-6">
-                <div className="section__topbar">
-                  <span className="h6 subtitle__icon__three mx-auto">נכסים דומים</span>
-                  <h2 className="section__title">נכסים דומים</h2>
-                </div>
-              </div>
-            </div>
-            <div className="row g-30">
-              {similar.map((p) => (
-                <div className="col-lg-6 col-xl-4 col-md-6" key={p.id}>
-                  <div className="room__card">
-                    <div className="room__card__top">
-                      <div className="room__card__image">
-                        <Link href={`/apartments/${p.id}`}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={p.image} width="420" height="310" alt={p.title} />
-                        </Link>
-                      </div>
-                    </div>
-                    <div className="room__card__meta">
-                      <Link href={`/apartments/${p.id}`} className="room__card__title h5">
-                        {p.title}
-                      </Link>
-                      <div className="room__card__meta__info">
-                        {p.area != null && (
-                          <span>
-                            <i className="flaticon-construction" />
-                            {p.area} מ״ר
-                          </span>
-                        )}
-                        {p.rooms != null && (
-                          <span>
-                            <i className="flaticon-user" />
-                            {p.rooms} חדרים
-                          </span>
-                        )}
-                      </div>
-                      <div className="room__price__tag">
-                        <span className="h6 d-block ltr">₪{formatPrice(String(p.price ?? ''))}</span>
-                      </div>
-                      <Link href={`/apartments/${p.id}`} className="room__card__link">
-                        לפרטים נוספים
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-      {/* similar rooms end */}
+      <div dangerouslySetInnerHTML={{ __html: extractBody($) }} />
+      <LeadFormBinder propertyId={property.id} title={title} />
     </>
   );
 }
