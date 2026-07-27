@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 
-import { formatPrice } from './kit';
+import { prisma } from '@/lib/prisma';
+import { firstImage, formatPrice } from './kit';
 import MoonlitPropertyForm from './MoonlitPropertyForm';
 
 /**
@@ -69,7 +70,30 @@ function chunk<T>(items: T[], size: number): T[][] {
   return out;
 }
 
-export default function MoonlitProperty({ property, title, description }: MoonlitPropertyProps) {
+export default async function MoonlitProperty({ property, title, description }: MoonlitPropertyProps) {
+  // "Similar Rooms" in the template — the same city, minus this listing.
+  const similarRaw = await prisma.property
+    .findMany({
+      where: {
+        isActive: true,
+        isSold: false,
+        id: { not: property.id },
+        ...(property.city ? { city: property.city } : {}),
+      },
+      orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
+      take: 3,
+      select: { id: true, title: true, price: true, rooms: true, area: true, images: true },
+    })
+    .catch(() => []);
+  const similar = similarRaw.map((p) => ({
+    id: p.id,
+    title: p.title,
+    price: p.price,
+    rooms: p.rooms,
+    area: p.area,
+    image: firstImage(p.images),
+  }));
+
   const images: string[] = Array.isArray(property.images) && property.images.length > 0
     ? property.images
     : [FALLBACK];
@@ -108,7 +132,7 @@ export default function MoonlitProperty({ property, title, description }: Moonli
         <div className="container">
           <div className="row align-items-center justify-content-center">
             <div className="col-lg-12">
-              <div className="page__hero__content">
+              <div className="page__hero__content visually-hidden">
                 <h1>{title}</h1>
                 <p className="font-sm">{locationLine}</p>
               </div>
@@ -214,6 +238,64 @@ export default function MoonlitProperty({ property, title, description }: Moonli
         </div>
       </div>
       {/* room details area end */}
+
+      {/* similar rooms */}
+      {similar.length > 0 && (
+        <div className="rts__section pb-120">
+          <div className="container">
+            <div className="row justify-content-center text-center mb-40">
+              <div className="col-lg-6">
+                <div className="section__topbar">
+                  <span className="h6 subtitle__icon__three mx-auto">נכסים דומים</span>
+                  <h2 className="section__title">נכסים דומים</h2>
+                </div>
+              </div>
+            </div>
+            <div className="row g-30">
+              {similar.map((p) => (
+                <div className="col-lg-6 col-xl-4 col-md-6" key={p.id}>
+                  <div className="room__card">
+                    <div className="room__card__top">
+                      <div className="room__card__image">
+                        <Link href={`/apartments/${p.id}`}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={p.image} width="420" height="310" alt={p.title} />
+                        </Link>
+                      </div>
+                    </div>
+                    <div className="room__card__meta">
+                      <Link href={`/apartments/${p.id}`} className="room__card__title h5">
+                        {p.title}
+                      </Link>
+                      <div className="room__card__meta__info">
+                        {p.area != null && (
+                          <span>
+                            <i className="flaticon-construction" />
+                            {p.area} מ״ר
+                          </span>
+                        )}
+                        {p.rooms != null && (
+                          <span>
+                            <i className="flaticon-user" />
+                            {p.rooms} חדרים
+                          </span>
+                        )}
+                      </div>
+                      <div className="room__price__tag">
+                        <span className="h6 d-block ltr">₪{formatPrice(String(p.price ?? ''))}</span>
+                      </div>
+                      <Link href={`/apartments/${p.id}`} className="room__card__link">
+                        לפרטים נוספים
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* similar rooms end */}
     </>
   );
 }

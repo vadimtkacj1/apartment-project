@@ -123,11 +123,9 @@ export default function MoonlitPropertyForm({
           {/* single input end */}
 
           {/* calculation */}
-          <div className="calculation">
-            <div className="single__calculation">
-              <span>מחיר מבוקש</span>
-              <span className="ltr">{price}</span>
-            </div>
+          <div className="total__price">
+            <span className="total h6 mb-0">מחיר מבוקש</span>
+            <span className="price h6 m-0 ltr">{price}</span>
           </div>
           {/* calculation end */}
 
