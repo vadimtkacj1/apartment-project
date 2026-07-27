@@ -6,6 +6,8 @@ import NeighborhoodChips, { type HoodChip } from '@/components/layout/Neighborho
 import SoldRecently, { type SoldItem } from '@/components/layout/SoldRecently';
 import GuidesSection from '@/components/layout/GuidesSection';
 import { prisma } from '@/lib/prisma';
+import { getActiveTheme } from '@/themes/server';
+import MoonlitHome from '@/themes/moonlit/MoonlitHome';
 import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 
 // Cache SSR output for 60 seconds — balances freshness with server load
@@ -56,6 +58,13 @@ function resolveDealType(dealType: string, category?: string | null): string {
 }
 
 export default async function Home() {
+  // A moonlit theme replaces the homepage wholesale (its own data + layout),
+  // so branch before the classic homepage's fetches run.
+  const theme = await getActiveTheme();
+  if (theme.family === 'moonlit') {
+    return <MoonlitHome variant={theme.variant ?? 'luxe'} />;
+  }
+
   // Hero poster is referenced via <video poster> (low browser priority) —
   // preload it here, scoped to the homepage only, so it paints at FCP.
   preload('/hero-poster.jpg', { as: 'image', fetchPriority: 'high' });

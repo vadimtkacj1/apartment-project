@@ -119,6 +119,18 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     ),
   },
   {
+    key: 'design',
+    segment: 'design',
+    label: { he: 'עיצוב האתר', en: 'Site design' },
+    href: '/admin/design',
+    isActive: (p) => p.includes('/design'),
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H14c2.21 0 4-1.79 4-4 0-3.87-3.58-7-8-7ZM5.5 10a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm2.5-3.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm4 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm2.5 3.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z" />
+      </svg>
+    ),
+  },
+  {
     key: 'analytics',
     segment: 'analytics',
     label: { he: 'אנליטיקה', en: 'Analytics' },

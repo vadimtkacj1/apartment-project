@@ -18,7 +18,7 @@ const NAV_GROUPS: { id: string; label: Record<'he' | 'en', string> }[] = [
 ];
 const SECTION_GROUP: Record<string, string> = {
   dashboard: 'main', inquiries: 'main', properties: 'main', owners: 'main', team: 'main', analytics: 'main',
-  homepage: 'settings', contact: 'settings', users: 'settings',
+  homepage: 'settings', design: 'settings', contact: 'settings', users: 'settings',
 };
 
 interface SidenavProps {

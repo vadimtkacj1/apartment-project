@@ -104,6 +104,8 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
   useEffect(() => {
     const dealTypeFromUrl = searchParams.get('dealType');
     const cityFromUrl = searchParams.get('city');
+    const minRoomsFromUrl = searchParams.get('minRooms');
+    const maxPriceFromUrl = searchParams.get('maxPrice');
 
     // Return prev unchanged when values are equal — a new object identity here
     // re-triggers the fetch effect and causes a duplicate API call.
@@ -114,10 +116,29 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
         dealTypeFromUrl === 'sale' || dealTypeFromUrl === 'rent' ? dealTypeFromUrl : 'all';
       const nextCity: FilterState['city'] =
         cityFromUrl && ISRAELI_CITIES.some((c) => c.value === cityFromUrl) ? cityFromUrl : 'all';
+      // Entry points outside the filters panel (e.g. the themed homepage search
+      // bar) can deep-link a minimum room count.
+      const parsedRooms = minRoomsFromUrl != null ? Number(minRoomsFromUrl) : NaN;
+      const nextMinRooms = Number.isFinite(parsedRooms) && parsedRooms > 0 ? parsedRooms : undefined;
+      const parsedMaxPrice = maxPriceFromUrl != null ? Number(maxPriceFromUrl) : NaN;
+      const nextMaxPrice = Number.isFinite(parsedMaxPrice) && parsedMaxPrice > 0 ? parsedMaxPrice : undefined;
       // Return prev unchanged when values are equal — a new object identity here
       // re-triggers the fetch effect and causes a duplicate API call.
-      if (nextDealType === prev.dealType && nextCity === prev.city) return prev;
-      return { ...prev, dealType: nextDealType, city: nextCity };
+      if (
+        nextDealType === prev.dealType &&
+        nextCity === prev.city &&
+        nextMinRooms === prev.minRooms &&
+        nextMaxPrice === prev.maxPrice
+      ) {
+        return prev;
+      }
+      return {
+        ...prev,
+        dealType: nextDealType,
+        city: nextCity,
+        minRooms: nextMinRooms,
+        maxPrice: nextMaxPrice,
+      };
     };
 
     setFilters(syncFromUrl);

@@ -36,8 +36,10 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
           {/* Brand möbius scrim: ink navy → indigo → near-transparent sky,
               replacing the flat black/40. Keeps white type legible while
               letting the photo breathe at the far corner. */}
+          {/* .hero-scrim lets an active theme (src/themes) repaint this scrim
+              without forking the component. */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hero-scrim"
             style={{
               background:
                 'linear-gradient(135deg, rgba(5,17,80,0.80) 0%, rgba(40,56,155,0.55) 45%, rgba(85,148,241,0.22) 100%)',
