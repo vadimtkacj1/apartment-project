@@ -3,7 +3,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 
 import { getFullProperty } from '@/lib/property-detail';
-import ApartmentsPageClient from '@/components/pages/ApartmentsPageClient';
+import MoonlitCatalog from '@/themes/moonlit/MoonlitCatalog';
 import { isThemeId, resolveTheme } from '@/themes/registry';
 import MoonlitShell from '@/themes/moonlit/MoonlitShell';
 import MoonlitHome from '@/themes/moonlit/MoonlitHome';
@@ -45,7 +45,7 @@ export default async function ThemePreviewPage({
   if (rest.length === 0) {
     body = <MoonlitHome variant={theme.variant ?? 'luxe'} />;
   } else if (rest[0] === 'apartments' && rest.length === 1) {
-    body = <ApartmentsPageClient />;
+    body = <MoonlitCatalog />;
   } else if (rest[0] === 'apartments' && rest.length === 2) {
     const property = await getFullProperty(parseInt(rest[1])).catch(() => null);
     if (!property) notFound();

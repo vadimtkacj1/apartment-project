@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import ApartmentsPageClient from '@/components/pages/ApartmentsPageClient';
+import { getActiveTheme } from '@/themes/server';
+import MoonlitCatalog from '@/themes/moonlit/MoonlitCatalog';
 import { DealType, City } from '@/types/property.types';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import { prisma } from '@/lib/prisma';
@@ -85,6 +87,18 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
     params.dealType === 'sale' || params.dealType === 'rent' ? params.dealType : undefined;
   const cityParam = typeof params.city === 'string' ? params.city : undefined;
   const city = cityParam && ISRAELI_CITIES.some((c) => c.value === cityParam) ? cityParam : undefined;
+
+  // A moonlit theme renders the template's own catalogue page instead.
+  const theme = await getActiveTheme();
+  if (theme.family === 'moonlit') {
+    return (
+      <MoonlitCatalog
+        dealType={dealType}
+        city={city}
+        minRooms={typeof params.minRooms === 'string' ? params.minRooms : undefined}
+      />
+    );
+  }
 
   // Fetch the initial listing server-side: the first paint shows property cards
   // without waiting for hydration + a client /api/properties round-trip, and
