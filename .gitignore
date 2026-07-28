@@ -82,3 +82,13 @@ recovered.tar.gz
 
 # Local-only Moonlit comparison harness (37MB copy of the bought template)
 /public/moonlit-ref/
+
+# Bought Moonlit template — the source archive stays local; everything the app
+# needs was copied into public/moonlit (CSS, fonts, icons) and
+# public/moonlit/pages (the HTML the theme renders).
+/moonlit-template/
+/moonlit-documentation/
+
+# Deploy leftovers (standalone bundles staged for scp)
+/bundle-*.tar.gz
+/moonlit-v*.tar.gz
