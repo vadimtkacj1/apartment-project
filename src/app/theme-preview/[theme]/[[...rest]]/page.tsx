@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 
 import { getFullProperty } from '@/lib/property-detail';
 import MoonlitCatalog from '@/themes/moonlit/MoonlitCatalog';
+import MoonlitAbout from '@/themes/moonlit/MoonlitAbout';
+import MoonlitBlog from '@/themes/moonlit/MoonlitBlog';
 import { isThemeId, resolveTheme } from '@/themes/registry';
 import MoonlitShell from '@/themes/moonlit/MoonlitShell';
 import MoonlitHome from '@/themes/moonlit/MoonlitHome';
@@ -57,6 +59,10 @@ export default async function ThemePreviewPage({
         description={serialized.description?.trim() || ''}
       />
     );
+  } else if (rest[0] === 'about' && rest.length === 1) {
+    body = <MoonlitAbout />;
+  } else if (rest[0] === 'articles' && rest.length === 1) {
+    body = <MoonlitBlog />;
   } else {
     notFound();
   }

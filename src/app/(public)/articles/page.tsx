@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
+import { getActiveTheme } from '@/themes/server';
+import MoonlitBlog from '@/themes/moonlit/MoonlitBlog';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import ArticlesGrid from './ArticlesGrid';
@@ -26,7 +28,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ArticlesPage() {
+export default async function ArticlesPage() {
+  const theme = await getActiveTheme();
+  if (theme.family === 'moonlit') return <MoonlitBlog />;
+
   return (
     <div className="articles-page" dir="rtl">
       <BreadcrumbSchema items={[{ name: 'מאמרים', path: '/articles' }]} />
