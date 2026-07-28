@@ -32,6 +32,12 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
 import type { ColumnsType } from 'antd/es/table';
 import { getCityLabel } from '@/data/cities';
+import {
+  DEFAULT_LISTING_ORDER,
+  LISTING_ORDERS,
+  LISTING_ORDER_LABELS,
+  ListingOrder,
+} from '@/lib/listing-order';
 
 interface Property {
   id: number;
@@ -89,6 +95,14 @@ function formatPropertyPrice(price: string): string {
   return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
 }
 
+// Explanatory copy under each choice in the site-order control
+const LISTING_ORDER_HINTS: Record<ListingOrder, string> = {
+  newest: 'הנכסים שנוספו לאחרונה יופיעו ראשונים',
+  'price-asc': 'הנכסים הזולים יופיעו ראשונים',
+  'price-desc': 'הנכסים היקרים יופיעו ראשונים',
+  random: 'הסדר מתחלף מדי שעה — כל הנכסים מקבלים חשיפה שווה',
+};
+
 export default function PropertiesPage() {
   const { message } = App.useApp();
   const [properties, setProperties] = useState<Property[]>([]);
@@ -100,6 +114,11 @@ export default function PropertiesPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+
+  // Order visitors see the properties in on the public /apartments page
+  const [listingOrder, setListingOrder] = useState<ListingOrder>(DEFAULT_LISTING_ORDER);
+  const [listingOrderLoading, setListingOrderLoading] = useState(true);
+  const [listingOrderSaving, setListingOrderSaving] = useState(false);
 
   // Skip persisting on the very first render (before saved state is restored)
   const skipFirstPersist = useRef(true);
@@ -120,6 +139,7 @@ export default function PropertiesPage() {
       // ignore malformed/blocked storage
     }
     fetchProperties();
+    fetchListingOrder();
   }, []);
 
   // Persist the table view whenever it changes
@@ -150,6 +170,44 @@ export default function PropertiesPage() {
       message.error('שגיאה בטעינת הנכסים');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchListingOrder = async () => {
+    try {
+      const response = await fetch('/api/admin/listing-settings', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      if (data?.propertyListingOrder) setListingOrder(data.propertyListingOrder);
+    } catch (error) {
+      // Non-blocking: the rest of the page still works, the control just shows the default
+      console.error('Error fetching listing order:', error);
+    } finally {
+      setListingOrderLoading(false);
+    }
+  };
+
+  const handleListingOrderChange = async (value: ListingOrder) => {
+    const previous = listingOrder;
+    setListingOrder(value); // optimistic — reverted below if the save fails
+    setListingOrderSaving(true);
+    try {
+      const response = await fetch('/api/admin/listing-settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ propertyListingOrder: value }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+      message.success('סדר ההצגה באתר עודכן');
+    } catch (error) {
+      console.error('Error updating listing order:', error);
+      message.error('שגיאה בעדכון סדר ההצגה. נסה שוב.');
+      setListingOrder(previous);
+    } finally {
+      setListingOrderSaving(false);
     }
   };
 
@@ -283,6 +341,30 @@ export default function PropertiesPage() {
           </Col>
         ))}
       </Row>
+
+      {/* Public listing order — controls the order visitors see on /apartments */}
+      <Card className="mb-6" title="סדר הצגת הנכסים באתר">
+        <Space vertical size="small" style={{ width: '100%' }}>
+          <span style={{ color: BRAND.textMuted }}>
+            קובע באיזה סדר הנכסים מוצגים למבקרים בעמוד הנכסים. הבחירה נשמרת מיד.
+          </span>
+          <Space wrap className="admin-filter-full" style={{ width: '100%' }} align="center">
+            <Select<ListingOrder>
+              value={listingOrder}
+              onChange={handleListingOrderChange}
+              loading={listingOrderLoading || listingOrderSaving}
+              disabled={listingOrderLoading || listingOrderSaving}
+              style={{ minWidth: 220 }}
+              size="large"
+              options={LISTING_ORDERS.map((order) => ({
+                value: order,
+                label: LISTING_ORDER_LABELS[order],
+              }))}
+            />
+            <span style={{ color: BRAND.textMuted }}>{LISTING_ORDER_HINTS[listingOrder]}</span>
+          </Space>
+        </Space>
+      </Card>
 
       {/* Filters */}
       <Card className="mb-6">

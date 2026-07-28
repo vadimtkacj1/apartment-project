@@ -22,8 +22,16 @@ const PropertyFilters = dynamic(() => import('@/components/properties/PropertyFi
 // Logic & Data Imports
 import { FilterState, DealType, City } from '@/types/property.types';
 
-import { CATEGORIES, Category, SortOption } from '@/data/properties.data';
+import { CATEGORIES, Category } from '@/data/properties.data';
 import { ISRAELI_CITIES } from '@/data/cities';
+import {
+  applyListingOrder,
+  currentListingSeed,
+  DEFAULT_LISTING_ORDER,
+  LISTING_ORDERS,
+  LISTING_ORDER_LABELS,
+  ListingOrder,
+} from '@/lib/listing-order';
 
 interface Property {
   id: number;
@@ -67,14 +75,25 @@ interface ApartmentsPageProps {
   initialProperties?: Property[];
   /** Query string the server data corresponds to (e.g. "dealType=rent") */
   initialFilterKey?: string;
+  /** Order the agency picked in the CMS — the initial value of "מיון לפי" */
+  defaultSort?: ListingOrder;
 }
 
-function ApartmentsPageContent({ initialDealType, initialCity, initialProperties, initialFilterKey }: ApartmentsPageProps) {
+function ApartmentsPageContent({
+  initialDealType,
+  initialCity,
+  initialProperties,
+  initialFilterKey,
+  defaultSort = DEFAULT_LISTING_ORDER,
+}: ApartmentsPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [selectedCategory, setSelectedCategory] = useState<Category>(() => getInitialCategory(initialDealType));
-  const [sortBy, setSortBy] = useState<SortOption>('newest');
+  // Starts on the CMS-managed order; the visitor can still override it below.
+  const [sortBy, setSortBy] = useState<ListingOrder>(defaultSort);
+  // One shuffle per visit, so "load more" doesn't reorder the list mid-scroll.
+  const [shuffleSeed] = useState(() => currentListingSeed());
   const [showFilters, setShowFilters] = useState(true);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false);
@@ -89,9 +108,8 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     city: initialCity ?? 'all',
   }));
 
-  const [properties, setProperties] = useState<Property[]>(() =>
-    initialProperties ? sortSoldLast(initialProperties) : []
-  );
+  // Raw server order — sorting and the sold-last pass happen in orderedProperties
+  const [properties, setProperties] = useState<Property[]>(() => initialProperties ?? []);
   const [loading, setLoading] = useState(!initialProperties);
 
   // Consumed on the first fetch-effect run: when the client's filter state
@@ -250,7 +268,9 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/properties?${qs}`, {
+        // order=cms opts this catalog into the CMS-managed order; homepage
+        // sections call the same endpoint without it and keep their own order.
+        const response = await fetch(`/api/properties?${qs}${qs ? '&' : ''}order=cms`, {
           signal: controller.signal,
         });
         if (!response.ok) throw new Error('Failed');
@@ -263,7 +283,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
           image: prop.images?.[0] || "/images/hero/sales.jpg",
         }));
 
-        setProperties(sortSoldLast(mappedProperties));
+        setProperties(mappedProperties);
         setVisibleCount(ITEMS_PER_PAGE);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') return;
@@ -276,15 +296,23 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
     return () => controller.abort();
   }, [appliedFilters, selectedCategory]);
 
-  const currentProperties = useMemo(() => {
-    return properties.slice(0, visibleCount);
-  }, [properties, visibleCount]);
+  const orderedProperties = useMemo(() => {
+    // The server already returns the CMS order (and re-sorting `random` here
+    // would fight the server's seed), so only re-sort on a visitor override.
+    const ordered =
+      sortBy === defaultSort ? properties : applyListingOrder(properties, sortBy, shuffleSeed);
+    return sortSoldLast(ordered);
+  }, [properties, sortBy, defaultSort, shuffleSeed]);
 
-  const hasMore = visibleCount < properties.length;
+  const currentProperties = useMemo(() => {
+    return orderedProperties.slice(0, visibleCount);
+  }, [orderedProperties, visibleCount]);
+
+  const hasMore = visibleCount < orderedProperties.length;
 
   const loadMore = useCallback(() => {
-    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, properties.length));
-  }, [properties.length]);
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_COUNT, orderedProperties.length));
+  }, [orderedProperties.length]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -373,7 +401,10 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
               <span className="text-gray-600 font-bold">מיון לפי:</span>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                onChange={(e) => {
+                  setSortBy(e.target.value as ListingOrder);
+                  setVisibleCount(ITEMS_PER_PAGE);
+                }}
                 className="pr-4 pl-10 py-3 bg-white border border-gray-200 rounded-2xl font-bold outline-none shadow-sm appearance-none cursor-pointer"
                 style={{
                   backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%231c3664' stroke-width='3'%3E%3Cpath d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
@@ -382,9 +413,11 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
                   backgroundSize: '16px',
                 }}
               >
-                <option value="newest">החדשים ביותר</option>
-                <option value="price-asc">מחיר: נמוך לגבוה</option>
-                <option value="price-desc">מחיר: גבוה לנמוך</option>
+                {LISTING_ORDERS.map((order) => (
+                  <option key={order} value={order}>
+                    {LISTING_ORDER_LABELS[order]}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -448,7 +481,7 @@ function ApartmentsPageContent({ initialDealType, initialCity, initialProperties
   );
 }
 
-export default function ApartmentsPageClient({ initialDealType, initialCity, initialProperties, initialFilterKey }: ApartmentsPageProps) {
+export default function ApartmentsPageClient({ initialDealType, initialCity, initialProperties, initialFilterKey, defaultSort }: ApartmentsPageProps) {
   return (
     <Suspense fallback={<div>טוען...</div>}>
       <ApartmentsPageContent
@@ -456,6 +489,7 @@ export default function ApartmentsPageClient({ initialDealType, initialCity, ini
         initialCity={initialCity}
         initialProperties={initialProperties}
         initialFilterKey={initialFilterKey}
+        defaultSort={defaultSort}
       />
     </Suspense>
   );

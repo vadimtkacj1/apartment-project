@@ -1,8 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
 
-const { findMany } = vi.hoisted(() => ({ findMany: vi.fn() }));
-vi.mock('@/lib/prisma', () => ({ prisma: { property: { findMany } } }));
+const { findMany, settingsFindFirst } = vi.hoisted(() => ({
+  findMany: vi.fn(),
+  settingsFindFirst: vi.fn(),
+}));
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    property: { findMany },
+    homepageSettings: { findFirst: settingsFindFirst },
+  },
+}));
 
 import { GET } from '@/app/api/properties/route';
 import { CENTER_REGION_CITY_SLUGS } from '@/data/cities';
@@ -36,6 +44,7 @@ const whereOf = () => findMany.mock.calls.at(-1)![0].where;
 describe('GET /api/properties', () => {
   beforeEach(() => {
     findMany.mockReset().mockResolvedValue([row()]);
+    settingsFindFirst.mockReset().mockResolvedValue({ propertyListingOrder: 'newest' });
   });
 
   it('returns formatted properties (arrays parsed, booleans coerced)', async () => {
@@ -121,6 +130,60 @@ describe('GET /api/properties', () => {
   it('sets a stale-while-revalidate cache header for normal listings', async () => {
     const res = await get();
     expect(res.headers.get('Cache-Control')).toContain('s-maxage=60');
+  });
+
+  describe('CMS listing order (order=cms opt-in)', () => {
+    const priced = () => [
+      row({ id: 1, price: '₪3,200,000' }),
+      row({ id: 2, price: '₪1,450,000' }),
+      row({ id: 3, price: '₪8,900,000' }),
+    ];
+    const idsOf = (body: { id: number }[]) => body.map((p) => p.id);
+
+    it('ignores the CMS order unless order=cms is passed', async () => {
+      settingsFindFirst.mockResolvedValue({ propertyListingOrder: 'price-desc' });
+      findMany.mockResolvedValue(priced());
+      // Homepage sections / similar-properties call the endpoint without it
+      const body = await (await get('?limit=3')).json();
+      expect(idsOf(body)).toEqual([1, 2, 3]);
+      expect(settingsFindFirst).not.toHaveBeenCalled();
+    });
+
+    it('applies the CMS price order when order=cms is passed', async () => {
+      settingsFindFirst.mockResolvedValue({ propertyListingOrder: 'price-desc' });
+      findMany.mockResolvedValue(priced());
+      const body = await (await get('?order=cms')).json();
+      expect(idsOf(body)).toEqual([3, 1, 2]);
+    });
+
+    it('orders before slicing so limit returns the top of the CMS order', async () => {
+      settingsFindFirst.mockResolvedValue({ propertyListingOrder: 'price-desc' });
+      findMany.mockResolvedValue(priced());
+      const body = await (await get('?order=cms&limit=1')).json();
+      // A SQL-level take would have returned the newest (id 1) instead
+      expect(findMany.mock.calls.at(-1)![0].take).toBeUndefined();
+      expect(idsOf(body)).toEqual([3]);
+    });
+
+    it('keeps the SQL take when the CMS order is newest', async () => {
+      settingsFindFirst.mockResolvedValue({ propertyListingOrder: 'newest' });
+      await get('?order=cms&limit=5');
+      expect(findMany.mock.calls.at(-1)![0].take).toBe(5);
+    });
+
+    it('applies the order to the post-filter result set', async () => {
+      settingsFindFirst.mockResolvedValue({ propertyListingOrder: 'price-asc' });
+      findMany.mockResolvedValue(priced());
+      const body = await (await get('?order=cms&minPrice=2000000')).json();
+      expect(idsOf(body)).toEqual([1, 3]);
+    });
+
+    it('falls back to newest when the settings row is unreadable', async () => {
+      settingsFindFirst.mockRejectedValue(new Error('column does not exist'));
+      findMany.mockResolvedValue(priced());
+      const body = await (await get('?order=cms')).json();
+      expect(idsOf(body)).toEqual([1, 2, 3]);
+    });
   });
 
   it('returns 500 when the database query throws', async () => {

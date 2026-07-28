@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { CENTER_REGION_CITY_SLUGS } from '@/data/cities';
+import { applyListingOrder, extractNumericPrice } from '@/lib/listing-order';
+import { getListingOrder } from '@/lib/listing-order.server';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -48,14 +50,6 @@ function formatProperty(property: any) {
   };
 }
 
-// Helper to extract numeric price from string like "₪3,200,000" or "₪5,500"
-function extractNumericPrice(priceStr: string): number {
-  if (!priceStr) return 0;
-  // Remove ₪, commas, and any non-numeric characters except for digits
-  const numericStr = priceStr.replace(/[^\d]/g, '');
-  return parseInt(numericStr) || 0;
-}
-
 // GET all active properties (public endpoint)
 // This endpoint depends on query params and request URL, so it must be dynamic.
 export const dynamic = 'force-dynamic';
@@ -73,6 +67,9 @@ export async function GET(request: NextRequest) {
     const pinned = searchParams.get('pinned');
     const hotProposition = searchParams.get('hotProposition');
     const noCommission = searchParams.get('noCommission');
+    // Opt-in: only the /apartments catalog asks for the CMS-managed order.
+    // Homepage sections and "similar properties" keep their own ordering.
+    const useCmsOrder = searchParams.get('order') === 'cms';
 
     // Additional filters
     const propertyType = searchParams.get('propertyType');
@@ -224,12 +221,17 @@ export async function GET(request: NextRequest) {
     if (hasHousingUnit === 'true') where.hasHousingUnit = true;
     if (hasShelter === 'true') where.hasShelter = true;
 
+    const listingOrder = useCmsOrder ? await getListingOrder() : 'newest';
+    // A SQL-level `take` would slice the newest N before reordering, so a
+    // price/random order has to fetch the full set and slice after sorting.
+    const sliceAfterOrder = listingOrder !== 'newest';
+
     let properties = await prisma.property.findMany({
       where,
       orderBy: {
         createdAt: 'desc',
       },
-      take: limit ? parseInt(limit) : undefined,
+      take: limit && !sliceAfterOrder ? parseInt(limit) : undefined,
     });
 
     // Filter by price range (client-side filtering since price is stored as string)
@@ -256,6 +258,12 @@ export async function GET(request: NextRequest) {
 
         return true;
       });
+    }
+
+    // Order last, so it applies to the post-filter result set
+    if (sliceAfterOrder) {
+      properties = applyListingOrder(properties, listingOrder);
+      if (limit) properties = properties.slice(0, parseInt(limit));
     }
 
     const response = NextResponse.json(properties.map(formatProperty));

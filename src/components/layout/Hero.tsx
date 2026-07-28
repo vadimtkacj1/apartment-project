@@ -258,14 +258,14 @@ const Hero: React.FC = () => {
           <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="/apartments?dealType=sale"
-              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
+                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                 color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
+                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
@@ -290,14 +290,14 @@ const Hero: React.FC = () => {
           <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
+                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
                 background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
                 color: '#1C1000',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
+                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >
@@ -322,14 +322,14 @@ const Hero: React.FC = () => {
           <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
             <Link
               href="#onethepark"
-              className="btn-green group relative block overflow-hidden w-full sm:w-auto sm:min-w-85 xl:min-w-105 2xl:min-w-[30rem] min-[2400px]:min-w-[40rem] rounded-2xl font-bold"
+              className="btn-green group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
               style={{
-                padding: 'clamp(0.55rem, 1.4vw, 2.8rem) clamp(1rem, 3.2vw, 7rem)',
+                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
                 background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',
                 color: '#ffffff',
                 textAlign: 'center',
                 letterSpacing: '0.04em',
-                fontSize: 'clamp(0.88rem, 1.4vw, 2.2rem)',
+                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
                 fontFamily: 'var(--font-caramel), cursive, sans-serif',
               }}
             >

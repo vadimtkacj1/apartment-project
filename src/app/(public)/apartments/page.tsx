@@ -4,6 +4,8 @@ import { DealType, City } from '@/types/property.types';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import { prisma } from '@/lib/prisma';
 import { ISRAELI_CITIES } from '@/data/cities';
+import { applyListingOrder } from '@/lib/listing-order';
+import { getListingOrder } from '@/lib/listing-order.server';
 
 function parseImages(value: string | null): string[] {
   if (!value) return [];
@@ -90,18 +92,24 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
   if (dealType === 'sale' || dealType === 'rent') where.dealType = dealType;
   if (city) where.city = city;
 
-  const rows = await prisma.property.findMany({
-    where,
-    select: {
-      id: true, title: true, location: true, price: true, rooms: true,
-      bathrooms: true, area: true, status: true, category: true,
-      dealType: true, city: true, images: true, isSold: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  const [listingOrder, rows] = await Promise.all([
+    // Order the agency picked in the CMS (admin → ניהול נכסים)
+    getListingOrder(),
+    prisma.property.findMany({
+      where,
+      select: {
+        id: true, title: true, location: true, price: true, rooms: true,
+        bathrooms: true, area: true, status: true, category: true,
+        dealType: true, city: true, images: true, isSold: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+  ]);
+
+  const orderedRows = applyListingOrder(rows, listingOrder);
 
   // Same shape ApartmentsPageClient builds from the API response
-  const initialProperties = rows.map((p) => {
+  const initialProperties = orderedRows.map((p) => {
     const resolvedDealType = resolveDealType(p.dealType, p.category) as DealType;
     return {
       id: p.id,
@@ -188,6 +196,7 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
         initialCity={city as City | undefined}
         initialProperties={initialProperties}
         initialFilterKey={initialFilterKey}
+        defaultSort={listingOrder}
       />
     </>
   );

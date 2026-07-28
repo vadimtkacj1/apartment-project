@@ -248,6 +248,10 @@ model HomepageSettings {
   testimonialsTitle String @default("מה הלקוחות שלנו אומרים")
   noCommissionTitle String @default("דירה ללא עמלת תיווך")
 
+  // Order properties are listed in on /apartments (see src/lib/listing-order.ts).
+  // One of: newest | price-asc | price-desc | random
+  propertyListingOrder String @default("newest")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
