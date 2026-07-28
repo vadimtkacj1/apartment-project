@@ -8,6 +8,10 @@ import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import ArticlesGrid from './ArticlesGrid';
 import './articles.css';
 
+// The active theme is read per render; without a revalidate window this page
+// would bake whichever theme was live at build time and never follow a switch.
+export const revalidate = 60;
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 // Company line (Organization schema): +972-52-384-7291.

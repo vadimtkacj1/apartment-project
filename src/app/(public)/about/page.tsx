@@ -12,6 +12,10 @@ import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
 import AboutCTA from '@/components/about/AboutCTA';
 
+// The active theme is read per render; without a revalidate window this page
+// would bake whichever theme was live at build time and never follow a switch.
+export const revalidate = 60;
+
 // Metadata lives in ./layout.tsx (richer: keywords, OG image, twitter card).
 // The weaker duplicate export that used to live here shadowed it — removed.
 
