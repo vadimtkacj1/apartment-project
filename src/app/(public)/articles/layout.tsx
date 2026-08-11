@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
-  title: { absolute: 'מאמרים ומדריכים - Aiterra' },
+  title: { absolute: 'מאמרים ומדריכים - רם נכסים חיים ענבי' },
   description: 'מאמרים מקצועיים ומדריכים על נדל״ן, רכישת דירה, מכירת דירה, השקעות נדל״ן ועוד. מידע עדכני וטיפים מקצועיים מהמומחים שלנו.',
   keywords: [
     'מאמרי נדל״ן',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     canonical: `${siteUrl}/articles`,
   },
   openGraph: {
-    title: 'מאמרים ומדריכים - Aiterra',
+    title: 'מאמרים ומדריכים - רם נכסים חיים ענבי',
     description: 'מאמרים מקצועיים ומדריכים על נדל״ן, רכישת דירה, מכירת דירה ועוד.',
     url: `${siteUrl}/articles`,
     images: [
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'מאמרים ומדריכים - Aiterra',
+    title: 'מאמרים ומדריכים - רם נכסים חיים ענבי',
     description: 'מאמרים מקצועיים ומדריכים על נדל״ן, רכישת דירה, מכירת דירה ועוד.',
     images: [`${siteUrl}/7.jpg`],
   },

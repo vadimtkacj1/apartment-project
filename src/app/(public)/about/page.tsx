@@ -1,6 +1,5 @@
+import type { Metadata } from 'next';
 import SecondaryHero from '@/components/layout/SecondaryHero';
-import { getActiveTheme } from '@/themes/server';
-import MoonlitAbout from '@/themes/moonlit/MoonlitAbout';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import PersonSchema from '@/components/SEO/PersonSchema';
@@ -10,28 +9,30 @@ import AboutMarketing from '@/components/about/AboutMarketing';
 import AboutStoryNew from '@/components/about/AboutStoryNew';
 import AboutOwners from '@/components/about/AboutOwners';
 import AboutTeam from '@/components/about/AboutTeam';
-import AboutCTA from '@/components/about/AboutCTA';
 
-// The active theme is read per render; without a revalidate window this page
-// would bake whichever theme was live at build time and never follow a switch.
-export const revalidate = 60;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
-// Metadata lives in ./layout.tsx (richer: keywords, OG image, twitter card).
-// The weaker duplicate export that used to live here shadowed it — removed.
+export const metadata: Metadata = {
+  title: 'אודות | רם נכסים חיים ענבי - תיווך נדל״ן בחולון',
+  description: 'הכירו את צוות רם נכסים — משרד תיווך נדל״ן מוביל בחולון. מומחיות מקומית, שיווק מתקדם, ליווי מלא בקנייה ומכירה של דירות בחולון, בת ים וראשון לציון.',
+  alternates: {
+    canonical: `${siteUrl}/about`,
+  },
+  openGraph: {
+    title: 'אודות | רם נכסים חיים ענבי - תיווך נדל״ן בחולון',
+    description: 'הכירו את צוות רם נכסים — משרד תיווך נדל״ן מוביל בחולון עם מומחיות מקומית וניסיון מצטבר.',
+    url: `${siteUrl}/about`,
+  },
+};
 
-export default async function AboutPage() {
-  const theme = await getActiveTheme();
-  if (theme.family === 'moonlit') return <MoonlitAbout />;
-
+export default function AboutPage() {
   return (
-    <div className="about-page bg-[#f5f7fb]" dir="rtl">
+    <div className="about-page bg-[#faf7f2]" dir="rtl">
       <BreadcrumbSchema items={[{ name: 'אודות', path: '/about' }]} />
       <PersonSchema />
       <SecondaryHero
         img="/images/hero/about-hero.jpg"
         title="אודות"
-        kicker="הכירו את Aiterra"
-        subtitle="משרד תיווך בחולון · 24 שנות ניסיון מצטבר · מכירה, השכרה וניהול נכסים"
         centered={true}
       />
       <Breadcrumbs />
@@ -41,7 +42,6 @@ export default async function AboutPage() {
       <AboutStoryNew />
       <AboutOwners />
       <AboutTeam />
-      <AboutCTA />
     </div>
   );
 }

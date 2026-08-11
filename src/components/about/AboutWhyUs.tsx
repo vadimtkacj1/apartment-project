@@ -55,7 +55,7 @@ export default function AboutWhyUs() {
           animate={whyInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#051150] mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-4">
             למה לבחור בנו?
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
@@ -84,11 +84,11 @@ export default function AboutWhyUs() {
                 }}
               >
                 {/* Иконка */}
-                <div className="mb-6 flex items-center justify-center text-[#051150] group-hover:scale-110 transition-transform duration-300 ease-out">
+                <div className="mb-6 flex items-center justify-center text-[#1c3664] group-hover:scale-110 transition-transform duration-300 ease-out">
                   <Icon strokeWidth={1.2} className="w-16 h-16" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-[#051150] mb-3 transition-colors duration-300">
+                <h3 className="text-2xl font-bold text-[#1c3664] mb-3 transition-colors duration-300">
                   {feature.title}
                 </h3>
                 

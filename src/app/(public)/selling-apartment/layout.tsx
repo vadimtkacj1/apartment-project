@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 export const metadata: Metadata = {
   title: 'מכירת דירה בחולון - תהליך מכירה מקצועי',

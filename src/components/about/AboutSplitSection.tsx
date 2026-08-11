@@ -26,7 +26,7 @@ export default function AboutSplitSection() {
           >
             <Image
               src="/images/buildings.jpeg"
-              alt="דניאל ויואב נכסים"
+              alt="רם וחיים נכסים"
               fill
               className="object-cover"
               priority
@@ -41,13 +41,13 @@ export default function AboutSplitSection() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Main Title */}
-            <h1 className="text-4xl font-extrabold text-[#051150] mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+            <h1 className="text-4xl font-extrabold text-[#1c3664] mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
               אודות
             </h1>
 
             {/* Subtitle/Tagline - Bold */}
-            <h2 className="text-3xl font-bold text-[#051150] leading-[1.6] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
-              Aiterra הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ24- שנה.
+            <h2 className="text-3xl font-bold text-[#1c3664] leading-[1.6] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+              רם שיווק נכסים & חיים עגבי הוא משרד תיווך ושיווק נכסים בעל ניסיון של למעלה מ24- שנה.
             </h2>
 
             {/* Description Paragraphs */}
@@ -69,7 +69,7 @@ export default function AboutSplitSection() {
             <div className="pt-8">
               <button
                 onClick={scrollToNextSection}
-                className="group inline-flex items-center gap-3 bg-[#354AC4] hover:bg-[#28389B] text-white px-8 py-4 rounded-xl font-bold text-base lg:text-lg transition-colors duration-200"
+                className="group inline-flex items-center gap-3 bg-[#1c3664] hover:bg-[#2a4a8c] text-white px-8 py-4 rounded-xl font-bold text-base lg:text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                 <span>קרא עוד על המשרד</span>

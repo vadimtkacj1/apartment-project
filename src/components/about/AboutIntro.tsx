@@ -48,7 +48,7 @@ export default function AboutIntro() {
           animate={introInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <h1 className="intro-title">Aiterra</h1>
+          <h1 className="intro-title">רם נכסים חיים ענבי</h1>
           <p className="intro-subtitle">
             משרד תיווך ושיווק נדל"ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה
           </p>

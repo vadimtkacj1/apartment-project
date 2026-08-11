@@ -1,23 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Loader2 } from 'lucide-react';
-import type { DealType } from '@/types/property.types';
-import { toast } from '@/components/shadcn/sonner';
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
-import { Textarea } from '@/components/shadcn/textarea';
-import { Badge } from '@/components/shadcn/badge';
-import { Checkbox } from '@/components/shadcn/checkbox';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
-} from '@/components/shadcn/table';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
-} from '@/components/shadcn/dialog';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { homepageMessages } from '@/lib/adminI18n/messages/homepage';
+import { Row, Col, Card, Button, App, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, Statistic, RadioChangeEvent } from 'antd';
+import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
+
+const { Title, Text } = Typography;
 
 interface Property {
   id: number;
@@ -68,26 +56,10 @@ interface Property {
   isNoCommission: boolean;
 }
 
-const FALLBACK_IMG = '/images/hero/sales.jpg';
-
-/** Property image with shared fallback handling — the single place the raw <img> lives. */
-function PropertyThumb({ src, alt, className }: { src?: string; alt: string; className?: string }) {
-  return (
-    <img
-      className={className}
-      src={src || FALLBACK_IMG}
-      alt={alt}
-      onError={(e) => { (e.currentTarget as HTMLImageElement).src = FALLBACK_IMG; }}
-    />
-  );
-}
-
 export default function HomepagePage() {
-  const t = useAdminMessages(homepageMessages);
-
+  const { message } = App.useApp();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [dirty, setDirty] = useState(false);
   const [allProperties, setAllProperties] = useState<Property[]>([]);
   const [hotProperties, setHotProperties] = useState<Property[]>([]);
   const [noCommissionProperties, setNoCommissionProperties] = useState<Property[]>([]);
@@ -99,8 +71,7 @@ export default function HomepagePage() {
   const [hotPropositionsMode, setHotPropositionsMode] = useState<'manual' | 'price'>('manual');
   const [hotPropositionsMaxPrice, setHotPropositionsMaxPrice] = useState<number>(3000000);
 
-  // Section titles — default CONTENT values for the public (Hebrew-only) site;
-  // intentionally not localized, they are data rather than admin UI strings.
+  // Section titles
   const [sectionTitles, setSectionTitles] = useState({
     hotPropositionsTitle: 'הצעות חמות',
     featuredPropertiesTitle: 'נכסים באיזור המרכז',
@@ -113,11 +84,7 @@ export default function HomepagePage() {
   });
   const [titlesLoading, setTitlesLoading] = useState(true);
   const [titlesSaving, setTitlesSaving] = useState(false);
-
-  const setTitle = (key: keyof typeof sectionTitles, value: string) => {
-    setSectionTitles((prev) => ({ ...prev, [key]: value }));
-    setDirty(true);
-  };
+  const [titlesForm] = Form.useForm();
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -153,6 +120,7 @@ export default function HomepagePage() {
       if (!response.ok) {
         if (response.status === 401) {
           console.warn('Not authenticated - using default titles');
+          titlesForm.setFieldsValue(sectionTitles);
           return;
         }
         throw new Error('Failed to fetch titles');
@@ -160,36 +128,45 @@ export default function HomepagePage() {
 
       const data = await response.json();
       setSectionTitles(data);
+      titlesForm.setFieldsValue(data);
     } catch (error) {
       console.error('Error fetching section titles:', error);
       console.warn('Using default section titles');
+      titlesForm.setFieldsValue(sectionTitles);
     } finally {
       setTitlesLoading(false);
     }
   };
 
-  // Toast-free: success/error feedback belongs to handleSaveEverything (one toast total).
   const handleSaveTitles = async () => {
-    setTitlesSaving(true);
     try {
+      setTitlesSaving(true);
+      const values = titlesForm.getFieldsValue();
       const response = await fetch('/api/admin/homepage-titles', {
         method: 'PUT',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sectionTitles),
+        body: JSON.stringify(values),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(errorData.error || errorData.details || `HTTP ${response.status}: Failed to save titles`);
       }
-
+      
       const data = await response.json();
       if (data.settings) {
         setSectionTitles(data.settings);
+        titlesForm.setFieldsValue(data.settings);
       } else if (data) {
         setSectionTitles(data);
+        titlesForm.setFieldsValue(data);
       }
+      message.success('הכותרות נשמרו בהצלחה!');
+    } catch (error) {
+      console.error('Error saving titles:', error);
+      const errorMessage = error instanceof Error ? error.message : 'שגיאה לא ידועה';
+      message.error(`שגיאה בשמירת הכותרות: ${errorMessage}`);
     } finally {
       setTitlesSaving(false);
     }
@@ -207,7 +184,7 @@ export default function HomepagePage() {
       setNoCommissionProperties(data.filter(p => p.isNoCommission));
     } catch (error) {
       console.error('Error fetching properties:', error);
-      toast.error(t.propertiesLoadError);
+      message.error('שגיאה בטעינת הנכסים');
     } finally {
       setLoading(false);
     }
@@ -222,14 +199,8 @@ export default function HomepagePage() {
     setIsModalVisible(true);
   };
 
-  const handleRadioChange = (id: number) => {
-    setSelectedIds([id]);
-  };
-
-  const togglePick = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
+  const handleRadioChange = (e: RadioChangeEvent) => {
+    setSelectedIds([e.target.value]);
   };
 
   const handleSelectAll = () => {
@@ -244,19 +215,18 @@ export default function HomepagePage() {
     const selectedProperties = allProperties.filter(p => selectedIds.includes(p.id));
 
     if (modalType === 'noCommission' && selectedProperties.length > 1) {
-      toast.warning(t.onlyOneNoCommissionWarning);
+      message.warning('ניתן לבחור רק נכס אחד לדירות ללא עמלה');
       return;
     }
 
     if (modalType === 'hot') {
       setHotProperties(selectedProperties);
-      toast.success(t.propertiesSelected);
+      message.success('הנכסים נבחרו בהצלחה');
     } else {
       setNoCommissionProperties(selectedProperties);
-      toast.success(t.propertySelected);
+      message.success('הנכס נבחר בהצלחה');
     }
 
-    setDirty(true);
     setIsModalVisible(false);
   };
 
@@ -266,13 +236,12 @@ export default function HomepagePage() {
     } else {
       setNoCommissionProperties(prev => prev.filter(p => p.id !== id));
     }
-    setDirty(true);
   };
 
-  // Toast-free: success/error feedback belongs to handleSaveEverything (one toast total).
   const handleSaveAll = async () => {
-    setSaving(true);
     try {
+      setSaving(true);
+
       const resetPromises = allProperties.map(prop =>
         fetch(`/api/admin/properties/${prop.id}`, {
           method: 'PUT',
@@ -312,22 +281,13 @@ export default function HomepagePage() {
 
       await Promise.all(noCommissionPromises);
 
+      message.success('כל השינויים נשמרו בהצלחה!');
       fetchProperties();
+    } catch (error) {
+      console.error('Error saving:', error);
+      message.error('שגיאה בשמירת השינויים');
     } finally {
       setSaving(false);
-    }
-  };
-
-  // Single dirty-tracked save: runs BOTH existing save flows (titles + selection)
-  // and reports exactly ONE success or error toast for the whole operation.
-  const handleSaveEverything = async () => {
-    try {
-      await Promise.all([handleSaveTitles(), handleSaveAll()]);
-      toast.success(t.allChangesSaved);
-      setDirty(false);
-    } catch (error) {
-      console.error('Error saving homepage settings:', error);
-      toast.error(t.changesSaveError);
     }
   };
 
@@ -349,366 +309,521 @@ export default function HomepagePage() {
     return true;
   });
 
+  const tableColumns = (type: 'hot' | 'noCommission') => [
+    {
+      title: 'תמונה',
+      dataIndex: 'images',
+      key: 'image',
+      width: 100,
+      render: (images: string[]) => (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '4px',
+          width: '80px',
+          height: '80px'
+        }}>
+          <Image
+            src={images[0] || '/images/hero/sales.jpg'}
+            alt="נכס"
+            width={80}
+            height={80}
+            preview={false}
+            style={{
+              objectFit: 'cover',
+              borderRadius: '8px',
+              display: 'block',
+              width: '80px',
+              height: '80px'
+            }}
+            fallback="/images/hero/sales.jpg"
+          />
+        </div>
+      ),
+    },
+    {
+      title: 'כותרת',
+      dataIndex: 'title',
+      key: 'title',
+      width: 250,
+      ellipsis: { showTitle: true },
+      render: (text: string, record: Property) => (
+        <div style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          maxWidth: '230px'
+        }}>
+          {text}
+          {record.isSold && <Tag color="error" style={{ marginRight: '8px' }}>{record.dealType === 'rent' ? 'מושכר' : 'נמכר'}</Tag>}
+        </div>
+      ),
+    },
+    {
+      title: 'מיקום',
+      dataIndex: 'location',
+      key: 'location',
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: 'מחיר',
+      dataIndex: 'price',
+      key: 'price',
+      width: 120,
+      render: (price: string) => {
+        const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
+        return (
+          <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
+            {Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`}
+          </span>
+        );
+      },
+    },
+    {
+      title: 'חדרים',
+      dataIndex: 'rooms',
+      key: 'rooms',
+      width: 80,
+      align: 'center' as const,
+    },
+    {
+      title: 'שטח',
+      dataIndex: 'area',
+      key: 'area',
+      width: 80,
+      align: 'center' as const,
+      render: (area: number) => `${area} מ"ר`,
+    },
+    {
+      title: 'פעולות',
+      key: 'actions',
+      width: 150,
+      render: (_: any, record: Property) => (
+        <Button
+          type="primary"
+          danger
+          size="small"
+          icon={<DeleteOutlined />}
+          onClick={() => handleRemove(record.id, type)}
+        >
+          הסר
+        </Button>
+      ),
+    },
+  ];
+
   const formatPrice = (price: string) => {
     const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
     return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
   };
 
-  const isSaving = saving || titlesSaving;
-
-  /* ---- Section-titles field row (label inline-start / control inline-end) ---- */
-  const renderTitleField = (
-    fieldKey: keyof typeof sectionTitles,
-    label: string,
-    placeholder: string,
-    multiline = false,
-  ) => (
-    <div className="field-row" key={fieldKey}>
-      <div>
-        <div className="fr-label">{label}</div>
-      </div>
-      <div className="fr-control">
-        {multiline ? (
-          <Textarea
-            value={sectionTitles[fieldKey]}
-            onChange={(e) => setTitle(fieldKey, e.target.value)}
-            placeholder={placeholder}
-            rows={2}
-          />
-        ) : (
-          <Input
-            value={sectionTitles[fieldKey]}
-            onChange={(e) => setTitle(fieldKey, e.target.value)}
-            placeholder={placeholder}
-          />
-        )}
-      </div>
-    </div>
-  );
-
-  /* ---- One chosen property as a .pick-row (thumb + title + quiet trash) ---- */
-  const renderPickRow = (p: Property, type: 'hot' | 'noCommission') => (
-    <div className="pick-row" key={p.id}>
-      <PropertyThumb className="thumb" src={p.images[0]} alt={p.title} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            font: '500 14px/1.35 var(--font-assistant), system-ui',
-            color: 'var(--text-ink)',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.title}</span>
-          {p.isSold && (
-            <Badge variant="muted" style={{ flexShrink: 0 }}>
-              {p.dealType === 'rent' ? t.rented : t.sold}
-            </Badge>
-          )}
-        </div>
-        <div
-          style={{
-            marginBlockStart: 3,
-            font: '400 12px/1.3 var(--font-assistant), system-ui',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            minWidth: 0,
-          }}
-        >
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {p.location}
-          </span>
-          <span style={{ color: 'var(--text-faint)' }}>·</span>
-          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-            {formatPrice(p.price)}
-          </bdi>
-        </div>
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-        onClick={() => handleRemove(p.id, type)}
-        aria-label={t.remove}
-      >
-        <Trash2 className="size-4" />
-      </Button>
-    </div>
-  );
-
-  /* ---- One "Manage properties" section-card ---- */
-  const renderManageCard = (opts: {
-    title: string;
-    count: React.ReactNode;
-    items: Property[];
-    type: 'hot' | 'noCommission';
-    emptyText: string;
-    addDisabled?: boolean;
-    showMode?: boolean;
-  }) => (
-    <section className="section-card">
-      <div className="section-card__head">
-        <div className="section-card__title">{opts.title}</div>
-        <Badge variant="muted" className="tabular-nums">
-          <bdi dir="ltr">{opts.count}</bdi>
-        </Badge>
-      </div>
-
-      <div style={{ padding: '16px 20px' }}>
-        {opts.showMode && (
-          <div className="inset-well" style={{ marginBlockEnd: 14 }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 20px' }}>
-              <label className="inline-flex items-center gap-2 cursor-pointer" style={{ color: 'var(--text-body)' }}>
-                <input
-                  type="radio"
-                  name="hotPropositionsMode"
-                  className="size-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  checked={hotPropositionsMode === 'manual'}
-                  onChange={() => setHotPropositionsMode('manual')}
-                />
-                <span>{t.manualSelection}</span>
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer" style={{ color: 'var(--text-body)' }}>
-                <input
-                  type="radio"
-                  name="hotPropositionsMode"
-                  className="size-4 accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  checked={hotPropositionsMode === 'price'}
-                  onChange={() => setHotPropositionsMode('price')}
-                />
-                <span>{t.priceFilter}</span>
-              </label>
-            </div>
-
-            {hotPropositionsMode === 'price' && (
-              <div style={{ marginBlockStart: 10, paddingBlockStart: 10, borderBlockStart: '1px solid var(--border)' }}>
-                <Input
-                  type="number"
-                  value={hotPropositionsMaxPrice}
-                  onChange={(e) => setHotPropositionsMaxPrice(Number(e.target.value) || 0)}
-                  min={0}
-                  step={100000}
-                  placeholder={t.maxPricePlaceholder}
-                  style={{ maxInlineSize: 260 }}
-                />
+  // Mobile card list mirroring the desktop table (same filtered data, same handlers)
+  const renderMobileCards = (rows: Property[], type: 'hot' | 'noCommission') => (
+    <div className="admin-card-list">
+      {rows.map((property) => (
+        <div key={property.id} className="admin-card">
+          <div className="admin-card__head">
+            <img
+              className="admin-card__thumb"
+              src={property.images[0] || '/images/hero/sales.jpg'}
+              alt={property.title}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg'; }}
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="admin-card__title">
+                {property.title}
+                {property.isSold && (
+                  <Tag color="error" style={{ marginInlineStart: '8px' }}>
+                    {property.dealType === 'rent' ? 'מושכר' : 'נמכר'}
+                  </Tag>
+                )}
               </div>
-            )}
+              <div className="admin-card__meta">{property.location}</div>
+            </div>
+            <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', fontWeight: 600, whiteSpace: 'nowrap' }}>
+              {formatPrice(property.price)}
+            </span>
           </div>
-        )}
-
-        {opts.items.length === 0 ? (
-          <div className="py-4 text-center text-sm text-muted-foreground">
-            {opts.emptyText}
+          <div className="admin-card__fields">
+            <span><b>חדרים</b> {property.rooms}</span>
+            <span><b>שטח</b> {property.area} מ&quot;ר</span>
           </div>
-        ) : (
-          <div>{opts.items.map((p) => renderPickRow(p, opts.type))}</div>
-        )}
-
-        <div style={{ marginBlockStart: 12 }}>
-          <Button
-            variant="ghost"
-            onClick={() => openModal(opts.type)}
-            disabled={opts.addDisabled}
-            style={{ color: 'var(--brand)' }}
-          >
-            <Plus className="size-4" />
-            {t.addProperty}
-          </Button>
+          <div className="admin-card__actions">
+            <Button
+              type="primary"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleRemove(property.id, type)}
+            >
+              הסר
+            </Button>
+          </div>
         </div>
-      </div>
-    </section>
+      ))}
+    </div>
   );
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="size-8 animate-spin text-primary" />
+        <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Sticky single-save settings bar */}
-      <div className="settings-bar">
-        <h1 style={{ margin: 0, font: '600 24px/1.25 var(--font-assistant), system-ui', color: 'var(--text-ink)' }}>
-          {t.settingsTitle}
-        </h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span className={`settings-bar__status${dirty ? ' dirty' : ''}`}>
-            {dirty ? t.unsaved : t.allSaved}
-          </span>
-          <Button
-            onClick={handleSaveEverything}
-            disabled={!dirty || isSaving}
-            variant={dirty ? 'default' : 'ghost'}
-            style={{ minWidth: 150 }}
+    <div className="px-2 sm:px-4 md:px-0">
+        {/* Header */}
+        <div style={{ marginBottom: '16px' }}>
+          <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול עמוד הבית</h1>
+          <Text type="secondary">ערוך כותרות וניהול נכסים מוצגים בדף הבית</Text>
+        </div>
+
+        {/* Section Titles Editor */}
+        <Card
+          title="עריכת כותרות סעיפים"
+          className="rounded-lg"
+          style={{ marginBottom: '24px' }}
+          loading={titlesLoading}
+        >
+          <Form
+            form={titlesForm}
+            layout="vertical"
+            onFinish={() => handleSaveTitles()}
           >
-            {isSaving && <Loader2 className="size-4 animate-spin" />}
-            {t.saveChanges}
+            <Tabs
+              items={[
+                {
+                  key: 'main',
+                  label: 'סעיפים ראשיים',
+                  children: (
+                    <Space vertical className="w-full" size="large">
+                      <Form.Item label="כותרת: הצעות חמות" name="hotPropositionsTitle">
+                        <Input placeholder="הצעות חמות" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: נכסים נבחרים" name="featuredPropertiesTitle">
+                        <Input placeholder="נכסים באיזור המרכז" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="תת-כותרת: נכסים נבחרים" name="featuredPropertiesSubtitle">
+                        <Input placeholder="מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: למה לבחור בנו?" name="valuesSectionTitle">
+                        <Input placeholder="למה לבחור בנו?" disabled={titlesLoading} />
+                      </Form.Item>
+                    </Space>
+                  ),
+                },
+                {
+                  key: 'secondary',
+                  label: 'סעיפים נוספים',
+                  children: (
+                    <Space vertical className="w-full" size="large">
+                      <Form.Item label="כותרת: אודות" name="aboutSectionTitle">
+                        <Input placeholder="אודות" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: מה חשוב לדעת" name="processSectionTitle">
+                        <Input placeholder="מה חשוב לדעת כשקונים נכס?" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: מה הלקוחות אומרים" name="testimonialsTitle">
+                        <Input placeholder="מה הלקוחות שלנו אומרים" disabled={titlesLoading} />
+                      </Form.Item>
+                      <Form.Item label="כותרת: דירה ללא עמלה" name="noCommissionTitle">
+                        <Input placeholder="דירה ללא עמלת תיווך" disabled={titlesLoading} />
+                      </Form.Item>
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+
+            <div style={{ marginTop: '24px', textAlign: 'right' }}>
+              <Button
+                type="primary"
+                size="large"
+                loading={titlesSaving}
+                onClick={handleSaveTitles}
+                icon={<EditOutlined />}
+                style={{ minWidth: '150px' }}
+              >
+                שמור כותרות
+              </Button>
+            </div>
+          </Form>
+        </Card>
+
+        {/* Properties Section Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3" style={{ marginTop: '24px', marginBottom: '16px' }}>
+          <div>
+            <Title level={3} style={{ margin: 0, marginBottom: '4px' }}>ניהול נכסים מוצגים</Title>
+            <Text type="secondary">בחר נכסים להצגה בסעיפים שונים בדף הבית</Text>
+          </div>
+          <Button
+            type="primary"
+            size="middle"
+            loading={saving}
+            onClick={handleSaveAll}
+            style={{ width: '100%', maxWidth: '180px' }}
+          >
+            שמור בחירת נכסים
           </Button>
         </div>
-      </div>
 
-      {/* A. Section titles & content */}
-      <section className="section-card">
-        <div className="section-card__head">
-          <div>
-            <div className="section-card__title">{t.contentCard}</div>
-            <div className="section-card__helper">{t.contentHelper}</div>
-          </div>
+        {/* Statistics */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col xs={24} sm={12}>
+            <Card>
+              <Statistic title="הצעות חמות" value={hotProperties.length} suffix="נכסים" />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12}>
+            <Card>
+              <Statistic title="דירות ללא עמלה (מקסימום 1)" value={`${noCommissionProperties.length}/1`} suffix="נכס" />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Sections */}
+        <div className="grid grid-cols-1 gap-6">
+          {/* Hot Propositions Section */}
+          <Card
+            title={
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: '18px', fontWeight: 600 }}>הצעות חמות</span>
+              </div>
+            }
+            extra={
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => openModal('hot')}
+                size="middle"
+                style={{ borderRadius: '8px', fontWeight: 500 }}
+              >
+                הוסף נכסים
+              </Button>
+            }
+          >
+            {/* Price Filter Settings */}
+            <div className="mb-4 p-3 rounded-lg" style={{ border: '1px solid #f0f0f0' }}>
+              <Radio.Group
+                value={hotPropositionsMode}
+                onChange={(e) => setHotPropositionsMode(e.target.value)}
+                style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 16px' }}
+              >
+                <Radio value="manual">בחירה ידנית</Radio>
+                <Radio value="price">סינון לפי מחיר</Radio>
+              </Radio.Group>
+
+              {hotPropositionsMode === 'price' && (
+                <div className="mt-2 pt-2 admin-filter-full" style={{ borderTop: '1px solid #f0f0f0' }}>
+                  <InputNumber
+                    value={hotPropositionsMaxPrice}
+                    onChange={(value) => setHotPropositionsMaxPrice(value || 0)}
+                    formatter={value => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={value => value!.replace(/₪\s?|(,*)/g, '') as any}
+                    style={{ width: '100%' }}
+                    min={0}
+                    step={100000}
+                    placeholder="מחיר מקסימלי"
+                  />
+                </div>
+              )}
+            </div>
+
+            {hotProperties.length === 0 ? (
+              <div className="text-center py-8">
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>אין נכסים מוצגים</Text>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => openModal('hot')}
+                >
+                  הוסף נכסים
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* desktop — existing table, unchanged */}
+                <div className="admin-only-desktop">
+                  <Table
+                    dataSource={hotProperties}
+                    rowKey="id"
+                    pagination={false}
+                    scroll={{ x: 'max-content' }}
+                    columns={tableColumns('hot')}
+                  />
+                </div>
+                {/* mobile — card list */}
+                <div className="admin-only-mobile">
+                  {renderMobileCards(hotProperties, 'hot')}
+                </div>
+              </>
+            )}
+          </Card>
+
+          {/* No Commission Section */}
+          <Card
+            title={
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span style={{ fontSize: '18px', fontWeight: 600 }}>דירות ללא עמלה</span>
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 'normal', color: '#999' }}>
+                  ניתן לבחור נכס אחד בלבד
+                </div>
+              </div>
+            }
+            extra={
+              <Button
+                type="primary"
+                icon={noCommissionProperties.length >= 1 ? <EditOutlined /> : <PlusOutlined />}
+                onClick={() => openModal('noCommission')}
+                disabled={noCommissionProperties.length >= 1}
+                size="middle"
+                style={{ borderRadius: '8px', fontWeight: 500 }}
+              >
+                {noCommissionProperties.length >= 1 ? 'נבחר נכס' : 'בחר נכס'}
+              </Button>
+            }
+          >
+            {noCommissionProperties.length === 0 ? (
+              <div className="text-center py-8">
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>לא נבחר נכס</Text>
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => openModal('noCommission')}
+                >
+                  בחר נכס
+                </Button>
+              </div>
+            ) : (
+              <>
+                {/* desktop — existing table, unchanged */}
+                <div className="admin-only-desktop">
+                  <Table
+                    dataSource={noCommissionProperties}
+                    rowKey="id"
+                    pagination={false}
+                    scroll={{ x: 'max-content' }}
+                    columns={tableColumns('noCommission')}
+                  />
+                </div>
+                {/* mobile — card list */}
+                <div className="admin-only-mobile">
+                  {renderMobileCards(noCommissionProperties, 'noCommission')}
+                </div>
+              </>
+            )}
+          </Card>
         </div>
 
-        {titlesLoading ? (
-          <div className="flex flex-col gap-3 px-5 py-4">
-            {/* 8 rows — one per real title field, so the card doesn't jump on load */}
-            {Array.from({ length: 8 }, (_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
-        ) : (
+        {/* Property Selector Modal */}
+        <Modal
+          title={
+            <div style={{ padding: '8px 0' }}>
+              <div style={{ fontSize: '20px', fontWeight: 600, marginBottom: '4px' }}>
+                {modalType === 'hot' ? 'בחר נכסים להצעות חמות' : 'בחר נכס אחד ללא עמלה'}
+              </div>
+              {modalType === 'noCommission' && (
+                <div style={{ fontSize: '13px', fontWeight: 'normal', color: '#999', marginTop: '4px' }}>
+                  שים לב: ניתן לבחור רק נכס אחד
+                </div>
+              )}
+            </div>
+          }
+          open={isModalVisible}
+          onOk={handleModalOk}
+          onCancel={() => setIsModalVisible(false)}
+          width="min(900px, 96vw)"
+          styles={{ body: { maxHeight: '70vh', overflowY: 'auto' } }}
+          okText="אישור"
+          cancelText="ביטול"
+          okButtonProps={{
+            size: 'large',
+            style: { borderRadius: '8px', fontWeight: 500 }
+          }}
+          cancelButtonProps={{
+            size: 'large',
+            style: { borderRadius: '8px' }
+          }}
+        >
           <div>
-            {renderTitleField('hotPropositionsTitle', t.labelHotTitle, t.phHotTitle)}
-            {renderTitleField('featuredPropertiesTitle', t.labelFeaturedTitle, t.phFeaturedTitle)}
-            {renderTitleField('featuredPropertiesSubtitle', t.labelFeaturedSubtitle, t.phFeaturedSubtitle, true)}
-            {renderTitleField('valuesSectionTitle', t.labelValuesTitle, t.phValuesTitle)}
-            {renderTitleField('aboutSectionTitle', t.labelAboutTitle, t.phAboutTitle)}
-            {renderTitleField('processSectionTitle', t.labelProcessTitle, t.phProcessTitle)}
-            {renderTitleField('testimonialsTitle', t.labelTestimonialsTitle, t.phTestimonialsTitle)}
-            {renderTitleField('noCommissionTitle', t.labelNoCommissionTitle, t.phNoCommissionTitle)}
-          </div>
-        )}
-      </section>
-
-      {/* B. Manage displayed properties */}
-      {renderManageCard({
-        title: t.hotDeals,
-        count: hotProperties.length,
-        items: hotProperties,
-        type: 'hot',
-        emptyText: t.noPropertiesShown,
-        showMode: true,
-      })}
-
-      {renderManageCard({
-        title: t.noCommissionSection,
-        count: `${noCommissionProperties.length}/1`,
-        items: noCommissionProperties,
-        type: 'noCommission',
-        emptyText: t.noPropertyChosen,
-        addDisabled: noCommissionProperties.length >= 1,
-      })}
-
-      {/* C. Property-picker */}
-      <Dialog open={isModalVisible} onOpenChange={(o) => { if (!o) setIsModalVisible(false); }}>
-        <DialogContent className="w-[96vw] max-w-[900px]">
-          <DialogHeader>
-            <DialogTitle>
-              {modalType === 'hot' ? t.modalTitleHot : t.modalTitleNoCommission}
-            </DialogTitle>
-            {modalType === 'noCommission' && (
-              <DialogDescription>{t.modalNoteOnlyOne}</DialogDescription>
+            {modalType === 'hot' && (
+              <div style={{ marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #f0f0f0' }}>
+                <Checkbox
+                  checked={selectedIds.length === availableProperties.length && availableProperties.length > 0}
+                  indeterminate={selectedIds.length > 0 && selectedIds.length < availableProperties.length}
+                  onChange={handleSelectAll}
+                >
+                  <strong>בחר הכל ({selectedIds.length}/{availableProperties.length})</strong>
+                </Checkbox>
+              </div>
             )}
-          </DialogHeader>
 
-          <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-            <div style={{ border: '1px solid var(--border)', borderRadius: 'var(--r-tile)', overflow: 'hidden' }}>
-              <Table>
-                <TableHeader>
-                  <TableRow style={{ background: 'var(--surface-sunken)' }}>
-                    <TableHead className="h-11 normal-case tracking-normal" style={{ inlineSize: 48 }}>
-                      {modalType === 'hot' && (
-                        <Checkbox
-                          checked={
-                            selectedIds.length === availableProperties.length && availableProperties.length > 0
-                              ? true
-                              : selectedIds.length > 0
-                                ? 'indeterminate'
-                                : false
-                          }
-                          onCheckedChange={handleSelectAll}
-                          aria-label={t.selectAll(selectedIds.length, availableProperties.length)}
-                        />
-                      )}
-                    </TableHead>
-                    <TableHead className="h-11 normal-case tracking-normal">{t.colTitle}</TableHead>
-                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colPrice}</TableHead>
-                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colRooms}</TableHead>
-                    <TableHead className="h-11 normal-case tracking-normal text-end">{t.colArea}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {availableProperties.map((p) => {
-                    const checked = modalType === 'hot'
-                      ? selectedIds.includes(p.id)
-                      : selectedIds[0] === p.id;
-                    const toggle = () => (modalType === 'hot' ? togglePick(p.id) : handleRadioChange(p.id));
-                    return (
-                      <TableRow
-                        key={p.id}
-                        onClick={toggle}
-                        data-state={checked ? 'selected' : undefined}
-                        style={{ height: 64, cursor: 'pointer', background: checked ? 'var(--brand-wash)' : undefined }}
-                      >
-                        <TableCell>
-                          {modalType === 'hot' ? (
-                            <Checkbox checked={checked} tabIndex={-1} style={{ pointerEvents: 'none' }} />
-                          ) : (
-                            <input
-                              type="radio"
-                              checked={checked}
-                              readOnly
-                              tabIndex={-1}
-                              className="pointer-events-none size-4 accent-primary"
+            <div>
+              {modalType === 'noCommission' ? (
+                <Radio.Group
+                  value={selectedIds[0]}
+                  onChange={handleRadioChange}
+                  className="w-full"
+                >
+                  <Space vertical className="w-full">
+                    {availableProperties.map((property) => (
+                      <Card key={property.id} size="small" className="w-full">
+                        <Radio value={property.id} className="w-full">
+                          <div className="flex items-center gap-3 ml-2">
+                            <img
+                              src={property.images[0] || '/images/placeholder.jpg'}
+                              alt={property.title}
+                              className="w-12 h-12 object-cover rounded"
                             />
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-                            <PropertyThumb
-                              className="h-10.5 w-14 shrink-0 rounded-lg bg-muted object-cover"
-                              src={p.images[0]}
-                              alt={p.title}
-                            />
-                            <div style={{ minWidth: 0 }}>
-                              <div style={{ font: '600 15px/1.3 var(--font-assistant), system-ui', color: 'var(--text-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {p.title}
-                              </div>
-                              <div style={{ marginBlockStart: 2, font: '400 13px/1.3 var(--font-assistant), system-ui', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {p.location}
-                              </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm">{property.title}</div>
+                              <div className="text-xs text-gray-500">{property.location}</div>
+                              <div className="text-xs font-bold text-primary">{property.price}</div>
                             </div>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-end">
-                          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums' }}>{formatPrice(p.price)}</bdi>
-                        </TableCell>
-                        <TableCell className="text-end">
-                          <bdi dir="ltr" style={{ fontVariantNumeric: 'tabular-nums' }}>{p.rooms}</bdi>
-                        </TableCell>
-                        <TableCell className="text-end">
-                          <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{t.areaSqm(p.area)}</span>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                        </Radio>
+                      </Card>
+                    ))}
+                  </Space>
+                </Radio.Group>
+              ) : (
+                <Checkbox.Group
+                  value={selectedIds}
+                  onChange={(values) => setSelectedIds(values as number[])}
+                  className="w-full"
+                >
+                  <Space vertical className="w-full">
+                    {availableProperties.map((property) => (
+                      <Card key={property.id} size="small" className="w-full">
+                        <Checkbox value={property.id} className="w-full">
+                          <div className="flex items-center gap-3 ml-2">
+                            <img
+                              src={property.images[0] || '/images/placeholder.jpg'}
+                              alt={property.title}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm">{property.title}</div>
+                              <div className="text-xs text-gray-500">{property.location}</div>
+                              <div className="text-xs font-bold text-primary">{property.price}</div>
+                            </div>
+                          </div>
+                        </Checkbox>
+                      </Card>
+                    ))}
+                  </Space>
+                </Checkbox.Group>
+              )}
             </div>
           </div>
-
-          <DialogFooter className="mt-2 gap-2">
-            <Button variant="outline" onClick={() => setIsModalVisible(false)}>{t.cancel}</Button>
-            <Button onClick={handleModalOk}>{t.addSelected(selectedIds.length)}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </Modal>
     </div>
   );
 }

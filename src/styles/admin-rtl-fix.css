@@ -1,36 +1,70 @@
-/* Direction fixes for Admin Dashboard (direction-neutral: follows the dir
-   attribute on .layout-dashboard — RTL for Hebrew, LTR for English) */
+/* RTL Fixes for Admin Dashboard */
 
-/* Sidebar position - fixed to the reading-start edge (right in RTL, left in LTR).
-   NOTE: collapse is driven solely by the `.sidebar-open` / `.sidebar-collapsed`
-   classes on the root .layout-dashboard (see antd-admin.css). MainLayout renders
-   a plain <aside> shell, so no library ever toggles its own collapsed class —
-   do NOT key collapse rules off anything else.
-   NOTE: the .sidebar-backdrop rules live in antd-admin.css (single source). */
-.layout-dashboard .ant-layout-sider.sider-primary {
-  inset-inline-start: 0;
-  inset-inline-end: auto;
-  transition: inset-inline-start 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Sidebar backdrop - hidden by default (desktop). Shown on mobile below. */
+.layout-dashboard .sidebar-backdrop {
+  display: none;
 }
 
-/* Responsive: Mobile behavior — the sider overlays content (backdrop shown via
-   antd-admin.css) */
+/* Sidebar position for RTL - fixed to the right edge.
+   NOTE: collapse is driven solely by the `.sidebar-open` / `.sidebar-collapsed`
+   classes on the root .layout-dashboard (see antd-admin.css). MainLayout uses
+   <Sider trigger={null}> with no `collapsed` prop, so antd never adds its own
+   `.ant-layout-sider-collapsed` class — do NOT key collapse rules off it. */
+.layout-dashboard .ant-layout-sider.sider-primary {
+  right: 0;
+  left: auto;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Responsive: Mobile behavior — the sider overlays content; show the backdrop */
 @media (max-width: 991px) {
   .layout-dashboard .ant-layout-sider.sider-primary {
     position: fixed;
     z-index: 1000;
     height: 100vh;
   }
+
+  /* Show backdrop on mobile when the sidebar is open */
+  .layout-dashboard .sidebar-backdrop {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
 }
 
-/* Direction-aware text alignment.
-   direction itself comes from the dynamic dir attribute on .layout-dashboard,
-   so no hardcoded `direction` here — descendants inherit it. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* RTL text alignment */
 .layout-dashboard {
-  text-align: start;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Ensure proper RTL for Ant Design components */
+.layout-dashboard .ant-card {
+  text-align: right;
+}
+
+.layout-dashboard .ant-form-item-label {
+  text-align: right;
+}
+
+.layout-dashboard .ant-table {
+  direction: rtl;
 }
 
 /* Footer */
 .layout-dashboard .ant-layout-footer {
   text-align: center;
+}
+
+/* Header breadcrumb */
+.layout-dashboard .ant-breadcrumb {
+  direction: rtl;
 }

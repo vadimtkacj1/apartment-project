@@ -22,32 +22,30 @@ export function PropertyDescription({ description, bedrooms, floor, totalFloors,
         isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
       }`}
     >
-      <h2 className={`text-2xl font-black mb-6 ${
+      <h2 className={`text-3xl font-black mb-6 uppercase ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>תיאור הנכס</h2>
 
       <div className="flex flex-wrap gap-5 mb-8 pb-8 border-b border-gray-100">
         <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
-          <LayoutDashboard size={20} className="text-[#354AC4]" aria-hidden="true"/>
+          <LayoutDashboard size={20} className="text-[#1c3664]"/>
           {bedrooms} חדרים
         </div>
-        {floor !== null && floor !== undefined && (
+        {!!floor && (
           <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
-            <ArrowUpFromLine size={20} className="text-[#354AC4]" aria-hidden="true"/>
-            {floor === 0
-              ? 'קומת קרקע'
-              : (totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
-                ? `קומה ${floor} מתוך ${totalFloors}`
-                : `קומה ${floor}`}
+            <ArrowUpFromLine size={20} className="text-[#1c3664]"/>
+            {(totalFloors !== null && totalFloors !== undefined && totalFloors > 0)
+              ? `קומה ${floor} מתוך ${totalFloors}`
+              : `קומה ${floor}`}
           </div>
         )}
         <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
-          <Maximize size={20} className="text-[#354AC4]" aria-hidden="true"/>
+          <Maximize size={20} className="text-[#1c3664]"/>
           {area} מ״ר
         </div>
         {builtArea && (
           <div className="px-5 py-3 bg-gray-50 rounded-lg text-base font-bold text-gray-700 border border-gray-100 flex items-center gap-3">
-            <Maximize size={20} className="text-[#354AC4]" aria-hidden="true"/>
+            <Maximize size={20} className="text-[#1c3664]"/>
             {builtArea} מ״ר בנוי
           </div>
         )}

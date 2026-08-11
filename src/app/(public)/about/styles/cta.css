@@ -59,6 +59,7 @@
   color: #ffffff;
   margin: 0 0 2rem 0;
   line-height: 1.1;
+  letter-spacing: -0.02em;
   text-shadow:
     0 4px 30px rgba(0, 0, 0, 0.8),
     0 2px 15px rgba(0, 0, 0, 0.6);
@@ -67,7 +68,7 @@
 
 .cta-subtitle {
   font-size: clamp(1.3rem, 2.5vw, 2rem);
-  color: #5594F1;
+  color: #1c3664;
   margin: 0 0 4rem 0;
   font-weight: 700;
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
@@ -88,6 +89,8 @@
   border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -96,25 +99,25 @@
 }
 
 .cta-btn.primary {
-  background: #354AC4;
+  background: #1c3664;
   color: #ffffff;
 }
 
 .cta-btn.primary:hover {
-  background: #28389B;
-  box-shadow: 0 12px 40px rgba(5, 17, 80, 0.5);
+  background: #152a4f;
+  box-shadow: 0 12px 40px rgba(28, 54, 100, 0.5);
 }
 
 .cta-btn.secondary {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   color: #ffffff;
-  border: 2px solid rgba(53, 74, 196, 0.8);
+  border: 2px solid rgba(28, 54, 100, 0.8);
 }
 
 .cta-btn.secondary:hover {
-  background: rgba(53, 74, 196, 0.2);
-  border-color: #354AC4;
-  box-shadow: 0 12px 40px rgba(5, 17, 80, 0.3);
+  background: rgba(28, 54, 100, 0.2);
+  border-color: #1c3664;
+  box-shadow: 0 12px 40px rgba(28, 54, 100, 0.3);
 }
 

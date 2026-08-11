@@ -7,9 +7,6 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
-import ArticleToc from '../ArticleToc';
-import ArticleCta from '../ArticleCta';
-import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function MortgageGuideContent() {
@@ -63,8 +60,6 @@ export default function MortgageGuideContent() {
                 במדריך הזה ריכזנו את מה שכל רוכש צריך לדעת לפני שנכנס לסניף: מה להוציא קודם, כמה הון עצמי צריך, איך עובדים המסלולים, ואיך משיגים תנאים טובים יותר. <strong>בלי ז׳רגון בנקאי — רק מה שחשוב באמת.</strong>
               </p>
             </section>
-
-            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -163,7 +158,7 @@ export default function MortgageGuideContent() {
                 <strong>2. סדרו את התיק הפיננסי.</strong> סגרו מינוס והלוואות קטנות לפני הבקשה — הם פוגעים ביחס ההחזר שהבנק מחשב.
               </p>
               <p>
-                <strong>3. שקלו יועץ משכנתאות.</strong> אנחנו עובדים צמוד עם <a href="https://avi-mashkanta.com" target="_blank" rel="noopener" className="text-[#354AC4] underline decoration-[#5594F1] underline-offset-2 hover:text-[#2A69C4]">אבי בוקעי (&quot;אבי — הבית למשכנתאות&quot;)</a>, שמלווה את הלקוחות שלנו משלב האישור העקרוני ועד החתימה — ויודע בדיוק איפה אפשר ללחוץ.
+                <strong>3. שקלו יועץ משכנתאות.</strong> אנחנו עובדים צמוד עם <a href="https://avi-mashkanta.com" target="_blank" rel="noopener" className="text-[#1c3664] underline decoration-[#c5a357] underline-offset-2 hover:text-[#c5a357]">אבי בוקעי (&quot;אבי — הבית למשכנתאות&quot;)</a>, שמלווה את הלקוחות שלנו משלב האישור העקרוני ועד החתימה — ויודע בדיוק איפה אפשר ללחוץ.
               </p>
               <p>
                 <strong>4. אל תמתחו את התקציב לקצה.</strong> השאירו כרית ביטחון. דירה קצת יותר צנועה עם שינה טובה בלילה מנצחת דירה גדולה עם החזר שחונק.
@@ -175,10 +170,6 @@ export default function MortgageGuideContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
-
-            {/* End CTA + related guides (shared components) */}
-            <ArticleCta articleId="mortgage-guide" />
-            <RelatedArticles currentId="mortgage-guide" />
           </div>
         </article>
       </div>

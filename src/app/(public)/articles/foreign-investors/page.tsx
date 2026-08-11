@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import ForeignInvestorsContent from './ForeignInvestorsContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 const ogImage = `${siteUrl}/images/masterkaspler_A_close-up_photograph_of_a_firm_handshake_betwe_4d324466-a227-404c-b8fb-60648a16bfbd_2.png`;
 
 export const metadata: Metadata = {
   title: 'נדל״ן בישראל עבור תושבי חוץ ומשקיעים זרים',
-  description: 'מדריך מקיף לרכישת דירה בישראל מרחוק: ייפוי כוח נוטריוני, מימון ומשכנתא לתושבי חוץ, ניהול נכסים מקצועי בחולון ובת ים. Aiterra — עיניים והידיים שלכם בארץ.',
+  description: 'מדריך מקיף לרכישת דירה בישראל מרחוק: ייפוי כוח נוטריוני, מימון ומשכנתא לתושבי חוץ, ניהול נכסים מקצועי בחולון ובת ים. רם נכסים — עיניים והידיים שלכם בארץ.',
   keywords: [
     'משקיעים זרים',
     'תושבי חוץ',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'נדל״ן בישראל עבור תושבי חוץ ומשקיעים זרים',
-    description: 'מדריך לרכישת דירה בישראל מרחוק עם ליווי מקצועי מלא — Aiterra.',
+    description: 'מדריך לרכישת דירה בישראל מרחוק עם ליווי מקצועי מלא — רם נכסים חיים ענבי.',
     url: `${siteUrl}/articles/foreign-investors`,
     type: 'article',
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'נדל״ן בישראל עבור תושבי חוץ ומשקיעים זרים',
-    description: 'מדריך לרכישת דירה בישראל מרחוק עם ליווי מקצועי מלא — Aiterra.',
+    description: 'מדריך לרכישת דירה בישראל מרחוק עם ליווי מקצועי מלא — רם נכסים חיים ענבי.',
     images: [ogImage],
   },
 };
@@ -59,14 +59,14 @@ const articleSchema = {
   author: {
     '@type': 'Person',
     '@id': `${siteUrl}/about#owner-2`,
-    name: 'יואב אלמוג',
+    name: 'חיים ענבי',
     jobTitle: 'מתווך נדל״ן מורשה ומייסד',
     url: `${siteUrl}/about`,
     worksFor: { '@id': `${siteUrl}/#organization` },
     hasCredential: {
       '@type': 'EducationalOccupationalCredential',
       credentialCategory: 'Real Estate License',
-      identifier: '3184627',
+      identifier: '3164492',
     },
   },
   publisher: { '@id': `${siteUrl}/#organization` },

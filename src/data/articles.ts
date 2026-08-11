@@ -157,27 +157,27 @@ export interface ArticleAuthor {
   personId: string;
 }
 
-export const ARTICLE_AUTHORS: Record<'daniel' | 'yoav', ArticleAuthor> = {
-  daniel: { name: 'דניאל שרון', jobTitle: 'מתווך נדל״ן מורשה ומייסד', license: '3072851', personId: 'owner-1' },
-  yoav: { name: 'יואב אלמוג', jobTitle: 'מתווך נדל״ן מורשה ומייסד', license: '3184627', personId: 'owner-2' },
+export const ARTICLE_AUTHORS: Record<'ram' | 'chaim', ArticleAuthor> = {
+  ram: { name: 'רם מזרחי', jobTitle: 'מתווך נדל״ן מורשה ומייסד', license: '3019640', personId: 'owner-1' },
+  chaim: { name: 'חיים ענבי', jobTitle: 'מתווך נדל״ן מורשה ומייסד', license: '3164492', personId: 'owner-2' },
 };
 
 // Which principal authored each guide (kept in sync with the inline author in each
-// article page.tsx). Defaults to yoav if a slug is missing.
-export const ARTICLE_AUTHOR_BY_SLUG: Record<string, 'daniel' | 'yoav'> = {
-  'home-staging': 'daniel',
-  'new-vs-secondhand': 'daniel',
-  'pre-purchase-checklist': 'daniel',
-  'apartment-pricing': 'daniel',
-  'selling-alone': 'daniel',
-  'holon-neighborhoods': 'yoav',
-  'landlord-guide': 'yoav',
-  'mortgage-guide': 'yoav',
-  'first-apartment-guide': 'yoav',
-  'urban-renewal-holon': 'yoav',
-  'purchase-tax-guide': 'yoav',
-  'foreign-investors': 'yoav',
+// article page.tsx). Defaults to chaim if a slug is missing.
+export const ARTICLE_AUTHOR_BY_SLUG: Record<string, 'ram' | 'chaim'> = {
+  'home-staging': 'ram',
+  'new-vs-secondhand': 'ram',
+  'pre-purchase-checklist': 'ram',
+  'apartment-pricing': 'ram',
+  'selling-alone': 'ram',
+  'holon-neighborhoods': 'chaim',
+  'landlord-guide': 'chaim',
+  'mortgage-guide': 'chaim',
+  'first-apartment-guide': 'chaim',
+  'urban-renewal-holon': 'chaim',
+  'purchase-tax-guide': 'chaim',
+  'foreign-investors': 'chaim',
 };
 
 export const getArticleAuthor = (id: string): ArticleAuthor =>
-  ARTICLE_AUTHORS[ARTICLE_AUTHOR_BY_SLUG[id] ?? 'yoav'];
+  ARTICLE_AUTHORS[ARTICLE_AUTHOR_BY_SLUG[id] ?? 'chaim'];

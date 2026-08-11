@@ -7,9 +7,6 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
-import ArticleToc from '../ArticleToc';
-import ArticleCta from '../ArticleCta';
-import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function HomeStagingContent() {
@@ -67,8 +64,6 @@ export default function HomeStagingContent() {
                 והחלק הטוב? <strong>זו ההשקעה עם התשואה הגבוהה ביותר בכל תהליך המכירה</strong> — אלפי שקלים שמחזירים עשרות אלפים. הנה השיטה המלאה.
               </p>
             </section>
-
-            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -182,10 +177,6 @@ export default function HomeStagingContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
-
-            {/* End CTA + related guides (shared components) */}
-            <ArticleCta articleId="home-staging" />
-            <RelatedArticles currentId="home-staging" />
           </div>
         </article>
       </div>

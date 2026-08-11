@@ -3,28 +3,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { m, useInView } from 'framer-motion';
 import OwnerCard from './OwnerCard';
-import SectionEyebrow from '@/components/ui/SectionEyebrow';
-
-/** Loading placeholder matching OwnerCard's dimensions (photo → name → role → actions). */
-function OwnerCardSkeleton() {
-  return (
-    <div className="flex flex-col items-center text-center max-w-lg mx-auto w-full" aria-hidden="true">
-      <div className="relative w-full max-w-[320px] aspect-[3/4] mb-8">
-        <div className="w-full h-full rounded-[40px] bg-[#E4E8F2] animate-pulse motion-reduce:animate-none" />
-      </div>
-      <div className="w-full px-4 flex flex-col items-center">
-        <div className="h-9 w-48 rounded-lg bg-[#E4E8F2] animate-pulse motion-reduce:animate-none mb-3" />
-        <div className="h-5 w-32 rounded-lg bg-[#E4E8F2] animate-pulse motion-reduce:animate-none mb-6" />
-        <div className="h-4 w-full max-w-sm rounded bg-[#E4E8F2] animate-pulse motion-reduce:animate-none mb-2" />
-        <div className="h-4 w-3/4 max-w-xs rounded bg-[#E4E8F2] animate-pulse motion-reduce:animate-none mb-8" />
-        <div className="flex justify-center gap-4">
-          <div className="h-12 w-40 rounded-full bg-[#E4E8F2] animate-pulse motion-reduce:animate-none" />
-          <div className="h-12 w-36 rounded-full bg-[#E4E8F2] animate-pulse motion-reduce:animate-none" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 type Owner = {
   id: number;
@@ -66,7 +44,7 @@ export default function AboutOwners() {
   return (
     <m.section
       ref={ownersRef}
-      className="relative py-24 w-full overflow-hidden bg-white"
+      className="relative py-24 w-full overflow-hidden bg-[#faf7f2]"
       dir="rtl"
       initial={{ opacity: 0 }}
       animate={ownersInView ? { opacity: 1 } : {}}
@@ -75,10 +53,7 @@ export default function AboutOwners() {
         
         {/* Header */}
         <div className="text-center mb-20">
-          <div className="mb-3">
-            <SectionEyebrow tone="light" align="center">ההנהלה</SectionEyebrow>
-          </div>
-          <h2 className="font-caramel text-4xl md:text-5xl font-extrabold text-[#051150] mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-4">
             המייסדים שלנו
           </h2>
         </div>
@@ -86,11 +61,7 @@ export default function AboutOwners() {
         {/* Grid Layout - 2 Columns for Founders */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 justify-items-center">
           {loading ? (
-            <>
-              <span className="sr-only" role="status">טוען נתונים…</span>
-              <OwnerCardSkeleton />
-              <OwnerCardSkeleton />
-            </>
+            <p className="text-center text-slate-400 col-span-2">טוען נתונים...</p>
           ) : owners.length > 0 ? (
             owners.map((owner, index) => (
               <OwnerCard

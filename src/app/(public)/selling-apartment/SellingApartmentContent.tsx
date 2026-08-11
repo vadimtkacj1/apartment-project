@@ -1,10 +1,7 @@
 'use client';
 
-import { Fragment } from 'react';
-import Link from 'next/link';
 import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
-import SectionEyebrow from '@/components/ui/SectionEyebrow';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import ContactForm from '@/components/layout/ContactForm';
@@ -158,46 +155,31 @@ export default function SellingApartmentContent() {
       <Breadcrumbs />
       <main className="max-w-7xl mx-auto px-6 lg:px-12 py-16">
         {sections.map((section, index) => (
-          <Fragment key={section.id}>
-            <m.section
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.7, delay: index * 0.1 }}
-              className={`mb-20 flex flex-col ${section.reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-4 lg:gap-6 items-center`}
-            >
-              <div className="flex-1 space-y-6">
-                <div>
-                  <SectionEyebrow tone="light" align="start">שלב {section.id}</SectionEyebrow>
-                  <h2 className="mt-2 text-3xl md:text-4xl font-black text-gray-900">
-                    {section.title}
-                  </h2>
-                </div>
-                <div className="text-lg leading-relaxed">
-                  {section.content}
-                </div>
+          <m.section
+            key={section.id}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-100px' }}
+            transition={{ duration: 0.7, delay: index * 0.1 }}
+            className={`mb-20 flex flex-col ${section.reverse ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-4 lg:gap-6 items-center`}
+          >
+            <div className="flex-1 space-y-6">
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900">
+                {section.title}
+              </h2>
+              <div className="text-lg leading-relaxed">
+                {section.content}
               </div>
-              {/* Decorative illustration — capped so the text leads */}
-              <div className="flex-1 relative w-full max-w-md mx-auto h-56 lg:h-96">
-                <Image
-                  src={section.image}
-                  alt=""
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            </m.section>
-            {index === 1 && (
-              <div className="-mt-10 mb-20">
-                <Link
-                  href="/#contact"
-                  className="inline-flex items-center gap-2 rounded-xl font-bold text-[#354AC4] transition-colors hover:text-[#28389B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#354AC4]"
-                >
-                  דברו איתנו ←
-                </Link>
-              </div>
-            )}
-          </Fragment>
+            </div>
+            <div className="flex-1 relative w-full h-[500px] lg:h-[600px]">
+              <Image
+                src={section.image}
+                alt={section.title}
+                fill
+                className="object-contain"
+              />
+            </div>
+          </m.section>
         ))}
         <FAQ items={faqItems} />
         <m.section

@@ -35,7 +35,7 @@ export default function AboutServices() {
   return (
     <section 
       ref={servicesRef} 
-      className="py-24 w-full bg-[#f5f7fb]" // Теплый фон секции
+      className="py-24 w-full bg-[#faf7f2]" // Теплый фон секции
       dir="rtl" 
     >
       <div className="max-w-[1300px] mx-auto px-6">
@@ -47,7 +47,7 @@ export default function AboutServices() {
           animate={servicesInView ? { y: 0, opacity: 1 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-extrabold text-[#051150] mb-4">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-[#1c3664] mb-4">
             השירותים שלנו
           </h2>
           <p className="text-lg text-slate-500 max-w-2xl mx-auto">
@@ -87,7 +87,7 @@ export default function AboutServices() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="text-2xl md:text-3xl font-bold text-[#051150] mb-3 leading-tight">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#1c3664] mb-3 leading-tight">
                     {service.title}
                   </h3>
 

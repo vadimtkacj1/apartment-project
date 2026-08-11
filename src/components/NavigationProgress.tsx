@@ -271,8 +271,9 @@ function NavigationProgressInner() {
           height: '100%',
           width: `${progress}%`,
           marginInlineStart: 0,
-          background: '#354AC4',
-          boxShadow: 'none',
+          background:
+            'linear-gradient(90deg, #1c3664 0%, #2a4f8f 60%, #3a66b0 100%)',
+          boxShadow: '0 0 8px rgba(28, 54, 100, 0.55), 0 0 4px rgba(28, 54, 100, 0.45)',
           borderRadius: '0 2px 2px 0',
           transition: done
             ? 'width 180ms ease-out, opacity 220ms ease-in 80ms'

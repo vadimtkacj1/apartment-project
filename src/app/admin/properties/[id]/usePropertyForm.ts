@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { toast } from '@/components/shadcn/sonner';
+import { App } from 'antd';
+import { FormInstance } from 'antd';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyForm } from './types';
 import { INITIAL_FORM } from './constants';
 import { getCityLabel, getCitySlug } from '@/data/cities';
@@ -13,9 +12,10 @@ dayjs.extend(customParseFormat);
 
 export function usePropertyForm(
   propertyId: string | string[] | undefined,
-  isNew: boolean
+  isNew: boolean,
+  form: FormInstance
 ) {
-  const t = useAdminMessages(propertyFormMessages);
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<PropertyForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -40,6 +40,38 @@ export function usePropertyForm(
       if (response.ok) {
         const data = await response.json();
 
+        // Convert vacancyDate string to dayjs object if it exists
+        // Handle different date formats and "מיד" (immediately) value
+        let vacancyDateValue: any = null;
+        if (data.vacancyDate) {
+          if (data.vacancyDate === 'מיד' || data.vacancyDate === 'immediately') {
+            vacancyDateValue = 'מיד';
+          } else if (data.vacancyDate === 'גמיש' || data.vacancyDate === 'flexible') {
+            vacancyDateValue = 'גמיש';
+          } else {
+            // Try different date formats
+            try {
+              // Try DD/MM/YYYY format first
+              const parsed = dayjs(data.vacancyDate, 'DD/MM/YYYY', true);
+              if (parsed.isValid()) {
+                vacancyDateValue = parsed;
+              } else {
+                // Try ISO format
+                const isoParsed = dayjs(data.vacancyDate);
+                if (isoParsed.isValid()) {
+                  vacancyDateValue = isoParsed;
+                } else {
+                  // If all parsing fails, keep as string
+                  vacancyDateValue = data.vacancyDate;
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to parse date:', data.vacancyDate, e);
+              vacancyDateValue = data.vacancyDate;
+            }
+          }
+        }
+
         // Convert agentIds to new format if needed (backward compatibility)
         let agentIds = data.agentIds || [];
         if (agentIds.length > 0 && typeof agentIds[0] === 'number') {
@@ -47,15 +79,22 @@ export function usePropertyForm(
           agentIds = agentIds.map((id: number) => `team-${id}`);
         }
 
-        // Keep vacancyDate as string in formData for API submission.
+        const formValues = {
+          ...data,
+          vacancyDate: vacancyDateValue,
+          agentIds,
+        };
+
+        // Keep vacancyDate as string in formData for API submission
         setFormData({
           ...data,
           vacancyDate: data.vacancyDate || null,
           agentIds,
         });
+        form.setFieldsValue(formValues);
       }
     } catch (err) {
-      toast.error(t.feedback.loadError);
+      message.error('שגיאה בטעינת הנכס');
     } finally {
       setLoading(false);
     }
@@ -69,12 +108,16 @@ export function usePropertyForm(
         const cityLabel = getCityLabel(updated.city) || updated.city;
         const parts = [cityLabel, updated.neighborhood].filter(Boolean);
         updated.location = parts.join(', ');
+        // Update location in form as well
+        form.setFieldValue('location', updated.location);
       }
+      // Update form value to keep it in sync
+      form.setFieldValue(field, value);
       return updated;
     });
   };
 
-  const handleSubmit = async (onSuccess?: () => void) => {
+  const handleSubmit = async (values: any, onSuccess?: () => void) => {
     setSaving(true);
 
     try {
@@ -85,7 +128,7 @@ export function usePropertyForm(
       const method = isNew ? 'POST' : 'PUT';
 
       // Convert vacancyDate to string if it's a dayjs object
-      const submitData: any = { ...formData };
+      const submitData = { ...formData, ...values };
       if (submitData.vacancyDate && typeof submitData.vacancyDate === 'object' && dayjs.isDayjs(submitData.vacancyDate)) {
         submitData.vacancyDate = submitData.vacancyDate.format('DD/MM/YYYY');
       }
@@ -100,7 +143,7 @@ export function usePropertyForm(
 
       if (response.ok) {
         setDirty(false);
-        toast.success(t.feedback.saveSuccess);
+        message.success('הנכס נשמר בהצלחה');
         if (onSuccess) {
           // Keep saving=true until redirect to prevent double submission
           setTimeout(onSuccess, 1500);
@@ -109,12 +152,12 @@ export function usePropertyForm(
         setSaving(false);
       } else {
         const errorMessage =
-          responseData.error || responseData.message || t.feedback.saveError;
-        toast.error(errorMessage);
+          responseData.error || responseData.message || 'שגיאה בשמירת הנכס';
+        message.error(errorMessage);
         setSaving(false);
       }
     } catch (err: any) {
-      toast.error(err.message || t.feedback.saveError);
+      message.error(err.message || 'שגיאה בשמירת הנכס');
       setSaving(false);
     }
   };
@@ -122,25 +165,32 @@ export function usePropertyForm(
   const handleAddressFromMap = (address: any) => {
     // Auto-fill address fields from map geocoding
     if (address.city) {
-      handleChange('city', getCitySlug(address.city));
+      const mappedCity = getCitySlug(address.city);
+      handleChange('city', mappedCity);
+      form.setFieldValue('city', mappedCity);
     }
 
     if (address.street) {
       handleChange('street', address.street);
+      form.setFieldValue('street', address.street);
     }
 
     if (address.streetNumber) {
       handleChange('streetNumber', address.streetNumber);
+      form.setFieldValue('streetNumber', address.streetNumber);
     }
 
     if (address.neighborhood) {
       handleChange('neighborhood', address.neighborhood);
+      form.setFieldValue('neighborhood', address.neighborhood);
     }
 
     // Auto-generate location display
     const locationParts = [address.city, address.neighborhood].filter(Boolean);
     if (locationParts.length > 0) {
-      handleChange('location', locationParts.join(', '));
+      const locationStr = locationParts.join(', ');
+      handleChange('location', locationStr);
+      form.setFieldValue('location', locationStr);
     }
   };
 

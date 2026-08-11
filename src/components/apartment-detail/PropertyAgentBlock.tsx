@@ -43,9 +43,9 @@ export function PropertyAgentBlock({
         isSold ? "border-gray-200 opacity-70" : "border-gray-100"
       }`}
     >
-      <h3 className="mb-4 text-xl font-bold text-[#051150]">יצירת קשר</h3>
+      <h3 className="mb-4 text-xl font-bold text-[#1c3664]">יצירת קשר</h3>
       <div className="flex flex-col gap-3">
-        {agents.map((agent) => {
+        {agents.filter((agent) => agent.image).map((agent) => {
           const whatsappNum = agent.whatsapp || agent.phone;
           const whatsappLink = whatsappNum
             ? `https://wa.me/${formatWhatsAppNumber(whatsappNum)}`
@@ -57,7 +57,7 @@ export function PropertyAgentBlock({
               className="flex flex-wrap items-center gap-3 py-2"
             >
               <div className="flex items-center gap-3 text-gray-900 font-semibold">
-                {agent.image ? (
+                {agent.image && (
                   <Image
                     src={agent.image}
                     alt={agent.name}
@@ -66,13 +66,6 @@ export function PropertyAgentBlock({
                     className="w-20 h-24 rounded-2xl object-cover shadow-md"
                     onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                   />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#EEF1FB] text-lg font-bold text-[#354AC4]"
-                  >
-                    {agent.name?.trim().charAt(0) || '?'}
-                  </span>
                 )}
                 <span>{agent.name}</span>
               </div>
@@ -81,10 +74,10 @@ export function PropertyAgentBlock({
                   href={`tel:${agent.phone.replace(/\D/g, "")}`}
                   onClick={() => propertyId && analytics.trackPhoneClick(propertyId)}
                   className={`inline-flex items-center gap-1.5 font-medium ${
-                    isSold ? "pointer-events-none text-gray-400" : "text-[#354AC4] hover:underline"
+                    isSold ? "pointer-events-none text-gray-400" : "text-[#1c3664] hover:underline"
                   }`}
                 >
-                  <Phone size={16} aria-hidden="true" />
+                  <Phone size={16} />
                   <span dir="ltr">{agent.phone}</span>
                 </a>
               )}
@@ -100,7 +93,7 @@ export function PropertyAgentBlock({
                       : "bg-[#25D366] text-white hover:bg-[#20bd5a] hover:shadow-lg"
                   }`}
                 >
-                  <FaWhatsapp size={20} aria-hidden="true" />
+                  <FaWhatsapp size={20} />
                   <span>WhatsApp</span>
                 </a>
               )}

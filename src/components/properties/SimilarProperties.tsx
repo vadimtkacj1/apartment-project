@@ -84,7 +84,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
 
   if (loading) {
     return (
-      <section className="w-full py-16 bg-[#fbfcfe]" dir="rtl">
+      <section className="w-full py-16 bg-[#fdfbf7]" dir="rtl">
         <div className="px-6 lg:px-12">
           <div className="text-center py-10">
             <p className="text-gray-600">טוען נכסים דומים...</p>
@@ -110,7 +110,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl font-black text-[#051150] mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-3xl font-black text-[#1c3664] mb-4 uppercase" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             נכסים דומים
           </h2>
           <p className="text-slate-500 text-lg font-medium">

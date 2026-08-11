@@ -29,7 +29,7 @@ export default function PrivacyPolicyContent() {
                   אנא קרא הוראות הסכם זה (להלן: "מדיניות הפרטיות") בקפידה, בטרם תעשה שימוש באתר האינטרנט (להלן: "האתר"). שימוש באתר מהווה הסכמה למדיניות זו. אם אינך מסכים לה, עליך להפסיק באופן מיידי את השימוש באתר.
                 </li>
                 <li>
-                  ההגדרות הקבועות בתנאי השימוש של האתר יחולו גם על מדיניות פרטיות זו. המשרד "Aiterra" (להלן: "המשרד" או "בית העסק") רשאי לעדכן, לשנות או לתקן מעת לעת את תנאי השימוש ואת מדיניות הפרטיות, וזאת לפי שיקול דעתו הבלעדי, ופרסום השינויים באתר יהווה הודעה עליהם.
+                  ההגדרות הקבועות בתנאי השימוש של האתר יחולו גם על מדיניות פרטיות זו. המשרד "רם שיווק נכסים & חיים ענבי" (להלן: "המשרד" או "בית העסק") רשאי לעדכן, לשנות או לתקן מעת לעת את תנאי השימוש ואת מדיניות הפרטיות, וזאת לפי שיקול דעתו הבלעדי, ופרסום השינויים באתר יהווה הודעה עליהם.
                 </li>
                 <li>
                   מדיניות הפרטיות ותנאי השימוש נכתבו בלשון זכר יחיד לשם נוחות בלבד, אולם הם מתייחסים לכל המינים ולרבים כאחד. הכותרות נועדו לנוחות בלבד ואין לייחס להן פרשנות משפטית.
@@ -220,9 +220,9 @@ export default function PrivacyPolicyContent() {
                 בכל שאלה הנוגעת למדיניות פרטיות זו, ניתן לפנות אלינו בפרטים הבאים:
               </p>
               <div className="contact-details">
-                <p><strong>שם בית העסק:</strong> Aiterra</p>
-                <p><strong>דוא"ל:</strong> daniel.sharon.re@gmail.com</p>
-                <p><strong>טלפון:</strong> 052-384-7291</p>
+                <p><strong>שם בית העסק:</strong> רם שיווק נכסים & חיים ענבי</p>
+                <p><strong>דוא"ל:</strong> rammiz800@gmail.com</p>
+                <p><strong>טלפון:</strong> 050-549-6626</p>
                 <p><strong>כתובת:</strong> חנקין 83 חולון, ישראל</p>
               </div>
             </section>
@@ -236,7 +236,7 @@ export default function PrivacyPolicyContent() {
           max-width: 1200px;
           margin: 0 auto;
           padding: 2rem 2rem 4rem;
-          background: #f5f7fb;
+          background: #faf7f2;
         }
 
         @media (min-width: 1920px) {
@@ -255,13 +255,13 @@ export default function PrivacyPolicyContent() {
           padding: 0;
           direction: rtl;
           text-align: right;
-          background: #f5f7fb;
+          background: #faf7f2;
         }
 
         .privacy-section {
           margin-bottom: 3rem;
           padding-bottom: 2rem;
-          border-bottom: 1px solid rgba(5, 17, 80, 0.1);
+          border-bottom: 1px solid rgba(28, 54, 100, 0.1);
         }
 
         .privacy-section:last-child {
@@ -272,7 +272,7 @@ export default function PrivacyPolicyContent() {
         .privacy-section h2 {
           font-size: 2rem;
           font-weight: 700;
-          color: #051150;
+          color: #1c3664;
           margin: 0 0 1.5rem 0;
           line-height: 1.3;
           font-family: var(--font-caramel), cursive, sans-serif;
@@ -281,7 +281,7 @@ export default function PrivacyPolicyContent() {
         .privacy-section h3 {
           font-size: 1.35rem;
           font-weight: 600;
-          color: #051150;
+          color: #1c3664;
           margin: 1.5rem 0 0.75rem 0;
           font-family: var(--font-caramel), cursive, sans-serif;
         }
@@ -316,7 +316,7 @@ export default function PrivacyPolicyContent() {
 
         .privacy-section ul li::before {
           content: "•";
-          color: #2A69C4;
+          color: #B8821E;
           font-weight: bold;
           font-size: 1.4rem;
           position: absolute;
@@ -329,7 +329,7 @@ export default function PrivacyPolicyContent() {
           border-radius: 12px;
           padding: 1.5rem;
           margin-bottom: 1.5rem;
-          border: 1px solid rgba(5, 17, 80, 0.08);
+          border: 1px solid rgba(28, 54, 100, 0.08);
         }
 
         .info-item h3 {
@@ -341,15 +341,15 @@ export default function PrivacyPolicyContent() {
         }
 
         .info-item.highlight {
-          background: rgba(85, 148, 241, 0.08);
-          border-color: rgba(85, 148, 241, 0.2);
+          background: rgba(184, 130, 30, 0.08);
+          border-color: rgba(184, 130, 30, 0.2);
         }
 
         .contact-section {
-          background: #f4f6fb;
+          background: linear-gradient(135deg, rgba(28, 54, 100, 0.05) 0%, rgba(184, 130, 30, 0.05) 100%);
           border-radius: 16px;
           padding: 2rem;
-          border: 1px solid rgba(5, 17, 80, 0.1);
+          border: 1px solid rgba(28, 54, 100, 0.1);
         }
 
         .contact-details {
@@ -362,12 +362,12 @@ export default function PrivacyPolicyContent() {
         }
 
         .contact-details strong {
-          color: #051150;
+          color: #1c3664;
           font-weight: 600;
         }
 
         strong {
-          color: #051150;
+          color: #1c3664;
           font-weight: 600;
         }
 

@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   articles,
   getArticle,
@@ -46,13 +46,13 @@ describe('getArticle', () => {
 
 describe('article authorship', () => {
   it('ARTICLE_AUTHORS has the two known principals with license numbers', () => {
-    expect(ARTICLE_AUTHORS.daniel.name).toBe('דניאל שרון');
-    expect(ARTICLE_AUTHORS.yoav.name).toBe('יואב אלמוג');
-    expect(ARTICLE_AUTHORS.daniel.license).toMatch(/^\d+$/);
-    expect(ARTICLE_AUTHORS.yoav.license).toMatch(/^\d+$/);
+    expect(ARTICLE_AUTHORS.ram.name).toBe('רם מזרחי');
+    expect(ARTICLE_AUTHORS.chaim.name).toBe('חיים ענבי');
+    expect(ARTICLE_AUTHORS.ram.license).toMatch(/^\d+$/);
+    expect(ARTICLE_AUTHORS.chaim.license).toMatch(/^\d+$/);
     // personId links to the canonical Person @id on /about.
-    expect(ARTICLE_AUTHORS.daniel.personId).toBe('owner-1');
-    expect(ARTICLE_AUTHORS.yoav.personId).toBe('owner-2');
+    expect(ARTICLE_AUTHORS.ram.personId).toBe('owner-1');
+    expect(ARTICLE_AUTHORS.chaim.personId).toBe('owner-2');
   });
 
   it('every article id has an author mapping', () => {
@@ -63,16 +63,16 @@ describe('article authorship', () => {
 
   it('author mappings reference only known principals', () => {
     for (const key of Object.values(ARTICLE_AUTHOR_BY_SLUG)) {
-      expect(['daniel', 'yoav']).toContain(key);
+      expect(['ram', 'chaim']).toContain(key);
     }
   });
 
   it('getArticleAuthor returns the mapped principal', () => {
-    expect(getArticleAuthor('mortgage-guide')).toBe(ARTICLE_AUTHORS.yoav);
-    expect(getArticleAuthor('home-staging')).toBe(ARTICLE_AUTHORS.daniel);
+    expect(getArticleAuthor('mortgage-guide')).toBe(ARTICLE_AUTHORS.chaim);
+    expect(getArticleAuthor('home-staging')).toBe(ARTICLE_AUTHORS.ram);
   });
 
-  it('getArticleAuthor defaults to yoav for an unmapped slug', () => {
-    expect(getArticleAuthor('unknown-slug')).toBe(ARTICLE_AUTHORS.yoav);
+  it('getArticleAuthor defaults to chaim for an unmapped slug', () => {
+    expect(getArticleAuthor('unknown-slug')).toBe(ARTICLE_AUTHORS.chaim);
   });
 });

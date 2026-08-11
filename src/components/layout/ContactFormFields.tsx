@@ -8,10 +8,6 @@ interface ContactFormFieldsProps {
   onSubmitSuccess?: () => void;
   resetOnSubmit?: boolean;
   idPrefix?: string;
-  /** When set, the lead is attributed to this property in /api/contact + analytics. */
-  propertyId?: string | number;
-  /** Lead source label persisted with the inquiry (defaults server-side to "contact_form"). */
-  source?: string;
 }
 
 export interface FormData {
@@ -24,9 +20,7 @@ export interface FormData {
 const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
   onSubmitSuccess,
   resetOnSubmit = false,
-  idPrefix = '',
-  propertyId,
-  source
+  idPrefix = ''
 }) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -64,12 +58,6 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           name: formData.name,
           phone: formData.phone,
           message: formData.message,
-          // Attribute the lead to a specific property when this form is rendered
-          // on a detail page. The API only persists integer propertyIds.
-          ...(propertyId != null && propertyId !== ''
-            ? { propertyId: Number(propertyId) }
-            : {}),
-          ...(source ? { source } : {}),
         }),
       });
 
@@ -81,9 +69,8 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           message: 'הפנייה נשלחה בהצלחה! נחזור אליך בקרוב'
         });
 
-        // Track contact form submission (success branch only), attributed to the
-        // property when a propertyId was threaded in.
-        analytics.trackContactForm(propertyId);
+        // Track contact form submission
+        analytics.trackContactForm();
 
         // Reset form state if enabled
         if (resetOnSubmit) {
@@ -153,7 +140,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
       {/* Full Name Field */}
       <div>
         <label htmlFor={`${idPrefix}name`} className="block text-lg font-bold text-gray-900 mb-3">
-          שם מלא <span className="text-[#051150]">*</span>
+          שם מלא <span className="text-[#1c3664]">*</span>
         </label>
         <input
           type="text"
@@ -162,7 +149,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#354ac4] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#354ac4]/20 transition-all duration-300"
+          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
           placeholder="הזן את שמך המלא"
         />
       </div>
@@ -170,11 +157,11 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
       {/* Phone Number Field */}
       <div>
         <label htmlFor={`${idPrefix}phone`} className="block text-lg font-bold text-gray-900 mb-3">
-          טלפון <span className="text-[#051150]">*</span>
+          טלפון <span className="text-[#1c3664]">*</span>
         </label>
         <div className="relative">
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-            <Phone size={20} className="text-gray-400" aria-hidden="true" />
+            <Phone size={20} className="text-gray-400" />
           </div>
           <input
             type="tel"
@@ -186,7 +173,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
             maxLength={12}
             inputMode="numeric"
             pattern="[0-9-]*"
-            className="w-full pr-12 pl-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#354ac4] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#354ac4]/20 transition-all duration-300"
+            className="w-full pr-12 pl-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
             placeholder="050-123-4567"
             dir="ltr"
           />
@@ -204,7 +191,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           value={formData.message}
           onChange={handleChange}
           rows={5}
-          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#354ac4] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#354ac4]/20 transition-all duration-300 resize-none"
+          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300 resize-none"
           placeholder="ספר לנו במה אתה מעוניין - מכירה, קניה, השכרה... (אופציונלי)"
         />
       </div>
@@ -218,10 +205,10 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
             checked={formData.consent}
             onChange={handleChange}
             required
-            className="mt-1 w-5 h-5 text-[#354ac4] border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#354ac4]/20 cursor-pointer"
+            className="mt-1 w-5 h-5 text-[#1c3664] border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#1c3664]/20 cursor-pointer"
           />
           <span className="text-sm text-gray-700 leading-relaxed">
-            אני מאשר/ת לחזור אליי גם בפנייה טלפונית בהתאם להוראות סעיף 16ג לחוק הגנת הצרכן, תשמ"א–1981, ו/או מאשר/ת קבלת דיוור ומידע פרסומי בדוא"ל ו/או באמצעות מסרונים מחברת דניאל ויואב נכסים ו/או חברות הקשורות אליה, ומסכים/ה לתקנון האתר.
+            אני מאשר/ת לחזור אליי גם בפנייה טלפונית בהתאם להוראות סעיף 16ג לחוק הגנת הצרכן, תשמ"א–1981, ו/או מאשר/ת קבלת דיוור ומידע פרסומי בדוא"ל ו/או באמצעות מסרונים מחברת רם וחיים נכסים ו/או חברות הקשורות אליה, ומסכים/ה לתקנון האתר.
           </span>
         </label>
       </div>
@@ -229,8 +216,6 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
       {/* Status Messages */}
       {submitStatus.type && (
         <m.div
-          role="status"
-          aria-live="polite"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className={`p-4 rounded-xl text-center font-bold ${
@@ -249,17 +234,16 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
         disabled={isSubmitting}
         whileHover={!isSubmitting ? { scale: 1.01 } : {}}
         whileTap={!isSubmitting ? { scale: 0.99 } : {}}
-        className={`w-full px-8 py-5 text-white font-black text-xl rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group mt-4 ${
+        className={`w-full px-8 py-5 text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group mt-4 ${
           isSubmitting
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-[#354ac4] hover:bg-[#28389b]'
+            : 'bg-[#1c3664] hover:bg-[#152a4f]'
         }`}
       >
         <span>{isSubmitting ? 'שולח...' : 'שלח הודעה'}</span>
         {!isSubmitting && (
           <Send
             size={22}
-            aria-hidden="true"
             className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
           />
         )}

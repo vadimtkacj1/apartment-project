@@ -133,7 +133,7 @@ describe('getFullProperty', () => {
 
     expect(ownerFindMany).not.toHaveBeenCalled();
     expect(teamFindMany).toHaveBeenCalledWith({ where: { id: { in: [3, 4] }, isActive: true } });
-    expect(res!.agents.map((a: { id: number }) => a.id)).toEqual([3, 4]);
+    expect(res!.agents.map((a) => a.id)).toEqual([3, 4]);
     expect(res!.agents[0].phone).toBe('052-3'); // mobile preferred
     expect(res!.agents[1].phone).toBe('03-4'); // falls back to phone
   });

@@ -198,18 +198,10 @@ jobs:
             # rows are preserved. Required so new columns (e.g. User.isActive, Property
             # SEO fields) and tables (Inquiry) exist before the app queries them.
             echo "🗄️ Syncing database schema (additive, non-destructive)..."
-            npx prisma db push --skip-generate || echo "⚠️ Schema sync issue — check logs (app may need new columns.)"
-
-            # Hand-written additive SQL for schema changes db push cannot deliver
-            # safely: every statement is IF NOT EXISTS, so re-running is a no-op and
-            # a database that has drifted from schema.prisma is left untouched
-            # (db push would want to drop the columns it does not know about).
-            echo "🗄️ Applying additive SQL migrations..."
-            for sql in prisma/sql/*.sql; do
-              [ -e "$sql" ] || continue
-              echo "   → $sql"
-              npx prisma db execute --file "$sql" || echo "⚠️ Failed to apply $sql — check logs."
-            done
+            # NOTE: Prisma 7 removed `--skip-generate`; passing it made this step
+            # fail on every deploy, and `|| echo` swallowed the error — so no schema
+            # change had reached the server DB since the Prisma 7 upgrade.
+            npx prisma db push || echo "⚠️ Schema sync issue — check logs (app may need new columns)."
 
             # Install PM2 if not available
             if ! command -v pm2 &> /dev/null; then

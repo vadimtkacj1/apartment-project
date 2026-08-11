@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import type { AdminLocale } from '@/lib/adminI18n';
 
 /**
  * SINGLE SOURCE OF TRUTH for admin sections.
@@ -10,17 +9,13 @@ import type { AdminLocale } from '@/lib/adminI18n';
  *
  * Nav, active-state and breadcrumbs all follow automatically — nothing else to touch.
  */
-
-/** A label in both admin languages; resolve with `label[locale]`. */
-export type LocalizedText = Record<AdminLocale, string>;
-
 export interface AdminSection {
   /** Stable key (antd Menu key / React key). */
   key: string;
   /** First path segment after /admin/ ('' = dashboard). Used for breadcrumbs. */
   segment: string;
-  /** Label shown in the sidebar and breadcrumb (Hebrew base + English). */
-  label: LocalizedText;
+  /** Hebrew label shown in the sidebar and breadcrumb. */
+  label: string;
   /** Canonical route for this section's main page. */
   href: string;
   /** Sidebar icon (20×20, fill=currentColor). */
@@ -31,7 +26,7 @@ export interface AdminSection {
   roles?: string[];
   /** Route + label for the "add new" page (sections with a create/edit form). */
   addHref?: string;
-  addLabel?: LocalizedText;
+  addLabel?: string;
 }
 
 /** Sections the given role is allowed to see (sections without `roles` are public to all). */
@@ -43,7 +38,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'dashboard',
     segment: '',
-    label: { he: 'לוח בקרה', en: 'Dashboard' },
+    label: 'לוח בקרה',
     href: '/admin',
     isActive: (p) => p === '/admin' || p === '/admin/',
     icon: (
@@ -57,7 +52,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'inquiries',
     segment: 'inquiries',
-    label: { he: 'פניות', en: 'Inquiries' },
+    label: 'פניות',
     href: '/admin/inquiries',
     isActive: (p) => p.includes('/inquiries'),
     icon: (
@@ -69,11 +64,11 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'properties',
     segment: 'properties',
-    label: { he: 'נכסים', en: 'Properties' },
+    label: 'נכסים',
     href: '/admin/properties',
     isActive: (p) => p.includes('/properties'),
     addHref: '/admin/properties/new',
-    addLabel: { he: 'הוספת נכס', en: 'Add Property' },
+    addLabel: 'הוספת נכס',
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path
@@ -85,16 +80,28 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     ),
   },
   {
-    // Owners / Team / Users merged into one tabbed page (/admin/people?tab=…).
-    // The Users tab is gated to admins inside the page itself, so the section
-    // is visible to everyone. Old routes stay live for deep links (see
-    // LEGACY_CRUMB_SECTIONS below) and keep this section highlighted.
-    key: 'people',
-    segment: 'people',
-    label: { he: 'אנשים', en: 'People' },
-    href: '/admin/people',
-    isActive: (p) =>
-      p.includes('/people') || p.includes('/owners') || p.includes('/team') || p.includes('/users'),
+    key: 'owners',
+    segment: 'owners',
+    label: 'בעלים',
+    href: '/admin/owners',
+    isActive: (p) => p.includes('/owners'),
+    addHref: '/admin/owners/new',
+    addLabel: 'הוספת בעלים',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9Z" />
+        <path d="M3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18H3Z" />
+      </svg>
+    ),
+  },
+  {
+    key: 'team',
+    segment: 'team',
+    label: 'צוות',
+    href: '/admin/team',
+    isActive: (p) => p.includes('/team'),
+    addHref: '/admin/team/new',
+    addLabel: 'הוספת חבר צוות',
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
         <path d="M13 6C13 7.65685 11.6569 9 10 9C8.34315 9 7 7.65685 7 6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6Z" />
@@ -109,7 +116,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'homepage',
     segment: 'homepage',
-    label: { he: 'עמוד הבית', en: 'Homepage' },
+    label: 'עמוד הבית',
     href: '/admin/homepage',
     isActive: (p) => p.includes('/homepage'),
     icon: (
@@ -119,21 +126,9 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     ),
   },
   {
-    key: 'design',
-    segment: 'design',
-    label: { he: 'עיצוב האתר', en: 'Site design' },
-    href: '/admin/design',
-    isActive: (p) => p.includes('/design'),
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H14c2.21 0 4-1.79 4-4 0-3.87-3.58-7-8-7ZM5.5 10a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm2.5-3.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm4 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Zm2.5 3.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z" />
-      </svg>
-    ),
-  },
-  {
     key: 'analytics',
     segment: 'analytics',
-    label: { he: 'אנליטיקה', en: 'Analytics' },
+    label: 'אנליטיקה',
     href: '/admin/analytics',
     isActive: (p) => p.includes('/analytics'),
     icon: (
@@ -145,7 +140,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   {
     key: 'contact',
     segment: 'contact',
-    label: { he: 'פרטי התקשרות', en: 'Contact Info' },
+    label: 'פרטי התקשרות',
     href: '/admin/contact/contact-info',
     isActive: (p) => p.includes('/contact'),
     icon: (
@@ -154,63 +149,46 @@ export const ADMIN_SECTIONS: AdminSection[] = [
       </svg>
     ),
   },
-];
-
-/**
- * Sections that used to live in the sidebar but were merged into /admin/people.
- * Their routes remain live for deep links / bookmarks; these entries exist ONLY
- * so buildAdminCrumbs still resolves them (list, /new and edit pages) properly.
- */
-type LegacyCrumbSection = Pick<AdminSection, 'segment' | 'label' | 'href' | 'addLabel'>;
-const LEGACY_CRUMB_SECTIONS: LegacyCrumbSection[] = [
   {
-    segment: 'owners',
-    label: { he: 'בעלים', en: 'Owners' },
-    href: '/admin/owners',
-    addLabel: { he: 'הוספת בעלים', en: 'Add Owner' },
-  },
-  {
-    segment: 'team',
-    label: { he: 'צוות', en: 'Team' },
-    href: '/admin/team',
-    addLabel: { he: 'הוספת חבר צוות', en: 'Add Team Member' },
-  },
-  {
+    key: 'users',
     segment: 'users',
-    label: { he: 'משתמשים', en: 'Users' },
+    label: 'משתמשים',
     href: '/admin/users',
+    isActive: (p) => p.includes('/users'),
+    roles: ['admin'], // only admins manage system users
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.53 1.53 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.53 1.53 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.53 1.53 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.532 1.532 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.53 1.53 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.53 1.53 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.53 1.53 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+        />
+      </svg>
+    ),
   },
 ];
 
-/** Build a breadcrumb trail from the current page path (never leaks raw slugs). */
+/** Build a Hebrew breadcrumb trail from the current page path (never leaks raw slugs). */
 export interface Crumb {
   title: string;
   href?: string;
 }
 
-const CRUMB_FALLBACKS: Record<AdminLocale, { root: string; add: string; edit: string }> = {
-  he: { root: 'ניהול', add: 'הוספה', edit: 'עריכה' },
-  en: { root: 'Admin', add: 'Add', edit: 'Edit' },
-};
-
-export function buildAdminCrumbs(name: string, locale: AdminLocale = 'he'): Crumb[] {
-  const f = CRUMB_FALLBACKS[locale];
-  const root: Crumb = { title: f.root, href: '/admin' };
+export function buildAdminCrumbs(name: string): Crumb[] {
+  const root: Crumb = { title: 'ניהול', href: '/admin' };
   const base = name.split('/')[0]; // '' for the dashboard root
-  const section =
-    ADMIN_SECTIONS.find((s) => s.segment === base) ??
-    LEGACY_CRUMB_SECTIONS.find((s) => s.segment === base);
+  const section = ADMIN_SECTIONS.find((s) => s.segment === base);
 
   if (!section) return [root, { title: name }];
 
   // The section's own main page (dashboard, a list, or contact-info).
   const fullPath = name ? `/admin/${name}` : '/admin';
   if (fullPath === section.href) {
-    return [root, { title: section.label[locale] }];
+    return [root, { title: section.label }];
   }
 
   // Detail / new page, e.g. "properties/123" or "team/new".
   const sub = name.split('/').slice(1).join('/');
-  const lastLabel = sub === 'new' ? section.addLabel?.[locale] || f.add : f.edit;
-  return [root, { title: section.label[locale], href: section.href }, { title: lastLabel }];
+  const lastLabel = sub === 'new' ? section.addLabel || 'הוספה' : 'עריכה';
+  return [root, { title: section.label, href: section.href }, { title: lastLabel }];
 }

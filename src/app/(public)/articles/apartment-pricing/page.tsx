@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import ApartmentPricingContent from './ApartmentPricingContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 const ogImage = `${siteUrl}/images/articles/apartment-pricing.jpg`;
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'איך קובעים מחיר נכון לדירה למכירה?',
-    description: 'מה באמת קובע את שווי הדירה שלכם, ולמה תמחור שגוי הוא הטעות היקרה ביותר — Aiterra.',
+    description: 'מה באמת קובע את שווי הדירה שלכם, ולמה תמחור שגוי הוא הטעות היקרה ביותר — רם נכסים חיים ענבי.',
     url: `${siteUrl}/articles/apartment-pricing`,
     type: 'article',
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'איך קובעים מחיר נכון לדירה למכירה?',
-    description: 'מה באמת קובע את שווי הדירה שלכם, ולמה תמחור שגוי הוא הטעות היקרה ביותר — Aiterra.',
+    description: 'מה באמת קובע את שווי הדירה שלכם, ולמה תמחור שגוי הוא הטעות היקרה ביותר — רם נכסים חיים ענבי.',
     images: [ogImage],
   },
 };
@@ -59,14 +59,14 @@ const articleSchema = {
   author: {
     '@type': 'Person',
     '@id': `${siteUrl}/about#owner-1`,
-    name: 'דניאל שרון',
+    name: 'רם מזרחי',
     jobTitle: 'מתווך נדל״ן מורשה ומייסד',
     url: `${siteUrl}/about`,
     worksFor: { '@id': `${siteUrl}/#organization` },
     hasCredential: {
       '@type': 'EducationalOccupationalCredential',
       credentialCategory: 'Real Estate License',
-      identifier: '3072851',
+      identifier: '3019640',
     },
   },
   publisher: { '@id': `${siteUrl}/#organization` },

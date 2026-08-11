@@ -1,21 +1,4 @@
-import { type MessagesShape } from '@/lib/adminI18n';
-import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyForm } from './types';
-
-/**
- * i18n consumption pattern for the property-form section components:
- *
- *   const t = useAdminMessages(propertyFormMessages);   // top level of the component
- *   <Select options={buildDealTypeOptions(t)} ... />    // locale-aware { value, label }[]
- *
- * All option labels live in src/lib/adminI18n/messages/propertyForm.ts under
- * `options.*`; the build*Options(t) helpers below turn the resolved messages
- * record into antd option arrays. ROOMS_OPTIONS is locale-neutral (numeric
- * labels) and is used directly.
- */
-
-/** Resolved propertyForm messages record (either locale). */
-export type PropertyFormT = MessagesShape<(typeof propertyFormMessages)['he']>;
 
 export const INITIAL_FORM: PropertyForm = {
   dealType: 'sale',
@@ -70,90 +53,72 @@ export const INITIAL_FORM: PropertyForm = {
   agentIds: [],
 };
 
-export function buildDealTypeOptions(t: PropertyFormT) {
-  return [
-    { value: 'sale', label: t.options.dealType.sale },
-    { value: 'rent', label: t.options.dealType.rent },
-  ];
-}
+export const DEAL_TYPE_OPTIONS = [
+  { value: 'sale', label: 'מכירה' },
+  { value: 'rent', label: 'השכרה' },
+];
 
-export function buildStatusOptions(t: PropertyFormT) {
-  return [
-    { value: '', label: t.options.status.none },
-    { value: 'Exclusive', label: t.options.status.exclusive },
-    { value: 'New', label: t.options.status.new },
-    { value: 'Opportunity', label: t.options.status.opportunity },
-  ];
-}
+export const STATUS_OPTIONS = [
+  { value: '', label: 'ללא' },
+  { value: 'Exclusive', label: 'בלעדי' },
+  { value: 'New', label: 'חדש' },
+  { value: 'Opportunity', label: 'הזדמנות' },
+];
 
-export function buildPropertyTypeOptions(t: PropertyFormT) {
-  return [
-    { value: 'apartment', label: t.options.propertyType.apartment },
-    { value: 'garden-apartment', label: t.options.propertyType.gardenApartment },
-    { value: 'cottage', label: t.options.propertyType.cottage },
-    { value: 'house', label: t.options.propertyType.house },
-    { value: 'duplex', label: t.options.propertyType.duplex },
-    { value: 'penthouse', label: t.options.propertyType.penthouse },
-    { value: 'mini-penthouse', label: t.options.propertyType.miniPenthouse },
-    { value: 'roof-apartment', label: t.options.propertyType.roofApartment },
-    { value: 'housing-unit', label: t.options.propertyType.housingUnit },
-    { value: 'studio', label: t.options.propertyType.studio },
-    { value: 'basement-apartment', label: t.options.propertyType.basementApartment },
-    { value: 'villa', label: t.options.propertyType.villa },
-  ];
-}
+export const PROPERTY_TYPE_OPTIONS = [
+  { value: 'apartment', label: 'דירה' },
+  { value: 'garden-apartment', label: 'דירת גן' },
+  { value: 'cottage', label: "קוטג'" },
+  { value: 'house', label: 'בית' },
+  { value: 'duplex', label: 'דופלקס' },
+  { value: 'penthouse', label: 'פנטהאוז' },
+  { value: 'mini-penthouse', label: 'מיני פנטהאוז' },
+  { value: 'roof-apartment', label: 'דירת גג' },
+  { value: 'housing-unit', label: 'יחידת דיור' },
+  { value: 'studio', label: 'סטודיו' },
+  { value: 'basement-apartment', label: 'דירת מרתף' },
+  { value: 'villa', label: 'וילה' },
+];
 
-export function buildPositionOptions(t: PropertyFormT) {
-  return [
-    { value: 'front', label: t.options.position.front },
-    { value: 'back', label: t.options.position.back },
-    { value: 'front-back', label: t.options.position.frontBack },
-    { value: 'side', label: t.options.position.side },
-    { value: 'corner', label: t.options.position.corner },
-  ];
-}
+export const POSITION_OPTIONS = [
+  { value: 'front', label: 'חזית' },
+  { value: 'back', label: 'עורף' },
+  { value: 'front-back', label: 'ח\\ע' },
+  { value: 'side', label: 'צד' },
+  { value: 'corner', label: 'פינה' },
+];
 
-export function buildFurnitureOptions(t: PropertyFormT) {
-  return [
-    { value: 'none', label: t.options.furniture.none },
-    { value: 'partial', label: t.options.furniture.partial },
-    { value: 'full', label: t.options.furniture.full },
-  ];
-}
+export const FURNITURE_OPTIONS = [
+  { value: 'none', label: 'ללא' },
+  { value: 'partial', label: 'חלקי' },
+  { value: 'full', label: 'מלא' },
+];
 
-export function buildKitchenOptions(t: PropertyFormT) {
-  return [
-    { value: 'standard', label: t.options.kitchen.standard },
-    { value: 'upgraded', label: t.options.kitchen.upgraded },
-  ];
-}
+export const KITCHEN_OPTIONS = [
+  { value: 'standard', label: 'סטנדרט' },
+  { value: 'upgraded', label: 'משודרג' },
+];
 
-export function buildParkingOptions(t: PropertyFormT) {
-  return [
-    { value: 'yes', label: t.options.parking.yes },
-    { value: 'none', label: t.options.parking.none },
-    { value: 'double', label: t.options.parking.double },
-    { value: 'two-separate', label: t.options.parking.twoSeparate },
-    { value: 'shared', label: t.options.parking.shared },
-    // Legacy misspelled value kept for backward compatibility with stored data.
-    { value: 'two-seperate', label: t.options.parking.twoSeparate },
-    { value: 'covered', label: t.options.parking.covered },
-    { value: 'three', label: t.options.parking.three },
-    { value: 'robotic', label: t.options.parking.robotic },
-    { value: 'multiplier', label: t.options.parking.multiplier },
-  ];
-}
+export const PARKING_OPTIONS = [
+  { value: 'yes', label: 'יש' },
+  { value: 'none', label: 'אין' },
+  { value: 'double', label: 'כפולה' },
+  { value: 'two-separate', label: 'שניים נפרדות' },
+  { value: 'shared', label: 'משותפת' },
+  { value: 'two-seperate', label: 'שניים נפרדות' },
+  { value: 'covered', label: 'מקורה' },
+  { value: 'three', label: 'שלוש' },
+  { value: 'robotic', label: 'רובוטית' },
+  { value: 'multiplier', label: 'מכפיל' },
+];
 
-export function buildDirectionOptions(t: PropertyFormT) {
-  return [
-    { label: t.options.direction.north, value: 'north' },
-    { label: t.options.direction.south, value: 'south' },
-    { label: t.options.direction.east, value: 'east' },
-    { label: t.options.direction.west, value: 'west' },
-  ];
-}
+export const DIRECTION_OPTIONS = [
+  { label: 'צפון', value: 'north' },
+  { label: 'דרום', value: 'south' },
+  { label: 'מזרח', value: 'east' },
+  { label: 'מערב', value: 'west' },
+];
 
-/** Locale-neutral numeric labels — safe to use directly in any locale. */
 export const ROOMS_OPTIONS = [
   { value: '1', label: '1' },
   { value: '1.5', label: '1.5' },

@@ -37,7 +37,7 @@ const PropertiesBanner: React.FC<PropertiesBannerProps> = ({ img = "/7.jpg" }) =
             fontFamily: 'var(--font-assistant), Arial, Helvetica, sans-serif',
             letterSpacing: '0.02em',
             textShadow: 'none',
-            backgroundColor: 'rgba(5, 17, 80, 0.75)',
+            backgroundColor: 'rgba(28, 54, 100, 0.75)',
             backdropFilter: 'blur(10px)'
           }}>
           נכסים למכירה והשכרה

@@ -6,9 +6,6 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
-import ArticleToc from '../ArticleToc';
-import ArticleCta from '../ArticleCta';
-import RelatedArticles from '../RelatedArticles';
 import './styles.css';
 
 export default function ForeignInvestorsContent() {
@@ -27,15 +24,11 @@ export default function ForeignInvestorsContent() {
     }
   ];
 
-  const article = getArticle('foreign-investors')!;
-
   return (
     <div className="article-page" dir="rtl">
-      {/* Hero — uses this article's own image (not the shared /7.jpg index hero),
-          which also serves as the single top visual so we don't stack a second
-          near-identical feature image directly below it. */}
+      {/* Hero with Background Image */}
       <SecondaryHero
-        img={article.image}
+        img="/7.jpg"
         title="נדל״ן בשלט רחוק: כשאתם בחו״ל והלב רוצה"
         centered={true}
       />
@@ -49,6 +42,14 @@ export default function ForeignInvestorsContent() {
           {/* Main Content */}
           <div className="article-body">
             <ArticleByline id="foreign-investors" />
+            <Image
+              src={getArticle('foreign-investors')!.image}
+              alt={getArticle('foreign-investors')!.title}
+              width={1200}
+              height={630}
+              className="article-hero-image"
+              priority
+            />
             {/* Introduction */}
             <section className="article-section">
               <p className="lead-paragraph">
@@ -67,8 +68,6 @@ export default function ForeignInvestorsContent() {
 
               <div className="definition-block"><p><span className="definition-term">ייפוי כוח נוטריוני</span> הוא מסמך משפטי המאומת על ידי נוטריון, המעניק לנציג מוסמך בישראל — לרוב עורך דין — סמכות לחתום על מסמכי הרכישה והרישום בשם הרוכש. הוא מאפשר לתושב חוץ להשלים עסקה מרחוק, בלי טיסה לארץ.</p></div>
             </section>
-
-            <ArticleToc />
 
             {/* Section 1: Why Foreign Investors Fear */}
             <section className="article-section">
@@ -89,7 +88,7 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 2: The Biggest Mistake */}
             <figure className="article-inline-figure">
-              <Image src="/images/articles/inbody/foreign-investors-a.jpg" alt={article.title} width={1200} height={675} className="article-inline-image" />
+              <Image src="/images/articles/inbody/foreign-investors-a.jpg" alt={getArticle('foreign-investors')!.title} width={1200} height={675} className="article-inline-image" />
             </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>הטעות הכי גדולה של תושבי חוץ: לסמוך על "מזל" או קרובי משפחה</h2>
@@ -170,7 +169,7 @@ export default function ForeignInvestorsContent() {
 
             {/* Section 4: Why Choose Us */}
             <figure className="article-inline-figure">
-              <Image src="/images/articles/inbody/foreign-investors-b.jpg" alt={article.title} width={1200} height={675} className="article-inline-image" />
+              <Image src="/images/articles/inbody/foreign-investors-b.jpg" alt={getArticle('foreign-investors')!.title} width={1200} height={675} className="article-inline-image" />
             </figure>
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה דווקא אנחנו?</h2>
@@ -178,16 +177,12 @@ export default function ForeignInvestorsContent() {
                 בניהול נכסים בשלט רחוק, <strong>אמון הוא המטבע החשוב ביותר</strong>. עם 24 שנות ניסיון ותעודות, אנחנו גוף יציב עם כתובת פיזית ומוניטין של אמינות וזמינות.
               </p>
               <p>
-                אנחנו לא "חברה וירטואלית", אלא אנשים אמיתיים – <strong>דניאל, יואב והצוות</strong> - שדואגים לנכס שלכם כאילו הוא שלנו.
+                אנחנו לא "חברה וירטואלית", אלא אנשים אמיתיים – <strong>רם, חיים והצוות</strong> - שדואגים לנכס שלכם כאילו הוא שלנו.
               </p>
             </section>
 
             {/* Section 5: FAQ */}
             <FAQ items={faqItems} />
-
-            {/* End CTA + related guides (shared components) */}
-            <ArticleCta articleId="foreign-investors" />
-            <RelatedArticles currentId="foreign-investors" />
           </div>
         </article>
       </div>

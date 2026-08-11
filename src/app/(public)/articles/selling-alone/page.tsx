@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import SellingAloneContent from './SellingAloneContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 const ogImage = `${siteUrl}/images/masterkaspler_A_candid_photograph_of_a_stressed_homeowner_sit_6c1f29f0-7069-4770-a24a-f80d5f110b06_2.png`;
 
 export const metadata: Metadata = {
@@ -60,14 +60,14 @@ const articleSchema = {
   author: {
     '@type': 'Person',
     '@id': `${siteUrl}/about#owner-1`,
-    name: 'דניאל שרון',
+    name: 'רם מזרחי',
     jobTitle: 'מתווך נדל״ן מורשה ומייסד',
     url: `${siteUrl}/about`,
     worksFor: { '@id': `${siteUrl}/#organization` },
     hasCredential: {
       '@type': 'EducationalOccupationalCredential',
       credentialCategory: 'Real Estate License',
-      identifier: '3072851',
+      identifier: '3019640',
     },
   },
   publisher: { '@id': `${siteUrl}/#organization` },

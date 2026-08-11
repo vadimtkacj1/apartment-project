@@ -7,9 +7,6 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
-import ArticleToc from '../ArticleToc';
-import ArticleCta from '../ArticleCta';
-import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function NewVsSecondhandContent() {
@@ -63,8 +60,6 @@ export default function NewVsSecondhandContent() {
                 מה שבטוח: ההחלטה לא צריכה להתקבל במשרד מכירות מעוצב, מול הדמיה ממוחשבת. <strong>הנה ההשוואה המלאה — כולל הסעיפים הקטנים שמשנים את התמונה.</strong>
               </p>
             </section>
-
-            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -199,10 +194,6 @@ export default function NewVsSecondhandContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
-
-            {/* End CTA + related guides (shared components) */}
-            <ArticleCta articleId="new-vs-secondhand" />
-            <RelatedArticles currentId="new-vs-secondhand" />
           </div>
         </article>
       </div>

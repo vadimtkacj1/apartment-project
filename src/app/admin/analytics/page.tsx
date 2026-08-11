@@ -1,65 +1,168 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { User, Trash2, RotateCw, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Card, Statistic, Table, Spin, DatePicker, Select, Tag, Button, Popconfirm, Empty, App } from 'antd';
+import {
+  EyeOutlined,
+  AppstoreOutlined,
+  UserOutlined,
+  HomeOutlined,
+  PhoneOutlined,
+  MailOutlined,
+  MessageOutlined,
+  DeleteOutlined,
+  LineChartOutlined,
+  PieChartOutlined,
+  ReloadOutlined,
+  RiseOutlined,
+  MobileOutlined,
+  DesktopOutlined,
+} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
-import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/shadcn/select';
-import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
-} from '@/components/shadcn/alert-dialog';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
-import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
-import { boardMessages } from '@/lib/adminI18n/messages/board';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import WidgetBoard from '@/components/admin/board/WidgetBoard';
-import AddWidgetDialog from '@/components/admin/board/AddWidgetDialog';
-import { BoardControls, BoardHint, BoardStyles } from '@/components/admin/board/BoardChrome';
-import { useWidgetLayout } from '@/components/admin/board/useWidgetLayout';
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Area,
+  AreaChart,
+} from 'recharts';
 
-import { ANALYTICS_WIDGETS, WIDGETS_BY_ID } from './widgets';
-import type {
-  AnalyticsSummary,
-  AnalyticsWidgetContext,
-  ChartDataPoint,
-  ClickEvent,
-  PropertyView,
-} from './types';
+const { RangePicker } = DatePicker;
 
-const LAYOUT_STORAGE_KEY = 'admin-analytics-layout-v1';
+interface AnalyticsSummary {
+  totalViews: number;
+  totalClicks: number;
+  uniqueVisitors: number;
+  topProperties: Array<{ propertyId: number; views: number }>;
+  topPropertiesByClicks: Array<{
+    propertyId: number;
+    clicks: number;
+    property?: { id: number; title: string; location: string } | null;
+  }>;
+  clickTypes: Array<{ eventType: string; count: number }>;
+  topUsersByClicks?: Array<{ ipAddress: string; clicks: number; userAgent: string | null }>;
+  // Real leads (Inquiry table) + acquisition — all computed server-side in the summary endpoint.
+  totalInquiries?: number;
+  newInquiries?: number;
+  inquiriesToday?: number;
+  inquiriesLast7Days?: number;
+  inquiriesBySource?: Array<{ source: string; count: number }>;
+  inquiriesByStatus?: Array<{ status: string; count: number }>;
+  trafficSources?: Array<{ source: string; count: number }>;
+}
+
+interface PropertyView {
+  id: number;
+  propertyId: number;
+  ipAddress: string;
+  userAgent: string | null;
+  referer: string | null;
+  createdAt: string;
+  property: {
+    id: number;
+    title: string;
+    location: string;
+  } | null;
+}
+
+interface ClickEvent {
+  id: number;
+  propertyId: number | null;
+  eventType: string;
+  elementId: string | null;
+  elementType: string | null;
+  ipAddress: string;
+  userAgent: string | null;
+  createdAt: string;
+  property: {
+    id: number;
+    title: string;
+    location: string;
+  } | null;
+}
+
+interface ChartDataPoint {
+  date: string;
+  views: number;
+  clicks: number;
+  uniqueUsers: number;
+}
+
+/* Brand palette (matches src/lib/adminTheme.ts) — navy · gold · cream, no rainbow */
+const NAVY = '#1C3664';
+const GOLD = '#C5A357';
+const GOLD_TEXT = '#8A6D2F'; // AA-safe gold for text on light surfaces
+const HAIRLINE = '#E6E8EC';
+// Categorical sequence kept within the navy/gold family + neutrals
+const COLORS = ['#1C3664', '#C5A357', '#2A4A8A', '#8A6D2F', '#5B6B8C', '#B8A98A', '#9AA0AA', '#C9CDD6'];
+
+// Referer buckets → Hebrew labels (keys come from classifyReferer in the API).
+const TRAFFIC_LABELS: Record<string, string> = {
+  direct: 'כניסה ישירה', internal: 'ניווט באתר', google: 'Google', facebook: 'Facebook',
+  instagram: 'Instagram', yad2: 'Yad2', madlan: 'Madlan', whatsapp: 'WhatsApp',
+  bing: 'Bing', duckduckgo: 'DuckDuckGo', twitter: 'X/Twitter', other: 'אחר',
+};
+// Inquiry.source raw keys → Hebrew labels (fallback to the raw key when unknown).
+const LEAD_SOURCE_LABELS: Record<string, string> = {
+  contact_form: 'טופס יצירת קשר', property_page: 'עמוד נכס', property: 'עמוד נכס',
+  whatsapp: 'וואטסאפ', phone: 'טלפון', email: 'אימייל', footer: 'פוטר', unknown: 'לא ידוע',
+};
+// Matches STATUS_META in /admin/inquiries, tinted to the estate palette.
+const LEAD_STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
+  new: { label: 'חדשה', color: GOLD_TEXT, bg: 'rgba(197,163,87,.14)' },
+  in_progress: { label: 'בטיפול', color: NAVY, bg: 'rgba(28,54,100,.08)' },
+  closed: { label: 'סגורה', color: '#3F7D4F', bg: 'rgba(63,125,79,.10)' },
+};
+
+// Compact ranked bar list — used for both traffic sources and lead sources.
+// One hairline-separated row per bucket: label · count · share, with a proportional
+// bar (top bucket in gold). Deliberately not another pie chart.
+function SourceBars({ items, labels }: { items?: Array<{ source: string; count: number }>; labels: Record<string, string> }) {
+  const data = (items || []).slice(0, 8);
+  const total = data.reduce((s, d) => s + d.count, 0);
+  if (!total) return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="אין נתונים בטווח" style={{ margin: '16px 0' }} />;
+  return (
+    <div>
+      {data.map((d, i) => {
+        const pct = Math.round((d.count / total) * 100);
+        return (
+          <div key={d.source} style={{ padding: '9px 0', borderBottom: i === data.length - 1 ? 'none' : `1px solid ${HAIRLINE}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
+              <span style={{ fontWeight: 600, color: '#334155' }}>{labels[d.source] || d.source}</span>
+              <span style={{ color: '#6B7280' }}>{d.count} · {pct}%</span>
+            </div>
+            <div style={{ position: 'relative', height: 6, borderRadius: 4, background: '#F0F1F3' }}>
+              <div style={{ position: 'absolute', insetInlineStart: 0, top: 0, height: 6, borderRadius: 4, width: `${pct}%`, background: i === 0 ? GOLD : NAVY }} />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function AnalyticsPage() {
-  const t = useAdminMessages(analyticsMessages);
-  const board = useAdminMessages(boardMessages);
-  const { dir } = useAdminI18n();
+  const { message } = App.useApp();
   const isMobile = useIsMobile();
-  const reduced = usePrefersReducedMotion();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [views, setViews] = useState<PropertyView[]>([]);
   const [clicks, setClicks] = useState<ClickEvent[]>([]);
-  const [dateRange, setDateRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([null, null]);
+  const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs] | null>(null);
   const [selectedProperty, setSelectedProperty] = useState<string>('all');
   const [selectedIP, setSelectedIP] = useState<string>('all');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [ipToVisitorMap, setIpToVisitorMap] = useState<Map<string, number>>(new Map());
-  const [resetOpen, setResetOpen] = useState(false);
-
-  // Dashboard customisation: block order / width / visibility (persisted locally).
-  const {
-    visibleItems, hiddenWidgets, isCustomized,
-    moveWidget, setSpan, hideWidget, addWidget, resetLayout,
-  } = useWidgetLayout(LAYOUT_STORAGE_KEY, ANALYTICS_WIDGETS);
-  const [editing, setEditing] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     fetchAnalytics();
@@ -70,10 +173,9 @@ export default function AnalyticsPage() {
       setLoading(true);
 
       const params = new URLSearchParams();
-      const [start, end] = dateRange;
-      if (start && end) {
-        params.append('startDate', start.toISOString());
-        params.append('endDate', end.toISOString());
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        params.append('startDate', dateRange[0].toISOString());
+        params.append('endDate', dateRange[1].toISOString());
       }
       if (selectedProperty !== 'all') {
         params.append('propertyId', selectedProperty);
@@ -133,7 +235,7 @@ export default function AnalyticsPage() {
 
     } catch (error) {
       console.error('Error fetching analytics:', error);
-      toast.error(t.loadError);
+      message.error('שגיאה בטעינת הנתונים');
     } finally {
       setLoading(false);
     }
@@ -194,246 +296,641 @@ export default function AnalyticsPage() {
       });
 
       if (response.ok) {
-        toast.success(t.deleteSuccess);
+        message.success('האנליטיקה נמחקה בהצלחה');
         fetchAnalytics();
       } else {
-        toast.error(t.deleteError);
+        message.error('שגיאה במחיקת האנליטיקה');
       }
     } catch (error) {
       console.error('Error deleting analytics:', error);
-      toast.error(t.deleteError);
+      message.error('שגיאה במחיקת האנליטיקה');
     }
   };
 
-  const getVisitorNumber = useCallback((ipAddress: string): string => {
+  const getVisitorNumber = (ipAddress: string): string => {
     const visitorNum = ipToVisitorMap.get(ipAddress);
-    return visitorNum ? t.visitor(visitorNum) : t.visitor('?');
-  }, [ipToVisitorMap, t]);
+    return visitorNum ? `מבקר #${visitorNum}` : 'מבקר #?';
+  };
 
-  // Everything the blocks render from — they are pure functions of this.
-  const widgetCtx: AnalyticsWidgetContext = useMemo(() => ({
-    t, dir, isMobile, reduced,
-    summary, views, clicks, chartData,
-    selectedIP, setSelectedIP, getVisitorNumber,
-  }), [t, dir, isMobile, reduced, summary, views, clicks, chartData, selectedIP, getVisitorNumber]);
+  const getEventTypeLabel = (eventType: string) => {
+    const labels: Record<string, string> = {
+      'property_view': 'צפייה בנכס',
+      'click_property': 'לחיצה על נכס',
+      'click_phone': 'לחיצה על טלפון',
+      'click_email': 'לחיצה על אימייל',
+      'click_whatsapp': 'לחיצה על וואטסאפ',
+      'contact_form': 'שליחת טופס',
+      'click_button': 'לחיצה על כפתור',
+    };
+    return labels[eventType] || eventType;
+  };
 
-  const handleHide = useCallback((id: string) => {
-    hideWidget(id);
-    const def = WIDGETS_BY_ID[id];
-    if (def) toast.success(board.blockHidden(def.title(widgetCtx)));
-  }, [hideWidget, board, widgetCtx]);
+  // Restrained, brand-aligned chip: leads in gold, views in navy, the rest neutral —
+  // replaces the previous rainbow of antd tag presets.
+  const LEAD_EVENTS = ['click_phone', 'click_whatsapp', 'click_email', 'contact_form'];
+  const getEventChipStyle = (eventType: string): React.CSSProperties => {
+    const lead = LEAD_EVENTS.includes(eventType);
+    const isView = eventType === 'property_view';
+    return {
+      background: lead ? 'rgba(197,163,87,.14)' : isView ? 'rgba(28,54,100,.08)' : '#F2F1EE',
+      color: lead ? GOLD_TEXT : isView ? NAVY : '#6B7280',
+      borderRadius: 6,
+      padding: '2px 9px',
+      fontSize: 12,
+      fontWeight: 600,
+      display: 'inline-block',
+      whiteSpace: 'nowrap',
+    };
+  };
 
-  const handleAdd = useCallback((id: string) => {
-    addWidget(id);
-    const def = WIDGETS_BY_ID[id];
-    if (def) toast.success(board.blockAdded(def.title(widgetCtx)));
-  }, [addWidget, board, widgetCtx]);
+  // Engagement = interactions (clicks) per view. This is NOT a conversion rate —
+  // real conversion is leads/visitors (shown in the פניות section below). Labeling
+  // clicks/views "יחס המרה" (conversion) next to 0 leads read as fake/"каша", so it
+  // is honestly surfaced as "מעורבות" (matches the /admin dashboard terminology).
+  const engagementRate = summary?.totalViews
+    ? ((summary.totalClicks / summary.totalViews) * 100).toFixed(1)
+    : '0.0';
 
-  const handleResetLayout = useCallback(() => {
-    resetLayout();
-    toast.success(board.layoutReset);
-  }, [resetLayout, board]);
+  const viewsColumns: ColumnsType<PropertyView> = [
+    {
+      title: 'נכס',
+      dataIndex: 'property',
+      key: 'property',
+      width: '35%',
+      ellipsis: { showTitle: true },
+      render: (property) => property ? (
+        <div style={{ fontWeight: 500 }}>
+          <div>{property.title}</div>
+          <div style={{color: '#999', fontSize: '0.85em', marginTop: '2px'}}>{property.location}</div>
+        </div>
+      ) : <span style={{color: '#ccc'}}>לא זמין</span>,
+    },
+    {
+      title: 'מזהה מבקר',
+      dataIndex: 'ipAddress',
+      key: 'ipAddress',
+      width: '20%',
+      render: (ip) => (
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
+          {getVisitorNumber(ip)}
+        </span>
+      ),
+    },
+    {
+      title: 'דפדפן',
+      dataIndex: 'userAgent',
+      key: 'userAgent',
+      width: '20%',
+      render: (userAgent) => {
+        if (!userAgent) return '-';
+        const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+        const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
+        const isMobile = userAgent.includes('Mobile');
+        return (
+          <span title={userAgent} style={{ fontSize: '0.9em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+            {browser}
+          </span>
+        );
+      },
+    },
+    {
+      title: 'תאריך',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '25%',
+      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm'),
+      sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
+    },
+  ];
+
+  const clicksColumns: ColumnsType<ClickEvent> = [
+    {
+      title: 'נכס',
+      dataIndex: 'property',
+      key: 'property',
+      width: '25%',
+      ellipsis: { showTitle: true },
+      render: (property, record) => property ? (
+        <div>
+          <div style={{ fontWeight: 600 }}>{property.title}</div>
+          <div style={{ fontSize: '0.85em', color: '#999' }}>#{record.propertyId}</div>
+        </div>
+      ) : record.propertyId ? <Tag>#{record.propertyId}</Tag> : '-',
+    },
+    {
+      title: 'פעולה',
+      dataIndex: 'eventType',
+      key: 'eventType',
+      width: '15%',
+      render: (eventType) => (
+        <span style={getEventChipStyle(eventType)}>
+          {getEventTypeLabel(eventType)}
+        </span>
+      ),
+    },
+    {
+      title: 'מזהה מבקר',
+      dataIndex: 'ipAddress',
+      key: 'ipAddress',
+      width: '18%',
+      render: (ip) => (
+        <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#1C3664' }}>
+          {getVisitorNumber(ip)}
+        </span>
+      ),
+    },
+    {
+      title: 'דפדפן',
+      dataIndex: 'userAgent',
+      key: 'userAgent',
+      width: '17%',
+      render: (userAgent) => {
+        if (!userAgent) return '-';
+        // Extract browser info
+        const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+        const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
+        const isMobile = userAgent.includes('Mobile');
+        return (
+          <span title={userAgent} style={{ fontSize: '0.9em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+            {browser}
+          </span>
+        );
+      },
+    },
+    {
+      title: 'תאריך',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: '25%',
+      render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm'),
+      sorter: (a, b) => dayjs(a.createdAt).unix() - dayjs(b.createdAt).unix(),
+    },
+  ];
 
   if (loading && !summary) {
-    // Same skeleton vocabulary as /admin: one hero-sized block + a stack of lines.
     return (
-      <div className="analytics-console" role="status" aria-busy="true" aria-label={t.loadingData}>
-        <Skeleton className="w-full" style={{ height: 108, marginBlock: '6px 24px', borderRadius: 16 }} />
-        <div className="flex flex-col gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-4 w-full" />
-          ))}
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+        <Spin size="large" description="טוען נתונים..." />
       </div>
     );
   }
 
+  // Prepare pie chart data
+  const pieChartData = (summary?.clickTypes || []).map(ct => ({
+    name: getEventTypeLabel(ct.eventType),
+    value: ct.count,
+  }));
+
+  // Fewer points on phone (last 7) vs desktop (last 30) — chartData itself is
+  // untouched; this is purely a display slice for the area chart.
+  const chartMaxChars = isMobile ? 10 : 15;
+  const displayChartData = isMobile ? chartData.slice(-7) : chartData.slice(-30);
+
+  // Prepare bar chart data
+  const barChartData = (summary?.topPropertiesByClicks || [])
+    .slice(0, 8)
+    .map(p => ({
+      name: p.property ? (p.property.title.length > chartMaxChars ? p.property.title.substring(0, chartMaxChars) + '...' : p.property.title) : `נכס #${p.propertyId}`,
+      clicks: p.clicks,
+      fullTitle: p.property?.title || '',
+      propertyId: p.propertyId,
+    }));
+
   return (
-    <div className="analytics-console">
+    <div className="px-2 sm:px-4 md:px-0 analytics-console">
       {/* Header */}
-      <AdminPageHeader
-        title={t.title}
-        subtitle={t.subtitle}
-        extra={
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-            <BoardControls
-              editing={editing}
-              onEdit={() => setEditing(true)}
-              onDone={() => setEditing(false)}
-              onAdd={() => setPickerOpen(true)}
-              onReset={handleResetLayout}
-              canReset={isCustomized}
-              labels={board}
-            />
-            {!editing && (
-              <>
-                <Button type="button" variant="outline" onClick={fetchAnalytics} disabled={loading}>
-                  <RotateCw className="size-4" />
-                  {t.refresh}
-                </Button>
-                <Button type="button" variant="destructive" onClick={() => setResetOpen(true)}>
-                  <Trash2 className="size-4" />
-                  {t.resetData}
-                </Button>
-              </>
-            )}
-          </div>
-        }
-      />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h1 className="text-4xl font-bold" style={{ margin: 0, color: '#1C3664' }}>דשבורד אנליטיקה</h1>
+          <div style={{ color: '#8c8c8c', marginTop: '4px' }}>צפה בביצועי האתר והנכסים שלך בזמן אמת</div>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '12px' }}>
+            <Button icon={<ReloadOutlined />} onClick={fetchAnalytics} loading={loading}>
+                רענן
+            </Button>
+            <Popconfirm
+            title="מחיקת נתונים"
+            description="האם אתה בטוח שברצונך למחוק את כל ההיסטוריה? פעולה זו אינה הפיכה."
+            onConfirm={() => handleDeleteAnalytics('all')}
+            okText="מחק הכל"
+            cancelText="ביטול"
+            okButtonProps={{ danger: true }}
+            >
+            <Button danger icon={<DeleteOutlined />}>
+                איפוס נתונים
+            </Button>
+            </Popconfirm>
+        </div>
+      </div>
 
       {/* Filters Bar */}
-      <Card className="ec-card p-6" style={{ marginBottom: 28 }}>
-        <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.dateRangeLabel}</div>
-            <div className="admin-filter-full flex flex-wrap items-center gap-2">
-              <input
-                type="date"
-                aria-label={t.fromDate}
-                className="h-10 min-w-0 flex-1 rounded-md border border-input bg-card px-3 text-sm"
-                value={dateRange[0] ? dateRange[0].format('YYYY-MM-DD') : ''}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setDateRange((prev) => [v ? dayjs(v) : null, prev[1]]);
-                }}
-              />
-              <input
-                type="date"
-                aria-label={t.toDate}
-                className="h-10 min-w-0 flex-1 rounded-md border border-input bg-card px-3 text-sm"
-                value={dateRange[1] ? dateRange[1].format('YYYY-MM-DD') : ''}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setDateRange((prev) => [prev[0], v ? dayjs(v) : null]);
-                }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.filterByProperty}</div>
-            <Select value={selectedProperty} onValueChange={setSelectedProperty}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t.selectProperty} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.showAll}</SelectItem>
-                {(summary?.topProperties || []).map((p) => (
-                  <SelectItem key={p.propertyId} value={p.propertyId.toString()}>
-                    {t.propertyOption(p.propertyId, p.views)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+      <Card className="mb-6">
+        <Row gutter={24} align="middle">
+          <Col xs={24} md={12} lg={8}>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>טווח תאריכים:</div>
+            <RangePicker
+              style={{ width: '100%' }}
+              onChange={(dates) => setDateRange(dates as [dayjs.Dayjs, dayjs.Dayjs] | null)}
+              format="DD/MM/YYYY"
+              placeholder={['מתאריך', 'עד תאריך']}
+            />
+          </Col>
+          <Col xs={24} md={12} lg={8}>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי נכס:</div>
+            <Select
+              style={{ width: '100%' }}
+              value={selectedProperty}
+              onChange={setSelectedProperty}
+              placeholder="בחר נכס"
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
+              }}
+            >
+              <Select.Option value="all">הצג הכל</Select.Option>
+              {(summary?.topProperties || []).map((p) => (
+                <Select.Option key={p.propertyId} value={p.propertyId.toString()}>
+                  נכס #{p.propertyId} ({p.views} צפיות)
+                </Select.Option>
+              ))}
             </Select>
-          </div>
-          <div>
-            <div className="mb-2 text-xs font-semibold text-muted-foreground">{t.filterByVisitor}</div>
-            <Select value={selectedIP} onValueChange={setSelectedIP}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder={t.selectVisitor} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t.showAll}</SelectItem>
-                {(summary?.topUsersByClicks || []).map((user) => (
-                  <SelectItem key={user.ipAddress} value={user.ipAddress}>
-                    {getVisitorNumber(user.ipAddress)} ({t.clicksCount(user.clicks)})
-                  </SelectItem>
-                ))}
-              </SelectContent>
+          </Col>
+          <Col xs={24} md={12} lg={8}>
+            <div style={{ marginBottom: '8px', fontWeight: 500 }}>סינון לפי מבקר:</div>
+            <Select
+              style={{ width: '100%' }}
+              value={selectedIP}
+              onChange={setSelectedIP}
+              placeholder="בחר מבקר"
+              showSearch={{
+                filterOption: (input, option) =>
+                  (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0,
+              }}
+            >
+              <Select.Option value="all">הצג הכל</Select.Option>
+              {(summary?.topUsersByClicks || []).map((user) => (
+                <Select.Option key={user.ipAddress} value={user.ipAddress}>
+                  {getVisitorNumber(user.ipAddress)} ({user.clicks} לחיצות)
+                </Select.Option>
+              ))}
             </Select>
-          </div>
-        </div>
+          </Col>
+        </Row>
       </Card>
 
       {/* Selected User Info */}
       {selectedIP !== 'all' && (
-        <Card className="ec-card p-6" style={{ marginBottom: 28 }}>
-          <div className="flex flex-wrap items-center gap-4">
-            <User className="size-8 shrink-0" style={{ color: 'var(--brand)' }} />
-            <div className="min-w-0 flex-1">
+        <Card className="mb-6">
+          <Row align="middle" gutter={16}>
+            <Col>
+              <UserOutlined style={{ fontSize: '32px', color: '#1C3664' }} />
+            </Col>
+            <Col xs={24} flex="auto">
               <div style={{ fontWeight: 600, fontSize: '16px', marginBottom: '4px' }}>
-                {t.userActivity} <span style={{ fontWeight: 700, color: 'var(--brand)' }}>{getVisitorNumber(selectedIP)}</span>
+                פעילות משתמש: <span style={{ fontWeight: 700, color: '#1C3664' }}>{getVisitorNumber(selectedIP)}</span>
               </div>
-              <div style={{ color: '#64748B' }}>
+              <div style={{ color: '#666' }}>
                 {summary?.topUsersByClicks?.find(u => u.ipAddress === selectedIP) && (
                   <>
-                    {t.totalClicksOf(summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks)}
+                    {summary.topUsersByClicks.find(u => u.ipAddress === selectedIP)!.clicks} לחיצות סה״כ
                   </>
                 )}
               </div>
+            </Col>
+            <Col xs={24}>
+              <Button
+                type="primary"
+                onClick={() => setSelectedIP('all')}
+                icon={<ReloadOutlined />}
+              >
+                נקה סינון
+              </Button>
+            </Col>
+          </Row>
+        </Card>
+      )}
+
+      {/* Key Metrics Cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={24} md={12} lg={6}>
+            <Card style={{ height: '100%' }}>
+            <Statistic
+                title="סה״כ צפיות"
+                value={summary?.totalViews || 0}
+                prefix={<EyeOutlined style={{ color: '#1C3664' }} />}
+                styles={{ content: { fontWeight: 'bold', color: '#1C3664' } }}
+            />
+            </Card>
+        </Col>
+
+        <Col xs={24} sm={24} md={12} lg={6}>
+            <Card style={{ height: '100%' }}>
+            <Statistic
+                title="סה״כ לחיצות (פעולות)"
+                value={summary?.totalClicks || 0}
+                prefix={<AppstoreOutlined style={{ color: NAVY }} />}
+                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
+            />
+            </Card>
+        </Col>
+
+        <Col xs={24} sm={24} md={12} lg={6}>
+            <Card style={{ height: '100%' }}>
+            <Statistic
+                title="מעורבות"
+                value={engagementRate}
+                suffix="%"
+                prefix={<RiseOutlined style={{ color: GOLD }} />}
+                styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }}
+                precision={1}
+            />
+            </Card>
+        </Col>
+
+        <Col xs={24} sm={24} md={12} lg={6}>
+            <Card style={{ height: '100%' }}>
+            <Statistic
+                title="משתמשים ייחודיים"
+                value={summary?.uniqueVisitors || 0}
+                prefix={<UserOutlined style={{ color: NAVY }} />}
+                styles={{ content: { fontWeight: 'bold', color: NAVY } }}
+            />
+            </Card>
+        </Col>
+      </Row>
+
+      {/* Leads (Inquiry table) — the money metric — plus where traffic and leads come
+          from. All values are computed server-side in /api/analytics/track (summary). */}
+      <div style={{ fontWeight: 700, color: NAVY, fontSize: 18, margin: '4px 4px 12px' }}>פניות (לידים)</div>
+      <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={{ height: '100%' }}>
+            <Statistic title="סה״כ פניות" value={summary?.totalInquiries || 0} prefix={<MessageOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={{ height: '100%' }}>
+            <Statistic title="פניות חדשות" value={summary?.newInquiries || 0} prefix={<RiseOutlined style={{ color: GOLD }} />} styles={{ content: { fontWeight: 'bold', color: GOLD_TEXT } }} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={{ height: '100%' }}>
+            <Statistic title="פניות היום" value={summary?.inquiriesToday || 0} prefix={<PhoneOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card style={{ height: '100%' }}>
+            <Statistic title="פניות ב-7 ימים" value={summary?.inquiriesLast7Days || 0} prefix={<MailOutlined style={{ color: NAVY }} />} styles={{ content: { fontWeight: 'bold', color: NAVY } }} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} lg={8}>
+          <Card title={<span style={{ fontWeight: 600 }}>מקורות תנועה</span>} style={{ height: '100%' }}>
+            <SourceBars items={summary?.trafficSources} labels={TRAFFIC_LABELS} />
+          </Card>
+        </Col>
+        <Col xs={24} lg={8}>
+          <Card title={<span style={{ fontWeight: 600 }}>פניות לפי מקור</span>} style={{ height: '100%' }}>
+            <SourceBars items={summary?.inquiriesBySource} labels={LEAD_SOURCE_LABELS} />
+          </Card>
+        </Col>
+        <Col xs={24} lg={8}>
+          <Card title={<span style={{ fontWeight: 600 }}>פניות לפי סטטוס</span>} style={{ height: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(['new', 'in_progress', 'closed'] as const).map((st) => {
+                const meta = LEAD_STATUS_META[st];
+                const count = summary?.inquiriesByStatus?.find((s) => s.status === st)?.count || 0;
+                return (
+                  <div key={st} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 8, background: meta.bg }}>
+                    <span style={{ fontWeight: 600, color: meta.color }}>{meta.label}</span>
+                    <span style={{ fontWeight: 700, fontSize: 18, color: meta.color }}>{count}</span>
+                  </div>
+                );
+              })}
             </div>
-            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={() => setSelectedIP('all')}>
-              <RotateCw className="size-4" />
-              {t.clearFilter}
-            </Button>
-          </div>
-        </Card>
-      )}
+          </Card>
+        </Col>
+      </Row>
 
-      {/* Customisation hint — only while editing, so read mode stays clean */}
-      {editing && <BoardHint labels={board} />}
+      {/* Main Charts Row */}
+      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+        {/* Line Chart */}
+        <Col xs={24} lg={16}>
+          <Card
+            title={<span style={{ fontWeight: 600 }}>מגמות לאורך זמן</span>}
+            style={{ height: '100%' }}
+          >
+            <ResponsiveContainer width="100%" height={350}>
+              <AreaChart data={displayChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1C3664" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#1C3664" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={GOLD} stopOpacity={0.7}/>
+                    <stop offset="95%" stopColor={GOLD} stopOpacity={0.05}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tick={{fontSize: 12}}
+                  interval="preserveStartEnd"
+                  minTickGap={24}
+                  {...(isMobile ? { angle: -45, textAnchor: 'end', height: 50 } : {})}
+                />
+                <YAxis tick={{fontSize: 12}} />
+                <Tooltip
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '5px' }}
+                />
+                <Legend verticalAlign="top" height={36} />
+                <Area type="monotone" dataKey="views" stroke="#1C3664" fillOpacity={1} fill="url(#colorViews)" name="צפיות" activeDot={{ r: 6 }} />
+                <Area type="monotone" dataKey="clicks" stroke={GOLD} fillOpacity={1} fill="url(#colorClicks)" name="לחיצות" activeDot={{ r: 6 }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
 
-      {/* The board — order, width and visibility come from the layout store */}
-      <WidgetBoard
-        items={visibleItems}
-        widgets={ANALYTICS_WIDGETS}
-        ctx={widgetCtx}
-        labels={board}
-        editing={editing}
-        rtl={dir === 'rtl'}
-        onMove={moveWidget}
-        onSpanChange={setSpan}
-        onHide={handleHide}
-      />
+        {/* Pie Chart */}
+        <Col xs={24} lg={8}>
+          <Card
+            title={<span style={{ fontWeight: 600 }}>התפלגות פעולות</span>}
+            style={{ height: '100%' }}
+          >
+            <ResponsiveContainer width="100%" height={350}>
+              <PieChart>
+                <Pie
+                  data={pieChartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, percent }) => `${(percent ? percent * 100 : 0).toFixed(0)}%`}
+                >
+                  {pieChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: '8px' }} />
+                <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              </PieChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+      </Row>
 
-      {visibleItems.length === 0 && (
-        <Card className="ec-card p-6" style={{ textAlign: 'center' }}>
-          <p className="m-0 text-sm text-muted-foreground">{board.emptyBoard}</p>
-          <Button type="button" className="mt-4" onClick={() => { setEditing(true); setPickerOpen(true); }}>
-            <Plus className="size-4" />
-            {board.addBlock}
-          </Button>
-        </Card>
-      )}
+      {/* Charts Row - Properties & Users */}
+      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }}>
+        {/* Bar Chart - Popular Properties */}
+        {barChartData.length > 0 && (
+          <Col xs={24} lg={12}>
+            <Card
+              title={<span style={{ fontWeight: 600 }}>נכסים מובילים (לפי פעולות)</span>}
+              style={{ height: '100%' }}
+            >
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barChartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                  <XAxis type="number" />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={isMobile ? 90 : 150}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                                <div style={{ backgroundColor: '#fff', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>
+                                    <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
+                                    <p style={{ margin: 0, color: GOLD_TEXT }}>{data.clicks} לחיצות</p>
+                                </div>
+                            );
+                        }
+                        return null;
+                    }}
+                  />
+                  <Bar dataKey="clicks" name="לחיצות" radius={[0, 4, 4, 0]} barSize={24}>
+                    {barChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 0 ? GOLD : NAVY} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </Col>
+        )}
 
-      {/* Block picker */}
-      <AddWidgetDialog
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        hidden={hiddenWidgets}
-        onAdd={handleAdd}
-        ctx={widgetCtx}
-        labels={board}
-      />
-      <BoardStyles />
+        {/* Top Users by Clicks */}
+        {summary?.topUsersByClicks && summary.topUsersByClicks.length > 0 && (
+          <Col xs={24} lg={barChartData.length > 0 ? 12 : 24}>
+            <Card
+              title={<span style={{ fontWeight: 600 }}>מבקרים פעילים</span>}
+              style={{ height: '100%' }}
+            >
+              <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+                {summary.topUsersByClicks.map((user, index) => {
+                  const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
+                  const browser = user.userAgent ? browsers.find(b => user.userAgent!.includes(b)) || 'Unknown' : 'Unknown';
+                  const isMobile = !!user.userAgent?.includes('Mobile');
+                  const isSelected = selectedIP === user.ipAddress;
 
-      {/* Reset-all confirmation */}
-      <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.deleteConfirmTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{t.deleteConfirmDescription}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => handleDeleteAnalytics('all')}>
-              {t.deleteAll}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                  return (
+                    <div
+                      key={user.ipAddress}
+                      onClick={() => setSelectedIP(user.ipAddress)}
+                      style={{
+                        padding: '12px 16px',
+                        backgroundColor: isSelected ? 'rgba(28, 54, 100, 0.06)' : 'transparent',
+                        borderBottom: `1px solid ${HAIRLINE}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s ease',
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                          <Tag color={index < 3 ? 'gold' : 'default'}>#{index + 1}</Tag>
+                          <span style={{ fontSize: '0.95em', fontWeight: 700, color: '#1C3664' }}>
+                            {getVisitorNumber(user.ipAddress)}
+                          </span>
+                          {isSelected && (
+                            <Tag color="gold">מסונן</Tag>
+                          )}
+                        </div>
+                        <div style={{ fontSize: '0.85em', color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          {isMobile ? <MobileOutlined /> : <DesktopOutlined />}
+                          {browser}
+                        </div>
+                      </div>
+                      <div style={{
+                        fontSize: '1.5em',
+                        fontWeight: 'bold',
+                        color: '#1C3664',
+                        minWidth: '60px',
+                        textAlign: 'center',
+                      }}>
+                        {user.clicks}
+                        <div style={{ fontSize: '0.4em', color: '#999', fontWeight: 'normal' }}>לחיצות</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          </Col>
+        )}
+      </Row>
+
+      {/* Recent Activity Tables — full-width, stacked one under the other so the
+          5-column clicks table has room (side-by-side clipped the date column). */}
+      <Row gutter={[24, 24]}>
+        <Col xs={24} lg={24} xl={12}>
+            <Card title="פעולות אחרונות">
+                <Table
+                columns={clicksColumns}
+                dataSource={Array.isArray(clicks) ? clicks.slice(0, 10) : []}
+                rowKey="id"
+                pagination={false}
+                scroll={{ x: 640 }}
+                />
+            </Card>
+        </Col>
+
+        <Col xs={24} lg={24} xl={12}>
+            <Card title="צפיות אחרונות">
+                <Table
+                columns={viewsColumns}
+                dataSource={Array.isArray(views) ? views.slice(0, 10) : []}
+                rowKey="id"
+                pagination={false}
+                scroll={{ x: 640 }}
+                />
+            </Card>
+        </Col>
+      </Row>
 
       <style
         dangerouslySetInnerHTML={{
           __html: `
-/* Flatten cards: one hairline enclosure, no border+shadow stacking — same values as
-   the /admin dashboard's .ec-card (--border / --r-card 14px / --shadow-card). */
-.layout-dashboard .analytics-console .ec-card{box-shadow:0 1px 2px rgba(5,17,80,0.04);border:1px solid var(--border,#e4e8f2);border-radius:14px;}
+/* Flatten cards: one hairline enclosure, no border+shadow stacking — matches the dashboard */
+.layout-dashboard .analytics-console .ant-card{box-shadow:none;border:1px solid ${HAIRLINE};border-radius:12px;}
+.layout-dashboard .analytics-console .ant-card-head{border-bottom:1px solid ${HAIRLINE};}
 .analytics-console .recharts-default-legend{font-size:12px;}
-/* Active-visitors rows are real buttons; background lives here so :hover isn't overridden by inline styles */
-.analytics-console .analytics-visitor-row{background:transparent;}
-.analytics-console .analytics-visitor-row:hover{background:rgba(53,74,196,.05);}
-.analytics-console .analytics-visitor-row.is-selected{background:rgba(53,74,196,.07);}
-.analytics-console .analytics-visitor-row:focus-visible{outline:2px solid var(--brand,#354ac4);outline-offset:-2px;}
 `,
         }}
       />

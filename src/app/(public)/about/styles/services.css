@@ -1,7 +1,7 @@
 /* ===== Services Section ===== */
 .services-section {
   padding: 6rem 2rem;
-  background: #f5f7fb;
+  background: #faf7f2;
 }
 
 .services-container {
@@ -34,7 +34,7 @@
 .services-header .section-title {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
-  color: #051150;
+  color: #1c3664;
   margin: 0 0 1rem 0;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .service-card {
-  background: #f5f7fb;
+  background: #faf7f2;
   padding: 2.5rem 2rem;
   border-radius: 16px;
   text-align: center;
@@ -64,10 +64,10 @@
 }
 
 .service-card:hover {
-  background: #f5f7fb;
-  border-color: #354AC4;
+  background: #faf7f2;
+  border-color: #1c3664;
   transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(5, 17, 80, 0.12);
+  box-shadow: 0 8px 30px rgba(28, 54, 100, 0.12);
 }
 
 .service-icon-wrapper {
@@ -76,7 +76,7 @@
   justify-content: center;
   width: 88px;
   height: 88px;
-  background: #f5f7fb;
+  background: #faf7f2;
   border-radius: 16px;
   padding: 0.875rem;
   margin-bottom: 1.5rem;
@@ -105,7 +105,7 @@
 
 /* Services Footer */
 .services-footer {
-  background: #354ac4;
+  background: linear-gradient(135deg, #1c3664, #2d5aa8);
   padding: 3rem;
   border-radius: 20px;
   text-align: center;

@@ -1,34 +1,34 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { BRAND } from '@/lib/adminTheme';
+import {
+  Row,
+  Col,
+  Card,
+  Table,
+  Tag,
+  Button,
+  Select,
+  Input,
+  App,
+  Popconfirm,
+  Segmented,
+  Statistic,
+  Modal,
+  Tooltip,
+  Skeleton,
+} from 'antd';
+import {
+  PhoneOutlined,
+  MailOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  HomeOutlined,
+} from '@ant-design/icons';
 import Link from 'next/link';
-import { Phone, Mail, MessageCircle, Trash2, Eye, Home, Inbox, Star, Clock, CheckCircle2, Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Textarea } from '@/components/shadcn/textarea';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel,
-} from '@/components/shadcn/select';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from '@/components/shadcn/dialog';
-import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
-} from '@/components/shadcn/alert-dialog';
-import {
-  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
-} from '@/components/shadcn/table';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/shadcn/tooltip';
-import MetricCardGrid from '@/components/admin/MetricCardGrid';
-import { IcInbox, IcStar, IcClock, IcCheckCircle } from '@/components/admin/AdminIcons';
+import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
-import { inquiriesMessages } from '@/lib/adminI18n/messages/inquiries';
 
 interface Inquiry {
   id: number;
@@ -48,59 +48,22 @@ interface Inquiry {
 interface TeamOption {
   id: number;
   name: string;
-  isActive?: boolean;
 }
 
-/** wa.me needs an international number with no leading zeros/symbols (IL default). */
-const waHref = (phone: string) => {
-  let digits = phone.replace(/\D/g, '');
-  if (digits.startsWith('00')) digits = digits.slice(2);
-  if (digits.startsWith('0')) digits = `972${digits.slice(1)}`;
-  return `https://wa.me/${digits}`;
+const STATUS_META: Record<Inquiry['status'], { label: string; color: string }> = {
+  new: { label: 'חדשה', color: 'gold' },
+  in_progress: { label: 'בטיפול', color: 'blue' },
+  closed: { label: 'סגורה', color: 'green' },
 };
 
-const STATUSES: Inquiry['status'][] = ['new', 'in_progress', 'closed'];
-
-// Maps each status to its pill role class (see SHARED PILL-CLASS CONTRACT).
-const STATUS_PILL_CLASS: Record<Inquiry['status'], string> = {
-  new: 'new',
-  in_progress: 'progress',
-  closed: 'closed',
-};
-
-// Sentinel used to represent "unassigned" in the (clearable) agent select.
-const NO_AGENT = '__none__';
+const { TextArea } = Input;
 
 export default function InquiriesPage() {
-  const t = useAdminMessages(inquiriesMessages);
-  const { locale } = useAdminI18n();
-  const dateLocale = locale === 'he' ? 'he-IL' : 'en-GB';
-  const statusLabels: Record<Inquiry['status'], string> = {
-    new: t.statusNew,
-    in_progress: t.statusInProgress,
-    closed: t.statusClosed,
-  };
-  const statusPill = (status: Inquiry['status']) => (
-    <span className={`admin-pill admin-pill--${STATUS_PILL_CLASS[status]}`}>
-      {statusLabels[status]}
-    </span>
-  );
-  // Localized labels for known lead sources; unknown values fall back to the raw string.
-  const sourceLabels: Record<string, string> = {
-    contact_form: t.sourceContactForm,
-    property_page: t.sourcePropertyPage,
-    whatsapp: t.sourceWhatsapp,
-  };
-  const sourcePill = (source: string | null) =>
-    source ? (
-      <span className="admin-pill admin-pill--neutral">{sourceLabels[source] ?? source}</span>
-    ) : null;
+  const { message } = App.useApp();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [team, setTeam] = useState<TeamOption[]>([]);
-  const [owners, setOwners] = useState<TeamOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | Inquiry['status']>('all');
-  const [deleteTarget, setDeleteTarget] = useState<Inquiry | null>(null);
 
   // Details / edit modal
   const [active, setActive] = useState<Inquiry | null>(null);
@@ -111,7 +74,6 @@ export default function InquiriesPage() {
   useEffect(() => {
     fetchInquiries();
     fetchTeam();
-    fetchOwners();
   }, []);
 
   const fetchInquiries = async () => {
@@ -120,7 +82,7 @@ export default function InquiriesPage() {
       if (!res.ok) throw new Error('failed');
       setInquiries(await res.json());
     } catch {
-      toast.error(t.loadError);
+      message.error('שגיאה בטעינת הפניות');
       setInquiries([]);
     } finally {
       setLoading(false);
@@ -132,23 +94,10 @@ export default function InquiriesPage() {
       const res = await fetch('/api/admin/team');
       if (res.ok) {
         const data = await res.json();
-        setTeam((data || []).map((tm: any) => ({ id: tm.id, name: tm.name, isActive: tm.isActive })));
+        setTeam((data || []).map((t: any) => ({ id: t.id, name: t.name })));
       }
     } catch {
       /* non-fatal — agent assignment just won't have options */
-    }
-  };
-
-  // Same source the property form uses for its agentIds options (see AgentSection).
-  const fetchOwners = async () => {
-    try {
-      const res = await fetch('/api/admin/owners');
-      if (res.ok) {
-        const data = await res.json();
-        setOwners((data || []).map((o: any) => ({ id: o.id, name: o.name, isActive: o.isActive })));
-      }
-    } catch {
-      /* non-fatal — agent assignment just won't have owner options */
     }
   };
 
@@ -168,7 +117,7 @@ export default function InquiriesPage() {
     try {
       await patchInquiry(id, { status });
     } catch {
-      toast.error(t.statusUpdateError);
+      message.error('שגיאה בעדכון הסטטוס');
       fetchInquiries();
     }
   };
@@ -188,10 +137,10 @@ export default function InquiriesPage() {
         agentId: draftAgent ?? null,
       });
       setInquiries((prev) => prev.map((i) => (i.id === active.id ? { ...i, ...updated } : i)));
-      toast.success(t.updated);
+      message.success('הפנייה עודכנה');
       setActive(null);
     } catch {
-      toast.error(t.saveError);
+      message.error('שגיאה בשמירה');
     } finally {
       setSaving(false);
     }
@@ -202,11 +151,9 @@ export default function InquiriesPage() {
       const res = await fetch(`/api/admin/inquiries/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('failed');
       setInquiries((prev) => prev.filter((i) => i.id !== id));
-      toast.success(t.deleted);
+      message.success('הפנייה נמחקה');
     } catch {
-      toast.error(t.deleteError);
-    } finally {
-      setDeleteTarget(null);
+      message.error('שגיאה במחיקה');
     }
   };
 
@@ -222,302 +169,222 @@ export default function InquiriesPage() {
 
   const agentName = (agentId: string | null) => {
     if (!agentId) return null;
-    if (agentId.startsWith('owner-')) {
-      const id = Number(agentId.slice('owner-'.length));
-      return owners.find((o) => o.id === id)?.name || agentId;
-    }
     const id = Number(agentId.replace(/^team-/, ''));
-    return team.find((tm) => tm.id === id)?.name || agentId;
+    return team.find((t) => t.id === id)?.name || agentId;
   };
 
-  // tel / WhatsApp / mailto quick actions — icon-ghost, only for fields that exist.
-  // stopPropagation keeps the row/card click (open details) from firing too.
-  const quickActions = (r: Inquiry) => (
-    <>
-      {r.phone && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button asChild variant="ghost" size="icon" aria-label={t.actionCall}>
-              <a href={`tel:${r.phone}`} onClick={(e) => e.stopPropagation()}>
-                <Phone className="size-4" />
+  const columns: ColumnsType<Inquiry> = [
+    {
+      title: 'סטטוס',
+      dataIndex: 'status',
+      key: 'status',
+      width: 130,
+      render: (status: Inquiry['status'], rec) => (
+        <Select
+          value={status}
+          size="small"
+          style={{ width: 110 }}
+          onChange={(v) => changeStatus(rec.id, v)}
+          options={(Object.keys(STATUS_META) as Inquiry['status'][]).map((s) => ({
+            value: s,
+            label: <Tag color={STATUS_META[s].color} style={{ marginInlineEnd: 0 }}>{STATUS_META[s].label}</Tag>,
+          }))}
+        />
+      ),
+    },
+    {
+      title: 'לקוח',
+      key: 'client',
+      render: (_, r) => (
+        <div>
+          <div style={{ fontWeight: 600, color: '#141414' }}>{r.name}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 4, fontSize: 13 }}>
+            {r.phone && (
+              <a href={`tel:${r.phone}`} style={{ color: '#1C3664' }}>
+                <PhoneOutlined /> {r.phone}
               </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t.actionCall}</TooltipContent>
-        </Tooltip>
-      )}
-      {r.phone && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button asChild variant="ghost" size="icon" aria-label={t.actionWhatsapp}>
-              <a
-                href={waHref(r.phone)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <MessageCircle className="size-4" />
+            )}
+            {r.email && (
+              <a href={`mailto:${r.email}`} style={{ color: '#1C3664' }}>
+                <MailOutlined /> {r.email}
               </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t.actionWhatsapp}</TooltipContent>
-        </Tooltip>
-      )}
-      {r.email && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button asChild variant="ghost" size="icon" aria-label={t.actionEmail}>
-              <a href={`mailto:${r.email}`} onClick={(e) => e.stopPropagation()}>
-                <Mail className="size-4" />
-              </a>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{t.actionEmail}</TooltipContent>
-        </Tooltip>
-      )}
-    </>
-  );
-
-  const dash = <span className="text-slate-400">—</span>;
-
-  const filterOptions: { label: string; value: 'all' | Inquiry['status'] }[] = [
-    { label: t.filterAll(stats.total), value: 'all' },
-    { label: t.filterNew(stats.new), value: 'new' },
-    { label: t.filterInProgress(stats.in_progress), value: 'in_progress' },
-    { label: t.filterClosed(stats.closed), value: 'closed' },
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'הודעה',
+      dataIndex: 'message',
+      key: 'message',
+      ellipsis: true,
+      render: (m: string | null) =>
+        m ? <Tooltip title={m}><span>{m}</span></Tooltip> : <span style={{ color: '#bfbfbf' }}>—</span>,
+    },
+    {
+      title: 'נכס',
+      key: 'property',
+      width: 150,
+      render: (_, r) =>
+        r.property ? (
+          <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#1C3664' }}>
+            <HomeOutlined /> {r.property.title}
+          </Link>
+        ) : (
+          <span style={{ color: '#bfbfbf' }}>—</span>
+        ),
+    },
+    {
+      title: 'סוכן',
+      key: 'agent',
+      width: 110,
+      render: (_, r) =>
+        agentName(r.agentId) || <span style={{ color: '#bfbfbf' }}>—</span>,
+    },
+    {
+      title: 'תאריך',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 120,
+      render: (d: string) => new Date(d).toLocaleDateString('he-IL'),
+    },
+    {
+      title: '',
+      key: 'actions',
+      width: 100,
+      render: (_, r) => (
+        <div style={{ display: 'flex', gap: 4 }}>
+          <Tooltip title="פרטים והערות">
+            <Button type="text" icon={<EyeOutlined />} onClick={() => openDetails(r)} />
+          </Tooltip>
+          <Popconfirm
+            title="למחוק את הפנייה?"
+            okText="מחק"
+            cancelText="ביטול"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => deleteInquiry(r.id)}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </div>
+      ),
+    },
   ];
-
-  const statusSelect = (r: Inquiry, triggerClass: string) => (
-    <Select value={r.status} onValueChange={(v) => changeStatus(r.id, v as Inquiry['status'])}>
-      <SelectTrigger className={triggerClass}><SelectValue /></SelectTrigger>
-      <SelectContent>
-        {STATUSES.map((s) => (
-          <SelectItem key={s} value={s}>{statusPill(s)}</SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
 
   return (
     <div>
-      <AdminPageHeader title={t.title} />
+      <h1 className="text-4xl font-bold" style={{ marginBottom: 16 }}>פניות לקוחות</h1>
 
-      <MetricCardGrid
-        items={[
-          { icon: <IcInbox className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <IcStar className="size-5" />, label: t.statNew, value: stats.new, accent: '#5594F1' },
-          { icon: <IcClock className="size-5" />, label: t.statInProgress, value: stats.in_progress, accent: '#354AC4' },
-          { icon: <IcCheckCircle className="size-5" />, label: t.statClosed, value: stats.closed, accent: '#2A69C4' },
-        ]}
-      />
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={12} lg={6}><Card><Statistic title="סה״כ" value={stats.total} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="חדשות" value={stats.new} styles={{ content: { color: BRAND.goldText } }} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="בטיפול" value={stats.in_progress} styles={{ content: { color: BRAND.navy } }} /></Card></Col>
+        <Col xs={12} lg={6}><Card><Statistic title="סגורות" value={stats.closed} styles={{ content: { color: BRAND.success } }} /></Card></Col>
+      </Row>
 
-      <Card className="p-4">
-        {/* filter toggle */}
-        <div className="mb-4 overflow-x-auto">
-          <div role="group" className="inline-flex items-center gap-0.5 rounded-lg bg-muted p-0.5">
-            {filterOptions.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                onClick={() => setFilter(o.value)}
-                aria-pressed={filter === o.value}
-                className={cn(
-                  'whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold transition-colors',
-                  filter === o.value
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
+      <Card>
+        <div style={{ marginBottom: 16 }}>
+          <Segmented
+            value={filter}
+            onChange={(v) => setFilter(v as typeof filter)}
+            options={[
+              { label: `הכל (${stats.total})`, value: 'all' },
+              { label: `חדשות (${stats.new})`, value: 'new' },
+              { label: `בטיפול (${stats.in_progress})`, value: 'in_progress' },
+              { label: `סגורות (${stats.closed})`, value: 'closed' },
+            ]}
+          />
         </div>
-
-        {/* desktop — table */}
         <div className="admin-only-desktop">
-          {loading ? (
-            <Skeleton className="h-64 w-full" />
-          ) : filtered.length === 0 ? (
-            <AdminEmptyState message={t.empty} />
-          ) : (
-            <Table className="min-w-[860px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[130px]">{t.colStatus}</TableHead>
-                  <TableHead>{t.colClient}</TableHead>
-                  <TableHead>{t.colMessage}</TableHead>
-                  <TableHead className="w-[150px]">{t.colProperty}</TableHead>
-                  <TableHead className="w-[110px]">{t.colAgent}</TableHead>
-                  <TableHead className="w-[120px]">{t.colDate}</TableHead>
-                  <TableHead className="w-[200px]" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((r) => (
-                  <TableRow key={r.id} onClick={() => openDetails(r)} className="cursor-pointer">
-                    <TableCell onClick={(e) => e.stopPropagation()}>{statusSelect(r, 'h-8 w-[120px]')}</TableCell>
-                    <TableCell>
-                      <button
-                        type="button"
-                        onClick={() => openDetails(r)}
-                        className="cursor-pointer border-0 bg-transparent p-0 text-start font-semibold text-foreground"
-                      >
-                        {r.name}
-                      </button>
-                      <div className="mt-1 flex flex-wrap items-center gap-3 text-sm">
-                        {sourcePill(r.source)}
-                        {r.phone && (
-                          <a
-                            href={`tel:${r.phone}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 text-primary"
-                          >
-                            <Phone className="size-3.5" /> <span dir="ltr">{r.phone}</span>
-                          </a>
-                        )}
-                        {r.email && (
-                          <a
-                            href={`mailto:${r.email}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 text-primary"
-                          >
-                            <Mail className="size-3.5" /> <bdi>{r.email}</bdi>
-                          </a>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {r.message ? (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span className="block max-w-[280px] truncate">{r.message}</span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs whitespace-pre-wrap">{r.message}</TooltipContent>
-                        </Tooltip>
-                      ) : (
-                        dash
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {r.property ? (
-                        <Link
-                          href={`/admin/properties/${r.property.id}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 text-primary"
-                        >
-                          <Home className="size-3.5" /> {r.property.title}
-                        </Link>
-                      ) : (
-                        dash
-                      )}
-                    </TableCell>
-                    <TableCell>{agentName(r.agentId) || dash}</TableCell>
-                    <TableCell>{new Date(r.createdAt).toLocaleDateString(dateLocale)}</TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <div className="flex gap-1">
-                        {quickActions(r)}
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openDetails(r)}
-                              aria-label={t.detailsTooltip}
-                            >
-                              <Eye className="size-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>{t.detailsTooltip}</TooltipContent>
-                        </Tooltip>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => setDeleteTarget(r)}
-                          aria-label={t.deleteButton}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <Table
+            dataSource={filtered}
+            columns={columns}
+            rowKey="id"
+            loading={loading}
+            pagination={{ pageSize: 20, showSizeChanger: true }}
+            scroll={{ x: 800 }}
+            locale={{ emptyText: <AdminEmptyState message="אין עדיין פניות" /> }}
+          />
         </div>
 
-        {/* mobile — card list */}
         <div className="admin-only-mobile">
           {loading ? (
-            <Skeleton className="h-64 w-full" />
+            <Skeleton active paragraph={{ rows: 6 }} />
           ) : filtered.length === 0 ? (
-            <AdminEmptyState message={t.empty} />
+            <AdminEmptyState message="אין עדיין פניות" />
           ) : (
             <div className="admin-card-list">
               {filtered.map((r) => (
                 <div key={r.id} className="admin-card">
                   <div className="admin-card__head">
-                    <div className="flex-1 min-w-0">
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="admin-card__title">{r.name}</div>
                       <div className="admin-card__meta">
-                        {new Date(r.createdAt).toLocaleDateString(dateLocale)}
+                        {new Date(r.createdAt).toLocaleDateString('he-IL')}
                       </div>
                     </div>
-                    {statusSelect(r, 'w-[120px]')}
+                    <Select
+                      value={r.status}
+                      style={{ width: 120 }}
+                      onChange={(v) => changeStatus(r.id, v)}
+                      options={(Object.keys(STATUS_META) as Inquiry['status'][]).map((s) => ({
+                        value: s,
+                        label: (
+                          <Tag color={STATUS_META[s].color} style={{ marginInlineEnd: 0 }}>
+                            {STATUS_META[s].label}
+                          </Tag>
+                        ),
+                      }))}
+                    />
                   </div>
-
-                  {r.source && <div className="mt-2">{sourcePill(r.source)}</div>}
 
                   <div className="admin-card__fields">
                     {r.phone && (
                       <span>
-                        <b>{t.fieldPhone}</b>{' '}
-                        <a href={`tel:${r.phone}`} className="text-primary">
-                          <span dir="ltr">{r.phone}</span>
+                        <b>טלפון</b>{' '}
+                        <a href={`tel:${r.phone}`} style={{ color: '#1C3664' }}>
+                          {r.phone}
                         </a>
                       </span>
                     )}
                     {r.email && (
                       <span>
-                        <b>{t.fieldEmail}</b>{' '}
-                        <a href={`mailto:${r.email}`} className="text-primary">
-                          <bdi>{r.email}</bdi>
+                        <b>אימייל</b>{' '}
+                        <a href={`mailto:${r.email}`} style={{ color: '#1C3664' }}>
+                          {r.email}
                         </a>
                       </span>
                     )}
                     {r.property && (
                       <span>
-                        <b>{t.fieldProperty}</b>{' '}
-                        <Link href={`/admin/properties/${r.property.id}`} className="text-primary">
+                        <b>נכס</b>{' '}
+                        <Link href={`/admin/properties/${r.property.id}`} style={{ color: '#1C3664' }}>
                           {r.property.title}
                         </Link>
                       </span>
                     )}
                     {agentName(r.agentId) && (
                       <span>
-                        <b>{t.fieldAgent}</b> {agentName(r.agentId)}
+                        <b>סוכן</b> {agentName(r.agentId)}
                       </span>
                     )}
                   </div>
 
                   <div className="admin-card__actions">
-                    {quickActions(r)}
-                    <Button type="button" variant="outline" size="sm" onClick={() => openDetails(r)}>
-                      <Eye className="size-4" />{t.detailsButton}
+                    <Button icon={<EyeOutlined />} onClick={() => openDetails(r)}>
+                      פרטים
                     </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setDeleteTarget(r)}
+                    <Popconfirm
+                      title="למחוק את הפנייה?"
+                      okText="מחק"
+                      cancelText="ביטול"
+                      okButtonProps={{ danger: true }}
+                      onConfirm={() => deleteInquiry(r.id)}
                     >
-                      <Trash2 className="size-4" />{t.deleteButton}
-                    </Button>
+                      <Button danger icon={<DeleteOutlined />}>
+                        מחיקה
+                      </Button>
+                    </Popconfirm>
                   </div>
                 </div>
               ))}
@@ -526,121 +393,49 @@ export default function InquiriesPage() {
         </div>
       </Card>
 
-      {/* Details modal */}
-      <Dialog open={!!active} onOpenChange={(o) => { if (!o) setActive(null); }}>
-        <DialogContent className="max-w-[440px]">
-          <DialogHeader>
-            <DialogTitle>{active ? t.modalTitle(active.name) : ''}</DialogTitle>
-          </DialogHeader>
-          {active && (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center gap-2">
-                {statusPill(active.status)}
-                {sourcePill(active.source)}
-                {active.property && (
-                  <Link
-                    href={`/admin/properties/${active.property.id}`}
-                    className="inline-flex items-center gap-1 text-sm text-primary"
-                  >
-                    <Home className="size-3.5" /> {active.property.title}
-                  </Link>
-                )}
-              </div>
-
-              {active.message && (
-                <div>
-                  <div className="mb-1 text-xs text-muted-foreground">{t.messageLabel}</div>
-                  <div className="whitespace-pre-wrap rounded-lg bg-muted p-3">
-                    {active.message}
-                  </div>
-                </div>
-              )}
-
-              {active.phone && (
-                <div>
-                  <div className="mb-0.5 text-xs text-muted-foreground">{t.fieldPhone}</div>
-                  <a href={`tel:${active.phone}`} className="inline-flex items-center gap-1 text-primary">
-                    <Phone className="size-3.5" /> <span dir="ltr">{active.phone}</span>
-                  </a>
-                </div>
-              )}
-              {active.email && (
-                <div>
-                  <div className="mb-0.5 text-xs text-muted-foreground">{t.fieldEmail}</div>
-                  <a href={`mailto:${active.email}`} className="inline-flex items-center gap-1 text-primary">
-                    <Mail className="size-3.5" /> <bdi>{active.email}</bdi>
-                  </a>
-                </div>
-              )}
+      <Modal
+        open={!!active}
+        title={active ? `פנייה — ${active.name}` : ''}
+        onCancel={() => setActive(null)}
+        onOk={saveDetails}
+        okText="שמירה"
+        cancelText="סגירה"
+        confirmLoading={saving}
+        destroyOnHidden
+      >
+        {active && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {active.message && (
               <div>
-                <div className="mb-1 text-xs text-muted-foreground">{t.assignedAgent}</div>
-                <Select
-                  value={draftAgent ?? ''}
-                  onValueChange={(v) => setDraftAgent(v === NO_AGENT ? undefined : v)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t.assignAgentPlaceholder} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NO_AGENT}>{t.assignAgentPlaceholder}</SelectItem>
-                    {owners.filter((o) => o.isActive !== false).length > 0 && (
-                      <SelectGroup>
-                        <SelectLabel>{t.ownersGroup}</SelectLabel>
-                        {owners
-                          .filter((o) => o.isActive !== false)
-                          .map((o) => (
-                            <SelectItem key={`owner-${o.id}`} value={`owner-${o.id}`}>{o.name}</SelectItem>
-                          ))}
-                      </SelectGroup>
-                    )}
-                    {team.filter((tm) => tm.isActive !== false).length > 0 && (
-                      <SelectGroup>
-                        <SelectLabel>{t.agentsGroup}</SelectLabel>
-                        {team
-                          .filter((tm) => tm.isActive !== false)
-                          .map((tm) => (
-                            <SelectItem key={`team-${tm.id}`} value={`team-${tm.id}`}>{tm.name}</SelectItem>
-                          ))}
-                      </SelectGroup>
-                    )}
-                  </SelectContent>
-                </Select>
+                <div style={{ fontWeight: 600, marginBottom: 4 }}>הודעה</div>
+                <div style={{ background: '#F1F3F5', padding: 12, borderRadius: 8, whiteSpace: 'pre-wrap' }}>
+                  {active.message}
+                </div>
               </div>
-              <div>
-                <div className="mb-1 text-xs text-muted-foreground">{t.internalNotes}</div>
-                <Textarea
-                  rows={4}
-                  value={draftNotes}
-                  onChange={(e) => setDraftNotes(e.target.value)}
-                  placeholder={t.notesPlaceholder}
-                />
-              </div>
+            )}
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 14 }}>
+              {active.phone && <a href={`tel:${active.phone}`} style={{ color: '#1C3664' }}><PhoneOutlined /> {active.phone}</a>}
+              {active.email && <a href={`mailto:${active.email}`} style={{ color: '#1C3664' }}><MailOutlined /> {active.email}</a>}
+              {active.source && <span style={{ color: '#8c8c8c' }}>מקור: {active.source}</span>}
             </div>
-          )}
-          <DialogFooter className="mt-2 gap-2">
-            <Button type="button" variant="outline" onClick={() => setActive(null)}>{t.close}</Button>
-            <Button type="button" disabled={saving} onClick={saveDetails}>
-              {saving && <Loader2 className="size-4 animate-spin" />}
-              {t.save}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirm */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.deleteConfirm}</AlertDialogTitle>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => deleteTarget && deleteInquiry(deleteTarget.id)}>
-              {t.deleteOk}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>סוכן מטפל</div>
+              <Select
+                allowClear
+                placeholder="שייך סוכן"
+                style={{ width: '100%' }}
+                value={draftAgent}
+                onChange={setDraftAgent}
+                options={team.map((t) => ({ label: t.name, value: `team-${t.id}` }))}
+              />
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, marginBottom: 4 }}>הערות פנימיות</div>
+              <TextArea rows={4} value={draftNotes} onChange={(e) => setDraftNotes(e.target.value)} placeholder="הערות לצוות..." />
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

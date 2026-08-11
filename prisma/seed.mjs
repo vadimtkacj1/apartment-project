@@ -45,10 +45,10 @@ async function main() {
   } else {
     await prisma.contactInfo.create({
       data: {
-        phone: '052-384-7291',
-        phoneLink: 'tel:0523847291',
-        email: 'daniel.sharon.re@gmail.com',
-        emailLink: 'mailto:daniel.sharon.re@gmail.com',
+        phone: '050-549-6626',
+        phoneLink: 'tel:0505496626',
+        email: 'rammiz800@gmail.com',
+        emailLink: 'mailto:rammiz800@gmail.com',
         address: 'חנקין 83',
         city: 'חולון',
         mapUrl: 'https://maps.google.com/?q=32.0167,34.7794',
@@ -1337,22 +1337,22 @@ async function main() {
     await prisma.owner.createMany({
       data: [
         {
-          name: 'דניאל שרון',
+          name: 'רם מזרחי',
           title: 'מייסד ומתווך נדל"ן',
           image: '/images/owner1.jpg',
-          phone: '052-384-7291',
-          email: 'daniel.sharon.re@gmail.com',
-          description: 'דניאל הוא מתווך נדל"ן מנוסה המתמחה בשיווק דירות למכירה בחולון. הוא ידוע בגישה הישירה, ביכולת להבין במהירות את צרכי הלקוח ובניהול משא ומתן מדויק שמוביל לתוצאות.',
+          phone: '050-549-6626',
+          email: 'rammiz800@gmail.com',
+          description: 'רם הוא מתווך נדל"ן מנוסה המתמחה בשיווק דירות למכירה בחולון. הוא ידוע בגישה הישירה, ביכולת להבין במהירות את צרכי הלקוח ובניהול משא ומתן מדויק שמוביל לתוצאות.',
           order: 1,
           isActive: true,
         },
         {
-          name: 'יואב אלמוג',
+          name: 'חיים ענבי',
           title: 'מייסד ומתווך נדל"ן',
           image: '/images/owner2.jpg',
-          phone: '054-729-3158',
-          email: 'yoav.almog.re@gmail.com',
-          description: 'יואב מביא ניסיון רב בתחום התיווך והשיווק, עם הכרות מעמיקה של שכונות חולון והסביבה. יואב מתמקד בליווי אישי, זמינות גבוהה ושירות מקצועי לכל לקוח.',
+          phone: '050-675-9999',
+          email: 'hd.nadlan@gmail.com',
+          description: 'חיים מביא ניסיון רב בתחום התיווך והשיווק, עם הכרות מעמיקה של שכונות חולון והסביבה. חיים מתמקד בליווי אישי, זמינות גבוהה ושירות מקצועי לכל לקוח.',
           order: 2,
           isActive: true,
         }

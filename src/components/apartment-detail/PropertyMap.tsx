@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { MapPin } from 'lucide-react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 
 interface PropertyMapProps {
@@ -54,31 +53,6 @@ export function PropertyMap({ isSold, latitude, longitude, location }: PropertyM
     region: 'IL',
     version: 'weekly', // Актуальная версия (3.55 retired)
   });
-
-  // No coordinates: never show a map centered on the Tel Aviv fallback —
-  // render a plain location card instead (hooks above already ran, so this
-  // early return is safe).
-  if (!hasCoordinates) {
-    if (!location) return null;
-    return (
-      <m.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className={`rounded-2xl p-8 mb-8 shadow-lg border ${
-          isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
-        }`}
-      >
-        <h2 className={`text-2xl font-black mb-4 ${
-          isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-        }`}>מיקום</h2>
-        <div className="flex items-center gap-2 text-base font-semibold text-[#475569]">
-          <MapPin size={18} className="shrink-0 text-[#354AC4]" aria-hidden="true" />
-          <span>{location}</span>
-        </div>
-      </m.div>
-    );
-  }
 
   if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY_HERE') {
     return (

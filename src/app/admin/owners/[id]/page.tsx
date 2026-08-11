@@ -1,21 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
-import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
-import { Textarea } from '@/components/shadcn/textarea';
-import { Switch } from '@/components/shadcn/switch';
-import { Label } from '@/components/shadcn/label';
+import { Card, Button, Input, Switch, InputNumber, App, Spin } from 'antd';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import AdminFormActions from '@/components/admin/AdminFormActions';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { ownersMessages } from '@/lib/adminI18n/messages/owners';
+
+const { TextArea } = Input;
 
 interface OwnerForm {
   name: string;
@@ -31,18 +23,17 @@ interface OwnerForm {
 }
 
 const INITIAL_FORM: OwnerForm = {
-  name: '', title: '', image: null, phone: '', email: '', whatsapp: '',
-  licenceNumber: '', description: '', order: 0, isActive: true,
+  name: '',
+  title: '',
+  image: null,
+  phone: '',
+  email: '',
+  whatsapp: '',
+  licenceNumber: '',
+  description: '',
+  order: 0,
+  isActive: true,
 };
-
-function FormCard({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
-  return (
-    <Card className="mb-6 p-6">
-      <div className="mb-4 text-base font-bold tracking-tight text-[#051150]">{title}</div>
-      <div className="flex flex-col gap-4">{children}</div>
-    </Card>
-  );
-}
 
 export default function OwnerEditPage() {
   const router = useRouter();
@@ -50,15 +41,18 @@ export default function OwnerEditPage() {
   const id = params?.id as string;
   const isNew = id === 'new';
 
-  const t = useAdminMessages(ownersMessages);
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<OwnerForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  // Warn before leaving with unsaved edits.
   const [dirty, setDirty] = useState(false);
   useUnsavedChangesWarning(dirty);
 
   useEffect(() => {
-    if (!isNew) fetchOwner();
+    if (!isNew) {
+      fetchOwner();
+    }
   }, [id, isNew]);
 
   const fetchOwner = async () => {
@@ -69,7 +63,7 @@ export default function OwnerEditPage() {
       setFormData(data);
     } catch (error) {
       console.error('Error fetching owner:', error);
-      toast.error(t.loadOneError);
+      message.error('שגיאה בטעינת הבעלים');
     } finally {
       setLoading(false);
     }
@@ -77,46 +71,76 @@ export default function OwnerEditPage() {
 
   const formatPhoneNumber = (value: string): string => {
     const digits = value.replace(/\D/g, '');
+
     const limited = digits.slice(0, 10);
-    if (limited.length <= 3) return limited;
-    if (limited.length <= 6) return `${limited.slice(0, 3)}-${limited.slice(3)}`;
-    return `${limited.slice(0, 3)}-${limited.slice(3, 6)}-${limited.slice(6)}`;
+
+    if (limited.length <= 3) {
+      return limited;
+    } else if (limited.length <= 6) {
+      return `${limited.slice(0, 3)}-${limited.slice(3)}`;
+    } else {
+      return `${limited.slice(0, 3)}-${limited.slice(3, 6)}-${limited.slice(6)}`;
+    }
   };
 
   const handleChange = (field: keyof OwnerForm, value: any) => {
     setDirty(true);
-    if (field === 'phone' || field === 'whatsapp') value = formatPhoneNumber(value);
+    if (field === 'phone' || field === 'whatsapp') {
+      value = formatPhoneNumber(value);
+    }
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const validateForm = (): boolean => {
-    if (!formData.name.trim()) { toast.error(t.nameRequired); return false; }
-    if (!formData.title.trim()) { toast.error(t.roleRequired); return false; }
-    if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { toast.error(t.emailInvalid); return false; }
+    if (!formData.name.trim()) {
+      message.error('שם הוא שדה חובה');
+      return false;
+    }
+    if (!formData.title.trim()) {
+      message.error('תפקיד הוא שדה חובה');
+      return false;
+    }
+    if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      message.error('כתובת אימייל לא תקינה');
+      return false;
+    }
+    // Проверка формата телефона (опционально)
     const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
-    if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) { toast.error(t.phoneInvalid); return false; }
-    if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) { toast.error(t.whatsappInvalid); return false; }
+    if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
+      message.error('טלפון לא תקין. פורמט: 050-123-4567');
+      return false;
+    }
+    if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
+      message.error('WhatsApp לא תקין. פורמט: 050-123-4567');
+      return false;
+    }
     return true;
   };
 
   const handleSave = async () => {
     if (!validateForm()) return;
+
     setSaving(true);
     try {
       const url = isNew ? '/api/admin/owners' : `/api/admin/owners/${id}`;
       const method = isNew ? 'POST' : 'PUT';
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      if (!response.ok) throw new Error('Failed to save owner');
+
+      if (!response.ok) {
+        throw new Error('Failed to save owner');
+      }
+
       setDirty(false);
-      toast.success(isNew ? t.createSuccess : t.updateSuccess);
+      message.success(isNew ? 'הבעלים נוצר בהצלחה' : 'הבעלים עודכן בהצלחה');
       router.push('/admin/owners');
     } catch (error) {
       console.error('Error saving owner:', error);
-      toast.error(t.saveError);
+      message.error('שגיאה בשמירת הבעלים');
     } finally {
       setSaving(false);
     }
@@ -125,85 +149,180 @@ export default function OwnerEditPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <Loader2 className="size-8 animate-spin text-[#354AC4]" />
+        <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div>
-      <Button variant="outline" onClick={() => router.push('/admin/owners')} className="mb-4">
-        <ArrowRight className="size-4" />{t.backToList}
-      </Button>
-      <AdminPageHeader title={isNew ? t.addNew : t.editTitle} />
+    <div className="px-2 sm:px-4 md:px-0">
+      {/* Header */}
+      <div style={{ marginBottom: '24px' }}>
+        <Button
+          icon={<ArrowRightOutlined />}
+          onClick={() => router.push('/admin/owners')}
+          style={{ marginBottom: '16px' }}
+        >
+          חזרה לרשימה
+        </Button>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>
+          {isNew ? 'הוסף בעלים חדש' : 'ערוך בעלים'}
+        </h1>
+      </div>
 
-      <FormCard title={t.basicInfoCard}>
-        <div>
-          <Label className="mb-2 block">{t.fieldName} <span className="text-destructive">*</span></Label>
-          <Input value={formData.name} onChange={(e) => handleChange('name', e.target.value)} placeholder={t.namePlaceholder} />
+      {/* Basic Information */}
+      <Card title="מידע בסיסי" style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              שם <span style={{ color: 'red' }}>*</span>
+            </label>
+            <Input
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              placeholder="הכנס שם"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              תפקיד <span style={{ color: 'red' }}>*</span>
+            </label>
+            <Input
+              value={formData.title}
+              onChange={(e) => handleChange('title', e.target.value)}
+              placeholder='לדוגמה: מייסד ומתווך נדל"ן'
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              מספר רישיון
+            </label>
+            <Input
+              value={formData.licenceNumber}
+              onChange={(e) => handleChange('licenceNumber', e.target.value)}
+              placeholder="הכנס מספר רישיון"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              תיאור
+            </label>
+            <TextArea
+              value={formData.description}
+              onChange={(e) => handleChange('description', e.target.value)}
+              placeholder="הכנס תיאור"
+              rows={4}
+              size="large"
+            />
+          </div>
         </div>
-        <div>
-          <Label className="mb-2 block">{t.fieldRole} <span className="text-destructive">*</span></Label>
-          <Input value={formData.title} onChange={(e) => handleChange('title', e.target.value)} placeholder={t.rolePlaceholder} />
-        </div>
-        <div>
-          <Label className="mb-2 block">{t.licenceNumberLabel}</Label>
-          <Input value={formData.licenceNumber} onChange={(e) => handleChange('licenceNumber', e.target.value)} placeholder={t.licencePlaceholder} />
-        </div>
-        <div>
-          <Label className="mb-2 block">{t.descriptionLabel}</Label>
-          <Textarea value={formData.description} onChange={(e) => handleChange('description', e.target.value)} placeholder={t.descriptionPlaceholder} rows={4} />
-        </div>
-      </FormCard>
+      </Card>
 
-      <FormCard title={t.profilePhotoCard}>
+      {/* Profile Photo */}
+      <Card title="תמונת פרופיל" style={{ marginBottom: '24px' }}>
         <ProfileImageUploader
           image={formData.image}
           onImageChange={(image) => handleChange('image', image)}
           uploadPath="owners"
         />
-      </FormCard>
+      </Card>
 
-      <FormCard title={t.contactInfoCard}>
-        <div>
-          <Label className="mb-2 block">{t.fieldPhone}</Label>
-          <Input value={formData.phone} onChange={(e) => handleChange('phone', e.target.value)} placeholder="050-123-4567" />
+      {/* Contact Information */}
+      <Card title="פרטי התקשרות" style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              טלפון
+            </label>
+            <Input
+              value={formData.phone}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              placeholder="050-123-4567"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              אימייל
+            </label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              placeholder="example@example.com"
+              size="large"
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              WhatsApp
+            </label>
+            <Input
+              value={formData.whatsapp}
+              onChange={(e) => handleChange('whatsapp', e.target.value)}
+              placeholder="050-123-4567"
+              size="large"
+            />
+          </div>
         </div>
-        <div>
-          <Label className="mb-2 block">{t.fieldEmail}</Label>
-          <Input type="email" value={formData.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="example@example.com" />
-        </div>
-        <div>
-          <Label className="mb-2 block">WhatsApp</Label>
-          <Input value={formData.whatsapp} onChange={(e) => handleChange('whatsapp', e.target.value)} placeholder="050-123-4567" />
-        </div>
-      </FormCard>
+      </Card>
 
-      <FormCard title={t.displaySettingsCard}>
-        <div>
-          <Label className="mb-2 block">{t.displayOrderLabel}</Label>
-          <Input
-            type="number"
-            min={0}
-            value={formData.order}
-            onChange={(e) => handleChange('order', parseInt(e.target.value, 10) || 0)}
-            className="w-full"
-          />
-          <div className="mt-1 text-xs text-slate-500">{t.orderHint}</div>
+      {/* Display Settings */}
+      <Card title="הגדרות תצוגה" style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              סדר תצוגה
+            </label>
+            <InputNumber
+              value={formData.order}
+              onChange={(value) => handleChange('order', value || 0)}
+              min={0}
+              size="large"
+              style={{ width: '100%' }}
+            />
+            <div style={{ color: '#8c8c8c', fontSize: '12px', marginTop: '4px' }}>
+              מספר נמוך יותר = מופיע ראשון
+            </div>
+          </div>
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+              סטטוס
+            </label>
+            <Switch
+              checked={formData.isActive}
+              onChange={(value) => handleChange('isActive', value)}
+              checkedChildren="פעיל"
+              unCheckedChildren="לא פעיל"
+            />
+          </div>
         </div>
-        <div>
-          <Label className="mb-2 block">{t.fieldStatus}</Label>
-          <Switch checked={formData.isActive} onCheckedChange={(value) => handleChange('isActive', value)} />
-        </div>
-      </FormCard>
+      </Card>
 
-      <AdminFormActions
-        saveLabel={t.save}
-        cancelLabel={t.cancel}
-        saving={saving}
-        onSave={handleSave}
-        onCancel={() => router.push('/admin/owners')}
-      />
+      {/* Sticky Footer */}
+      <div
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          background: '#fff',
+          padding: '16px 0',
+          borderTop: '1px solid #f0f0f0',
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end',
+          zIndex: 10,
+        }}
+      >
+        <Button size="large" onClick={() => router.push('/admin/owners')}>
+          ביטול
+        </Button>
+        <Button type="primary" size="large" loading={saving} onClick={handleSave}>
+          שמור
+        </Button>
+      </div>
     </div>
   );
 }

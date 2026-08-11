@@ -16,7 +16,7 @@ export default function ArticleByline({ id }: { id: string }) {
 
   return (
     <p className="article-byline">
-      מאת <a href="/about">{author.name}</a>, {author.jobTitle} (רישיון {author.license}) · Aiterra
+      מאת <a href="/about">{author.name}</a>, {author.jobTitle} (רישיון {author.license}) · רם נכסים חיים ענבי
       <span className="article-byline-sep"> · </span>
       <time dateTime={article.date}>עודכן: {updated}</time>
     </p>

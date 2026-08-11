@@ -1,36 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Plus, Pencil, Trash2, User as UserIcon, Eye, EyeOff } from 'lucide-react';
+import {
+  Card,
+  Table,
+  Tag,
+  Button,
+  Switch,
+  Modal,
+  Form,
+  Input,
+  Select,
+  App,
+  Popconfirm,
+  Skeleton,
+} from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
-import { Switch } from '@/components/shadcn/switch';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from '@/components/shadcn/dialog';
-import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
-} from '@/components/shadcn/alert-dialog';
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/shadcn/select';
-import {
-  Form, FormField, FormItem, FormLabel, FormControl, FormMessage,
-} from '@/components/shadcn/form';
-import {
-  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
-} from '@/components/shadcn/table';
+import type { ColumnsType } from 'antd/es/table';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { usersMessages } from '@/lib/adminI18n/messages/users';
 
 interface AdminUser {
   id: string;
@@ -42,37 +31,24 @@ interface AdminUser {
   createdAt: string;
 }
 
-interface FormValues {
-  username: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'agent';
-  isActive: boolean;
-  password: string;
-}
+const ROLE_META: Record<AdminUser['role'], { label: string; color: string }> = {
+  admin: { label: 'מנהל', color: '#1C3664' },
+  agent: { label: 'סוכן', color: 'gold' },
+};
 
 export default function UsersPage() {
+  const { message } = App.useApp();
   const { data: session, status } = useSession();
   const router = useRouter();
-  const t = useAdminMessages(usersMessages);
-
-  const ROLE_META: Record<AdminUser['role'], { label: string; pill: string }> = {
-    admin: { label: t.roleAdmin, pill: 'admin-pill admin-pill--admin' },
-    agent: { label: t.roleAgent, pill: 'admin-pill admin-pill--neutral' },
-  };
 
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<AdminUser | null>(null);
+  const [editing, setEditing] = useState<AdminUser | null>(null); // null=closed
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [form] = Form.useForm();
 
-  const form = useForm<FormValues>({
-    defaultValues: { username: '', name: '', email: '', role: 'agent', isActive: true, password: '' },
-  });
-
+  // Page-level admin guard (defence-in-depth; API + nav already gate this).
   const role = (session?.user as { role?: string } | undefined)?.role;
   useEffect(() => {
     if (status === 'authenticated' && role !== 'admin') router.replace('/admin');
@@ -88,7 +64,7 @@ export default function UsersPage() {
       if (!res.ok) throw new Error('failed');
       setUsers(await res.json());
     } catch {
-      toast.error(t.loadError);
+      message.error('שגיאה בטעינת המשתמשים');
       setUsers([]);
     } finally {
       setLoading(false);
@@ -98,22 +74,15 @@ export default function UsersPage() {
   const openCreate = () => {
     setCreating(true);
     setEditing(null);
-    setShowPassword(false);
-    form.reset({ username: '', name: '', email: '', role: 'agent', isActive: true, password: '' });
+    form.resetFields();
+    form.setFieldsValue({ role: 'agent', isActive: true });
   };
 
   const openEdit = (u: AdminUser) => {
     setCreating(false);
     setEditing(u);
-    setShowPassword(false);
-    form.reset({
-      username: u.username,
-      name: u.name ?? '',
-      email: u.email ?? '',
-      role: u.role,
-      isActive: u.isActive,
-      password: '',
-    });
+    form.resetFields();
+    form.setFieldsValue({ name: u.name, email: u.email, role: u.role, isActive: u.isActive, password: '' });
   };
 
   const closeModal = () => {
@@ -121,7 +90,8 @@ export default function UsersPage() {
     setEditing(null);
   };
 
-  const submit = form.handleSubmit(async (values) => {
+  const submit = async () => {
+    const values = await form.validateFields();
     setSaving(true);
     try {
       if (creating) {
@@ -131,7 +101,7 @@ export default function UsersPage() {
           body: JSON.stringify(values),
         });
         if (!res.ok) throw new Error((await res.json()).error || 'failed');
-        toast.success(t.userCreated);
+        message.success('המשתמש נוצר');
       } else if (editing) {
         const payload: Record<string, unknown> = {
           name: values.name,
@@ -146,16 +116,16 @@ export default function UsersPage() {
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error((await res.json()).error || 'failed');
-        toast.success(t.userUpdated);
+        message.success('המשתמש עודכן');
       }
       closeModal();
       fetchUsers();
     } catch (e: any) {
-      toast.error(e?.message || t.saveError);
+      message.error(e?.message || 'שגיאה בשמירה');
     } finally {
       setSaving(false);
     }
-  });
+  };
 
   const toggleActive = async (u: AdminUser, isActive: boolean) => {
     setUsers((prev) => prev.map((x) => (x.id === u.id ? { ...x, isActive } : x)));
@@ -167,7 +137,7 @@ export default function UsersPage() {
       });
       if (!res.ok) throw new Error((await res.json()).error || 'failed');
     } catch (e: any) {
-      toast.error(e?.message || t.updateError);
+      message.error(e?.message || 'שגיאה בעדכון');
       fetchUsers();
     }
   };
@@ -177,115 +147,123 @@ export default function UsersPage() {
       const res = await fetch(`/api/admin/users/${u.id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error((await res.json()).error || 'failed');
       setUsers((prev) => prev.filter((x) => x.id !== u.id));
-      toast.success(t.userDeleted);
+      message.success('המשתמש נמחק');
     } catch (e: any) {
-      toast.error(e?.message || t.deleteError);
-    } finally {
-      setDeleteTarget(null);
+      message.error(e?.message || 'שגיאה במחיקה');
     }
   };
 
-  const dash = <span className="text-muted-foreground">—</span>;
+  const columns: ColumnsType<AdminUser> = [
+    {
+      title: 'שם משתמש',
+      dataIndex: 'username',
+      key: 'username',
+      render: (u: string) => <span style={{ fontWeight: 600, color: '#141414' }}><UserOutlined /> {u}</span>,
+    },
+    { title: 'שם', dataIndex: 'name', key: 'name', render: (n: string | null) => n || <span style={{ color: '#bfbfbf' }}>—</span> },
+    { title: 'אימייל', dataIndex: 'email', key: 'email', render: (e: string | null) => e || <span style={{ color: '#bfbfbf' }}>—</span> },
+    {
+      title: 'תפקיד',
+      dataIndex: 'role',
+      key: 'role',
+      width: 110,
+      render: (r: AdminUser['role']) => <Tag color={ROLE_META[r].color}>{ROLE_META[r].label}</Tag>,
+    },
+    {
+      title: 'פעיל',
+      dataIndex: 'isActive',
+      key: 'isActive',
+      width: 90,
+      render: (active: boolean, rec) => (
+        <Switch checked={active} onChange={(v) => toggleActive(rec, v)} />
+      ),
+    },
+    {
+      title: '',
+      key: 'actions',
+      width: 100,
+      render: (_, rec) => (
+        <div style={{ display: 'flex', gap: 4 }}>
+          <Button type="text" icon={<EditOutlined />} onClick={() => openEdit(rec)} />
+          <Popconfirm
+            title="למחוק את המשתמש?"
+            okText="מחק"
+            cancelText="ביטול"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => deleteUser(rec)}
+          >
+            <Button type="text" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div>
-      <AdminPageHeader
-        title={t.title}
-        extra={
-          <Button size="lg" className="w-full sm:w-auto" onClick={openCreate}>
-            <Plus className="size-4" />{t.addUser}
-          </Button>
-        }
-      />
+    <div className="px-2 sm:px-4 md:px-0">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>משתמשי מערכת</h1>
+        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>הוספת משתמש</Button>
+      </div>
 
-      {/* desktop — table */}
+      {/* desktop — existing table, unchanged, just wrapped */}
       <div className="admin-only-desktop">
-        <Card className="p-2">
-          {loading ? (
-            <div className="p-4"><Skeleton className="h-64 w-full" /></div>
-          ) : users.length === 0 ? (
-            <AdminEmptyState message={t.noUsers} />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t.username}</TableHead>
-                  <TableHead>{t.name}</TableHead>
-                  <TableHead>{t.email}</TableHead>
-                  <TableHead className="w-[110px]">{t.role}</TableHead>
-                  <TableHead className="w-[90px]">{t.active}</TableHead>
-                  <TableHead className="w-[100px]" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell>
-                      <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
-                        <UserIcon className="size-4 text-muted-foreground" /> {u.username}
-                      </span>
-                    </TableCell>
-                    <TableCell>{u.name || dash}</TableCell>
-                    <TableCell>{u.email ? <bdi>{u.email}</bdi> : dash}</TableCell>
-                    <TableCell><span className={ROLE_META[u.role].pill}>{ROLE_META[u.role].label}</span></TableCell>
-                    <TableCell><Switch checked={u.isActive} onCheckedChange={(v) => toggleActive(u, v)} /></TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(u)} aria-label={t.edit}>
-                          <Pencil className="size-4" />
-                        </Button>
-                        <Button
-                          variant="ghost" size="icon"
-                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => setDeleteTarget(u)} aria-label={t.deleteAction}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+        <Card>
+          <Table
+            dataSource={users}
+            columns={columns}
+            rowKey="id"
+            loading={loading}
+            pagination={false}
+            scroll={{ x: 700 }}
+            locale={{ emptyText: <AdminEmptyState message="אין משתמשים" /> }}
+          />
         </Card>
       </div>
 
       {/* mobile — card list */}
       <div className="admin-only-mobile">
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton active paragraph={{ rows: 6 }} />
         ) : users.length === 0 ? (
-          <AdminEmptyState message={t.noUsers} />
+          <AdminEmptyState message="אין משתמשים" />
         ) : (
           <div className="admin-card-list">
             {users.map((u) => (
               <div key={u.id} className="admin-card">
                 <div className="admin-card__head">
-                  <div className="min-w-0 flex-1">
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="admin-card__title">
-                      <UserIcon className="inline size-4" /> {u.username}
+                      <UserOutlined /> {u.username}
                     </div>
                   </div>
-                  <span className={ROLE_META[u.role].pill}>{ROLE_META[u.role].label}</span>
+                  <Tag color={ROLE_META[u.role].color}>{ROLE_META[u.role].label}</Tag>
                 </div>
                 <div className="admin-card__fields">
-                  <span><b>{t.name}</b> {u.name || dash}</span>
-                  <span><b>{t.email}</b> {u.email ? <bdi>{u.email}</bdi> : dash}</span>
+                  <span>
+                    <b>שם</b> {u.name || '—'}
+                  </span>
+                  <span>
+                    <b>אימייל</b> {u.email || '—'}
+                  </span>
                 </div>
                 <div className="admin-card__actions">
-                  <Switch checked={u.isActive} onCheckedChange={(v) => toggleActive(u, v)} />
-                  <span className="admin-card__grow flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => openEdit(u)}>
-                      <Pencil className="size-4" />{t.edit}
+                  <Switch checked={u.isActive} onChange={(v) => toggleActive(u, v)} />
+                  <span className="admin-card__grow">
+                    <Button icon={<EditOutlined />} onClick={() => openEdit(u)}>
+                      עריכה
                     </Button>
-                    <Button
-                      variant="outline" size="sm"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setDeleteTarget(u)}
+                    <Popconfirm
+                      title="למחוק את המשתמש?"
+                      okText="מחק"
+                      cancelText="ביטול"
+                      okButtonProps={{ danger: true }}
+                      onConfirm={() => deleteUser(u)}
                     >
-                      <Trash2 className="size-4" />{t.deleteAction}
-                    </Button>
+                      <Button danger icon={<DeleteOutlined />}>
+                        מחיקה
+                      </Button>
+                    </Popconfirm>
                   </span>
                 </div>
               </div>
@@ -294,138 +272,53 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Create / edit modal */}
-      <Dialog open={creating || !!editing} onOpenChange={(o) => { if (!o) closeModal(); }}>
-        <DialogContent className="max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>{creating ? t.addUser : t.editUser}</DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={submit} className="mt-1 flex flex-col gap-4">
-              {creating && (
-                <FormField
-                  control={form.control}
-                  name="username"
-                  rules={{ required: t.minChars(3), minLength: { value: 3, message: t.minChars(3) } }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t.username}</FormLabel>
-                      <FormControl><Input autoComplete="off" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t.fullName}</FormLabel>
-                    <FormControl><Input {...field} /></FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                rules={{ validate: (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || t.invalidEmail }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t.email}</FormLabel>
-                    <FormControl><Input type="email" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t.role}</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        <SelectItem value="admin">{t.roleAdminOption}</SelectItem>
-                        <SelectItem value="agent">{t.roleAgentOption}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex-row items-center justify-between">
-                    <FormLabel>{t.active}</FormLabel>
-                    <FormControl><Switch checked={field.value} onCheckedChange={field.onChange} /></FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                rules={{
-                  validate: (v: string) => {
-                    if (creating) return (!!v && v.length >= 6) || t.minChars(6);
-                    return !v || v.length >= 6 || t.minChars(6);
-                  },
-                }}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{creating ? t.password : t.newPasswordLabel}</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? 'text' : 'password'}
-                          autoComplete="new-password"
-                          className="pe-9"
-                          {...field}
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setShowPassword((s) => !s)}
-                          className="absolute end-1 top-1/2 size-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          aria-label={showPassword ? t.hidePassword : t.showPassword}
-                        >
-                          {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                        </Button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter className="mt-2 gap-2">
-                <Button type="button" variant="outline" onClick={closeModal}>{t.cancel}</Button>
-                <Button type="submit" disabled={saving}>{saving ? '…' : t.save}</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete confirm */}
-      <AlertDialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.deleteConfirm}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {deleteTarget ? t.deleteConfirmBody(deleteTarget.username) : null}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => deleteTarget && deleteUser(deleteTarget)}>
-              {t.deleteOk}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Modal
+        open={creating || !!editing}
+        title={creating ? 'הוספת משתמש' : 'עריכת משתמש'}
+        width={520}
+        onCancel={closeModal}
+        onOk={submit}
+        okText="שמירה"
+        cancelText="ביטול"
+        confirmLoading={saving}
+        destroyOnHidden
+      >
+        <Form form={form} layout="vertical" style={{ marginTop: 12 }}>
+          {creating && (
+            <Form.Item
+              label="שם משתמש"
+              name="username"
+              rules={[{ required: true, min: 3, message: 'לפחות 3 תווים' }]}
+            >
+              <Input autoComplete="off" />
+            </Form.Item>
+          )}
+          <Form.Item label="שם מלא" name="name">
+            <Input />
+          </Form.Item>
+          <Form.Item label="אימייל" name="email" rules={[{ type: 'email', message: 'אימייל לא תקין' }]}>
+            <Input type="email" />
+          </Form.Item>
+          <Form.Item label="תפקיד" name="role" rules={[{ required: true }]}>
+            <Select
+              options={[
+                { value: 'admin', label: 'מנהל (גישה מלאה)' },
+                { value: 'agent', label: 'סוכן (גישה מוגבלת)' },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item label="פעיל" name="isActive" valuePropName="checked">
+            <Switch />
+          </Form.Item>
+          <Form.Item
+            label={creating ? 'סיסמה' : 'סיסמה חדשה (להשארת ריק — ללא שינוי)'}
+            name="password"
+            rules={creating ? [{ required: true, min: 6, message: 'לפחות 6 תווים' }] : [{ min: 6, message: 'לפחות 6 תווים' }]}
+          >
+            <Input.Password autoComplete="new-password" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

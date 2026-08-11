@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
 const linksTitle = 'קישורים שימושיים | כלים לרכישה ומכירת נדל״ן';
 const linksDescription = 'כלים ומקורות מידע רשמיים לבדיקת נכסים ותכנון עסקאות נדל״ן: נסח טאבו, מסמכי בית משותף, מדד תשומות הבנייה, מדד המחירים לצרכן ומחשבון משכנתא.';

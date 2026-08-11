@@ -7,9 +7,6 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
-import ArticleToc from '../ArticleToc';
-import ArticleCta from '../ArticleCta';
-import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function LandlordGuideContent() {
@@ -63,8 +60,6 @@ export default function LandlordGuideContent() {
                 אחרי 24 שנים שבהן אנחנו משכירים ומנהלים נכסים בחולון, בת ים וראשון לציון — עבור בעלי דירות בארץ ו<Link href="/articles/foreign-investors">תושבי חוץ</Link> — ריכזנו כאן את השיטה המלאה. <strong>ככה משכירים דירה כמו מקצוענים.</strong>
               </p>
             </section>
-
-            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -148,10 +143,6 @@ export default function LandlordGuideContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
-
-            {/* End CTA + related guides (shared components) */}
-            <ArticleCta articleId="landlord-guide" />
-            <RelatedArticles currentId="landlord-guide" />
           </div>
         </article>
       </div>

@@ -1,20 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
-import { useRouter, useParams } from 'next/navigation';
+import { Card, Button, Input, Switch, InputNumber, App, Spin } from 'antd';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
-import { toast } from '@/components/shadcn/sonner';
-import { Card, CardTitle } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
-import { Textarea } from '@/components/shadcn/textarea';
-import { Switch } from '@/components/shadcn/switch';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { useRouter, useParams } from 'next/navigation';
 import ProfileImageUploader from '@/components/admin/ProfileImageUploader';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import AdminFormActions from '@/components/admin/AdminFormActions';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { teamMessages } from '@/lib/adminI18n/messages/team';
+
+const { TextArea } = Input;
 
 interface TeamMemberForm {
   name: string;
@@ -52,7 +45,7 @@ export default function TeamMemberEditPage() {
   const id = params?.id as string;
   const isNew = id === 'new';
 
-  const t = useAdminMessages(teamMessages);
+  const { message } = App.useApp();
   const [formData, setFormData] = useState<TeamMemberForm>(INITIAL_FORM);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -74,7 +67,7 @@ export default function TeamMemberEditPage() {
       setFormData(data);
     } catch (error) {
       console.error('Error fetching team member:', error);
-      toast.error(t.loadOneError);
+      message.error('שגיאה בטעינת חבר הצוות');
     } finally {
       setLoading(false);
     }
@@ -108,29 +101,29 @@ export default function TeamMemberEditPage() {
 
   const validateForm = (): boolean => {
     if (!formData.name.trim()) {
-      toast.error(t.nameRequired);
+      message.error('שם הוא שדה חובה');
       return false;
     }
     if (!formData.role.trim()) {
-      toast.error(t.roleRequired);
+      message.error('תפקיד הוא שדה חובה');
       return false;
     }
     if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      toast.error(t.emailInvalid);
+      message.error('כתובת אימייל לא תקינה');
       return false;
     }
     // Проверка формата телефона (опционально)
     const phoneRegex = /^0\d{1,2}-\d{3}-\d{4}$/;
     if (formData.phone && formData.phone.trim() && !phoneRegex.test(formData.phone)) {
-      toast.error(t.phoneInvalid);
+      message.error('טלפון לא תקין. פורמט: 050-123-4567');
       return false;
     }
     if (formData.mobile && formData.mobile.trim() && !phoneRegex.test(formData.mobile)) {
-      toast.error(t.mobileInvalid);
+      message.error('נייד לא תקין. פורמט: 052-123-4567');
       return false;
     }
     if (formData.whatsapp && formData.whatsapp.trim() && !phoneRegex.test(formData.whatsapp)) {
-      toast.error(t.whatsappInvalid);
+      message.error('WhatsApp לא תקין. פורמט: 050-123-4567');
       return false;
     }
     return true;
@@ -155,11 +148,11 @@ export default function TeamMemberEditPage() {
       }
 
       setDirty(false);
-      toast.success(isNew ? t.createSuccess : t.updateSuccess);
+      message.success(isNew ? 'חבר הצוות נוצר בהצלחה' : 'חבר הצוות עודכן בהצלחה');
       router.push('/admin/team');
     } catch (error) {
       console.error('Error saving team member:', error);
-      toast.error(t.saveError);
+      message.error('שגיאה בשמירת חבר הצוות');
     } finally {
       setSaving(false);
     }
@@ -168,77 +161,80 @@ export default function TeamMemberEditPage() {
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="px-2 sm:px-4 md:px-0">
       {/* Header */}
       <div style={{ marginBottom: '24px' }}>
         <Button
-          variant="outline"
+          icon={<ArrowRightOutlined />}
           onClick={() => router.push('/admin/team')}
           style={{ marginBottom: '16px' }}
         >
-          <ArrowRight className="size-4" />
-          {t.backToList}
+          חזרה לרשימה
         </Button>
-        <AdminPageHeader title={isNew ? t.addNew : t.editTitle} style={{ marginBottom: 0 }} />
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>
+          {isNew ? 'הוסף חבר צוות חדש' : 'ערוך חבר צוות'}
+        </h1>
       </div>
 
       {/* Basic Information */}
-      <Card className="p-6" style={{ marginBottom: '24px' }}>
-        <CardTitle className="mb-4">{t.basicInfoCard}</CardTitle>
+      <Card title="מידע בסיסי" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldName} <span style={{ color: '#C0392B' }}>*</span>
+              שם <span style={{ color: 'red' }}>*</span>
             </label>
             <Input
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder={t.namePlaceholder}
+              placeholder="הכנס שם"
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldRole} <span style={{ color: '#C0392B' }}>*</span>
+              תפקיד <span style={{ color: 'red' }}>*</span>
             </label>
             <Input
               value={formData.role}
               onChange={(e) => handleChange('role', e.target.value)}
-              placeholder={t.rolePlaceholder}
+              placeholder='לדוגמה: סוכן נדל"ן'
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.licenceNumberLabel}
+              מספר רישיון
             </label>
             <Input
               value={formData.licenceNumber}
               onChange={(e) => handleChange('licenceNumber', e.target.value)}
-              placeholder={t.licencePlaceholder}
+              placeholder="הכנס מספר רישיון"
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.descriptionLabel}
+              תיאור
             </label>
-            <Textarea
+            <TextArea
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
-              placeholder={t.descriptionPlaceholder}
+              placeholder="הכנס תיאור"
               rows={4}
+              size="large"
             />
           </div>
         </div>
       </Card>
 
       {/* Profile Photo */}
-      <Card className="p-6" style={{ marginBottom: '24px' }}>
-        <CardTitle className="mb-4">{t.profilePhotoCard}</CardTitle>
+      <Card title="תמונת פרופיל" style={{ marginBottom: '24px' }}>
         <ProfileImageUploader
           image={formData.image}
           onImageChange={(image) => handleChange('image', image)}
@@ -247,27 +243,28 @@ export default function TeamMemberEditPage() {
       </Card>
 
       {/* Contact Information */}
-      <Card className="p-6" style={{ marginBottom: '24px' }}>
-        <CardTitle className="mb-4">{t.contactInfoCard}</CardTitle>
+      <Card title="פרטי התקשרות" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldPhone}
+              טלפון
             </label>
             <Input
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder="050-123-4567"
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldMobile}
+              נייד
             </label>
             <Input
               value={formData.mobile}
               onChange={(e) => handleChange('mobile', e.target.value)}
               placeholder="052-123-4567"
+              size="large"
             />
           </div>
           <div>
@@ -278,74 +275,88 @@ export default function TeamMemberEditPage() {
               value={formData.whatsapp}
               onChange={(e) => handleChange('whatsapp', e.target.value)}
               placeholder="050-123-4567"
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.faxLabel}
+              פקס
             </label>
             <Input
               value={formData.fax}
               onChange={(e) => handleChange('fax', e.target.value)}
               placeholder="03-123-4567"
+              size="large"
             />
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldEmail}
+              אימייל
             </label>
             <Input
               type="email"
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
               placeholder="example@example.com"
+              size="large"
             />
           </div>
         </div>
       </Card>
 
       {/* Display Settings */}
-      <Card className="p-6" style={{ marginBottom: '24px' }}>
-        <CardTitle className="mb-4">{t.displaySettingsCard}</CardTitle>
+      <Card title="הגדרות תצוגה" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.displayOrderLabel}
+              סדר תצוגה
             </label>
-            <Input
-              type="number"
-              min={0}
+            <InputNumber
               value={formData.order}
-              onChange={(e) => handleChange('order', e.target.value === '' ? 0 : Number(e.target.value))}
+              onChange={(value) => handleChange('order', value || 0)}
+              min={0}
+              size="large"
+              style={{ width: '100%' }}
             />
-            <div style={{ color: '#64748B', fontSize: '12px', marginTop: '4px' }}>
-              {t.orderHint}
+            <div style={{ color: '#8c8c8c', fontSize: '12px', marginTop: '4px' }}>
+              מספר נמוך יותר = מופיע ראשון
             </div>
           </div>
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-              {t.fieldStatus}
+              סטטוס
             </label>
-            <div className="flex items-center gap-3">
-              <Switch
-                checked={formData.isActive}
-                onCheckedChange={(value) => handleChange('isActive', value)}
-              />
-              <span className="text-sm text-muted-foreground">
-                {formData.isActive ? t.statusActive : t.statusInactive}
-              </span>
-            </div>
+            <Switch
+              checked={formData.isActive}
+              onChange={(value) => handleChange('isActive', value)}
+              checkedChildren="פעיל"
+              unCheckedChildren="לא פעיל"
+            />
           </div>
         </div>
       </Card>
 
-      <AdminFormActions
-        saveLabel={t.save}
-        cancelLabel={t.cancel}
-        saving={saving}
-        onSave={handleSave}
-        onCancel={() => router.push('/admin/team')}
-      />
+      {/* Sticky Footer */}
+      <div
+        style={{
+          position: 'sticky',
+          bottom: 0,
+          background: '#fff',
+          padding: '16px 0',
+          borderTop: '1px solid #E6E8EC',
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end',
+          zIndex: 10,
+        }}
+      >
+        <Button size="large" onClick={() => router.push('/admin/team')}>
+          ביטול
+        </Button>
+        <Button type="primary" size="large" loading={saving} onClick={handleSave}>
+          שמור
+        </Button>
+      </div>
     </div>
   );
 }

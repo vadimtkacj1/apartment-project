@@ -1,5 +1,14 @@
-import { redirect } from 'next/navigation';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ContactRedirect() {
-  redirect('/admin/contact/contact-info');
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/admin/contact/contact-info');
+  }, [router]);
+
+  return null;
 }

@@ -2,7 +2,7 @@
 import React, { memo, useState } from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Bed, Maximize, MapPin, Wind, Warehouse, Sun,
   Droplet, Shield, ArrowUpDown, Building, ArrowLeft,
@@ -33,9 +33,9 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  'Exclusive': 'bg-[#5594F1] text-[#051150]',
-  'Opportunity': 'bg-white/95 text-[#051150]',
-  'New': 'bg-[#051150] text-white'
+  'Exclusive': 'bg-[#c5a357] text-[#1c3664]',
+  'Opportunity': 'bg-white/95 text-[#1c3664]',
+  'New': 'bg-[#1c3664] text-white'
 };
 
 const DEFAULT_IMAGE = '/images/hero/sales.jpg';
@@ -59,8 +59,6 @@ interface PropertyCardProps extends Partial<Property> {
   showImage?: boolean;
   totalFloors?: number;
   disableClick?: boolean;
-  /** Eager-load this card's image (LCP) instead of lazy — pass true for the first few cards. */
-  priority?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = memo(({
@@ -84,9 +82,10 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   features,
   isSold,
   showImage = true,
-  disableClick = false,
-  priority = false
+  disableClick = false
 }) => {
+  const router = useRouter();
+
   // Состояние
   const displayImage = image || images?.find(img => img?.trim()) || DEFAULT_IMAGE;
   const [imageSrc, setImageSrc] = useState(displayImage);
@@ -100,25 +99,12 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const dealTypeLabel = actualDealType === 'rent' ? 'להשכרה' : 'למכירה';
   const soldLabel = actualDealType === 'rent' ? 'מושכר' : 'נמכר';
   const displayRooms = rooms || bedrooms || 0;
-  const propertyTypeLabel = propertyType ? (PROPERTY_TYPE_LABELS[propertyType] || propertyType) : '';
-  // Declutter: show at most the 4 most-relevant amenities on the card (the full
-  // list lives on the detail page) — Trulia-style minimal card.
-  const featureChips = (features
-    ? [
-        { on: features.hasAirConditioning, icon: Wind, label: 'מיזוג' },
-        { on: features.hasElevator, icon: ArrowUpDown, label: 'מעלית' },
-        { on: features.hasStorage, icon: Warehouse, label: 'מחסן' },
-        { on: features.hasSafeRoom, icon: Shield, label: 'ממ״ד' },
-        { on: features.hasSunBalcony, icon: Sun, label: 'מ. שמש' },
-        { on: features.hasBoiler, icon: Droplet, label: 'דוד' },
-        { on: features.hasMamak, icon: ShieldCheck, label: 'ממ״ק' },
-        { on: features.hasBars, icon: GripVertical, label: 'סורגים' },
-        { on: features.hasPets, icon: Dog, label: 'חיות מחמד' },
-        { on: features.hasHousingUnit, icon: Building2, label: 'יחידת דיור' },
-        { on: features.hasShelter, icon: Home, label: 'מקלט בבניין' },
-      ].filter((f) => f.on)
-    : []
-  ).slice(0, 4);
+
+  // Обработчики
+  const handleClick = () => {
+    if (!isSold) analytics.trackPropertyClick(id, 'card');
+    router.push(`/apartments/${id}`);
+  };
 
   const handleImageError = () => {
     if (imageSrc !== DEFAULT_IMAGE && !imageError) {
@@ -128,19 +114,23 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
     }
   };
 
-  // Shared elevation tokens (globals.css): rest at --elev-1, lift to --elev-2 on
-  // hover alongside the y:-4 translate — one calm, navy-tinted system across the
-  // whole site. Sold cards stay flat at elev-1 (no lift).
-  const cardClasses = `group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full shadow-elev-1 ${
-    isSold
-      ? 'bg-[#F8FAFC] border border-[#E4E8F2] opacity-80'
-      : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40 hover:shadow-elev-2'
+  const cardClasses = `group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
+    isSold ? 'bg-gray-100 border-2 border-gray-300 opacity-75' : 'bg-white border border-gray-100'
   }`;
 
-  const cardInner = (
+  const cardShadow = isSold
+    ? '0 2px 10px rgba(0, 0, 0, 0.1)'
+    : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)';
+
+  return (
+    <div
+      onClick={disableClick ? undefined : handleClick}
+      className={`block h-full ${disableClick ? '' : 'cursor-pointer'}`}
+    >
       <m.div
-        whileHover={isSold ? {} : { y: -4 }}
+        whileHover={isSold ? {} : { y: -5 }}
         className={cardClasses}
+        style={{ boxShadow: cardShadow }}
         dir="rtl"
       >
         {showImage && (
@@ -154,17 +144,17 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
                 isSold ? 'grayscale opacity-60' : 'group-hover:scale-105'
               }`}
               onError={handleImageError}
-              {...(priority ? { priority: true } : { loading: 'lazy' as const })}
+              loading="lazy"
             />
 
             {imageError && (
-              <div className="absolute inset-0 bg-slate-200 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                 <span className="text-gray-500 text-sm">תמונה לא זמינה</span>
               </div>
             )}
 
-            <div className={`absolute inset-0 bg-linear-to-t from-[#051150]/35 via-[#051150]/0 to-transparent ${
-              isSold ? 'opacity-50' : ''
+            <div className={`absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent ${
+              isSold ? 'opacity-40' : 'opacity-60'
             }`} />
 
             {/* Штамп продано/сдано */}
@@ -179,40 +169,46 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             )}
 
             {/* Бейдж типа сделки */}
-            <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-[0_4px_14px_rgba(5,17,80,0.35)] backdrop-blur-sm bg-[#051150]/90 text-white border border-white/20">
+            <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm bg-[#1c3664]/90 text-white border border-white/20">
               <Tag size={13} />
               <span>{dealTypeLabel}</span>
             </div>
 
             {/* Бейдж статуса */}
             {status && !isSold && (
-              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-[0_2px_8px_rgba(5,17,80,0.20)] ${
-                STATUS_STYLES[status] || 'bg-white/90 text-[#051150]'
+              <div className={`absolute top-4 right-4 z-30 px-3 py-1 text-xs font-black rounded-md shadow-md tracking-wide uppercase ${
+                STATUS_STYLES[status] || 'bg-white/90 text-[#1c3664]'
               }`}>
                 {STATUS_LABELS[status] || status}
               </div>
             )}
 
+            {/* Тип недвижимости */}
+            {propertyType && (
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-900 px-3 py-1 text-xs font-bold rounded shadow-sm z-30">
+                {PROPERTY_TYPE_LABELS[propertyType] || propertyType}
+              </div>
+            )}
           </div>
         )}
 
         {/* Контент карточки */}
-        <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-[#F8FAFC]' : ''}`}>
+        <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
           {/* Заголовок */}
           <div className="mb-3">
             <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
-              isSold ? 'text-[#94A3B8] line-through' : 'text-[#051150]'
+              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
             }`}>
               {title}
             </h3>
-            <div className={`flex items-start gap-1.5 text-xs mb-2 ${isSold ? 'text-[#94A3B8]' : 'text-[#64748B]'}`}>
-              <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-[#94A3B8]' : 'text-[#354AC4]'}`} />
+            <div className={`flex items-start gap-1.5 text-xs mb-2 ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>
+              <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
               <span className="break-words">
-                {propertyTypeLabel && `${propertyTypeLabel} • `}{location}{neighborhood && ` • ${neighborhood}`}
+                {location}{neighborhood && ` • ${neighborhood}`}
               </span>
             </div>
             {isSold && (
-              <div className="flex items-center gap-1 bg-[#64748B] text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
+              <div className="flex items-center gap-1 bg-red-600 text-white px-2 py-1 rounded text-xs font-bold w-fit mb-2">
                 <CheckCircle2 size={10} />
                 <span>{soldLabel}</span>
               </div>
@@ -233,40 +229,45 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
             <StatBox isSold={isSold} icon={Maximize} label={`${area} מ״ר`} />
           </div>
 
-          {/* Amenities — top 4 only (declutter; the full list lives on the detail page) */}
-          {featureChips.length > 0 && (
+          {/* Особенности */}
+          {features && (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-              {featureChips.map((f, i) => (
-                <FeatureTag key={i} icon={f.icon} label={f.label} />
-              ))}
+              {features.hasAirConditioning && <FeatureTag icon={Wind} label="מיזוג" color="blue" />}
+              {features.hasElevator && <FeatureTag icon={ArrowUpDown} label="מעלית" color="purple" />}
+              {features.hasStorage && <FeatureTag icon={Warehouse} label="מחסן" color="orange" />}
+              {features.hasSafeRoom && <FeatureTag icon={Shield} label="ממ״ד" color="green" />}
+              {features.hasSunBalcony && <FeatureTag icon={Sun} label="מ. שמש" color="yellow" />}
+              {features.hasBoiler && <FeatureTag icon={Droplet} label="דוד" color="red" />}
+              {features.hasMamak && <FeatureTag icon={ShieldCheck} label="ממ״ק" color="green" />}
+              {features.hasBars && <FeatureTag icon={GripVertical} label="סורגים" color="blue" />}
+              {features.hasPets && <FeatureTag icon={Dog} label="חיות מחמד" color="purple" />}
+              {features.hasHousingUnit && <FeatureTag icon={Building2} label="יחידת דיור" color="orange" />}
+              {features.hasShelter && <FeatureTag icon={Home} label="מקלט בבניין" color="green" />}
             </div>
           )}
 
           {/* Цена и кнопка */}
           <div className={`mt-auto border-t pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 ${
-            isSold ? 'border-[#E4E8F2]' : 'border-[#E9EDF5]'
+            isSold ? 'border-gray-300' : 'border-gray-100'
           }`}>
             <div className="w-full sm:w-auto">
               {originalPrice && (
-                <p className="text-xs text-[#94A3B8] line-through mb-0.5"><span dir="ltr">{originalPrice} <span className="text-[0.65em]">₪</span></span></p>
+                <p className="text-xs text-gray-400 line-through mb-0.5"><span dir="ltr">{originalPrice} <span className="text-[0.65em]">₪</span></span></p>
               )}
-              <p className={`text-xl sm:text-2xl font-black tracking-tight ${
-                isSold ? 'text-[#94A3B8] line-through' : 'text-[#051150]'
+              <p className={`text-lg sm:text-xl font-black ${
+                isSold ? 'text-gray-400 line-through' : 'text-[#1c3664]'
               }`}>
                 <span dir="ltr">{price} <span className="text-sm sm:text-base font-bold">₪</span></span>
               </p>
             </div>
 
             {isSold ? (
-              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#94A3B8] text-white font-bold text-sm sm:text-base rounded-xl opacity-70 w-full sm:w-auto justify-center">
+              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gray-400 text-white font-bold text-sm sm:text-base rounded-xl opacity-60 w-full sm:w-auto justify-center">
                 {soldLabel}
                 <CheckCircle2 size={18} />
               </div>
             ) : (
-              <div
-                className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 text-white font-bold text-sm sm:text-base rounded-xl transition-[filter] duration-200 group-hover:brightness-110 hover:brightness-110 w-full sm:w-auto justify-center whitespace-nowrap"
-                style={{ background: 'linear-gradient(135deg, #4A5FD6 0%, #354AC4 55%, #28389B 120%)' }}
-              >
+              <div className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[#1c3664] text-white font-bold text-sm sm:text-base rounded-xl hover:bg-[#162d54] transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto justify-center whitespace-nowrap">
                 <span>לפרטים נוספים</span>
                 <ArrowLeft size={18} className="hidden sm:block" />
                 <ArrowLeft size={16} className="sm:hidden" />
@@ -275,42 +276,24 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
           </div>
         </div>
       </m.div>
-  );
-
-  // When a parent already wraps the card in its own link (e.g. the marquee),
-  // render a plain non-link container to avoid nested anchors.
-  if (disableClick) {
-    return <div className="block h-full">{cardInner}</div>;
-  }
-
-  // Real next/link: restores keyboard focus + Enter + cmd/middle-click.
-  return (
-    <Link
-      href={`/apartments/${id}`}
-      onClick={() => {
-        if (!isSold) analytics.trackPropertyClick(id, 'card');
-      }}
-      className="block h-full cursor-pointer"
-    >
-      {cardInner}
-    </Link>
+    </div>
   );
 });
 
 // Вспомогательные компоненты
 const StatBox: React.FC<{ isSold?: boolean; icon: any; label: string }> = ({ isSold, icon: Icon, label }) => (
   <div className={`flex flex-col items-center justify-center rounded-lg py-2 sm:py-3 ${
-    isSold ? 'bg-[#EEF1F6]' : 'bg-[#F4F6FB]'
+    isSold ? 'bg-gray-200' : 'bg-gray-50'
   }`}>
-    <Icon size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-[#94A3B8]' : 'text-[#354AC4]'} mb-1`} />
-    <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-[#94A3B8]' : 'text-[#1E293B]'}`}>
+    <Icon size={18} className={`sm:w-5 sm:h-5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'} mb-1`} />
+    <span className={`text-xs sm:text-sm font-bold ${isSold ? 'text-gray-500' : 'text-gray-900'}`}>
       {label}
     </span>
   </div>
 );
 
-const FeatureTag: React.FC<{ icon: any; label: string }> = ({ icon: Icon, label }) => (
-  <div className="flex items-center gap-0.5 sm:gap-1 bg-[#EAF1FE] px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-[#354AC4]">
+const FeatureTag: React.FC<{ icon: any; label: string; color: string }> = ({ icon: Icon, label, color }) => (
+  <div className={`flex items-center gap-0.5 sm:gap-1 bg-${color}-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold text-${color}-700`}>
     <Icon size={12} className="sm:w-3.5 sm:h-3.5" />
     <span>{label}</span>
   </div>

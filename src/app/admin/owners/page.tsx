@@ -1,31 +1,32 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Search, CheckCircle2, Ban } from 'lucide-react';
+import { BRAND } from '@/lib/adminTheme';
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Input,
+  Select,
+  Modal,
+  App,
+  Statistic,
+  Space,
+  Switch,
+  Table,
+  Image,
+  Skeleton,
+} from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import Link from 'next/link';
-import { toast } from '@/components/shadcn/sonner';
-import { Card } from '@/components/shadcn/card';
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
-import { Switch } from '@/components/shadcn/switch';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from '@/components/shadcn/select';
-import {
-  AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
-} from '@/components/shadcn/alert-dialog';
-import {
-  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
-} from '@/components/shadcn/table';
-import MetricCardGrid from '@/components/admin/MetricCardGrid';
-import { IcUser, IcCheckCircle, IcBan } from '@/components/admin/AdminIcons';
-import AdminAvatar from '@/components/admin/AdminAvatar';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
-import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import { useAdminMessages } from '@/lib/adminI18n';
-import { ownersMessages } from '@/lib/adminI18n/messages/owners';
 
 interface Owner {
   id: number;
@@ -43,10 +44,11 @@ interface Owner {
 }
 
 export default function OwnersPage() {
-  const t = useAdminMessages(ownersMessages);
+  const { message } = App.useApp();
   const [owners, setOwners] = useState<Owner[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedOwner, setSelectedOwner] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
@@ -63,7 +65,7 @@ export default function OwnersPage() {
     } catch (error) {
       console.error('Error fetching owners:', error);
       setOwners([]);
-      toast.error(t.loadListError);
+      message.error('שגיאה בטעינת הבעלים');
     } finally {
       setLoading(false);
     }
@@ -90,16 +92,17 @@ export default function OwnersPage() {
   }, [owners, searchTerm, filterStatus]);
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!selectedOwner) return;
     try {
-      const response = await fetch(`/api/admin/owners/${deleteTarget}`, { method: 'DELETE' });
+      const response = await fetch(`/api/admin/owners/${selectedOwner}`, { method: 'DELETE' });
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      setDeleteTarget(null);
+      setDeleteModal(false);
+      setSelectedOwner(null);
       fetchOwners();
-      toast.success(t.deleteSuccess);
+      message.success('הבעלים נמחק בהצלחה');
     } catch (error) {
       console.error('Error deleting owner:', error);
-      toast.error(t.deleteError);
+      message.error('שגיאה במחיקת הבעלים. נסה שוב.');
     }
   };
 
@@ -117,158 +120,261 @@ export default function OwnersPage() {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
       fetchOwners();
-      toast.success(value ? t.activatedSuccess : t.deactivatedSuccess);
+      message.success(value ? 'הבעלים הופעל' : 'הבעלים הושבת');
     } catch (error) {
       console.error('Error updating status:', error);
-      toast.error(t.statusUpdateError);
+      message.error('שגיאה בעדכון הסטטוס. נסה שוב.');
     }
   };
 
-  const dash = <span className="text-muted-foreground">—</span>;
-
   return (
-    <div>
-      <AdminPageHeader
-        title={t.title}
-        extra={
-          <Button asChild size="lg" className="w-full sm:w-auto">
-            <Link href="/admin/owners/new"><Plus className="size-4" />{t.addNew}</Link>
+    <div className="px-2 sm:px-4 md:px-0">
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול בעלים</h1>
+        <Link href="/admin/owners/new" className="w-full sm:w-auto">
+          <Button type="primary" icon={<PlusOutlined />} size="large" className="w-full sm:w-auto">
+            הוסף בעלים חדש
           </Button>
-        }
-      />
-
-      <MetricCardGrid
-        items={[
-          { icon: <IcUser className="size-5" />, label: t.statTotal, value: stats.total, accent: '#354AC4' },
-          { icon: <IcCheckCircle className="size-5" />, label: t.statActive, value: stats.active, accent: '#2A69C4' },
-          { icon: <IcBan className="size-5" />, label: t.statInactive, value: stats.inactive, accent: '#64748B' },
-        ]}
-      />
-
-      {/* Filters */}
-      <Card className="mb-6 p-5">
-        <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t.searchPlaceholder}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="ps-9"
-            />
-          </div>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full sm:w-50"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.filterAllStatuses}</SelectItem>
-              <SelectItem value="active">{t.statusActive}</SelectItem>
-              <SelectItem value="inactive">{t.statusInactive}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </Card>
-
-      {/* Desktop table */}
-      <div className="admin-only-desktop">
-        <Card className="p-2">
-          {loading ? (
-            <div className="p-4"><Skeleton className="h-64 w-full" /></div>
-          ) : filteredOwners.length === 0 ? (
-            <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} />
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t.fieldName}</TableHead>
-                  <TableHead>{t.fieldEmail}</TableHead>
-                  <TableHead>{t.fieldPhone}</TableHead>
-                  <TableHead>WhatsApp</TableHead>
-                  <TableHead className="text-center">{t.fieldOrder}</TableHead>
-                  <TableHead className="text-center">{t.fieldStatus}</TableHead>
-                  <TableHead>{t.colActions}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredOwners.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>
-                      <div className="flex min-w-0 items-center gap-3">
-                        <AdminAvatar src={record.image} name={record.name} />
-                        <div className="min-w-0">
-                          <Link href={`/admin/owners/${record.id}`} className="block truncate text-sm font-semibold text-primary">
-                            {record.name}
-                          </Link>
-                          <div className="truncate text-[12.5px] text-muted-foreground">{record.title}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{record.email ? <bdi>{record.email}</bdi> : dash}</TableCell>
-                    <TableCell>{record.phone ? <span dir="ltr">{record.phone}</span> : dash}</TableCell>
-                    <TableCell>{record.whatsapp ? <span dir="ltr">{record.whatsapp}</span> : dash}</TableCell>
-                    <TableCell className="text-center">{record.order}</TableCell>
-                    <TableCell className="text-center">
-                      <Switch checked={record.isActive} onCheckedChange={(v) => handleStatusChange(record.id, v)} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button asChild variant="ghost" size="icon" aria-label={t.edit}>
-                          <Link href={`/admin/owners/${record.id}`}><Pencil className="size-4" /></Link>
-                        </Button>
-                        <Button
-                          variant="ghost" size="icon"
-                          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => setDeleteTarget(record.id)} aria-label={t.delete}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Card>
+        </Link>
       </div>
 
-      {/* Mobile card list */}
+      {/* Statistics */}
+      <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Col xs={24} sm={12} md={8}>
+          <Card><Statistic title="סה״כ בעלים" value={stats.total} prefix={<UserOutlined />} /></Card>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Card><Statistic title="בעלים פעילים" value={stats.active} styles={{ content: { color: BRAND.success } }} /></Card>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Card><Statistic title="בעלים לא פעילים" value={stats.inactive} styles={{ content: { color: BRAND.danger } }} /></Card>
+        </Col>
+      </Row>
+
+      {/* Filters */}
+      <Card className="mb-6">
+        <Space vertical style={{ width: '100%' }} size="middle">
+          <Input
+            placeholder="חפש לפי שם או אימייל..."
+            prefix={<SearchOutlined />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            size="large"
+          />
+          <Select
+            value={filterStatus}
+            onChange={setFilterStatus}
+            style={{ minWidth: 120, width: '100%', maxWidth: '200px' }}
+            size="large"
+          >
+            <Select.Option value="all">כל הסטטוסים</Select.Option>
+            <Select.Option value="active">פעיל</Select.Option>
+            <Select.Option value="inactive">לא פעיל</Select.Option>
+          </Select>
+        </Space>
+      </Card>
+
+      {/* Owners Table — desktop */}
+      <div className="admin-only-desktop">
+      <Card>
+        <Table
+          dataSource={filteredOwners}
+          loading={loading}
+          rowKey="id"
+          size="middle"
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `סה״כ ${total} בעלים`,
+          }}
+          scroll={{ x: 1000 }}
+          locale={{ emptyText: <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" /> }}
+          columns={[
+            {
+              title: 'תמונה',
+              dataIndex: 'image',
+              key: 'image',
+              width: 80,
+              render: (image: string | null) => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {image ? (
+                    <Image
+                      src={image}
+                      alt="Owner"
+                      width={60}
+                      height={60}
+                      preview={false}
+                      style={{
+                        objectFit: 'cover',
+                        borderRadius: '50%',
+                        border: '2px solid #d9d9d9',
+                      }}
+                      fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%23e5e7eb'/%3E%3C/svg%3E"
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '60px',
+                        height: '60px',
+                        borderRadius: '50%',
+                        background: '#f0f0f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <UserOutlined style={{ fontSize: '24px', color: '#bfbfbf' }} />
+                    </div>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: 'שם',
+              dataIndex: 'name',
+              key: 'name',
+              width: 150,
+            },
+            {
+              title: 'תפקיד',
+              dataIndex: 'title',
+              key: 'title',
+              width: 200,
+            },
+            {
+              title: 'אימייל',
+              dataIndex: 'email',
+              key: 'email',
+              width: 200,
+              render: (email: string | null) => email || '-',
+            },
+            {
+              title: 'טלפון',
+              dataIndex: 'phone',
+              key: 'phone',
+              width: 120,
+              render: (phone: string | null) => phone || '-',
+            },
+            {
+              title: 'WhatsApp',
+              dataIndex: 'whatsapp',
+              key: 'whatsapp',
+              width: 120,
+              render: (whatsapp: string | null) => whatsapp || '-',
+            },
+            {
+              title: 'סדר',
+              dataIndex: 'order',
+              key: 'order',
+              width: 80,
+              align: 'center',
+            },
+            {
+              title: 'סטטוס',
+              key: 'status',
+              width: 100,
+              align: 'center',
+              render: (_, record: Owner) => (
+                <Switch
+                  checked={record.isActive}
+                  onChange={(v) => handleStatusChange(record.id, v)}
+                  checkedChildren="פעיל"
+                  unCheckedChildren="כבוי"
+                />
+              ),
+            },
+            {
+              title: 'פעולות',
+              key: 'actions',
+              width: 150,
+              render: (_, record: Owner) => (
+                <Space size={4}>
+                  <Link href={`/admin/owners/${record.id}`}>
+                    <Button type="primary" icon={<EditOutlined />} size="small">
+                      ערוך
+                    </Button>
+                  </Link>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    size="small"
+                    onClick={() => {
+                      setSelectedOwner(record.id);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    מחק
+                  </Button>
+                </Space>
+              ),
+            },
+          ]}
+        />
+      </Card>
+      </div>
+
+      {/* Owners — mobile card list */}
       <div className="admin-only-mobile">
         {loading ? (
-          <Skeleton className="h-64 w-full" />
+          <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredOwners.length === 0 ? (
-          <AdminEmptyState message={t.emptyMessage} addHref="/admin/owners/new" addLabel={t.emptyAddLabel} />
+          <AdminEmptyState message="לא נמצאו בעלים" addHref="/admin/owners/new" addLabel="הוספת בעלים" />
         ) : (
           <div className="admin-card-list">
             {filteredOwners.map((owner) => (
               <div key={owner.id} className="admin-card">
                 <div className="admin-card__head">
-                  <AdminAvatar src={owner.image} name={owner.name} />
-                  <div className="min-w-0 flex-1">
+                  {owner.image ? (
+                    <img className="admin-card__thumb" src={owner.image} alt={owner.name} />
+                  ) : (
+                    <div
+                      className="admin-card__thumb"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#f0f0f0',
+                      }}
+                    >
+                      <UserOutlined style={{ fontSize: '22px', color: '#bfbfbf' }} />
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="admin-card__title">{owner.name}</div>
                     <div className="admin-card__meta">{owner.title}</div>
                   </div>
                 </div>
                 <div className="admin-card__fields">
-                  {owner.phone && <span><b>{t.fieldPhone}</b> <span dir="ltr">{owner.phone}</span></span>}
-                  {owner.whatsapp && <span><b>WhatsApp</b> <span dir="ltr">{owner.whatsapp}</span></span>}
-                  {owner.email && <span><b>{t.fieldEmail}</b> <span dir="ltr">{owner.email}</span></span>}
-                  <span><b>{t.fieldOrder}</b> {owner.order}</span>
+                  {owner.phone && <span><b>טלפון</b> {owner.phone}</span>}
+                  {owner.whatsapp && <span><b>WhatsApp</b> {owner.whatsapp}</span>}
+                  {owner.email && <span><b>אימייל</b> {owner.email}</span>}
+                  <span><b>סדר</b> {owner.order}</span>
                 </div>
                 <div className="admin-card__actions">
-                  <Switch checked={owner.isActive} onCheckedChange={(v) => handleStatusChange(owner.id, v)} />
-                  <span className="admin-card__grow flex gap-2">
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/admin/owners/${owner.id}`}><Pencil className="size-4" />{t.edit}</Link>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setDeleteTarget(owner.id)}
-                    >
-                      <Trash2 className="size-4" />{t.delete}
-                    </Button>
+                  <Switch
+                    checked={owner.isActive}
+                    onChange={(v) => handleStatusChange(owner.id, v)}
+                    checkedChildren="פעיל"
+                    unCheckedChildren="כבוי"
+                  />
+                  <span className="admin-card__grow">
+                    <Link href={`/admin/owners/${owner.id}`}>
+                      <Button type="primary" icon={<EditOutlined />}>ערוך</Button>
+                    </Link>
                   </span>
+                  <Button
+                    type="primary"
+                    danger
+                    icon={<DeleteOutlined />}
+                    onClick={() => {
+                      setSelectedOwner(owner.id);
+                      setDeleteModal(true);
+                    }}
+                  >
+                    מחק
+                  </Button>
                 </div>
               </div>
             ))}
@@ -276,19 +382,21 @@ export default function OwnersPage() {
         )}
       </div>
 
-      {/* Delete confirm */}
-      <AlertDialog open={deleteTarget !== null} onOpenChange={(o) => { if (!o) setDeleteTarget(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.deleteConfirmTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{t.deleteConfirmBody}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleDelete}>{t.delete}</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation Modal */}
+      <Modal
+        title="אישור מחיקה"
+        open={deleteModal}
+        onOk={handleDelete}
+        onCancel={() => {
+          setDeleteModal(false);
+          setSelectedOwner(null);
+        }}
+        okText="מחק"
+        cancelText="ביטול"
+        okButtonProps={{ danger: true }}
+      >
+        <p>האם אתה בטוח שברצונך למחוק בעלים זה?</p>
+      </Modal>
     </div>
   );
 }

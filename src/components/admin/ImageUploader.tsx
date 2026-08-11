@@ -1,14 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Inbox, Trash2, ChevronLeft, ChevronRight, Info } from 'lucide-react';
-import { Button } from '@/components/shadcn/button';
-import { Alert, AlertTitle, AlertDescription } from '@/components/shadcn/alert';
-import { toast } from '@/components/shadcn/sonner';
+import { useEffect, useState } from 'react';
+import { Upload, Button, App, Alert, Typography } from 'antd';
+import { InboxOutlined, DeleteOutlined, LeftOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
+import type { UploadProps } from 'antd';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
-import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
-import { uploadAdminImage, validateImageFile } from './adminUpload';
+
+const { Dragger } = Upload;
+const { Text } = Typography;
 
 interface ImageUploaderProps {
   images: string[];
@@ -21,15 +20,10 @@ export default function ImageUploader({
   onImagesChange,
   maxImages = 25,
 }: ImageUploaderProps) {
-  const t = useAdminMessages(uploadersMessages);
-  const { dir } = useAdminI18n();
+  const { message } = App.useApp();
   const isMobile = useIsMobile();
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const disabled = uploading || images.length >= maxImages;
 
   // Lock body scroll while the fullscreen preview overlay is open.
   useEffect(() => {
@@ -41,69 +35,101 @@ export default function ImageUploader({
     };
   }, [previewImage]);
 
-  const handleUpload = async (file: File) => {
+  const uploadImage = async (file: File): Promise<string> => {
+    console.log('🚀 [FRONTEND] Starting file upload:', file.name);
+    console.log('   Size:', file.size, 'bytes');
+    console.log('   Type:', file.type);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    console.log('📡 [FRONTEND] Sending request to /api/admin/upload...');
+    const response = await fetch('/api/admin/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    console.log('📥 [FRONTEND] Received response, status:', response.status);
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to upload image';
+
+      try {
+        const error = await response.json();
+        console.error('❌ [FRONTEND] Error from server (JSON):', error);
+        errorMessage = error.error || errorMessage;
+      } catch (jsonError) {
+        console.error('❌ [FRONTEND] Error parsing JSON error response:', jsonError);
+
+        if (response.status === 413) {
+          // Payload Too Large – сервер отверг файл ещё до обработки нашим бэкендом
+          errorMessage = 'התמונה גדולה מדי עבור השרת. נסה להקטין את התמונה ולהעלות שוב.';
+        } else {
+          const text = await response.text().catch(() => null);
+          console.error('❌ [FRONTEND] Non-JSON error response body:', text);
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    try {
+      const data = await response.json();
+      console.log('✅ [FRONTEND] File uploaded successfully!');
+      console.log('   URL:', data.url);
+      return data.url;
+    } catch (parseError) {
+      console.error('❌ [FRONTEND] Failed to parse success response as JSON:', parseError);
+      throw new Error('שגיאה לא צפויה בתשובת השרת בעת העלאת התמונה');
+    }
+  };
+
+  const handleUpload: UploadProps['customRequest'] = async ({ file, onSuccess, onError }) => {
+    console.log('📤 [FRONTEND] handleUpload called');
     setUploading(true);
 
     try {
-      const url = await uploadAdminImage(file, t);
+      const url = await uploadImage(file as File);
+      console.log('💾 [FRONTEND] Adding URL to images list:', url);
       onImagesChange([...images, url]);
-      toast.success(t.uploadSuccess);
+      console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
+      message.success('התמונה הועלתה בהצלחה');
+      onSuccess?.(url);
     } catch (err: any) {
-      toast.error(err.message || t.uploadError);
+      console.error('❌ [FRONTEND] Upload error:', err);
+      message.error(err.message || 'שגיאה בהעלאת התמונה');
+      onError?.(err);
     } finally {
       setUploading(false);
+      console.log('🏁 [FRONTEND] Upload completed\n');
     }
   };
 
   const beforeUpload = (file: File) => {
-    const invalid = validateImageFile(file, t);
-    if (invalid) {
-      toast.error(invalid);
+    const isImage = file.type.startsWith('image/');
+    if (!isImage) {
+      message.error('רק קבצי תמונה מותרים');
+      return false;
+    }
+
+    const isLt50M = file.size / 1024 / 1024 < 50;
+    if (!isLt50M) {
+      message.error('התמונה חייבת להיות קטנה מ-50MB');
       return false;
     }
 
     if (images.length >= maxImages) {
-      toast.error(t.maxImagesLimit(maxImages));
+      message.error(`ניתן להעלות עד ${maxImages} תמונות`);
       return false;
     }
 
     return true;
   };
 
-  const handleFiles = (files: FileList | null) => {
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      if (beforeUpload(file)) {
-        handleUpload(file);
-      }
-    });
-  };
-
-  const openFilePicker = () => {
-    if (!disabled) fileInputRef.current?.click();
-  };
-
-  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (!disabled) setDragOver(true);
-  };
-
-  const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
-
-  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (disabled) return;
-    handleFiles(e.dataTransfer.files);
-  };
-
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
-    toast.success(t.imageDeleted);
+    message.success('התמונה נמחקה');
   };
 
   const moveImage = (fromIndex: number, toIndex: number) => {
@@ -115,68 +141,49 @@ export default function ImageUploader({
 
   return (
     <div>
-      {/* Upload Area — custom drag-and-drop zone */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={openFilePicker}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openFilePicker();
-          }
-        }}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
+      {/* Upload Area */}
+      <Dragger
+        name="file"
+        multiple
+        accept="image/*"
+        customRequest={handleUpload}
+        beforeUpload={beforeUpload}
+        showUploadList={false}
+        disabled={uploading || images.length >= maxImages}
         style={{
           marginBottom: '24px',
           borderRadius: '12px',
-          border: `2px dashed ${dragOver ? '#354AC4' : '#d9d9d9'}`,
-          background: dragOver ? '#EEF1FB' : '#F7F8FA',
+          border: '2px dashed #d9d9d9',
+          background: '#F7F8FA',
           padding: '20px',
-          textAlign: 'center',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.6 : 1,
-          transition: 'border-color 0.2s, background 0.2s',
-          outline: 'none',
         }}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          style={{ display: 'none' }}
-          onChange={(e) => {
-            handleFiles(e.target.files);
-            e.target.value = '';
-          }}
-        />
-        <p style={{ margin: 0 }}>
-          <Inbox size={48} color="#354AC4" style={{ display: 'inline-block' }} />
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
-          {t.dragImagesHint}
+          גרור תמונות לכאן או לחץ להעלאה
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          {t.galleryUploadHint(maxImages)}
+          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 50MB לכל תמונה
         </p>
         {uploading && (
-          <span className="text-muted-foreground text-sm" style={{ display: 'block', marginTop: '8px' }}>
-            {t.uploading}
-          </span>
+          <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
+            מעלה...
+          </Text>
         )}
-      </div>
+      </Dragger>
 
       {/* Images Grid */}
       {images.length > 0 && (
         <div>
-          <Alert variant="info" style={{ marginBottom: '16px' }}>
-            <Info className="size-4" />
-            <AlertTitle>{t.uploadedImagesTitle(images.length)}</AlertTitle>
-            <AlertDescription>{t.firstImageIsMain}</AlertDescription>
-          </Alert>
+          <Alert
+            title={`תמונות שהועלו (${images.length})`}
+            description="התמונה הראשונה תוצג כתמונה ראשית"
+            type="info"
+            showIcon
+            style={{ marginBottom: '16px' }}
+          />
 
           <div
             style={{
@@ -190,7 +197,7 @@ export default function ImageUploader({
                 key={`${url}-${index}`}
                 style={{
                   position: 'relative',
-                  border: index === 0 ? '3px solid #354AC4' : '1px solid #d9d9d9',
+                  border: index === 0 ? '3px solid #1C3664' : '1px solid #d9d9d9',
                   borderRadius: '10px',
                   overflow: 'hidden',
                   aspectRatio: '1',
@@ -203,7 +210,7 @@ export default function ImageUploader({
                       position: 'absolute',
                       top: '8px',
                       right: '8px',
-                      background: '#354AC4',
+                      background: '#1C3664',
                       color: 'white',
                       padding: '2px 10px',
                       borderRadius: '6px',
@@ -212,7 +219,7 @@ export default function ImageUploader({
                       zIndex: 2,
                     }}
                   >
-                    {t.mainImageBadge}
+                    ראשית
                   </div>
                 )}
 
@@ -227,8 +234,8 @@ export default function ImageUploader({
                   }}
                 >
                   <img
-                    src="/aiterra-white-logo.png"
-                    alt="Aiterra logo"
+                    src="/images/logos.png"
+                    alt="Logo"
                     style={{
                       maxWidth: '140px',
                       maxHeight: '70px',
@@ -266,35 +273,27 @@ export default function ImageUploader({
                 >
                   {index > 0 && (
                     <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
+                      size="small"
+                      icon={<RightOutlined />}
                       onClick={() => moveImage(index, index - 1)}
                       style={{ flex: 1 }}
-                    >
-                      {dir === 'rtl' ? <ChevronRight /> : <ChevronLeft />}
-                    </Button>
+                    />
                   )}
                   {index < images.length - 1 && (
                     <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
+                      size="small"
+                      icon={<LeftOutlined />}
                       onClick={() => moveImage(index, index + 1)}
                       style={{ flex: 1 }}
-                    >
-                      {dir === 'rtl' ? <ChevronLeft /> : <ChevronRight />}
-                    </Button>
+                    />
                   )}
                   <Button
-                    type="button"
-                    size="sm"
-                    variant="destructive"
+                    size="small"
+                    danger
+                    icon={<DeleteOutlined />}
                     onClick={() => removeImage(index)}
                     style={{ flex: 1 }}
-                  >
-                    <Trash2 />
-                  </Button>
+                  />
                 </div>
               </div>
             ))}
@@ -342,8 +341,8 @@ export default function ImageUploader({
               }}
             >
               <img
-                src="/aiterra-white-logo.png"
-                alt="Aiterra logo"
+                src="/images/logos.png"
+                alt="Logo"
                 style={{
                   maxWidth: '200px',
                   maxHeight: '100px',

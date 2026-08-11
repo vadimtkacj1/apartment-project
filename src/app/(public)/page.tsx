@@ -2,18 +2,18 @@ import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import { preload } from 'react-dom';
 import Hero from '@/components/layout/Hero';
-import NeighborhoodChips, { type HoodChip } from '@/components/layout/NeighborhoodChips';
-import SoldRecently, { type SoldItem } from '@/components/layout/SoldRecently';
 import GuidesSection from '@/components/layout/GuidesSection';
 import { prisma } from '@/lib/prisma';
-import { getActiveTheme } from '@/themes/server';
-import MoonlitHome from '@/themes/moonlit/MoonlitHome';
 import type { DealType, Direction, PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
 
 // Cache SSR output for 60 seconds — balances freshness with server load
 export const revalidate = 60;
 
 // Lazy load heavy components below the fold
+const FloorPlansSection = dynamic(() => import('@/components/layout/FloorPlansSection'), {
+  loading: () => <div className="h-96 bg-warm animate-pulse" />,
+});
+
 const NoCommissionSection = dynamic(() => import('@/components/layout/NoCommissionSection'), {
   loading: () => <div className="h-64 bg-warm animate-pulse" />,
 });
@@ -24,10 +24,6 @@ const HotPropositions = dynamic(() => import('@/components/layout/HotProposition
 
 const AboutSection = dynamic(() => import('@/components/layout/AboutSection'), {
   loading: () => <div className="h-96 bg-warm animate-pulse" />,
-});
-
-const Stats = dynamic(() => import('@/components/layout/Stats'), {
-  loading: () => <div className="h-64 bg-warm animate-pulse" />,
 });
 
 const ValuesSection = dynamic(() => import('@/components/layout/ValuesSection'), {
@@ -58,24 +54,24 @@ function resolveDealType(dealType: string, category?: string | null): string {
 }
 
 export default async function Home() {
-  // A moonlit theme replaces the homepage wholesale (its own data + layout),
-  // so branch before the classic homepage's fetches run.
-  const theme = await getActiveTheme();
-  if (theme.family === 'moonlit') {
-    return <MoonlitHome variant={theme.variant ?? 'luxe'} />;
-  }
-
   // Hero poster is referenced via <video poster> (low browser priority) —
   // preload it here, scoped to the homepage only, so it paints at FCP.
-  preload('/hero-poster.jpg', { as: 'image', fetchPriority: 'high' });
+  preload('/hero-poster-v2.jpg', { as: 'image', fetchPriority: 'high' });
 
   // Fetch all homepage section data in parallel — eliminates client-side waterfall
   const HomepageSettings = (prisma as any).homepageSettings;
 
-  const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings, hoodGroups, soldRaw] = await Promise.all([
+  const [hotPropsRaw, noCommPropRaw, featuredPropsRaw, settings] = await Promise.all([
+    // The "נכסים למכירה" / "נכסים להשכרה" carousels are labelled by deal type,
+    // so they should show properties of that deal type — not ONLY the handful
+    // flagged `isHotProposition`. With just 1 hot sale flagged the carousel had a
+    // single card and no arrows (nothing to scroll). Fetch all active, unsold
+    // listings and surface the hot/pinned ones first, so each carousel is always
+    // populated; HotPropositions still caps each group at MAX_PER_GROUP.
     prisma.property.findMany({
-      where: { isActive: true, isHotProposition: true, isSold: false },
-      take: 12,
+      where: { isActive: true, isSold: false },
+      orderBy: [{ isHotProposition: 'desc' }, { isPinned: 'desc' }, { createdAt: 'desc' }],
+      take: 24,
       select: {
         id: true, title: true, price: true, rooms: true, bathrooms: true, area: true,
         location: true, images: true, status: true, isSold: true, floor: true,
@@ -107,17 +103,6 @@ export default async function Home() {
       },
     }),
     HomepageSettings ? HomepageSettings.findFirst().catch(() => null) : Promise.resolve(null),
-    prisma.property.groupBy({
-      by: ['neighborhood', 'city'],
-      where: { isActive: true, isSold: false, neighborhood: { not: null } },
-      _count: true,
-    }).catch(() => []),
-    prisma.property.findMany({
-      where: { isSold: true },
-      orderBy: { updatedAt: 'desc' },
-      take: 3,
-      select: { id: true, title: true, location: true, neighborhood: true, price: true, images: true },
-    }).catch(() => []),
   ]);
 
   const hotProperties = hotPropsRaw.map((p: any) => {
@@ -181,18 +166,6 @@ export default async function Home() {
     };
   });
 
-
-  const hoods: HoodChip[] = (hoodGroups as Array<{ neighborhood: string | null; city: string; _count: number }>)
-    .filter((g) => g.neighborhood)
-    .sort((a, b) => b._count - a._count)
-    .slice(0, 6)
-    .map((g) => ({ name: g.neighborhood as string, city: g.city, count: g._count }));
-
-  const sold: SoldItem[] = (soldRaw as Array<{ id: number; title: string; location: string; neighborhood: string | null; price: string; images: string | null }>).map((s0) => ({
-    id: s0.id, title: s0.title, location: s0.location, neighborhood: s0.neighborhood,
-    price: s0.price, image: parseJson(s0.images)[0] || '/images/hero/sales.jpg',
-  }));
-
   const homepageTitles = {
     hotPropositionsTitle: settings?.hotPropositionsTitle || 'הצעות חמות',
     noCommissionTitle: settings?.noCommissionTitle || 'דירה ללא עמלת תיווך',
@@ -208,14 +181,13 @@ export default async function Home() {
       </div>
 
       {/* Content below hero - lazy loaded */}
-      <div id="hero-next" className="relative bg-warm">
+      <div className="relative bg-warm">
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <HotPropositions
             initialProperties={hotProperties}
             initialTitle={homepageTitles.hotPropositionsTitle}
           />
         </Suspense>
-        <NeighborhoodChips hoods={hoods} />
         <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
           <NoCommissionSection
             initialProperty={noCommProperty}
@@ -223,15 +195,14 @@ export default async function Home() {
           />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
-          <AboutSection />
+          <FloorPlansSection />
         </Suspense>
-        <Suspense fallback={<div className="h-64 bg-warm animate-pulse" />}>
-          <Stats />
+        <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
+          <AboutSection />
         </Suspense>
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <ValuesSection />
         </Suspense>
-        <SoldRecently items={sold} />
         <Suspense fallback={<div className="h-96 bg-warm animate-pulse" />}>
           <Testimonials />
         </Suspense>
