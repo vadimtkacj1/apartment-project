@@ -1,61 +1,45 @@
-import { Frank_Ruhl_Libre, Gilda_Display, Jost, Rubik } from 'next/font/google';
+import { Heebo, Secular_One } from 'next/font/google';
 
 /**
- * MOONLIT TYPOGRAPHY — all four faces are free (SIL Open Font License) and are
- * self-hosted by next/font, so no request ever leaves the site.
+ * MOONLIT TYPOGRAPHY — both faces are free (SIL Open Font License), carry real
+ * Hebrew glyphs, and are self-hosted by next/font, so no request ever leaves
+ * the site.
  *
- * The template pairs Gilda Display (display serif) with Jost (geometric sans).
- * Neither has Hebrew glyphs, so each is stacked with its Hebrew counterpart:
- * the browser takes Latin glyphs (numbers, "Moonlit", ₪ prices in LTR) from the
- * original face and Hebrew glyphs from the matched one.
+ * The bought template pairs Gilda Display with Jost; neither has Hebrew, so the
+ * first build stacked each with a Hebrew stand-in (Frank Ruhl Libre / Rubik)
+ * and let the browser pick per script. That split meant prices and other Latin
+ * runs rendered in a different face than the Hebrew beside them. Every word on
+ * this site is Hebrew apart from the numerals, so the pair is now chosen for
+ * Hebrew first and used for both scripts — one face per role, no mixing:
  *
- *   --glida → Gilda Display  →  Frank Ruhl Libre   (Hebrew serif, same era/feel)
- *   --jost  → Jost           →  Rubik              (Hebrew geometric sans)
+ *   --glida → Secular One  (display: section titles, card titles)
+ *   --jost  → Heebo        (everything else: body, meta, buttons, prices)
  */
 
-export const gildaDisplay = Gilda_Display({
-  subsets: ['latin'],
+export const secularOne = Secular_One({
+  subsets: ['hebrew', 'latin'],
   weight: '400',
   display: 'swap',
-  variable: '--font-gilda',
+  variable: '--font-secular',
 });
 
-export const jost = Jost({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-jost',
-});
-
-export const frankRuhlLibre = Frank_Ruhl_Libre({
+export const heebo = Heebo({
   subsets: ['hebrew', 'latin'],
-  weight: ['300', '400', '500', '700'],
+  weight: ['300', '400', '500', '700', '800'],
   display: 'swap',
-  variable: '--font-frank',
+  variable: '--font-heebo',
 });
 
-export const rubik = Rubik({
-  subsets: ['hebrew', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-rubik',
-});
-
-/** Class list that activates all four faces on the moonlit wrapper. */
-export const moonlitFontVariables = [
-  gildaDisplay.variable,
-  jost.variable,
-  frankRuhlLibre.variable,
-  rubik.variable,
-].join(' ');
+/** Class list that activates both faces on the moonlit wrapper. */
+export const moonlitFontVariables = [secularOne.variable, heebo.variable].join(' ');
 
 /**
  * The template reads `--glida` / `--jost` everywhere. Emitted as an inline
- * <style> after the template stylesheets so the Hebrew fallbacks win.
+ * <style> after the template stylesheets so these win over its own stack.
  */
 export const moonlitFontFaceCss = `
 :root, .moonlit-tpl {
-  --glida: ${gildaDisplay.style.fontFamily}, ${frankRuhlLibre.style.fontFamily}, Georgia, serif;
-  --jost: ${jost.style.fontFamily}, ${rubik.style.fontFamily}, Arial, Helvetica, sans-serif;
+  --glida: ${secularOne.style.fontFamily}, Georgia, serif;
+  --jost: ${heebo.style.fontFamily}, Arial, Helvetica, sans-serif;
 }
 `;

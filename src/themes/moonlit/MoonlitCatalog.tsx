@@ -36,7 +36,10 @@ export default async function MoonlitCatalog({ dealType, city, minRooms }: Props
         },
         orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }],
         take: 12,
-        select: { id: true, title: true, price: true, rooms: true, area: true, images: true },
+        select: {
+          id: true, title: true, price: true, rooms: true, area: true, images: true,
+          dealType: true, category: true,
+        },
       })
       .catch(() => []),
     getMoonlitContent(),
@@ -117,7 +120,9 @@ export default async function MoonlitCatalog({ dealType, city, minRooms }: Props
               ${p.area != null ? `<span><i class="flaticon-construction"></i>${p.area} מ״ר</span>` : ''}
               ${p.rooms != null ? `<span><i class="flaticon-user"></i>${p.rooms} חדרים</span>` : ''}
             </div>
-            <div class="room__price__tag"><span class="h6 d-block ltr">₪${formatPrice(String(p.price ?? ''))}</span></div>
+            <div class="room__price__tag"><span class="h6 d-block ltr">₪${formatPrice(String(p.price ?? ''))}${
+              p.category === 'rentals' || p.dealType === 'rent' ? '<span class="price__period">לחודש</span>' : ''
+            }</span></div>
             <a href="${href}" class="room__card__link">לפרטים נוספים</a>
           </div>
         </div>

@@ -127,7 +127,10 @@ export function RoomsSlider({ properties }: { properties: MnProp[] }) {
                     </span>
                   )}
                 </div>
-                <span className="h4 rent mb-0 mt-15 d-block ltr">₪{formatPrice(p.price)}</span>
+                <span className="h4 rent mb-0 mt-15 d-block ltr">
+                  ₪{formatPrice(p.price)}
+                  {p.dealType === 'rent' && <span className="price__period">לחודש</span>}
+                </span>
               </div>
             </div>
           </SwiperSlide>

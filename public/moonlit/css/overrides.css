@@ -286,3 +286,67 @@ picture.jarallax-img img {
     height: 240px;
   }
 }
+
+/* --- slider card: photo must fill the box --------------------------------
+   The generic 420px above is right for the grid thumbnails, but the carousel
+   box is taller than that, so the image stopped short and the absolutely
+   positioned content block landed BELOW the photo — reading as a solid slab
+   bolted under the picture rather than a caption laid over it. Pin the box to
+   one height and let the photo fill it, which is what the template assumes. */
+.moonlit-tpl .room__slide__box {
+  height: 560px;
+}
+
+.moonlit-tpl .room__slide__box .room__thumbnail,
+.moonlit-tpl .room__slide__box .room__thumbnail img {
+  height: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .moonlit-tpl .room__slide__box {
+    height: 420px;
+  }
+}
+
+/* --- slider card scrim ---------------------------------------------------
+   The template washes the WHOLE thumbnail with a 0→70% black gradient, tuned
+   for its own dim, evenly-lit demo renders. Real listing photos are bright
+   daylight interiors: the wash greys the room out over its full height while
+   still leaving the meta row low-contrast at the bottom. Anchor the darkening
+   to the text instead — photo stays untouched down to ~60%, then ramps to a
+   solid base the title, meta and price sit on. */
+.moonlit-tpl .room__slide__box .room__thumbnail::before {
+  background: linear-gradient(-180deg, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.18) 100%);
+}
+
+.moonlit-tpl .room__slide__box .room__content {
+  padding-top: 64px;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(
+    to top,
+    rgba(20, 17, 14, 0.88) 0%,
+    rgba(20, 17, 14, 0.62) 55%,
+    rgba(20, 17, 14, 0) 100%
+  );
+}
+
+/* --- equal-height cards --------------------------------------------------
+   The template's demo copy is trimmed to a uniform length, so its cards happen
+   to line up without ever being told to. Ours come from the admin panel and
+   vary by a line or two, which left every row ragged along the bottom. The
+   bootstrap column already stretches to the row height — the card inside it
+   just never claimed that height. */
+.moonlit-tpl .rts__card,
+.moonlit-tpl .single__offer__card,
+.moonlit-tpl .room__card {
+  height: 100%;
+}
+
+/* "לחודש" after a rental price — same line, deliberately quieter than the
+   number so ₪7,700/month never reads as a ₪7,700 sale. */
+.moonlit-tpl .price__period {
+  font-size: 0.55em;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-inline-start: 0.35em;
+}

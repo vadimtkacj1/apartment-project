@@ -94,9 +94,15 @@ function OfferCard({ property, flex = false }: { property: MnProp; flex?: boolea
           ))}
         </ul>
         {flex ? (
-          <h4 className="offer__price mb-0 ltr">₪{formatPrice(property.price)}</h4>
+          <h4 className="offer__price mb-0 ltr">
+            ₪{formatPrice(property.price)}
+            {property.dealType === 'rent' && <span className="price__period">לחודש</span>}
+          </h4>
         ) : (
-          <h3 className="offer__price mb-0 ltr">₪{formatPrice(property.price)}</h3>
+          <h3 className="offer__price mb-0 ltr">
+            ₪{formatPrice(property.price)}
+            {property.dealType === 'rent' && <span className="price__period">לחודש</span>}
+          </h3>
         )}
       </div>
     </div>
