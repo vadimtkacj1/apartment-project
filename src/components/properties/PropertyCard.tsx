@@ -1,15 +1,17 @@
 "use client";
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
   Bed, Maximize, MapPin, Wind, Warehouse, Sun,
   Droplet, Shield, ArrowUpDown, Building, ArrowLeft,
-  CheckCircle2, Tag, ShieldCheck, GripVertical, Dog, Building2, Home
+  CheckCircle2, Tag, ShieldCheck, GripVertical, Dog, Building2, Home,
+  Share2, Check
 } from 'lucide-react';
 import { Property } from '@/types/property.types';
 import { analytics } from '@/lib/analytics';
+import { copyToClipboard, propertyShareUrl } from '@/lib/copy-to-clipboard';
 
 const PROPERTY_TYPE_LABELS: Record<string, string> = {
   'apartment': 'דירה',
@@ -90,6 +92,14 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const displayImage = image || images?.find(img => img?.trim()) || DEFAULT_IMAGE;
   const [imageSrc, setImageSrc] = useState(displayImage);
   const [imageError, setImageError] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cards unmount on every filter/sort change — clear the pending reset so it
+  // never fires against an unmounted card.
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+  }, []);
 
   const fromCategory = category === 'rentals' || category === 'commercial' ? 'rent'
     : category === 'sales' || category === 'land' ? 'sale' : null;
@@ -104,6 +114,21 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const handleClick = () => {
     if (!isSold) analytics.trackPropertyClick(id, 'card');
     router.push(`/apartments/${id}`);
+  };
+
+  // The whole card is a click target, so the copy button must not bubble into
+  // the router.push above.
+  const handleCopyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const ok = await copyToClipboard(propertyShareUrl(id));
+    if (!ok) return;
+
+    analytics.trackButtonClick('copy-link-card', id);
+    setCopied(true);
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 2000);
   };
 
   const handleImageError = () => {
@@ -196,11 +221,26 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
         <div className={`p-4 sm:p-5 flex flex-col flex-1 ${isSold ? 'bg-gray-50' : ''}`}>
           {/* Заголовок */}
           <div className="mb-3">
-            <h3 className={`text-base sm:text-lg font-bold leading-tight mb-1.5 ${
-              isSold ? 'text-gray-500 line-through' : 'text-gray-900'
-            }`}>
-              {title}
-            </h3>
+            <div className="flex items-start justify-between gap-2 mb-1.5">
+              <h3 className={`text-base sm:text-lg font-bold leading-tight ${
+                isSold ? 'text-gray-500 line-through' : 'text-gray-900'
+              }`}>
+                {title}
+              </h3>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                aria-label={copied ? 'הקישור הועתק ללוח' : 'העתקת קישור לנכס'}
+                title={copied ? 'הקישור הועתק ללוח!' : 'העתקת קישור לנכס'}
+                className={`shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors duration-200 ${
+                  copied
+                    ? 'border-[#1c3664] bg-[#1c3664] text-white'
+                    : 'border-gray-200 text-[#1c3664] hover:bg-[#1c3664] hover:text-white hover:border-[#1c3664]'
+                }`}
+              >
+                {copied ? <Check size={16} /> : <Share2 size={16} />}
+              </button>
+            </div>
             <div className={`flex items-start gap-1.5 text-xs mb-2 ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>
               <MapPin size={12} className={`shrink-0 mt-0.5 ${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
               <span className="break-words">
