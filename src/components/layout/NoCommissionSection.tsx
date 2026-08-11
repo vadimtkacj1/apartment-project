@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { PropertyType, ParkingType, FurnitureLevel } from '@/types/property.types';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 
 interface Property {
   id: number;
@@ -43,6 +46,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
   const [loading, setLoading] = useState(initialProperty === undefined);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState(initialTitle ?? 'דירה ללא עמלת תיווך');
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     if (initialProperty !== undefined) return;
@@ -122,7 +126,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       <section
         className="relative py-16 md:py-20 w-full overflow-hidden"
         dir="rtl"
-        style={{ background: 'rgb(42, 74, 138)' }}
+        style={{ background: '#051150' }}
       >
         <div className="container mx-auto px-4 md:px-8 2xl:px-16 relative z-10" style={{ maxWidth: '75rem' }}>
           <div className="text-center">
@@ -139,19 +143,11 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
 
   return (
     <section
-      className="relative py-16 md:py-24 w-full overflow-hidden"
+      className={`relative py-16 md:py-24 w-full overflow-hidden ${reduced ? 'rm' : ''}`}
       dir="rtl"
-      style={{ background: 'linear-gradient(135deg, rgb(42, 74, 138) 0%, rgb(35, 62, 115) 100%)' }}
+      style={{ background: '#051150' }}
     >
       <style>{`
-        @keyframes goldGlow {
-          0%, 100% { box-shadow: 0 0 30px 3px rgba(212,168,67,0.4), 0 8px 24px rgba(0,0,0,0.3); }
-          50%       { box-shadow: 0 0 50px 10px rgba(212,168,67,0.7), 0 8px 32px rgba(0,0,0,0.3); }
-        }
-        @keyframes shineSwipe {
-          0%   { transform: translateX(-200%) skewX(-20deg); }
-          100% { transform: translateX(400%) skewX(-20deg); }
-        }
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -162,27 +158,32 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
             transform: translateY(0);
           }
         }
-        .btn-no-commission:hover .btn-shine {
-          animation: shineSwipe 0.6s ease forwards;
-        }
         .btn-no-commission {
-          animation: goldGlow 3s ease-in-out infinite;
+          box-shadow: 0 6px 18px rgba(2, 8, 40, 0.35);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-no-commission:hover {
-          transform: scale(1.05) translateY(-4px);
-          box-shadow: 0 0 60px 15px rgba(212,168,67,0.8), 0 12px 40px rgba(0,0,0,0.4);
+          transform: translateY(-2px);
+          box-shadow: 0 10px 26px rgba(2, 8, 40, 0.45);
         }
         .btn-no-commission:active {
           transform: scale(0.98);
         }
+        /* One cohesive panel on the navy band — a faint white-tinted surface with
+           a hairline border (dark-band language: borders + surface tints, not
+           heavy black shadows). The image and info column live INSIDE it. */
         .no-commission-card {
           overflow: hidden;
           animation: fadeInUp 0.6s ease-out;
           transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 16px;
+          box-shadow: 0 24px 48px -24px rgba(2, 8, 40, 0.55);
         }
         .no-commission-card:hover {
-          transform: translateY(-8px);
+          transform: translateY(-6px);
+          border-color: rgba(255, 255, 255, 0.18);
         }
         .no-commission-card:hover .property-image {
           transform: scale(1.1);
@@ -197,6 +198,20 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
         .feature-tag:hover {
           background: rgba(255,255,255,0.12) !important;
         }
+        /* Honour prefers-reduced-motion: kill the entrance / hover transforms
+           while keeping the layout intact. */
+        .rm .btn-no-commission:hover {
+          transform: none !important;
+        }
+        .rm .no-commission-card {
+          animation: none !important;
+        }
+        .rm .no-commission-card:hover {
+          transform: none !important;
+        }
+        .rm .no-commission-card:hover .property-image {
+          transform: none !important;
+        }
       `}</style>
 
       <div
@@ -205,7 +220,10 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
       >
         {/* Header */}
         <div className="text-center mb-4 md:mb-6">
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <div className="inline-block mb-3">
+            <SectionEyebrow tone="dark">הזדמנות</SectionEyebrow>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-white mb-2 md:mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
           <p className="text-xl md:text-2xl font-semibold max-w-3xl mx-auto" style={{ color: 'rgba(255,255,255,0.7)' }}>
@@ -218,20 +236,20 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
           <div className="no-commission-card transition-all duration-300 max-w-2xl mx-auto">
             <div className="grid md:grid-cols-5 gap-0 md:min-h-96">
 
-              {/* Image — 3/5 width */}
-              <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden rounded-2xl" style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}>
+              {/* Image — 3/5 width, flush inside the panel (the panel clips corners) */}
+              <div className="md:col-span-3 relative h-80 md:h-full overflow-hidden">
                 <Image
                   src={property.image || '/images/hero/sales.jpg'}
                   alt={property.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 60vw"
-                  className="property-image object-cover transition-transform duration-700 rounded-2xl"
+                  className="property-image object-cover transition-transform duration-700"
                 />
                 {/* Badge */}
                 <div className="absolute top-5 right-5 z-10">
                   <span
-                    className="text-sm font-bold px-4 py-1.5 rounded-lg shadow-lg"
-                    style={{ background: '#D4AF37', color: '#1C1000' }}
+                    className="text-sm font-bold px-4 py-1.5 rounded-lg shadow-[0_4px_14px_rgba(2,8,40,0.4)]"
+                    style={{ background: '#5594F1', color: '#051150' }}
                   >
                     ללא עמלה
                   </span>
@@ -246,7 +264,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 {/* Property Type Badge */}
                 <span
                   className="inline-block text-xs font-bold px-3 py-1 rounded-full mb-3"
-                  style={{ background: 'rgba(212,175,55,0.12)', color: '#D4AF37', letterSpacing: '0.06em' }}
+                  style={{ background: 'rgba(85,148,241,0.15)', color: '#7BAAF5', letterSpacing: '0.06em' }}
                 >
                   {property.propertyType === 'apartment' ? 'דירה' :
                    property.propertyType === 'penthouse' ? 'פנטהאוז' :
@@ -269,7 +287,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                 </div>
 
                 {/* Price */}
-                <p className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#D4AF37' }}>
+                <p className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#7BAAF5' }}>
                   {property.price}
                 </p>
 
@@ -303,7 +321,7 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
                       className="text-center p-2 rounded-lg"
                       style={{ background: 'rgba(255,255,255,0.06)' }}
                     >
-                      <svg className="w-4 h-4 mx-auto mb-1" style={{ color: '#D4AF37' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 mx-auto mb-1" style={{ color: '#7BAAF5' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {item.icon}
                       </svg>
                       <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.65rem', marginBottom: '2px' }}>{item.label}</p>
@@ -345,22 +363,16 @@ function NoCommissionSection({ initialProperty, initialTitle }: NoCommissionSect
 
                 {/* CTA */}
                 <div
-                  className="btn-no-commission group relative text-center py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
+                  className="btn-no-commission group relative inline-flex items-center justify-center gap-2 py-2.5 px-8 rounded-xl font-bold text-sm overflow-hidden cursor-pointer"
                   style={{
-                    background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
-                    color: '#1C1000',
+                    background: '#5594F1',
+                    color: '#051150',
                     letterSpacing: '0.04em',
                     minWidth: '180px',
                   }}
                 >
-                  <span
-                    className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                      transform: 'translateX(-200%) skewX(-20deg)',
-                    }}
-                  />
-                  <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים ←</span>
+                  <span className="relative z-10" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>לפרטים נוספים</span>
+                  <ArrowLeft size={16} className="relative z-10 transition-transform duration-300 group-hover:-translate-x-1" aria-hidden="true" />
                 </div>
 
                 <p className="text-xs font-semibold mt-3" style={{ color: 'rgba(255,255,255,0.75)' }}>

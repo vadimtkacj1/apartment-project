@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import NewVsSecondhandContent from './NewVsSecondhandContent';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 const ogImage = `${siteUrl}/images/articles/new-vs-secondhand.jpg`;
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'דירה חדשה מקבלן או יד שנייה — מה משתלם יותר?',
-    description: 'השוואה כנה בין דירה מקבלן לדירה יד שנייה: עלויות, סיכונים ופוטנציאל — רם נכסים חיים ענבי.',
+    description: 'השוואה כנה בין דירה מקבלן לדירה יד שנייה: עלויות, סיכונים ופוטנציאל — Aiterra.',
     url: `${siteUrl}/articles/new-vs-secondhand`,
     type: 'article',
     images: [
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'דירה חדשה מקבלן או יד שנייה — מה משתלם יותר?',
-    description: 'השוואה כנה בין דירה מקבלן לדירה יד שנייה: עלויות, סיכונים ופוטנציאל — רם נכסים חיים ענבי.',
+    description: 'השוואה כנה בין דירה מקבלן לדירה יד שנייה: עלויות, סיכונים ופוטנציאל — Aiterra.',
     images: [ogImage],
   },
 };
@@ -59,14 +59,14 @@ const articleSchema = {
   author: {
     '@type': 'Person',
     '@id': `${siteUrl}/about#owner-1`,
-    name: 'רם מזרחי',
+    name: 'דניאל שרון',
     jobTitle: 'מתווך נדל״ן מורשה ומייסד',
     url: `${siteUrl}/about`,
     worksFor: { '@id': `${siteUrl}/#organization` },
     hasCredential: {
       '@type': 'EducationalOccupationalCredential',
       credentialCategory: 'Real Estate License',
-      identifier: '3019640',
+      identifier: '3072851',
     },
   },
   publisher: { '@id': `${siteUrl}/#organization` },

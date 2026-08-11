@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function ApartmentPricingContent() {
@@ -60,6 +63,8 @@ export default function ApartmentPricingContent() {
                 אחרי אלפי עסקאות בחולון, בת ים וראשון לציון, אנחנו רואים תבנית חוזרת: <strong>מניסיון המשרד, ההבדל בין תמחור נכון לשגוי מגיע לרוב לכ-5%–10% ממחיר הדירה.</strong> על דירה של 2 מיליון ש״ח — זה עד 200,000 ש״ח. (הערכה מניסיוננו בשטח, לא נתון רשמי.)
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -171,6 +176,10 @@ export default function ApartmentPricingContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="apartment-pricing" />
+            <RelatedArticles currentId="apartment-pricing" />
           </div>
         </article>
       </div>

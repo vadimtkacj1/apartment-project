@@ -12,7 +12,7 @@ interface FAQProps {
   items: FAQItem[];
 }
 
-export default function FAQ({ title = 'שאלות נפוצות – רם וחיים עונים', items }: FAQProps) {
+export default function FAQ({ title = 'שאלות נפוצות – דניאל ויואב עונים', items }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleItem = (index: number) => {
@@ -122,7 +122,7 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
         }
 
         .faq-item:hover .question-text {
-          color: #2563eb; /* כחול עדין בריחוף */
+          color: #354AC4; /* כחול עדין בריחוף */
         }
 
         .faq-icon {
@@ -134,7 +134,7 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
 
         .faq-item.active .faq-icon {
           transform: rotate(180deg);
-          color: #2563eb;
+          color: #354AC4;
         }
 
         .faq-answer {
@@ -154,11 +154,11 @@ export default function FAQ({ title = 'שאלות נפוצות – רם וחיי
           color: #4b5563;
           font-size: 1rem;
           line-height: 1.6;
-          padding-left: 40px; /* רווח לאייקון */
+          padding-inline-end: 40px; /* רווח לאייקון (בצד ההפוך לטקסט) */
         }
 
         .answer-content :global(strong) {
-          color: #2563eb;
+          color: #051150;
           font-weight: 600;
         }
 

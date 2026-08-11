@@ -1,8 +1,8 @@
 import { owners, team } from '@/app/(public)/about/aboutData';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
-// "050-549-6626" -> "+972505496626" (E.164). Returns undefined for empty input.
+// "052-384-7291" -> "+972523847291" (E.164). Returns undefined for empty input.
 function toE164(phone?: string): string | undefined {
   if (!phone) return undefined;
   const digits = phone.replace(/\D/g, '');

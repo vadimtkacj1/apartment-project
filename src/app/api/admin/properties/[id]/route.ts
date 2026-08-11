@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { recordPropertySold } from '@/lib/notifications';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -117,6 +118,18 @@ export async function PUT(
 
     // If property is being marked as sold, clear hot proposition and no commission flags
     const isSold = body.isSold !== undefined ? body.isSold : false;
+    // Was it already sold? Only a false → true flip stamps soldAt and notifies
+    // the team, so re-saving a sold listing never fires a second time.
+    let previous: { isSold: boolean } | null = null;
+    try {
+      previous = await prisma.property.findUnique({
+        where: { id: parseInt(id) },
+        select: { isSold: true },
+      });
+    } catch {
+      /* treat an unreadable previous state as "not sold yet" */
+    }
+    const justSold = isSold && !previous?.isSold;
     const isHotProposition = isSold ? false : (body.isHotProposition !== undefined ? body.isHotProposition : false);
     const isNoCommission = isSold ? false : (body.isNoCommission !== undefined ? body.isNoCommission : false);
 
@@ -214,6 +227,7 @@ export async function PUT(
 
         // Sold status
         isSold: isSold,
+        ...(justSold ? { soldAt: new Date() } : !isSold ? { soldAt: null } : {}),
 
         // Pin status
         isPinned: body.isPinned !== undefined ? body.isPinned : false,
@@ -229,6 +243,11 @@ export async function PUT(
 
     console.log('✅ [DB UPDATE] Property обновлён успешно! ID:', property.id);
     console.log('   - Изображений в БД:', property.images);
+
+    // Best-effort: a failed notification must not fail the save.
+    if (justSold) {
+      await recordPropertySold({ id: property.id, title: property.title, agentIds: property.agentIds });
+    }
 
     const formatted = formatProperty(property);
     console.log('🎉 [DB UPDATE] Property форматирован для ответа');
@@ -270,9 +289,22 @@ export async function PATCH(
       updateData.isPinned = body.isPinned;
     }
 
+    // A false → true flip is the sale event: stamp soldAt and notify the team.
+    let justSold = false;
     if (typeof body.isSold === 'boolean') {
       const isSold = body.isSold;
       updateData.isSold = isSold;
+      let previous: { isSold: boolean } | null = null;
+      try {
+        previous = await prisma.property.findUnique({
+          where: { id: parseInt(id) },
+          select: { isSold: true },
+        });
+      } catch {
+        /* treat an unreadable previous state as "not sold yet" */
+      }
+      justSold = isSold && !previous?.isSold;
+      updateData.soldAt = isSold ? (justSold ? new Date() : undefined) : null;
       // When marking as sold, automatically clear homepage flags
       if (isSold) {
         updateData.isHotProposition = false;
@@ -293,6 +325,10 @@ export async function PATCH(
       },
       data: updateData,
     });
+
+    if (justSold) {
+      await recordPropertySold({ id: property.id, title: property.title, agentIds: property.agentIds });
+    }
 
     const formatted = formatProperty(property);
     console.log('✅ [DB PATCH] Property partially updated. Fields:', Object.keys(updateData));

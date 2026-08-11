@@ -3,157 +3,153 @@
 import React, { useMemo, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { Form, Input, Button, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { User, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/shadcn/button';
+import { Label } from '@/components/shadcn/label';
+import { Alert, AlertDescription } from '@/components/shadcn/alert';
+import { Card } from '@/components/shadcn/card';
+import { Skeleton } from '@/components/shadcn/skeleton';
+import { useAdminI18n, useAdminMessages, DEFAULT_ADMIN_LOCALE, dirOf } from '@/lib/adminI18n';
+import { loginMessages } from '@/lib/adminI18n/messages/login';
+import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 
-function AiterraLogo({ size = 56, color = '#1C3664' }: { size?: number; color?: string }) {
+function AiterraLogo({ size = 56 }: { size?: number }) {
   return (
-    <svg
+    <img
+      src="/aiterra-dark-logo.png"
+      alt="Aiterra"
       width={size}
-      height={size}
-      // The artwork's bounding box sits high in a plain "0 0 112 112" box
-      // (ink center ≈ y47 vs box center y56), so the mark looked shifted up.
-      // Re-center the viewBox on the actual paths — same 112 side length, so
-      // it only pans the glyph to true center, no scaling/distortion.
-      viewBox="-0.71 -8.66 112 112"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ color, display: 'block' }}
-      role="img"
-      aria-label="Aiterra"
-    >
-      <path fill="currentColor" d="M55.03 5.92L88.17 68.07L73.41 67.96L54.82 33.88L32.67 75.40L47.28 75.45L55.92 88.59L11.31 88.70Z" />
-      <path fill="currentColor" d="M57.49 75.50L92.21 75.45L99.27 88.70L66.86 88.75Z" />
-    </svg>
+      height={Math.round(size * 0.35)}
+      style={{ display: 'block' }}
+    />
   );
 }
 
 function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
+  const { dir } = useAdminI18n();
+  const t = useAdminMessages(loginMessages);
 
   const nextUrl = useMemo(() => search.get('next') || '/admin', [search]);
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
 
-  const onFinish = async (values: { username: string; password: string }) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTouched(true);
+    if (!username || !password) return;
     setError(null);
     setLoading(true);
     try {
       const result = await signIn('credentials', {
-        username: values.username,
-        password: values.password,
+        username,
+        password,
         redirect: false,
         callbackUrl: nextUrl,
       });
 
       if (result?.error) {
-        setError('שם משתמש או סיסמה שגויים');
+        setError(t.invalidCredentials);
         return;
       }
-
       if (result?.ok) {
         router.push(nextUrl);
         router.refresh();
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('שגיאה בהתחברות');
+      setError(t.loginError);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      dir="rtl"
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#ffffff',
-        padding: '20px',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          background: '#fff',
-          padding: '40px',
-          borderRadius: '12px',
-          border: '1px solid #E6E8EC',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-            <AiterraLogo size={56} />
+    <div dir={dir} className="flex min-h-screen items-center justify-center bg-muted p-5">
+      <Card className="w-full max-w-100 p-10 shadow-[0_4px_16px_rgba(5,17,80,0.06)]">
+        <div className="mb-6 flex justify-center">
+          <LanguageSwitcher compact />
+        </div>
+
+        <div className="mb-8 text-center">
+          <div className="mb-4 flex justify-center">
+            <AiterraLogo size={48} />
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, margin: 0 }}>
-            לוח ניהול
-          </h1>
-          <p style={{ color: '#8c8c8c', marginTop: '8px' }}>
-            התחבר למערכת
-          </p>
+          <h1 className="text-2xl font-semibold text-foreground">{t.title}</h1>
+          <p className="mt-2 text-muted-foreground">{t.subtitle}</p>
         </div>
 
         {error && (
-          <Alert
-            title={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: 24 }}
-          />
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
 
-        <Form
-          onFinish={onFinish}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            label="שם משתמש"
-            name="username"
-            rules={[{ required: true, message: 'אנא הכנס שם משתמש!' }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="הכנס שם משתמש"
-              disabled={loading}
-              dir="ltr"
-              style={{ textAlign: 'left' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="סיסמה"
-            name="password"
-            rules={[{ required: true, message: 'אנא הכנס סיסמה!' }]}
-          >
-            <div dir="ltr">
-              <Input.Password
-                prefix={<LockOutlined />}
-                placeholder="הכנס סיסמה"
+        <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate aria-busy={loading}>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="login-username">
+              {t.username} <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative" dir="ltr">
+              <User className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="login-username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder={t.usernamePlaceholder}
                 disabled={loading}
-                style={{ textAlign: 'left' }}
+                autoComplete="username"
+                className="ps-9 pe-9 text-left"
               />
             </div>
-          </Form.Item>
+            {touched && !username && (
+              <span className="text-xs font-medium text-destructive">{t.usernameRequired}</span>
+            )}
+          </div>
 
-          <Form.Item style={{ marginBottom: 0 }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              block
-            >
-              התחבר
-            </Button>
-          </Form.Item>
-        </Form>
-      </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="login-password">
+              {t.password} <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative" dir="ltr">
+              <Lock className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t.passwordPlaceholder}
+                disabled={loading}
+                autoComplete="current-password"
+                className="ps-9 pe-9 text-left"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? t.hidePassword : t.showPassword}
+                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
+            {touched && !password && (
+              <span className="text-xs font-medium text-destructive">{t.passwordRequired}</span>
+            )}
+          </div>
+
+          <Button type="submit" size="lg" disabled={loading} className="w-full">
+            {loading ? <Loader2 className="animate-spin" aria-hidden="true" /> : t.submit}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }
@@ -162,16 +158,28 @@ export default function AdminLoginPage() {
   return (
     <Suspense fallback={
       <div
-        dir="rtl"
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#ffffff',
-        }}
+        dir={dirOf(DEFAULT_ADMIN_LOCALE)}
+        className="flex min-h-screen items-center justify-center bg-muted p-5"
+        aria-busy="true"
+        aria-label={loginMessages[DEFAULT_ADMIN_LOCALE].loading}
       >
-        <div style={{ fontSize: '18px' }}>טוען...</div>
+        <Card className="w-full max-w-100 p-10 shadow-[0_4px_16px_rgba(5,17,80,0.06)]">
+          <Skeleton className="mx-auto mb-6 h-8 w-20" />
+          <Skeleton className="mx-auto mb-4 size-12 rounded-lg" />
+          <Skeleton className="mx-auto mb-2 h-7 w-32" />
+          <Skeleton className="mx-auto mb-8 h-4 w-40" />
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-9 w-full" />
+            </div>
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </Card>
       </div>
     }>
       <LoginForm />

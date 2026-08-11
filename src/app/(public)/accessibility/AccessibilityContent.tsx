@@ -24,9 +24,9 @@ export default function AccessibilityContent() {
 
             {/* Introduction */}
             <section className="accessibility-section intro-section">
-              <h2>הצהרת נגישות - רם שיווק נכסים & חיים ענבי</h2>
+              <h2>הצהרת נגישות - Aiterra</h2>
               <p className="lead-text">
-                ב"רם שיווק נכסים & חיים ענבי", אנו רואים חשיבות עליונה במתן שירות שוויוני, מכבד ונגיש לכלל הלקוחות ובכלל זה לאנשים עם מוגבלויות. בהתאם לחוק שוויון זכויות לאנשים עם מוגבלות תשנ"ח-1998 ולתקנות שהותקנו מכוחו, מושקעים מאמצים ומשאבים רבים בביצוע התאמות נגישות באתר האינטרנט במטרה לאפשר לכל גולש ולקוח להשתמש בשירותים המוצעים באופן עצמאי, נוח ושוויוני.
+                ב"Aiterra", אנו רואים חשיבות עליונה במתן שירות שוויוני, מכבד ונגיש לכלל הלקוחות ובכלל זה לאנשים עם מוגבלויות. בהתאם לחוק שוויון זכויות לאנשים עם מוגבלות תשנ"ח-1998 ולתקנות שהותקנו מכוחו, מושקעים מאמצים ומשאבים רבים בביצוע התאמות נגישות באתר האינטרנט במטרה לאפשר לכל גולש ולקוח להשתמש בשירותים המוצעים באופן עצמאי, נוח ושוויוני.
               </p>
               <p>
                 אתר זה עומד בדרישות תקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע"ג 2013. התאמות הנגישות בוצעו עפ"י המלצות התקן הישראלי (ת"י 5568) לנגישות תכנים באינטרנט ברמת AA ומסמך WCAG 2.1 הבינלאומי.
@@ -97,10 +97,10 @@ export default function AccessibilityContent() {
             <section className="accessibility-section contact-section">
               <h2>פרטי רכז הנגישות בארגון</h2>
               <div className="coordinator-details">
-                <p><strong>שם בית העסק:</strong> רם שיווק נכסים & חיים ענבי</p>
-                <p><strong>שם רכז הנגישות:</strong> רם מזרחי</p>
-                <p><strong>דוא"ל:</strong> rammiz800@gmail.com</p>
-                <p><strong>טלפון:</strong> 050-549-6626</p>
+                <p><strong>שם בית העסק:</strong> Aiterra</p>
+                <p><strong>שם רכז הנגישות:</strong> דניאל שרון</p>
+                <p><strong>דוא"ל:</strong> daniel.sharon.re@gmail.com</p>
+                <p><strong>טלפון:</strong> 052-384-7291</p>
                 <p><strong>כתובת:</strong> חנקין 83 חולון, ישראל</p>
               </div>
               <p className="contact-note">
@@ -124,7 +124,7 @@ export default function AccessibilityContent() {
           max-width: 1200px;
           margin: 0 auto;
           padding: 2rem 2rem 4rem;
-          background: #faf7f2;
+          background: #f5f7fb;
         }
 
         @media (min-width: 1920px) {
@@ -143,13 +143,13 @@ export default function AccessibilityContent() {
           padding: 0;
           direction: rtl;
           text-align: right;
-          background: #faf7f2;
+          background: #f5f7fb;
         }
 
         .accessibility-section {
           margin-bottom: 3rem;
           padding-bottom: 2rem;
-          border-bottom: 1px solid rgba(28, 54, 100, 0.1);
+          border-bottom: 1px solid rgba(5, 17, 80, 0.1);
         }
 
         .accessibility-section:last-child {
@@ -158,16 +158,16 @@ export default function AccessibilityContent() {
         }
 
         .intro-section {
-          background: linear-gradient(135deg, rgba(28, 54, 100, 0.05) 0%, rgba(184, 130, 30, 0.05) 100%);
+          background: #f4f6fb;
           border-radius: 16px;
           padding: 2rem;
-          border: 1px solid rgba(28, 54, 100, 0.1);
+          border: 1px solid rgba(5, 17, 80, 0.1);
         }
 
         .accessibility-section h2 {
           font-size: 2rem;
           font-weight: 700;
-          color: #1c3664;
+          color: #051150;
           margin: 0 0 1.5rem 0;
           line-height: 1.3;
           font-family: var(--font-caramel), cursive, sans-serif;
@@ -180,7 +180,7 @@ export default function AccessibilityContent() {
         .accessibility-section h3 {
           font-size: 1.35rem;
           font-weight: 600;
-          color: #1c3664;
+          color: #051150;
           margin: 0 0 1rem 0;
           font-family: var(--font-caramel), cursive, sans-serif;
         }
@@ -204,12 +204,12 @@ export default function AccessibilityContent() {
           border-radius: 12px;
           padding: 1.75rem;
           margin-bottom: 1.5rem;
-          border: 1px solid rgba(28, 54, 100, 0.08);
+          border: 1px solid rgba(5, 17, 80, 0.08);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
         }
 
         .feature-box h3 {
-          color: #B8821E;
+          color: #2A69C4;
           margin-top: 0;
           margin-bottom: 1.25rem;
         }
@@ -231,7 +231,7 @@ export default function AccessibilityContent() {
 
         .features-list li::before {
           content: "✓";
-          color: #B8821E;
+          color: #2A69C4;
           font-weight: bold;
           font-size: 1.3rem;
           position: absolute;
@@ -260,7 +260,7 @@ export default function AccessibilityContent() {
 
         .simple-list li::before {
           content: "•";
-          color: #B8821E;
+          color: #2A69C4;
           font-weight: bold;
           font-size: 1.4rem;
           position: absolute;
@@ -269,10 +269,10 @@ export default function AccessibilityContent() {
         }
 
         .contact-section {
-          background: linear-gradient(135deg, rgba(28, 54, 100, 0.05) 0%, rgba(184, 130, 30, 0.05) 100%);
+          background: #f4f6fb;
           border-radius: 16px;
           padding: 2rem;
-          border: 1px solid rgba(28, 54, 100, 0.1);
+          border: 1px solid rgba(5, 17, 80, 0.1);
         }
 
         .coordinator-details {
@@ -293,7 +293,7 @@ export default function AccessibilityContent() {
 
         .contact-note {
           font-style: italic;
-          color: #1c3664;
+          color: #051150;
           margin-top: 1.5rem;
         }
 
@@ -312,7 +312,7 @@ export default function AccessibilityContent() {
         }
 
         strong {
-          color: #1c3664;
+          color: #051150;
           font-weight: 600;
         }
 

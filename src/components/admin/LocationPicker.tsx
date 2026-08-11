@@ -2,9 +2,13 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
-import { Input, Button, Space, App } from 'antd';
-import { SearchOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { Search, MapPin, Loader2 } from 'lucide-react';
+import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/shadcn/button';
+import { toast } from '@/components/shadcn/sonner';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { uploadersMessages } from '@/lib/adminI18n/messages/uploaders';
 
 interface Position {
   lat: number;
@@ -52,7 +56,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   onPositionChange,
   onAddressChange,
 }) => {
-  const { message } = App.useApp();
+  const t = useAdminMessages(uploadersMessages);
   const [searchAddress, setSearchAddress] = useState('');
   const [searching, setSearching] = useState(false);
   const [markerPosition, setMarkerPosition] = useState<Position | null>(position);
@@ -166,16 +170,16 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           onAddressChange(addressData);
         }
 
-        message.success(`נמצא: ${result.formatted || result.city || term}`);
+        toast.success(t.foundResult(result.formatted || result.city || term));
       } else {
         console.log('No results found for term:', term, 'Response:', data);
-        const errorMsg = data.error || 'לא נמצאו תוצאות. בדוק את המיקוד או הכתובת';
-        message.error(errorMsg);
+        const errorMsg = data.error || t.noResults;
+        toast.error(errorMsg);
       }
     } catch (error: any) {
       console.error('Search error:', error);
-      const errorMessage = error.message || 'שגיאה בחיפוש';
-      message.error(`שגיאה בחיפוש: ${errorMessage}`);
+      const errorMessage = error.message || t.searchError;
+      toast.error(t.searchErrorWith(errorMessage));
     } finally {
       setSearching(false);
     }
@@ -259,27 +263,28 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     return (
       <div style={{ width: '100%' }}>
         <div style={{ marginBottom: '16px' }}>
-          <Space.Compact style={{ width: '100%' }}>
-            <Input
-              size="large"
-              placeholder="הזן מיקוד או כתובת"
-              value={searchAddress}
-              onChange={(e) => setSearchAddress(e.target.value)}
-              onPressEnter={searchAddressOnMap}
-              prefix={<EnvironmentOutlined />}
-              disabled
-            />
+          <div className="flex w-full">
+            <div className="relative flex-1">
+              <MapPin className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-3 size-4 text-muted-foreground" />
+              <Input
+                className="h-11 ps-9 rounded-e-none"
+                placeholder={t.searchPlaceholder}
+                value={searchAddress}
+                onChange={(e) => setSearchAddress(e.target.value)}
+                disabled
+              />
+            </div>
             <Button
-              type="primary"
-              size="large"
-              icon={<SearchOutlined />}
+              type="button"
+              size="lg"
+              className="rounded-s-none"
               onClick={searchAddressOnMap}
-              loading={true}
               disabled
             >
-              חפש
+              <Loader2 className="size-4 animate-spin" />
+              {t.search}
             </Button>
-          </Space.Compact>
+          </div>
         </div>
         <div style={{
           width: '100%',
@@ -291,7 +296,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
           justifyContent: 'center',
           background: '#F1F3F5'
         }}>
-          <p>טוען מפה...</p>
+          <p>{t.loadingMap}</p>
         </div>
       </div>
     );
@@ -300,25 +305,30 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   return (
     <div style={{ width: '100%' }}>
       <div style={{ marginBottom: '16px' }}>
-        <Space.Compact style={{ width: '100%' }}>
-          <Input
-            size="large"
-            placeholder="הזן מיקוד או כתובת"
-            value={searchAddress}
-            onChange={(e) => setSearchAddress(e.target.value)}
-            onPressEnter={searchAddressOnMap}
-            prefix={<EnvironmentOutlined />}
-          />
+        <div className="flex w-full">
+          <div className="relative flex-1">
+            <MapPin className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-3 size-4 text-muted-foreground" />
+            <Input
+              className="h-11 ps-9 rounded-e-none"
+              placeholder={t.searchPlaceholder}
+              value={searchAddress}
+              onChange={(e) => setSearchAddress(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') searchAddressOnMap();
+              }}
+            />
+          </div>
           <Button
-            type="primary"
-            size="large"
-            icon={<SearchOutlined />}
+            type="button"
+            size="lg"
+            className="rounded-s-none"
             onClick={searchAddressOnMap}
-            loading={searching}
+            disabled={searching}
           >
-            חפש
+            {searching ? <Loader2 className="size-4 animate-spin" /> : <Search className="size-4" />}
+            {t.search}
           </Button>
-        </Space.Compact>
+        </div>
       </div>
 
       <GoogleMap

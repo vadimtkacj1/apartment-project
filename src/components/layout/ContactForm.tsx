@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { m, useInView } from 'framer-motion';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import ContactFormFields from './ContactFormFields';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 import dynamic from 'next/dynamic';
 
 const MapPlaceholder = () => (
@@ -100,7 +101,7 @@ const ContactForm: React.FC = () => {
     <section
       id="contact"
       dir="rtl"
-      className="relative w-full py-16 md:py-20 bg-[#faf7f2]"
+      className="relative w-full py-16 md:py-20 bg-white"
     >
       <div className="relative max-w-7xl mx-auto px-6 lg:px-12 z-10">
         {/* Section Header */}
@@ -111,7 +112,10 @@ const ContactForm: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl md:text-6xl font-black text-[#1c3664] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <div className="inline-block mb-4">
+            <SectionEyebrow>צרו קשר</SectionEyebrow>
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             בואו נדבר
           </h2>
           <p className="text-xl md:text-2xl text-slate-500 font-semibold max-w-3xl mx-auto">
@@ -127,7 +131,7 @@ const ContactForm: React.FC = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-3xl p-6 md:p-8 lg:p-12 shadow-xl border border-slate-200 lg:order-2 lg:self-start"
+            className="bg-white rounded-2xl p-6 md:p-8 lg:p-12 shadow-elev-1 border border-slate-200 lg:order-2 lg:self-start"
           >
             <ContactFormFields idPrefix="contact-" />
           </m.div>
@@ -141,7 +145,7 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-200 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
+              className="bg-white rounded-2xl overflow-hidden shadow-elev-1 border border-slate-200 h-[300px] md:h-[400px] lg:flex-1 lg:min-h-[500px] relative"
               style={{ isolation: 'isolate' }}
             >
               {mapNearViewport ? (
@@ -162,9 +166,9 @@ const ContactForm: React.FC = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-200 space-y-6"
+              className="bg-white rounded-2xl p-6 md:p-8 shadow-elev-1 border border-slate-200 space-y-6"
             >
-              <h3 className="text-2xl font-black text-[#1c3664] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+              <h3 className="text-2xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                 פרטי התקשרות
               </h3>
 
@@ -174,21 +178,21 @@ const ContactForm: React.FC = () => {
                   <div key={owner.id} className={`space-y-4 ${index > 0 ? 'pt-6 border-t border-slate-200' : ''}`}>
                     {/* Owner Name */}
                     <div className="mb-2">
-                      <p className="text-lg font-bold text-[#1c3664]">{owner.name}</p>
+                      <p className="text-lg font-bold text-[#051150]">{owner.name}</p>
                       {owner.title && <p className="text-sm text-slate-600">{owner.title}</p>}
                     </div>
 
                     {/* Phone */}
                     {owner.phone && (
                       <div className="flex items-start gap-4 group">
-                        <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
-                          <Phone size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
+                        <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
+                          <Phone size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm text-slate-600 font-semibold mb-1">טלפון</p>
                           <a
                             href={`tel:${owner.phone.replace(/[^0-9+]/g, '')}`}
-                            className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
+                            className="text-lg font-bold text-gray-900 hover:text-[#354ac4] transition-colors underline decoration-gray-400 hover:decoration-[#354ac4] underline-offset-2"
                           >
                             <span dir="ltr">{owner.phone}</span>
                           </a>
@@ -199,14 +203,14 @@ const ContactForm: React.FC = () => {
                     {/* Email */}
                     {owner.email && (
                       <div className="flex items-start gap-4 group">
-                        <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
-                          <Mail size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
+                        <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
+                          <Mail size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                         </div>
                         <div className="flex-1">
                           <p className="text-sm text-slate-600 font-semibold mb-1">דוא״ל</p>
                           <a
                             href={`mailto:${owner.email}`}
-                            className="text-lg font-bold text-gray-900 hover:text-[#1c3664] transition-colors break-all underline decoration-gray-400 hover:decoration-[#1c3664] underline-offset-2"
+                            className="text-lg font-bold text-gray-900 hover:text-[#354ac4] transition-colors break-all underline decoration-gray-400 hover:decoration-[#354ac4] underline-offset-2"
                           >
                             <span dir="ltr">{owner.email}</span>
                           </a>
@@ -221,8 +225,8 @@ const ContactForm: React.FC = () => {
 
               {/* Address - Same for all */}
               <div className="flex items-start gap-4 group pt-6 border-t border-slate-200">
-                <div className="bg-[#1c3664]/10 p-4 rounded-2xl group-hover:bg-[#1c3664] transition-all duration-300">
-                  <MapPin size={24} className="text-[#1c3664] group-hover:text-white transition-colors" />
+                <div className="bg-[#354ac4]/10 p-3 rounded-xl group-hover:bg-[#354ac4] transition-all duration-300">
+                  <MapPin size={24} className="text-[#354ac4] group-hover:text-white transition-colors" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate-600 font-semibold mb-1">כתובת</p>

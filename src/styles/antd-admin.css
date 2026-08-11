@@ -1,6 +1,9 @@
 /*!
 =========================================================
-* Admin Dashboard - Custom Ant Design Styles
+* Admin Dashboard — shell + shared admin primitives
+* NOTE: antd itself is gone (admin is 100% shadcn). The few
+* remaining `.ant-layout*` selectors are load-bearing shell
+* class names hand-written in MainLayout.tsx / Footer.tsx.
 =========================================================
 */
 
@@ -9,9 +12,13 @@
 
 /* ===== LAYOUT ===== */
 .layout-dashboard {
-  background: #F4F6F8;
-  text-align: right;
-  direction: rtl;
+  /* Faint blue top-wash fading into the cool page bg — the brand's blue canvas
+     (à la Deta Surf) without turning the admin into a loud blue field. */
+  background-color: #F4F6FB;
+  background-image: linear-gradient(180deg, #E6EEFC 0%, rgba(230, 238, 252, 0) 340px);
+  background-repeat: no-repeat;
+  text-align: start;
+  /* direction comes from the dynamic dir attribute on this element (rtl/ltr) */
   position: relative;
   overflow-x: hidden;
   min-height: 100vh;
@@ -38,17 +45,19 @@
 .layout-dashboard .ant-layout-sider.sider-primary {
   width: 250px;
   position: fixed;
-  right: 0;
-  left: auto;
+  inset-inline-start: 0; /* reading-start edge: right in RTL, left in LTR */
+  inset-inline-end: auto;
   z-index: 99;
   height: 100vh;
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background: #fff !important;
-  border-left: 1px solid #E6E8EC;
+  background: #ffffff !important;
+  /* Light rail (Mapbox-console pattern): white surface separated from the
+     blue-grey canvas by the system hairline. */
+  border-inline-end: 1px solid #e4e8f2;
   box-shadow: none;
-  transition: right 0.3s ease, box-shadow 0.3s ease;
+  transition: inset-inline-start 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Let the Sidenav own a full-height flex column (brand · scrolling nav · footer) */
@@ -64,13 +73,17 @@
   background: transparent;
   position: relative;
   min-height: 100vh;
-  width: 100%;
-  flex-shrink: 0;
-  margin-right: 250px;
-  margin-left: 0;
+  /* width:auto (not 100%) so the 250px sidebar-clearance margin subtracts from
+     the content width instead of adding to it. The old value only worked when
+     antd rendered this as a flex child (flex:auto + min-width:0); after the
+     shadcn shell rewrite it's a plain block <div>, where width:100% + margin
+     overflowed the viewport by 250px. */
+  width: auto;
+  margin-inline-start: 250px; /* clears the sidebar at the reading-start edge */
+  margin-inline-end: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  transition: margin-right 0.3s ease;
+  transition: margin-inline-start 0.3s ease;
 }
 
 /* ===== HEADER ===== */
@@ -78,92 +91,50 @@
   background: #fff !important;
   height: auto;
   padding: 0 24px;
-  margin: 12px 20px;
+  /* Same 1480px cap as .content-ant so the header card and the page content
+     share one aligned column on wide monitors. */
+  max-width: 1480px;
+  margin-block: 12px;
+  margin-inline: max(20px, calc((100% - 1480px) / 2));
   line-height: inherit;
   border-radius: 12px;
-  box-shadow: none;
+  border: 1px solid #E4E8F2;
+  box-shadow: 0 2px 10px rgba(53, 74, 196, 0.05);
   transition: 0.2s;
 }
 
-.layout-dashboard .ant-breadcrumb > span .ant-breadcrumb-link a {
-  color: #8c8c8c;
-}
-
-.layout-dashboard .ant-breadcrumb > span:last-child .ant-breadcrumb-link {
-  color: #141414;
-}
-
-.layout-dashboard .ant-page-header-heading {
-  margin-top: 0;
-}
-
-.layout-dashboard .ant-page-header-heading .ant-page-header-heading-title {
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 20px;
-  margin-top: 4px;
-  color: #141414;
-}
-
-.layout-dashboard .header-control {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  margin-top: 0;
-  gap: 8px;
-}
-
-.layout-dashboard .header-control .ant-btn-link {
-  height: auto;
-  padding: 0 7px;
-  margin: 0;
-  box-shadow: none;
-  color: #595959;
-  line-height: normal;
-}
-
-.layout-dashboard .header-control svg {
-  width: 20px;
-  height: 20px;
-}
-
-.layout-dashboard .header-control svg path {
-  fill: #595959;
-}
-
-/* ===== CONTENT AREA ===== */
+/* ===== CONTENT AREA =====
+   Single source of truth for page padding — every admin page inherits this,
+   so no page needs its own px-* wrapper. Consistent horizontal rhythm across
+   the whole panel: 24px desktop, 20px tablet, 16px phone.
+   Content is capped at 1480px and centered so cards don't stretch into empty
+   slabs on wide monitors (Fernand/Mapbox-console pattern). */
 .layout-dashboard .content-ant {
-  margin: 0 20px;
+  max-width: 1480px;
+  margin-block: 0;
+  margin-inline: max(20px, calc((100% - 1480px) / 2));
   padding: 24px;
   min-height: calc(100vh - 140px);
   overflow-x: hidden;
   overflow-y: visible;
 }
 
-/* ===== CARDS ===== */
-.layout-dashboard .ant-card {
-  border-radius: 12px;
-  box-shadow: none;
-  border: 1px solid #E6E8EC;
-  color: #141414;
+@media (max-width: 991px) {
+  .layout-dashboard .content-ant {
+    margin: 0 16px;
+    padding: 20px;
+  }
 }
 
-.layout-dashboard .ant-card-head {
-  border-bottom: 1px solid #E6E8EC;
-  min-height: auto;
-  padding: 16px 24px;
-}
-
-.layout-dashboard .ant-card-head-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #141414;
-  padding: 0;
-}
-
-.layout-dashboard .ant-card-body {
-  padding: 20px 24px;
-  color: #141414;
+/* Shared save/cancel row under edit forms (AdminFormActions.tsx) — stacks to
+   full-width buttons on phones. */
+@media (max-width: 575px) {
+  .admin-form-actions {
+    flex-direction: column;
+  }
+  .admin-form-actions button {
+    width: 100%;
+  }
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -174,12 +145,13 @@
 .layout-dashboard h5,
 .layout-dashboard h6 {
   font-weight: 700;
-  color: #141414;
+  color: #051150;
+  letter-spacing: -0.02em;
 }
 
 .layout-dashboard p {
   font-size: 14px;
-  color: #595959;
+  color: #475569;
   line-height: 1.6;
 }
 
@@ -187,155 +159,41 @@
   color: #141414;
 }
 
-/* ===== STATISTICS ===== */
-.layout-dashboard .ant-statistic-title {
-  color: #8c8c8c;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.layout-dashboard .ant-statistic-content {
-  color: #141414;
-  font-weight: 700;
-}
-
-/* ===== TABLES ===== */
-.layout-dashboard .tabled {
-  padding: 0;
-}
-
-.layout-dashboard .criclebox {
-  border-radius: 12px;
-  box-shadow: none;
-}
-
-.layout-dashboard .tablespace {
-  margin-bottom: 24px;
-}
-
-.layout-dashboard .ant-border-space {
-  border: 1px solid #E6E8EC;
-  border-radius: 8px;
-}
-
-.layout-dashboard .ant-table-thead > tr > th {
-  color: #595959;
-  font-weight: 700;
-  background-color: #fafafa;
-  font-size: 13px;
-  border-bottom: 1px solid #E6E8EC;
-}
-
-.layout-dashboard .ant-table-tbody > tr > td {
-  color: #141414;
-  font-size: 14px;
-  border-bottom: 1px solid #E6E8EC;
-}
-
-.layout-dashboard .ant-table-tbody > tr:hover > td {
-  background: #F4F6F8;
-}
-
-.layout-dashboard .table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.layout-dashboard .ant-table-tbody > tr > td,
-.layout-dashboard .ant-table-thead > tr > th {
-  padding: 14px 16px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-/* ===== BUTTONS ===== */
-.layout-dashboard .ant-btn {
-  font-weight: 600;
-  border-radius: 8px;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.layout-dashboard .ant-btn-primary {
-  box-shadow: none;
-}
-
-/* ===== FORMS ===== */
-.layout-dashboard .ant-form-item-label > label {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
-}
-
-.layout-dashboard .ant-input,
-.layout-dashboard .ant-select-selector,
-.layout-dashboard .ant-input-number,
-.layout-dashboard .ant-picker {
-  border-radius: 8px !important;
-  font-size: 14px;
-  color: #141414;
-}
-
-.layout-dashboard .ant-input::placeholder {
-  color: #bfbfbf;
-}
-
-/* ===== BADGES ===== */
-.layout-dashboard .ant-badge-status-text {
-  color: #141414;
-  font-size: 14px;
-}
+/* ===== BRAND PILLS ===== */
+/* Unscoped so pills keep their shape inside body-level portals (Select dropdowns, Drawer). */
+.admin-pill { display:inline-flex; align-items:center; font-size:11.5px; font-weight:600; padding:2px 10px; border-radius:999px; white-space:nowrap; line-height:1.7; }
+.admin-pill--sale     { background:rgba(53,74,196,.08); color:#354AC4; }   /* deal: sale */
+.admin-pill--rent     { background:rgba(85,148,241,.16); color:#2A69C4; }   /* deal: rent */
+.admin-pill--new      { background:rgba(85,148,241,.16); color:#2A69C4; }   /* inquiry: new — sky blue */
+.admin-pill--progress { background:rgba(53,74,196,.08); color:#354AC4; }   /* inquiry: in_progress */
+.admin-pill--closed   { background:rgba(5,17,80,.07); color:#051150; }   /* inquiry: closed — deep ink (done/archived) */
+.admin-pill--neutral  { background:rgba(85,148,241,.14); color:#2A69C4; }   /* role:agent, rank, lead-source, generic */
+.admin-pill--admin    { background:#354AC4; color:#fff; }                   /* role: admin (solid indigo) */
 
 /* ===== FOOTER ===== */
 .layout-dashboard .ant-layout-footer {
   background: transparent;
-  padding: 16px 24px;
+  padding: 12px 24px;
   margin: 0 20px 16px;
 }
 
-.layout-dashboard .copyright {
-  color: #8c8c8c;
-  font-size: 13px;
-  text-align: center;
-}
-
-.layout-dashboard .footer-menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-}
-
-.layout-dashboard .footer-menu .nav-link {
-  color: #8c8c8c;
-  text-decoration: none;
-  font-size: 13px;
-}
-
-.layout-dashboard .footer-menu .nav-link:hover {
-  color: #1C3664;
-}
-
 /* ===== SIDEBAR COLLAPSE / BACKDROP ===== */
-/* Slide the sidebar off the right edge when collapsed (all breakpoints) */
+/* Slide the sidebar off the reading-start edge when collapsed (all breakpoints) */
 .layout-dashboard.sidebar-collapsed .ant-layout-sider.sider-primary {
-  right: -250px;
+  inset-inline-start: -250px;
   box-shadow: none;
 }
 
-/* Dim backdrop shown behind the open sidebar on mobile */
+/* Dim backdrop behind the open sidebar — hidden on desktop, shown on mobile
+   (single source of truth; the display toggle used to live in admin-rtl-fix.css). */
 .layout-dashboard .sidebar-backdrop {
+  display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   z-index: 90;
   border: none;
   cursor: pointer;
-  animation: sidebar-backdrop-in 0.2s ease;
 }
 
 @keyframes sidebar-backdrop-in {
@@ -361,13 +219,13 @@
 
   /* Open: reserve room for the sidebar. Collapsed: content reclaims the space. */
   .layout-dashboard.sidebar-open .ant-layout {
-    margin-right: 250px;
-    margin-left: 0;
+    margin-inline-start: 250px;
+    margin-inline-end: 0;
   }
 
   .layout-dashboard.sidebar-collapsed .ant-layout {
-    margin-right: 0;
-    margin-left: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 }
 
@@ -375,69 +233,19 @@
   .layout-dashboard .ant-layout-header {
     margin: 12px 20px;
   }
-
-  .layout-dashboard .header-control {
-    margin-top: 0;
-  }
 }
 
 @media (max-width: 991px) {
   /* Sidebar overlays the content on mobile; never reserve space for it. */
   .layout-dashboard .ant-layout {
-    margin-right: 0;
+    margin-inline-start: 0;
   }
-}
 
-/* ===== UPLOAD AREA ===== */
-.layout-dashboard .ant-upload-drag {
-  border-radius: 12px;
-  border: 2px dashed #d9d9d9;
-  background: #fafafa;
-  transition: all 0.3s;
-}
-
-.layout-dashboard .ant-upload-drag:hover {
-  border-color: #1C3664;
-  background: rgba(28, 54, 100, 0.06);
-}
-
-.layout-dashboard .ant-upload-text {
-  color: #141414 !important;
-  font-weight: 600;
-}
-
-.layout-dashboard .ant-upload-hint {
-  color: #8c8c8c !important;
-}
-
-/* ===== IMAGES ===== */
-.layout-dashboard .ant-image {
-  display: inline-block;
-}
-
-.layout-dashboard .ant-image img {
-  object-fit: cover;
-}
-
-/* ===== MISC UTILITY CLASSES ===== */
-.mb-4 {
-  margin-bottom: 24px !important;
-}
-
-.mb-24 {
-  margin-bottom: 24px;
-}
-
-/* ===== DRAWER SIDEBAR ===== */
-.drawer-sidebar .ant-drawer-body {
-  padding: 0;
-}
-
-.drawer-sidebar .ant-drawer-body .ant-layout-sider.sider-primary {
-  position: relative;
-  right: 0;
-  margin: 0;
-  height: 100%;
+  /* Show the backdrop on mobile when the sidebar is open */
+  .layout-dashboard .sidebar-backdrop {
+    display: block;
+    animation: sidebar-backdrop-in 0.3s ease;
+  }
 }
 
 /* ===== SCROLLBAR ===== */
@@ -450,12 +258,12 @@
 }
 
 .layout-dashboard ::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
+  background: #CBD5E1;
   border-radius: 3px;
 }
 
 .layout-dashboard ::-webkit-scrollbar-thumb:hover {
-  background: #bfbfbf;
+  background: #94A3B8;
 }
 
 /* ===== IMAGE FIX - Override Tailwind preflight ===== */
@@ -464,146 +272,41 @@
   height: auto;
 }
 
-.layout-dashboard .ant-image-img {
-  display: block;
-  width: auto;
-  height: auto;
-}
-
-/* ===== MODAL ===== */
-.layout-dashboard .ant-modal-header {
-  text-align: right;
-}
-
-/* ===== SELECT ===== */
-.layout-dashboard .ant-select-item-option-content {
-  color: #141414;
-}
-
-/* ===== SWITCH ===== */
-.layout-dashboard .ant-switch-inner-checked,
-.layout-dashboard .ant-switch-inner-unchecked {
-  font-size: 12px;
-}
-
-/* ===== TABLE IMPROVEMENTS ===== */
-/* Every admin table sets scroll={{ x }} (see each admin page), so antd's own
-   scroll container (.ant-table-content) owns the horizontal scroll and is
-   RTL-aware. Previously forcing overflow-x on .ant-table + .ant-table-wrapper
-   here created a SECOND, mis-aligned RTL scroller that fought antd's — which
-   left a gap on the start (right) edge and clipped the last columns (status /
-   actions) on the end (left) edge with no usable scrollbar. Let antd manage the
-   overflow, and just make the horizontal scrollbar clearly visible so it's
-   obvious the table scrolls. */
-.layout-dashboard .ant-table-wrapper {
-  max-width: 100%;
-}
-
-.layout-dashboard .ant-table-content,
-.layout-dashboard .ant-table-body {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;                 /* Firefox */
-  scrollbar-color: #c1c7d0 #eef0f3;
-}
-
-.layout-dashboard .ant-table-content::-webkit-scrollbar,
-.layout-dashboard .ant-table-body::-webkit-scrollbar {
-  height: 10px;                          /* always-visible horizontal bar (WebKit/Blink) */
-}
-.layout-dashboard .ant-table-content::-webkit-scrollbar-track,
-.layout-dashboard .ant-table-body::-webkit-scrollbar-track {
-  background: #eef0f3;
-  border-radius: 8px;
-}
-.layout-dashboard .ant-table-content::-webkit-scrollbar-thumb,
-.layout-dashboard .ant-table-body::-webkit-scrollbar-thumb {
-  background: #c1c7d0;
-  border-radius: 8px;
-}
-.layout-dashboard .ant-table-content::-webkit-scrollbar-thumb:hover,
-.layout-dashboard .ant-table-body::-webkit-scrollbar-thumb:hover {
-  background: #1c3664;
-}
-
-.layout-dashboard .ant-table-cell {
-  vertical-align: middle;
-}
-
-/* Ellipsis styles for table cells */
-.layout-dashboard .ant-table-cell-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Better text wrapping in table cells */
-.layout-dashboard .ant-table-tbody > tr > td > div {
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-/* Tables sit inset within the card body padding — uniform across all admin tables */
-.layout-dashboard .ant-card-body .ant-table-wrapper {
-  margin: 0;
-}
-
 /* ===== SOLD PROPERTY STYLING ===== */
 .layout-dashboard .sold-property-row {
-  background-color: #f5f5f5 !important;
-  opacity: 0.65;
+  background-color: #F8FAFC !important;
 }
 
 .layout-dashboard .sold-property-row:hover > td {
-  background-color: #ececec !important;
+  background-color: #EEF2F9 !important;
 }
 
 .layout-dashboard .sold-property-row td {
-  color: #8c8c8c !important;
+  color: #64748B !important;
 }
 
-.layout-dashboard .sold-property-row .ant-image {
-  opacity: 0.5;
-  filter: grayscale(100%);
-}
-
-.layout-dashboard .sold-property-row .ant-tag {
-  opacity: 0.7;
-}
+/* Mobile card view of a sold property (parallels the table row above) */
+.layout-dashboard .admin-card.sold-property-row{background:#F8FAFC;border-color:#E4E8F2}
+.layout-dashboard .admin-card.sold-property-row .admin-card__title{color:#64748B}
+.layout-dashboard .admin-card.sold-property-row .admin-card__thumb{filter:grayscale(100%);opacity:.6}
 
 /* ===== MOBILE FULL WIDTH ===== */
 @media (max-width: 639px) {
-  /* Remove margin and padding from content area */
+  /* Consistent 16px page padding on phones (not edge-to-edge) so every page —
+     with or without its own wrapper — reads with the same gutter. */
   .layout-dashboard .content-ant {
     margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Remove margin from header */
-  .layout-dashboard .ant-layout-header {
-    margin: 0 !important;
-    border-radius: 0 !important;
-  }
-
-  /* Remove margin from footer */
-  .layout-dashboard .ant-layout-footer {
-    margin: 0 !important;
-  }
-
-  /* Cards full width with no border radius */
-  .layout-dashboard .ant-card {
-    border-radius: 0 !important;
-    border-left: none !important;
-    border-right: none !important;
-  }
-
-  /* Card body padding adjustment */
-  .layout-dashboard .ant-card-body {
     padding: 16px !important;
   }
 
-  /* Card header padding adjustment */
-  .layout-dashboard .ant-card-head {
-    padding: 12px 16px !important;
+  /* Header stays a full-bleed top app-bar (chrome), footer flush */
+  .layout-dashboard .ant-layout-header {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-inline: none;
+  }
+  .layout-dashboard .ant-layout-footer {
+    margin: 0 !important;
   }
 }
 
@@ -613,27 +316,6 @@
  * from 360px phones up. This is the foundation the per-page mobile
  * card views build on — keep page-specific tweaks in the pages.
  * ========================================================= */
-
-/* ---- Responsive modal cap ----
-   antd modals portal to <body> (outside .layout-dashboard) and ship a fixed
-   px width (520 default, some 900). Cap every modal to the viewport so none
-   overflow a phone. Desktop widths are untouched (520 < 100vw-24 on desktop),
-   so this only ever shrinks a modal that would otherwise clip. antd-admin.css
-   loads on admin routes only, so this never touches the public site. */
-.ant-modal {
-  max-width: calc(100vw - 24px);
-}
-@media (max-width: 575px) {
-  .ant-modal {
-    max-width: calc(100vw - 16px);
-    margin: 8px auto;
-    top: 8px;
-  }
-  .ant-modal .ant-modal-body {
-    max-height: 72vh;
-    overflow-y: auto;
-  }
-}
 
 /* ---- Visibility utilities: one flash-free table→card swap ----
    Render the desktop <Table> inside .admin-only-desktop and the phone card
@@ -659,7 +341,7 @@
   gap: 12px;
 }
 .admin-card {
-  border: 1px solid #e6e8ec;
+  border: 1px solid #e4e8f2;
   border-radius: 12px;
   padding: 14px;
   background: #fff;
@@ -680,9 +362,17 @@
   flex-shrink: 0;
   background: #f1f3f5;
 }
+/* Round people-avatar variant (owners / team). Scoped under .layout-dashboard
+   so it beats the global `.layout-dashboard img { height: auto }` preflight
+   override that would otherwise stretch the photo into an oval. */
+.layout-dashboard .admin-card__thumb--round {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
 .admin-card__title {
   font-weight: 700;
-  color: #1c3664;
+  color: #051150;
   font-size: 15px;
   line-height: 1.35;
   display: -webkit-box;
@@ -716,23 +406,9 @@
   padding-top: 10px;
   border-top: 1px solid #f0f1f4;
 }
-.admin-card__actions .ant-btn {
-  min-height: 40px;
-}
 /* Let Edit / Delete share the row and stay comfortably tappable */
 .admin-card__actions > .admin-card__grow {
   flex: 1 1 auto;
-}
-
-/* ---- Touch-target floor for any dense in-table control that stays on phone ---- */
-@media (max-width: 767.98px) {
-  .layout-dashboard .ant-table .ant-btn-sm {
-    min-height: 34px;
-    min-width: 34px;
-  }
-  .layout-dashboard .ant-table .ant-btn > .anticon {
-    font-size: 16px;
-  }
 }
 
 /* ---- Filter / control helper: full-width & comfortable on phone ----
@@ -740,9 +416,7 @@
    instead of sitting as two cramped half-width controls at 360px. */
 @media (max-width: 575px) {
   .admin-filter-full,
-  .admin-filter-full > *,
-  .admin-filter-full .ant-select,
-  .admin-filter-full .ant-picker {
+  .admin-filter-full > * {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
@@ -763,8 +437,7 @@
 }
 
 /* ---- Fluid admin page titles ----
-   The list pages use Tailwind's text-4xl (36px) h1, which is heavy at 360px.
-   Scale it down fluidly without touching every page. */
+   Scale a text-4xl h1 down fluidly at narrow widths without touching pages. */
 .layout-dashboard h1.text-4xl {
   font-size: clamp(1.5rem, 5vw, 2.25rem);
   line-height: 1.2;

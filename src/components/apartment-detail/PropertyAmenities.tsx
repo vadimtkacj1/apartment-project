@@ -34,7 +34,7 @@ export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps)
         isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
       }`}
     >
-      <h2 className={`text-3xl font-black mb-8 uppercase ${
+      <h2 className={`text-2xl font-black mb-8 ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>תוספות</h2>
 
@@ -43,10 +43,10 @@ export function PropertyAmenities({ amenities, isSold }: PropertyAmenitiesProps)
             const IconComponent = item.icon;
             return (
               <div key={item.key} className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center transition-colors text-[#1c3664] bg-[#1c3664]/10">
-                  <IconComponent size={24} strokeWidth={2.5} />
+                <div className="w-12 h-12 rounded-full flex items-center justify-center transition-colors text-[#354AC4] bg-[#354AC4]/10">
+                  <IconComponent size={24} strokeWidth={2.5} aria-hidden="true" />
                 </div>
-                <span className="font-bold text-base text-[#1a1a1a]">
+                <span className="font-bold text-base text-[#051150]">
                   {item.label}
                 </span>
               </div>

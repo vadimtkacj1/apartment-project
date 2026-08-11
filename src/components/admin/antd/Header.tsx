@@ -1,12 +1,22 @@
 'use client';
 
-import { Row, Col, Breadcrumb, Button, Tooltip } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import React from 'react';
+import {
+  PanelLeftClose,
+  PanelLeftOpen,
+  PanelRightClose,
+  PanelRightOpen,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/shadcn/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
 // Breadcrumbs derive from the single source of truth (src/config/adminSections.tsx).
 import { buildAdminCrumbs } from '@/config/adminSections';
-
-const FONT = "var(--font-assistant), Arial, Helvetica, sans-serif";
+import { useAdminI18n, useAdminMessages } from '@/lib/adminI18n';
+import { navMessages } from '@/lib/adminI18n/messages/nav';
+import LanguageSwitcher from '@/components/admin/LanguageSwitcher';
 
 interface HeaderProps {
   onPress: () => void;
@@ -15,65 +25,58 @@ interface HeaderProps {
 }
 
 export default function Header({ onPress, name, collapsed = false }: HeaderProps) {
-  const crumbs = buildAdminCrumbs(name);
+  const { locale, dir } = useAdminI18n();
+  const t = useAdminMessages(navMessages);
+  const crumbs = buildAdminCrumbs(name, locale);
+  const Sep = dir === 'rtl' ? ChevronLeft : ChevronRight;
+  // The sidebar sits at the inline-start edge — right in RTL — so the panel
+  // icon must mirror with direction to point at the actual sidebar side.
+  const PanelOpen = dir === 'rtl' ? PanelRightOpen : PanelLeftOpen;
+  const PanelClose = dir === 'rtl' ? PanelRightClose : PanelLeftClose;
 
   return (
-    <Row
-      align="middle"
-      justify="space-between"
-      wrap={false}
-      className="admin-header-row"
-      style={{ width: '100%', margin: 0, gap: 12 }}
-    >
-      {/* Single, clear control: collapse / expand the sidebar.
-          (User identity + logout live in the sidebar footer.) */}
-      <Col flex="none">
-        <Tooltip title={collapsed ? 'פתח תפריט' : 'כווץ תפריט'} placement="bottom">
-          <Button
-            type="text"
-            className="sidebar-toggler"
-            onClick={onPress}
-            aria-label={collapsed ? 'פתח תפריט' : 'כווץ תפריט'}
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            style={{ color: '#595959', fontSize: '18px', minWidth: 44, minHeight: 44 }}
-          />
+    <div className="admin-header-row flex w-full items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={onPress}
+              aria-label={collapsed ? t.openMenu : t.collapseMenu}
+              className="text-slate-600"
+            >
+              {collapsed ? <PanelOpen className="!size-[18px]" /> : <PanelClose className="!size-[18px]" />}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{collapsed ? t.openMenu : t.collapseMenu}</TooltipContent>
         </Tooltip>
-      </Col>
+        <LanguageSwitcher />
+      </div>
 
-      {/* Breadcrumb: allowed to shrink/truncate so a deep Hebrew trail can't
-          collide with the toggle on a 360px screen (minWidth:0 + flex). */}
-      <Col
-        flex="auto"
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 0, overflow: 'hidden' }}
+      <nav
+        aria-label="breadcrumb"
+        className="flex min-w-0 items-center gap-1 overflow-hidden text-[13px]"
       >
-        <Breadcrumb
-          items={crumbs.map((c, i) => {
-            const isLast = i === crumbs.length - 1;
-            if (!isLast && c.href) {
-              return {
-                title: (
-                  <Link href={c.href} style={{ color: '#8c8c8c', fontFamily: FONT }}>
-                    {c.title}
-                  </Link>
-                ),
-              };
-            }
-            return {
-              title: (
-                <span
-                  style={{
-                    color: isLast ? '#1C3664' : '#8c8c8c',
-                    fontWeight: isLast ? 600 : 400,
-                    fontFamily: FONT,
-                  }}
-                >
+        {crumbs.map((c, i) => {
+          const isLast = i === crumbs.length - 1;
+          return (
+            <React.Fragment key={i}>
+              {i > 0 && <Sep className="size-3.5 shrink-0 text-slate-400" aria-hidden="true" />}
+              {!isLast && c.href ? (
+                <Link href={c.href} className="shrink-0 text-muted-foreground hover:text-primary">
+                  {c.title}
+                </Link>
+              ) : (
+                <span className={isLast ? 'truncate font-semibold text-[var(--text-ink)]' : 'shrink-0 text-muted-foreground'}>
                   {c.title}
                 </span>
-              ),
-            };
-          })}
-        />
-      </Col>
-    </Row>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </nav>
+    </div>
   );
 }

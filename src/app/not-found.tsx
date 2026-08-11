@@ -3,7 +3,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "דף לא נמצא | רם נכסים חיים ענבי",
+  title: "דף לא נמצא | Aiterra",
   description: "הדף שחיפשת לא נמצא",
 };
 
@@ -11,14 +11,19 @@ export default function NotFound() {
   return (
     <div
       className="flex flex-col min-h-screen"
-      style={{ background: "#faf7f2", color: "#171717" }}
+      style={{ background: "#f5f7fb", color: "#171717" }}
     >
       <Header />
-      <main className="flex-grow flex items-center justify-center px-4">
+      {/* The site header is position:fixed, so the page owns the offset that
+          keeps its content out from under it (same as every public page's hero). */}
+      <main
+        className="flex flex-grow items-center justify-center px-4"
+        style={{ paddingBlockStart: 'clamp(112px, 14vh, 160px)', paddingBlockEnd: 'clamp(56px, 8vh, 96px)' }}
+      >
         <div className="text-center" dir="rtl">
           <p
             className="text-8xl font-bold mb-4"
-            style={{ color: "#c9a96e", fontFamily: "var(--font-caramel, cursive)" }}
+            style={{ color: "#5594f1", fontFamily: "var(--font-caramel, cursive)" }}
           >
             404
           </p>
@@ -32,14 +37,14 @@ export default function NotFound() {
             <Link
               href="/"
               className="inline-block px-8 py-3 rounded-lg font-semibold text-white transition-opacity hover:opacity-90"
-              style={{ background: "#c9a96e" }}
+              style={{ background: "#354AC4" }}
             >
               חזרה לדף הבית
             </Link>
             <Link
               href="/apartments"
               className="inline-block px-8 py-3 rounded-lg font-semibold transition-colors border-2"
-              style={{ borderColor: "#c9a96e", color: "#c9a96e" }}
+              style={{ borderColor: "#354AC4", color: "#354AC4" }}
             >
               לחיפוש דירות
             </Link>

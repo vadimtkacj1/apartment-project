@@ -1,4 +1,7 @@
-import { Card, Row, Col, Form, Checkbox } from 'antd';
+'use client';
+
+import { Card } from '@/components/shadcn/card';
+import { Checkbox } from '@/components/shadcn/checkbox';
 import {
   Snowflake,
   Accessibility,
@@ -14,49 +17,53 @@ import {
   Building2,
   Home,
 } from 'lucide-react';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps, PropertyForm } from '../types';
 
+// Locale-neutral definitions; display labels live in propertyFormMessages.features.items.
 const FEATURES = [
-  { key: 'hasAirConditioning', label: 'מיזוג אוויר', icon: Snowflake },
-  { key: 'hasDisabledAccess', label: 'גישה לנכים', icon: Accessibility },
-  { key: 'hasSunBalcony', label: 'מרפסת שמש', icon: Waves },
-  { key: 'hasStorage', label: 'מחסן', icon: Box },
-  { key: 'hasSunroom', label: 'חימום גז', icon: Sun },
-  { key: 'hasBoiler', label: 'דוד שמש', icon: Flame },
-  { key: 'hasSafeRoom', label: 'ממ״ד', icon: Shield },
-  { key: 'hasElevator', label: 'מעלית', icon: ArrowUpDown },
-  { key: 'hasMamak', label: 'ממ״ק', icon: ShieldCheck },
-  { key: 'hasBars', label: 'סורגים', icon: GripVertical },
-  { key: 'hasPets', label: 'חיות מחמד', icon: Dog },
-  { key: 'hasHousingUnit', label: 'יחידת דיור', icon: Building2 },
-  { key: 'hasShelter', label: 'מקלט בבניין', icon: Home },
-];
+  { key: 'hasAirConditioning', labelKey: 'airConditioning', icon: Snowflake },
+  { key: 'hasDisabledAccess', labelKey: 'disabledAccess', icon: Accessibility },
+  { key: 'hasSunBalcony', labelKey: 'sunBalcony', icon: Waves },
+  { key: 'hasStorage', labelKey: 'storage', icon: Box },
+  { key: 'hasSunroom', labelKey: 'gasHeating', icon: Sun },
+  { key: 'hasBoiler', labelKey: 'solarBoiler', icon: Flame },
+  { key: 'hasSafeRoom', labelKey: 'safeRoom', icon: Shield },
+  { key: 'hasElevator', labelKey: 'elevator', icon: ArrowUpDown },
+  { key: 'hasMamak', labelKey: 'mamak', icon: ShieldCheck },
+  { key: 'hasBars', labelKey: 'bars', icon: GripVertical },
+  { key: 'hasPets', labelKey: 'pets', icon: Dog },
+  { key: 'hasHousingUnit', labelKey: 'housingUnit', icon: Building2 },
+  { key: 'hasShelter', labelKey: 'shelter', icon: Home },
+] as const;
 
 export function FeaturesSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
   return (
-    <Card title="מאפיינים נוספים" className="mb-4">
-      <Row gutter={[16, 16]}>
+    <Card className="mb-4 p-5">
+      <h3 className="mb-4 text-base font-semibold text-foreground">{t.features.cardTitle}</h3>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {FEATURES.map((feature) => {
           const IconComponent = feature.icon;
+          const key = feature.key as keyof PropertyForm;
           return (
-            <Col xs={12} sm={8} md={6} key={feature.key}>
-              <Form.Item name={feature.key} valuePropName="checked" style={{ marginBottom: 0 }}>
-                <Checkbox
-                  onChange={(e) =>
-                    handleChange(feature.key as keyof PropertyForm, e.target.checked)
-                  }
-                  style={{ display: 'flex', alignItems: 'center', minHeight: 44 }}
-                >
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-                    <IconComponent size={16} />
-                    {feature.label}
-                  </span>
-                </Checkbox>
-              </Form.Item>
-            </Col>
+            <label
+              key={feature.key}
+              className="flex min-h-11 cursor-pointer items-center gap-2"
+            >
+              <Checkbox
+                checked={Boolean(formData[key])}
+                onCheckedChange={(c) => handleChange(key, c === true)}
+              />
+              <span className="flex items-center gap-2 text-sm">
+                <IconComponent size={16} />
+                {t.features.items[feature.labelKey]}
+              </span>
+            </label>
           );
         })}
-      </Row>
+      </div>
     </Card>
   );
 }

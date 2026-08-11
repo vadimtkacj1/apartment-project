@@ -1,19 +1,21 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Button,
-  App,
-  InputNumber,
-} from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Save, Info, Loader2 } from 'lucide-react';
 import LocationPicker from '@/components/admin/LocationPicker';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import { toast } from '@/components/shadcn/sonner';
+import { Card, CardTitle } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
+import { Input } from '@/components/shadcn/input';
+import { Label } from '@/components/shadcn/label';
+import {
+  Tooltip, TooltipTrigger, TooltipContent,
+} from '@/components/shadcn/tooltip';
+import { cn } from '@/lib/utils';
 import { useUnsavedChangesWarning } from '@/hooks/useUnsavedChangesWarning';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { contactMessages } from '@/lib/adminI18n/messages/contact';
 
 interface ContactInfoForm {
   phone: string;
@@ -43,7 +45,7 @@ interface ContactInfoForm {
   linkedin: string;
 }
 
-const INITIAL_FORM: ContactInfoForm = {
+const INITIAL_FORM: Omit<ContactInfoForm, 'weekdayHours' | 'fridayHours'> = {
   phone: '',
   phoneName: '',
   phone2: '',
@@ -58,8 +60,6 @@ const INITIAL_FORM: ContactInfoForm = {
   city: '',
   latitude: null,
   longitude: null,
-  weekdayHours: 'ראשון - חמישי: 9:00 - 18:00',
-  fridayHours: 'שישי: 9:00 - 13:00',
   facebook: '',
   facebookName: '',
   facebook2: '',
@@ -71,9 +71,69 @@ const INITIAL_FORM: ContactInfoForm = {
   linkedin: '',
 };
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Module scope so the components keep a stable identity across renders
+// (defining them inside the page remounts every field on each keystroke).
+const FieldLabel = ({
+  htmlFor,
+  tooltip,
+  tooltipAriaLabel,
+  required,
+  children,
+}: {
+  htmlFor?: string;
+  tooltip?: string;
+  tooltipAriaLabel?: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) => (
+  <Label htmlFor={htmlFor} className="flex items-center gap-1.5">
+    <span>
+      {children}
+      {required && <span className="ms-0.5 text-destructive">*</span>}
+    </span>
+    {tooltip && (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label={tooltipAriaLabel}
+            className="inline-flex text-muted-foreground hover:text-foreground"
+          >
+            <Info className="size-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    )}
+  </Label>
+);
+
+const SectionCard = ({
+  title,
+  children,
+}: {
+  title: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <Card className="mb-4 p-5">
+    <div className="mb-4 border-b border-border pb-3">
+      <CardTitle className="text-base font-semibold">{title}</CardTitle>
+    </div>
+    <div className="space-y-4">{children}</div>
+  </Card>
+);
+
 export default function ContactInfoPage() {
-  const { message } = App.useApp();
-  const [form] = Form.useForm();
+  const t = useAdminMessages(contactMessages);
+  const [values, setValues] = useState<ContactInfoForm>(() => ({
+    ...INITIAL_FORM,
+    weekdayHours: t.weekdayHoursExample,
+    fridayHours: t.fridayHoursExample,
+  }));
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactInfoForm, string>>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [mapPosition, setMapPosition] = useState<{ lat: number; lng: number } | null>(null);
@@ -91,7 +151,17 @@ export default function ContactInfoPage() {
       if (response.ok) {
         const data = await response.json();
         if (data) {
-          form.setFieldsValue(data);
+          // Merge only the known form fields (ignore server-only keys like id/links).
+          setValues((prev) => {
+            const next: ContactInfoForm = { ...prev };
+            const target = next as unknown as Record<string, unknown>;
+            for (const key of Object.keys(prev)) {
+              if (data[key] !== undefined) {
+                target[key] = data[key];
+              }
+            }
+            return next;
+          });
           // Update map position if coordinates exist
           if (data.latitude && data.longitude) {
             setMapPosition({ lat: data.latitude, lng: data.longitude });
@@ -100,13 +170,40 @@ export default function ContactInfoPage() {
       }
     } catch (err) {
       console.error('Error fetching contact info:', err);
-      message.error('שגיאה בטעינת פרטי ההתקשרות');
+      toast.error(t.loadError);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (values: ContactInfoForm) => {
+  const setField = (name: keyof ContactInfoForm, value: string | number | null) => {
+    setValues((v) => ({ ...v, [name]: value }));
+    setDirty(true);
+    setErrors((e) => (e[name] ? { ...e, [name]: undefined } : e));
+  };
+
+  const validate = (): Partial<Record<keyof ContactInfoForm, string>> => {
+    const e: Partial<Record<keyof ContactInfoForm, string>> = {};
+    if (!values.phone?.trim()) e.phone = t.phoneRequired;
+    if (!values.email?.trim()) e.email = t.emailRequired;
+    else if (!EMAIL_RE.test(values.email)) e.email = t.emailInvalid;
+    if (values.email2 && !EMAIL_RE.test(values.email2)) e.email2 = t.emailInvalid;
+    if (!values.address?.trim()) e.address = t.addressRequired;
+    if (!values.city?.trim()) e.city = t.cityRequired;
+    if (!values.weekdayHours?.trim()) e.weekdayHours = t.hoursRequired;
+    if (!values.fridayHours?.trim()) e.fridayHours = t.hoursRequired;
+    return e;
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const nextErrors = validate();
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+    setErrors({});
     setSaving(true);
 
     try {
@@ -139,323 +236,245 @@ export default function ContactInfoPage() {
 
       if (response.ok) {
         setDirty(false);
-        message.success('פרטי ההתקשרות נשמרו בהצלחה');
+        toast.success(t.saveSuccess);
         fetchContactInfo();
       } else {
-        message.error('שגיאה בשמירת פרטי ההתקשרות');
+        toast.error(t.saveError);
       }
     } catch (err) {
-      message.error('שגיאה בשמירת פרטי ההתקשרות');
+      toast.error(t.saveError);
     } finally {
       setSaving(false);
     }
   };
 
+  const renderText = (
+    name: keyof ContactInfoForm,
+    label: React.ReactNode,
+    opts: {
+      placeholder?: string;
+      tooltip?: string;
+      type?: string;
+      required?: boolean;
+      className?: string;
+    } = {},
+  ) => (
+    <div className={cn('space-y-2', opts.className)}>
+      <FieldLabel
+        htmlFor={name}
+        tooltip={opts.tooltip}
+        tooltipAriaLabel={t.infoTooltipAria}
+        required={opts.required}
+      >
+        {label}
+      </FieldLabel>
+      <Input
+        id={name}
+        type={opts.type}
+        placeholder={opts.placeholder}
+        value={(values[name] as string | null | undefined) ?? ''}
+        onChange={(e) => setField(name, e.target.value)}
+      />
+      {errors[name] && (
+        <p className="text-sm font-medium text-destructive">{errors[name]}</p>
+      )}
+    </div>
+  );
+
   return (
     <div>
-      <div style={{ marginBottom: '16px' }}>
-        <h1 className="text-4xl font-bold" style={{ margin: 0 }}>ניהול פרטי התקשרות</h1>
-      </div>
+      <AdminPageHeader title={t.title} />
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        onValuesChange={() => setDirty(true)}
-        initialValues={INITIAL_FORM}
-        disabled={loading}
-      >
-        {/* Contact Details */}
-        <Card className="mb-4" title="פרטי יצירת קשר - מספר 1">
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="טלפון 1"
-                name="phone"
-                rules={[{ required: true, message: 'אנא הכנס מספר טלפון' }]}
-              >
-                <Input placeholder="03-1234567" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label="שם לטלפון 1"
-                name="phoneName"
-                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'יוסי כהן')"
-              >
-                <Input placeholder="יוסי כהן" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="אימייל 1"
-                name="email"
-                rules={[
-                  { required: true, message: 'אנא הכנס אימייל' },
-                  { type: 'email', message: 'אנא הכנס אימייל תקין' },
-                ]}
-              >
-                <Input type="email" placeholder="info@example.com" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="WhatsApp 1"
-                name="whatsapp"
-                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972501234567)"
-              >
-                <Input placeholder="972501234567" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label="שם ל-WhatsApp 1"
-                name="whatsappName"
-                tooltip="שם שיופיע בחלון הבחירה"
-              >
-                <Input placeholder="יוסי כהן" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+      <form onSubmit={handleSubmit}>
+        <fieldset disabled={loading} className="m-0 min-w-0 border-0 p-0">
+          {/* Contact Details */}
+          <SectionCard title={t.contactCard1}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('phone', t.phone1Label, { placeholder: '03-1234567', required: true })}
+              {renderText('phoneName', t.phoneName1Label, {
+                placeholder: t.personPlaceholder1,
+                tooltip: t.phoneName1Tooltip,
+              })}
+            </div>
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
+              {renderText('email', t.email1Label, {
+                placeholder: 'info@example.com',
+                type: 'email',
+                required: true,
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('whatsapp', 'WhatsApp 1', {
+                placeholder: '972501234567',
+                tooltip: t.whatsapp1Tooltip,
+              })}
+              {renderText('whatsappName', t.whatsappName1Label, {
+                placeholder: t.personPlaceholder1,
+                tooltip: t.whatsappNameTooltip,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Second Contact Details */}
-        <Card className="mb-4" title="פרטי יצירת קשר - מספר 2 (אופציונלי)">
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="טלפון 2"
-                name="phone2"
-              >
-                <Input placeholder="03-7654321" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label="שם לטלפון 2"
-                name="phoneName2"
-                tooltip="שם שיופיע בחלון הבחירה (לדוגמה: 'דוד לוי')"
-              >
-                <Input placeholder="דוד לוי" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="אימייל 2"
-                name="email2"
-                rules={[
-                  { type: 'email', message: 'אנא הכנס אימייל תקין' },
-                ]}
-              >
-                <Input type="email" placeholder="info2@example.com" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="WhatsApp 2"
-                name="whatsapp2"
-                tooltip="מספר WhatsApp בפורמט בינלאומי (לדוגמה: 972507654321)"
-              >
-                <Input placeholder="972507654321" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label="שם ל-WhatsApp 2"
-                name="whatsappName2"
-                tooltip="שם שיופיע בחלון הבחירה"
-              >
-                <Input placeholder="דוד לוי" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Second Contact Details */}
+          <SectionCard title={t.contactCard2}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('phone2', t.phone2Label, { placeholder: '03-7654321' })}
+              {renderText('phoneName2', t.phoneName2Label, {
+                placeholder: t.personPlaceholder2,
+                tooltip: t.phoneName2Tooltip,
+              })}
+            </div>
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
+              {renderText('email2', t.email2Label, {
+                placeholder: 'info2@example.com',
+                type: 'email',
+              })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('whatsapp2', 'WhatsApp 2', {
+                placeholder: '972507654321',
+                tooltip: t.whatsapp2Tooltip,
+              })}
+              {renderText('whatsappName2', t.whatsappName2Label, {
+                placeholder: t.personPlaceholder2,
+                tooltip: t.whatsappNameTooltip,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Address */}
-        <Card className="mb-4" title="כתובת ומיקום">
-          <Row gutter={16}>
-            <Col md={16}>
-              <Form.Item
-                label="כתובת"
-                name="address"
-                rules={[{ required: true, message: 'אנא הכנס כתובת' }]}
-              >
-                <Input placeholder="רחוב 123" />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item
-                label="עיר"
-                name="city"
-                rules={[{ required: true, message: 'אנא הכנס עיר' }]}
-              >
-                <Input placeholder="תל אביב" />
-              </Form.Item>
-            </Col>
-          </Row>
+          {/* Address */}
+          <SectionCard title={t.addressCard}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              {renderText('address', t.addressLabel, {
+                placeholder: t.addressPlaceholder,
+                required: true,
+                className: 'md:col-span-2',
+              })}
+              {renderText('city', t.cityLabel, {
+                placeholder: t.cityPlaceholder,
+                required: true,
+              })}
+            </div>
 
-          {/* Map Location Picker */}
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item label="מיקום על המפה (לחץ על המפה לבחירה)">
-                <LocationPicker
-                  position={mapPosition}
-                  onPositionChange={(coords: { lat: number; lng: number }) => {
-                    setMapPosition(coords);
-                    form.setFieldsValue({
-                      latitude: coords.lat,
-                      longitude: coords.lng,
-                    });
-                  }}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+            {/* Map Location Picker */}
+            <div className="space-y-2">
+              <Label>{t.mapLabel}</Label>
+              <LocationPicker
+                position={mapPosition}
+                onPositionChange={(coords: { lat: number; lng: number }) => {
+                  setMapPosition(coords);
+                  setValues((v) => ({ ...v, latitude: coords.lat, longitude: coords.lng }));
+                  setDirty(true);
+                }}
+              />
+            </div>
 
-          {/* Coordinates Display */}
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item label="קו רוחב (Latitude)" name="latitude">
-                <InputNumber
-                  style={{ width: '100%' }}
+            {/* Coordinates Display */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="latitude">{t.latitudeLabel}</Label>
+                <Input
+                  id="latitude"
+                  type="number"
+                  step="any"
                   placeholder="32.0853"
-                  step={0.000001}
-                  precision={6}
-                  onChange={(value) => {
-                    if (typeof value === 'number' && form.getFieldValue('longitude')) {
-                      setMapPosition({ lat: value, lng: form.getFieldValue('longitude') });
+                  value={values.latitude ?? ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === '' ? null : parseFloat(raw);
+                    setField('latitude', num);
+                    if (
+                      typeof num === 'number' &&
+                      !Number.isNaN(num) &&
+                      typeof values.longitude === 'number'
+                    ) {
+                      setMapPosition({ lat: num, lng: values.longitude });
                     }
                   }}
                 />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item label="קו אורך (Longitude)" name="longitude">
-                <InputNumber
-                  style={{ width: '100%' }}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="longitude">{t.longitudeLabel}</Label>
+                <Input
+                  id="longitude"
+                  type="number"
+                  step="any"
                   placeholder="34.7818"
-                  step={0.000001}
-                  precision={6}
-                  onChange={(value) => {
-                    const lat = form.getFieldValue('latitude');
-                    if (typeof value === 'number' && typeof lat === 'number') {
-                      setMapPosition({ lat: lat, lng: value });
+                  value={values.longitude ?? ''}
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    const num = raw === '' ? null : parseFloat(raw);
+                    setField('longitude', num);
+                    if (
+                      typeof num === 'number' &&
+                      !Number.isNaN(num) &&
+                      typeof values.latitude === 'number'
+                    ) {
+                      setMapPosition({ lat: values.latitude, lng: num });
                     }
                   }}
                 />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+              </div>
+            </div>
+          </SectionCard>
 
-        {/* Working Hours */}
-        <Card className="mb-4" title="שעות פעילות">
-          <Row gutter={16}>
-            <Col md={12}>
-              <Form.Item
-                label="ימים א׳-ה׳"
-                name="weekdayHours"
-                rules={[{ required: true, message: 'אנא הכנס שעות פעילות' }]}
-              >
-                <Input placeholder="ראשון - חמישי: 9:00 - 18:00" />
-              </Form.Item>
-            </Col>
-            <Col md={12}>
-              <Form.Item
-                label="יום שישי"
-                name="fridayHours"
-                rules={[{ required: true, message: 'אנא הכנס שעות פעילות' }]}
-              >
-                <Input placeholder="שישי: 9:00 - 13:00" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Working Hours */}
+          <SectionCard title={t.hoursCard}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('weekdayHours', t.weekdayHoursLabel, {
+                placeholder: t.weekdayHoursExample,
+                required: true,
+              })}
+              {renderText('fridayHours', t.fridayHoursLabel, {
+                placeholder: t.fridayHoursExample,
+                required: true,
+              })}
+            </div>
+          </SectionCard>
 
-        {/* Social Media */}
-        <Card className="mb-4" title="רשתות חברתיות - מספר 1">
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Facebook 1 URL" name="facebook">
-                <Input placeholder="https://facebook.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label="שם Facebook 1" name="facebookName">
-                <Input placeholder="יוסי כהן" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Instagram 1 URL" name="instagram">
-                <Input placeholder="https://instagram.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label="שם Instagram 1" name="instagramName">
-                <Input placeholder="יוסי כהן" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="LinkedIn" name="linkedin">
-                <Input placeholder="https://linkedin.com/..." />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Social Media */}
+          <SectionCard title={t.socialCard1}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('facebook', 'Facebook 1 URL', { placeholder: 'https://facebook.com/...' })}
+              {renderText('facebookName', t.facebookName1Label, { placeholder: t.personPlaceholder1 })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('instagram', 'Instagram 1 URL', { placeholder: 'https://instagram.com/...' })}
+              {renderText('instagramName', t.instagramName1Label, { placeholder: t.personPlaceholder1 })}
+            </div>
+            {/* single field — full-width row (no empty grid cell) */}
+            <div className="grid grid-cols-1 gap-4">
+              {renderText('linkedin', 'LinkedIn', { placeholder: 'https://linkedin.com/...' })}
+            </div>
+          </SectionCard>
 
-        {/* Second Social Media */}
-        <Card className="mb-4" title="רשתות חברתיות - מספר 2 (אופציונלי)">
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Facebook 2 URL" name="facebook2">
-                <Input placeholder="https://facebook.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label="שם Facebook 2" name="facebookName2">
-                <Input placeholder="דוד לוי" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col md={8}>
-              <Form.Item label="Instagram 2 URL" name="instagram2">
-                <Input placeholder="https://instagram.com/..." />
-              </Form.Item>
-            </Col>
-            <Col md={8}>
-              <Form.Item label="שם Instagram 2" name="instagramName2">
-                <Input placeholder="דוד לוי" />
-              </Form.Item>
-            </Col>
-          </Row>
-        </Card>
+          {/* Second Social Media */}
+          <SectionCard title={t.socialCard2}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('facebook2', 'Facebook 2 URL', { placeholder: 'https://facebook.com/...' })}
+              {renderText('facebookName2', t.facebookName2Label, { placeholder: t.personPlaceholder2 })}
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {renderText('instagram2', 'Instagram 2 URL', { placeholder: 'https://instagram.com/...' })}
+              {renderText('instagramName2', t.instagramName2Label, { placeholder: t.personPlaceholder2 })}
+            </div>
+          </SectionCard>
 
-        {/* Submit */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={saving}
-            icon={<SaveOutlined />}
-          >
-            שמור שינויים
-          </Button>
-        </div>
-      </Form>
+          {/* Submit */}
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="submit" size="lg" disabled={saving}>
+              {saving ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {t.saveButton}
+            </Button>
+          </div>
+        </fieldset>
+      </form>
     </div>
   );
 }

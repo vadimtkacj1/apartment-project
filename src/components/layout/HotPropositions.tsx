@@ -1,14 +1,13 @@
 "use client";
 
-import { memo, useEffect, useState } from "react";
+import { useMemo, memo, useEffect, useState, type CSSProperties } from "react";
 import { m } from "framer-motion";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Autoplay } from "swiper/modules";
+import { usePerformanceSettings } from "@/lib/usePerformanceSettings";
+import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import PropertyCard from "@/components/properties/PropertyCard";
+import SectionEyebrow from "@/components/ui/SectionEyebrow";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
-
-import "swiper/css";
 
 // Type for apartment data
 interface Property {
@@ -39,89 +38,82 @@ interface Property {
   features?: any;
 }
 
-/** How many cards to show per deal-type group. The heading links to the full
-    listing, so this stays a curated preview rather than an endless list. */
-const MAX_PER_GROUP = 8;
-
 /**
- * Infinite, self-advancing property carousel. It scrolls on its own — Swiper
- * `loop` + autoplay steps ONE card forward every few seconds — and pauses while
- * the pointer is over it so a visitor can read a card; cards stay draggable.
- *
- * Stepped (not a continuous marquee) on purpose: it settles on WHOLE cards
- * between steps instead of leaving cards cropped mid-flow at the edges, and moves
- * at a relaxed pace (`delay` 4.5s, smooth 0.9s transition). Integer
- * `slidesPerView` at every breakpoint keeps cards whole — no fractional peek.
- *
- * Auto-scroll only engages when a group has more cards than fit (desktop shows
- * 3); a smaller group is a static, centered row.
+ * Marquee Row Component utilizing Framer Motion for high-performance looping.
  */
-const PropertyCarousel = ({ items }: { items: Property[] }) => {
-  const autoScroll = items.length > 3;
+const MarqueeRow = ({
+  items,
+  direction = "left",
+  duration = 40,
+  isMobile = false
+}: {
+  items: Property[],
+  direction?: "left" | "right",
+  duration?: number,
+  isMobile?: boolean
+}) => {
+  const duplicatedItems = useMemo(() => {
+    // Guarantee smooth infinite carousel even when there are few items
+    if (items.length === 1) {
+      // One item – duplicate more times to avoid big empty gaps
+      return [...items, ...items, ...items, ...items];
+    }
+    if (items.length === 2) {
+      // Two items – 3 cycles give good density
+      return [...items, ...items, ...items];
+    }
+
+    // 3+ items – standard behavior
+    return isMobile ? [...items, ...items] : [...items, ...items, ...items];
+  }, [items, isMobile]);
+
+  const animationDuration = isMobile ? duration * 0.8 : duration;
+
+  const xInitial = direction === "left" ? "0%" : (isMobile ? "-50%" : "-33.33%");
+  const xAnimate = direction === "left" ? (isMobile ? "-50%" : "-33.33%") : "0%";
 
   return (
-    <div className="relative">
-      <Swiper
-        modules={[A11y, Autoplay]}
-        spaceBetween={24}
-        slidesPerView={1}
-        grabCursor
-        loop={autoScroll}
-        autoplay={autoScroll ? { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
-        speed={900}
-        watchOverflow
-        centerInsufficientSlides={!autoScroll}
-        breakpoints={{
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
-        }}
-        className="!px-1 !py-1"
+    // CSS-driven marquee: the transform loop lives in a keyframe (see the
+    // <style> block in the section) so it can pause on hover / keyboard-focus,
+    // letting a moving card be clicked without a drag-interception hack.
+    <div className="hp-marquee-viewport flex w-full overflow-hidden" style={{ direction: 'ltr' }}>
+      <div
+        className="hp-marquee-track flex gap-4 md:gap-6 py-4 md:py-6"
+        style={{
+          animation: `hp-marquee-x ${animationDuration}s linear infinite`,
+          willChange: 'transform',
+          '--hp-from': xInitial,
+          '--hp-to': xAnimate,
+        } as CSSProperties}
       >
-        {items.map((item: Property, i: number) => {
+        {duplicatedItems.map((item: Property, i: number) => {
           const cardProps = {
             ...item,
             propertyType: item.propertyType as PropertyType | undefined,
             index: i,
-            // The <a> wrapper handles navigation, so the card's own click is
-            // disabled to avoid a double push.
-            disableClick: true,
+            disableClick: true
           };
           return (
-            <SwiperSlide key={`hot-proposition-card-${item.id}-${i}`} className="!h-auto">
-              <a
-                href={`/apartments/${item.id}`}
-                onClick={() => {
-                  if (!item.isSold) {
-                    analytics.trackPropertyClick(item.id, 'hot-proposition');
-                  }
-                }}
-                className="block h-full"
-              >
-                <PropertyCard {...cardProps} />
-              </a>
-            </SwiperSlide>
+            <a
+              key={`hot-proposition-card-${direction}-${i}`}
+              href={`/apartments/${item.id}`}
+              onClick={() => {
+                if (!item.isSold) {
+                  analytics.trackPropertyClick(item.id, 'hot-proposition');
+                }
+              }}
+              draggable={false}
+              className="w-[320px] sm:w-[340px] md:w-[360px] shrink-0 block select-none"
+              style={{ cursor: 'pointer' }}
+            >
+              <PropertyCard {...cardProps} />
+            </a>
           );
         })}
-      </Swiper>
+      </div>
     </div>
   );
 };
-
-/** Heading above each grid, doubling as a link to the matching listing page. */
-const RowTitle = ({ children, href }: { children: React.ReactNode; href: string }) => (
-  <div className="mb-6 md:mb-8 flex items-center justify-center gap-3">
-    <span className="h-px w-8 md:w-14 bg-[#c5a357]" aria-hidden="true" />
-    <h3
-      className="text-3xl md:text-4xl font-black text-[#1c3664] tracking-tight"
-      style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
-    >
-      <a href={href} className="hover:text-[#c5a357] transition-colors">
-        {children}
-      </a>
-    </h3>
-    <span className="h-px w-8 md:w-14 bg-[#c5a357]" aria-hidden="true" />
-  </div>
-);
 
 interface HotPropositionsProps {
   initialProperties?: Property[];
@@ -129,6 +121,8 @@ interface HotPropositionsProps {
 }
 
 function HotPropositions({ initialProperties, initialTitle }: HotPropositionsProps = {}) {
+  const { isMobile } = usePerformanceSettings();
+  const reduced = usePrefersReducedMotion();
   const [properties, setProperties] = useState<Property[]>(initialProperties ?? []);
   const [loading, setLoading] = useState(initialProperties === undefined);
   const [title, setTitle] = useState(initialTitle ?? 'הצעות חמות');
@@ -203,12 +197,6 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // One carousel per deal type: sale first, rent second. `dealType` is already
-  // resolved upstream (SSR maps category -> dealType), so trust it and treat
-  // anything non-rent as a sale.
-  const forSale = properties.filter((p) => p.dealType !== 'rent');
-  const forRent = properties.filter((p) => p.dealType === 'rent');
-
   if (loading) {
     return (
       <section className="relative pt-16 md:pt-24 lg:pt-32 pb-8 md:pb-12 overflow-hidden w-full" dir="rtl">
@@ -224,10 +212,17 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
   }
 
   return (
-    // `bg-white` overrides the page-wide `bg-warm` (#faf7f2) cream that otherwise
-    // shows through behind the carousel — the user wanted that beige removed from
-    // under this section.
-    <section className="relative py-16 md:py-20 overflow-hidden w-full bg-white" dir="rtl">
+    <section className="relative py-16 md:py-20 overflow-hidden w-full" dir="rtl">
+      <style>{`
+        @keyframes hp-marquee-x {
+          from { transform: translateX(var(--hp-from)); }
+          to   { transform: translateX(var(--hp-to)); }
+        }
+        .hp-marquee-viewport:hover .hp-marquee-track,
+        .hp-marquee-viewport:focus-within .hp-marquee-track {
+          animation-play-state: paused;
+        }
+      `}</style>
       <div className="relative z-10 w-full">
         {/* Section Header */}
         <m.div
@@ -244,35 +239,47 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
-              מבחר נכסים
-            </span>
+            <SectionEyebrow>מבחר נכסים</SectionEyebrow>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
         </m.div>
 
-        {/* Carousel rows — one per deal type. A group with no properties is
-            skipped entirely (title included) rather than left as an empty strip.
-            Centered in a rem container so it uses the extra width on large
-            screens without stretching edge-to-edge. */}
-        <div className="flex flex-col gap-14 md:gap-20 w-full max-w-7xl mx-auto px-4 md:px-6">
-          {forSale.length > 0 && (
-            <div className="w-full">
-              <RowTitle href="/apartments?dealType=sale">נכסים למכירה</RowTitle>
-              <PropertyCarousel items={forSale.slice(0, MAX_PER_GROUP)} />
-            </div>
-          )}
-
-          {forRent.length > 0 && (
-            <div className="w-full">
-              <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
-              <PropertyCarousel items={forRent.slice(0, MAX_PER_GROUP)} />
-            </div>
-          )}
-        </div>
+        {/* Reduced motion → static 3-up grid; otherwise the paused-on-hover marquee */}
+        {reduced ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 md:px-6">
+            {properties.slice(0, 3).map((item, i) => (
+              <a
+                key={`hot-proposition-static-${item.id}`}
+                href={`/apartments/${item.id}`}
+                onClick={() => {
+                  if (!item.isSold) {
+                    analytics.trackPropertyClick(item.id, 'hot-proposition');
+                  }
+                }}
+                className="block"
+              >
+                <PropertyCard
+                  {...item}
+                  propertyType={item.propertyType as PropertyType | undefined}
+                  index={i}
+                  disableClick={true}
+                />
+              </a>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 w-full">
+            <MarqueeRow
+              items={properties}
+              direction="left"
+              duration={60}
+              isMobile={isMobile}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

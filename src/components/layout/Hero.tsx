@@ -1,28 +1,23 @@
 import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { Search } from 'lucide-react';
 import HeroMedia from './HeroMedia';
+import { ISRAELI_CITIES } from '@/data/cities';
 
 /**
- * Server component: the headline text ships in the initial HTML so LCP fires
- * at first paint instead of after hydration. The typewriter look is recreated
- * with CSS steps() clip-path reveals — zero JS, no per-keystroke re-layouts.
+ * Server component: the headline/subtitle text ships in the initial HTML so LCP
+ * fires at first paint instead of after hydration. The only interactive element
+ * is a plain <a> to /apartments — no client JS needed, keeping this a server
+ * component and preserving the LCP-first strategy.
  */
 const Hero: React.FC = () => {
-  const line1 = 'רם נכסים';
-  const line2 = 'חיים ענבי';
-
   return (
-    // minHeight (below), not a fixed height: on a SHORT viewport a fixed 100dvh
-    // forces the centred content to overflow upward under the fixed navbar (the
-    // heading landed on the logo). min-height lets the hero grow to fit its
-    // content + top padding instead, so the content always clears the navbar.
     <section
       dir="rtl"
-      className="relative w-full overflow-hidden md:flex md:items-center"
-      style={{ minHeight: '100dvh', maxWidth: '100vw' }}
+      className="relative w-full overflow-hidden"
+      style={{ height: '100dvh', maxWidth: '100vw' }}
     >
       <style>{`
+        /* HeroMedia relies on these two classes — keep them here. */
         .hero-video-wrap {
           position: absolute;
           inset: 0;
@@ -43,316 +38,238 @@ const Hero: React.FC = () => {
         .hero-video[poster] {
           background: transparent;
         }
-        /* RTL typewriter: reveal right-to-left in discrete steps.
-           Negative outsets keep the text-shadow from being clipped. */
-        @keyframes typeReveal {
-          from { clip-path: inset(-40px -40px -40px 100%); }
-          to   { clip-path: inset(-40px -40px -40px -40px); }
-        }
-        .type-line1 {
-          animation: typeReveal 0.45s steps(8, end) 0.35s both;
-        }
-        .type-line2 {
-          animation: typeReveal 0.45s steps(8, end) 0.95s both;
-        }
-        @keyframes ampPop {
-          from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-          to   { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-        .amp-pop {
-          animation: ampPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.85s both;
-        }
-        /* Scrim over the video: it is bright (pale façade, sky) and text-shadow
-           alone doesn't carry the subtitle. A full-bleed gradient rather than a
-           blob behind the text — an ellipse sized to the text box shows its own
-           edge as a dark smudge once the box is smaller than the hero (desktop).
-           Phones: a horizontal band through the centred content.
-           md+ (RTL, text on the right): fades in from the right edge. */
-        .hero-scrim {
-          position: absolute;
-          inset: 0;
-          z-index: 10;
-          pointer-events: none;
-          background: linear-gradient(
-            180deg,
-            rgba(0,0,0,0.12) 0%,
-            rgba(0,0,0,0.55) 28%,
-            rgba(0,0,0,0.55) 64%,
-            rgba(0,0,0,0.15) 100%
-          );
-        }
-        @media (min-width: 768px) {
-          .hero-scrim {
-            background: linear-gradient(
-              to left,
-              rgba(0,0,0,0.72) 0%,
-              rgba(0,0,0,0.5) 28%,
-              rgba(0,0,0,0.18) 52%,
-              rgba(0,0,0,0) 75%
-            );
-          }
-        }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(30px); }
+
+        @keyframes heroFadeUp {
+          from { opacity: 0; transform: translateY(22px); }
           to   { opacity: 1; transform: none; }
         }
-        .hero-fade-1 { animation: fadeUp 0.7s ease-out 1.55s both; }
-        .hero-fade-2 { animation: fadeUp 0.7s ease-out 1.75s both; }
-        @keyframes cursorBlink {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
+        .hero-fade { animation: heroFadeUp 0.7s ease-out both; }
+
+        .hero-cta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.85rem 2.2rem;
+          border-radius: 12px;
+          font-weight: 700;
+          font-size: 1.05rem;
+          text-decoration: none;
+          transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
-        @keyframes cursorHide {
-          to { opacity: 0; visibility: hidden; }
-        }
-        .cursor {
-          display: inline-block;
-          width: 3px;
-          height: 0.85em;
+        .hero-cta:active { transform: none; }
+        .hero-cta:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
+        /* Primary: solid white on the dark video, with a soft navy lift-shadow. */
+        .hero-cta--primary {
           background: #ffffff;
-          margin-right: 4px;
-          vertical-align: middle;
-          border-radius: 1px;
-          opacity: 0;
-          animation:
-            cursorBlink 0.7s step-end 1.4s 2,
-            cursorHide 0.01s linear 2.8s forwards;
+          color: #051150;
+          box-shadow: 0 6px 20px rgba(5,17,80,0.28);
         }
+        .hero-cta--primary:hover {
+          background: rgba(255,255,255,0.92);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 28px rgba(5,17,80,0.34);
+        }
+        /* Secondary: glass ghost — a restrained second path (contact). */
+        .hero-cta--ghost {
+          background: rgba(255,255,255,0.06);
+          color: #ffffff;
+          border: 1px solid rgba(255,255,255,0.55);
+          backdrop-filter: blur(2px);
+        }
+        .hero-cta--ghost:hover {
+          background: rgba(255,255,255,0.16);
+          border-color: #ffffff;
+          transform: translateY(-2px);
+        }
+
+        /* Search pill — 1:1 the Refero reference spec (segmented white pill):
+           label 12px/600 over value 14px, 1px hairline dividers between
+           segments, circular brand trigger at the end, exact layered shadow
+           stack rgba(0,0,0,.02) ring + .04 mid + .10 drop. */
+        .hero-pill {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          max-width: 560px;
+          background: #ffffff;
+          border-radius: 9999px;
+          padding: 6px;
+          padding-inline-start: 0;
+          box-shadow: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px 0px, rgba(0,0,0,0.1) 0px 4px 8px 0px;
+        }
+        .hero-pill-seg {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 1px;
+          min-width: 0;
+          padding-block: 8px;
+          padding-inline: 26px 16px;
+          text-align: start;
+          cursor: pointer;
+        }
+        .hero-pill-seg--grow { flex: 1; }
+        .hero-pill-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #051150;
+          line-height: 1.2;
+        }
+        .hero-pill-seg select {
+          appearance: none;
+          -webkit-appearance: none;
+          border: 0;
+          padding: 0;
+          background: transparent;
+          font-family: inherit;
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748B;
+          cursor: pointer;
+          max-width: 100%;
+        }
+        .hero-pill-seg select:focus-visible { outline: 2px solid #354AC4; outline-offset: 2px; border-radius: 4px; }
+        .hero-pill-div {
+          flex: none;
+          width: 1px;
+          height: 32px;
+          background: #E4E8F2;
+        }
+        .hero-pill-btn {
+          flex: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          border: 0;
+          border-radius: 50%;
+          background: #354AC4;
+          color: #ffffff;
+          cursor: pointer;
+          transition: background-color 0.15s ease;
+          margin-inline-start: 8px;
+        }
+        .hero-pill-btn:hover { background: #28389B; }
+        .hero-pill-btn:focus-visible { outline: 2px solid #ffffff; outline-offset: 2px; }
+        @media (max-width: 420px) {
+          .hero-pill-seg { padding-inline: 18px 10px; }
+        }
+
+        /* Scroll affordance for the full-height hero. */
+        .hero-scroll {
+          position: absolute;
+          bottom: 1.6rem;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 20;
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+          color: rgba(255,255,255,0.82);
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.08em;
+          text-decoration: none;
+        }
+        .hero-scroll:hover { color: #ffffff; }
+        .hero-scroll:focus-visible { outline: 2px solid #ffffff; outline-offset: 4px; border-radius: 6px; }
+        .hero-scroll svg { animation: heroBob 1.8s ease-in-out infinite; }
+        @keyframes heroBob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(6px); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          .type-line1, .type-line2, .amp-pop, .hero-fade-1, .hero-fade-2 {
-            animation: none;
-          }
-          .cursor { animation: none; opacity: 0; }
-        }
-        @keyframes shineSwipe {
-          0%   { transform: translateX(-200%) skewX(-20deg); }
-          100% { transform: translateX(400%) skewX(-20deg); }
-        }
-        .btn-primary:hover .btn-shine {
-          animation: shineSwipe 0.5s ease forwards;
-        }
-        .btn-primary {
-          box-shadow: 0 0 20px 2px rgba(212,168,67,0.3), 0 4px 16px rgba(0,0,0,0.4);
-          transition: box-shadow 0.3s ease;
-        }
-        .btn-primary:hover {
-          box-shadow: 0 0 30px 4px rgba(212,168,67,0.5), 0 4px 20px rgba(0,0,0,0.4);
-        }
-        .btn-green:hover .btn-shine {
-          animation: shineSwipe 0.5s ease forwards;
-        }
-        .btn-green {
-          box-shadow: 0 0 20px 2px rgba(34,197,94,0.3), 0 4px 16px rgba(0,0,0,0.4);
-          transition: box-shadow 0.3s ease;
-        }
-        .btn-green:hover {
-          box-shadow: 0 0 30px 4px rgba(34,197,94,0.5), 0 4px 20px rgba(0,0,0,0.4);
-        }
-        .btn-secondary {
-          transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        .btn-secondary:hover {
-          background: rgba(255,255,255,0.13) !important;
-          border-color: rgba(255,255,255,0.7) !important;
-          box-shadow: 0 0 24px rgba(255,255,255,0.12);
-        }
-        .btn-lift {
-          transition: transform 0.25s ease;
-        }
-        .btn-lift:hover { transform: translateY(-3px) scale(1.02); }
-        .btn-lift:active { transform: scale(0.97); }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
+          .hero-fade { animation: none; }
+          .hero-cta { transition: none; }
+          .hero-scroll svg { animation: none; }
         }
       `}</style>
 
-      {/* ── Video / poster ── */}
+      {/* ── Video / poster (+ möbius scrim) ── */}
       <HeroMedia />
 
-      {/* Readability scrim, between the video (z-0) and the content (z-20) */}
-      <div className="hero-scrim" aria-hidden="true" />
-
       {/* ── Content ── */}
-      {/* One shared container for ALL hero content. Best-practice responsive
-          hero: content is CENTERED on narrow screens (phones/tablets read best
-          centered) and flips to the RTL start edge (right) from md up, where a
-          side-anchored text block over the video reads better. Elements share
-          the same axis at each breakpoint so nothing staircases. */}
-      {/* Same container as the navbar and the content sections below —
-          `max-w-7xl mx-auto px-4 md:px-6` — so the hero heading/buttons line up
-          with the logo above and the sections beneath on every width, instead of
-          sitting in their own wider 3200px box. */}
       <div
-        className="
-          relative z-20 min-h-[100dvh] md:min-h-0 md:h-auto w-full
-          max-w-7xl mx-auto
-          px-4 md:px-6
-          flex flex-col
-          items-center md:items-start
-          justify-center
-          gap-6 md:gap-10 xl:gap-14
-          pt-24 pb-10 md:py-24
-        "
+        className="relative z-20 h-full w-full px-6 md:px-16 xl:px-20 flex flex-col items-center justify-center text-center"
+        style={{ maxWidth: '2400px', margin: '0 auto' }}
       >
+        <div className="flex flex-col items-center gap-6 w-full max-w-3xl">
 
-        {/* TOP: heading + subtitle */}
-        <div className="flex flex-col items-center md:items-start w-full">
-
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
-            <h1
-              className="font-black text-white leading-none whitespace-nowrap shrink-0"
-              style={{
-                fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
-                textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
-                WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
-                paintOrder: 'stroke',
-                minWidth: '1ch',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span className="type-line1 inline-block">{line1}</span>
-            </h1>
-
-            <span
-              className="amp-pop relative shrink-0 inline-block"
-              style={{ width: 'clamp(1.3rem, 3.7vw, 5.75rem)', height: 'clamp(1.3rem, 3.7vw, 5.75rem)' }}
-            >
-              <Image
-                src="/images/and.png"
-                alt="&"
-                fill
-                className="object-contain"
-                style={{ filter: 'brightness(0) invert(1)' }}
-                priority
-              />
-            </span>
-
-            <h1
-              className="font-black text-white leading-none whitespace-nowrap shrink-0"
-              style={{
-                fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
-                textShadow: '0 1px 2px rgba(0,0,0,0.45), 0 2px 18px rgba(0,0,0,0.55)',
-                WebkitTextStroke: '1.1px rgba(0,0,0,0.45)',
-                paintOrder: 'stroke',
-                minWidth: '1ch',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span className="type-line2 inline-block">{line2}</span>
-              <span className="cursor" />
-            </h1>
-          </div>
+          <h1
+            className="hero-fade"
+            style={{
+              animationDelay: '0.1s',
+              fontFamily: 'var(--font-caramel), sans-serif',
+              color: '#ffffff',
+              fontWeight: 900,
+              lineHeight: 1.08,
+              fontSize: 'clamp(2.2rem, 7vw, 4.75rem)',
+              textShadow: '0 2px 24px rgba(5,17,80,0.45)',
+              textWrap: 'balance',
+            }}
+          >
+            מוצאים לכם את הדירה הנכונה בחולון והמרכז
+          </h1>
 
           <p
-            className="hero-fade-1 text-white font-medium max-w-2xl xl:max-w-4xl 2xl:max-w-[80rem] leading-relaxed text-center md:text-start"
-            style={{ fontSize: 'clamp(0.82rem, 1.5vw, 2.6rem)', textShadow: '0 1px 2px rgba(0,0,0,0.7), 0 1px 10px rgba(0,0,0,0.55)', WebkitTextStroke: '0.5px rgba(0,0,0,0.3)', paintOrder: 'stroke' }}
+            className="hero-fade leading-relaxed"
+            style={{
+              animationDelay: '0.22s',
+              color: 'rgba(255,255,255,0.88)',
+              maxWidth: '42rem',
+              fontWeight: 400,
+              fontSize: 'clamp(1rem, 1.8vw, 1.25rem)',
+              textShadow: '0 1px 12px rgba(5,17,80,0.5)',
+            }}
           >
             מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
           </p>
+
+          {/* search pill — 1:1 reference anatomy; server-rendered GET form */}
+          <form action="/apartments" method="GET" className="hero-pill hero-fade mt-3" style={{ animationDelay: '0.34s' }}>
+            <label className="hero-pill-seg">
+              <span className="hero-pill-label">סוג עסקה</span>
+              <select name="dealType" defaultValue="sale">
+                <option value="sale">לקנייה</option>
+                <option value="rent">להשכרה</option>
+              </select>
+            </label>
+            <span aria-hidden="true" className="hero-pill-div" />
+            <label className="hero-pill-seg hero-pill-seg--grow">
+              <span className="hero-pill-label">איפה</span>
+              <select name="city" defaultValue="holon">
+                <option value="">כל הערים</option>
+                {ISRAELI_CITIES.slice(0, 12).map((c) => (
+                  <option key={c.value} value={c.value}>{c.label}</option>
+                ))}
+              </select>
+            </label>
+            <button type="submit" className="hero-pill-btn" aria-label="חיפוש נכסים">
+              <Search size={19} aria-hidden="true" />
+            </button>
+          </form>
+
+          <a
+            href="#contact"
+            className="hero-fade mt-1 text-[14.5px] font-semibold text-white/85 underline-offset-4 hover:underline"
+            style={{ animationDelay: '0.44s' }}
+          >
+            או דברו איתנו ישירות
+          </a>
+
         </div>
-
-        {/* BOTTOM: CTA buttons — centered on narrow screens, right-aligned from
-            md up, matching the heading/subtitle above. Full-width only on true
-            phones (<sm); a fixed 340px block from sm up so they never sprawl. */}
-        <div className="hero-fade-2 flex flex-col gap-4 items-center md:items-start w-full">
-          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
-            <Link
-              href="/apartments?dealType=sale"
-              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
-              style={{
-                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
-                background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
-                color: '#1C1000',
-                textAlign: 'center',
-                letterSpacing: '0.04em',
-                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span
-                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                  transform: 'translateX(-200%) skewX(-20deg)',
-                }}
-              />
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                נכסים למכירה
-                <svg viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            </Link>
-          </div>
-
-          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
-            <Link
-              href="/apartments?dealType=rent"
-              className="btn-primary group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
-              style={{
-                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
-                background: 'linear-gradient(135deg, #B8821E 0%, #F2C443 50%, #C8922A 100%)',
-                color: '#1C1000',
-                textAlign: 'center',
-                letterSpacing: '0.04em',
-                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span
-                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                  transform: 'translateX(-200%) skewX(-20deg)',
-                }}
-              />
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                נכסים להשכרה
-                <svg viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            </Link>
-          </div>
-
-          <div className="btn-lift w-full max-w-[20rem] sm:max-w-none sm:w-auto">
-            <Link
-              href="#onethepark"
-              className="btn-green group relative block overflow-hidden w-full sm:w-auto sm:min-w-[18rem] rounded-2xl font-bold"
-              style={{
-                padding: 'clamp(0.6rem, 0.85vw, 1.25rem) clamp(1rem, 2vw, 2.5rem)',
-                background: 'linear-gradient(135deg, #15803D 0%, #22C55E 50%, #16A34A 100%)',
-                color: '#ffffff',
-                textAlign: 'center',
-                letterSpacing: '0.04em',
-                fontSize: 'clamp(0.9rem, 1vw, 1.35rem)',
-                fontFamily: 'var(--font-caramel), cursive, sans-serif',
-              }}
-            >
-              <span
-                className="btn-shine pointer-events-none absolute top-0 left-0 h-full w-1/3"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
-                  transform: 'translateX(-200%) skewX(-20deg)',
-                }}
-              />
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                <span dir="ltr">One The Park</span>
-                <svg viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={{ width: '1.05em', height: '1.05em', transform: 'scaleX(-1)', flexShrink: 0 }}>
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </span>
-            </Link>
-          </div>
-        </div>
-
       </div>
+
+      {/* Scroll affordance → first content section below the hero */}
+      <a href="#hero-next" className="hero-scroll hero-fade" style={{ animationDelay: '0.5s' }} aria-label="גלול למטה">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </a>
     </section>
   );
 };

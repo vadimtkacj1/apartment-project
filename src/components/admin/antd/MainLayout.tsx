@@ -2,32 +2,29 @@
 
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Layout } from 'antd';
 import Sidenav from './Sidenav';
 import Header from './Header';
 import Footer from './Footer';
-
-const { Header: AntHeader, Content, Sider } = Layout;
+import { useAdminI18n } from '@/lib/adminI18n';
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
+/**
+ * Admin shell. Renders plain semantic elements but KEEPS the antd-era
+ * structural class names (`ant-layout`, `sider-primary`, `content-ant`, …) so
+ * the existing layout/sidebar/header CSS in antd-admin.css keeps applying
+ * unchanged after the antd → shadcn swap.
+ */
 export default function MainLayout({ children }: MainLayoutProps) {
-  // Mobile-first defaults: SSR / first paint render the CLOSED, mobile state so
-  // a phone never flashes the open sidebar (and its 250px content margin) before
-  // JS runs. The matchMedia effect promotes to the open desktop state on mount.
   const [collapsed, setCollapsed] = useState(true);
   const [isMobile, setIsMobile] = useState(true);
-  const sidenavColor = '#1C3664';
+  const { dir } = useAdminI18n();
 
   const pathname = usePathname();
   const page = pathname.replace('/admin/', '').replace('/admin', '');
 
-  // Single source of truth for "are we in overlay (mobile) mode": one matchMedia
-  // query, which also fires reliably on orientationchange. Crossing the 992px
-  // breakpoint re-syncs the default (desktop = open, mobile = closed); it does
-  // not fire on every resize tick, so a manual toggle within a range is kept.
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 991px)');
     const apply = (matches: boolean) => {
@@ -40,20 +37,14 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  // On phones, auto-close the overlay after a navigation so tapping a nav item
-  // doesn't leave the menu + backdrop covering the new page. The permanent
-  // desktop sider is untouched.
-  //
-  // Query matchMedia directly instead of reading `isMobile`: on mount this effect
-  // runs with the FIRST render's closure, where isMobile is still its `true`
-  // default — so it re-collapsed the sider on desktop right after the matchMedia
-  // effect had opened it, and the sidebar never showed until you hit the burger.
+  // Auto-close the overlay after a navigation on phones. Read the viewport
+  // directly (not the isMobile state) so this never fires on the initial mount
+  // with a stale value and wrongly collapses the permanent desktop sidebar.
   useEffect(() => {
     if (window.matchMedia('(max-width: 991px)').matches) setCollapsed(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Lock body scroll while the overlay sidebar is open on mobile, so the page
-  // behind the dim backdrop can't scroll under the finger.
   useEffect(() => {
     const lock = !collapsed && isMobile;
     document.body.style.overflow = lock ? 'hidden' : '';
@@ -66,31 +57,27 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const closeSidebar = () => setCollapsed(true);
 
   return (
-    <Layout
+    <div
       className={`layout-dashboard ${collapsed ? 'sidebar-collapsed' : 'sidebar-open'}`}
-      dir="rtl"
+      dir={dir}
     >
-      {/* Dim backdrop — only on mobile, where the sidebar overlays content */}
       {!collapsed && isMobile && (
         <div className="sidebar-backdrop" onClick={closeSidebar} aria-hidden="true" />
       )}
 
-      <Sider
-        trigger={null}
-        width={250}
-        theme="light"
-        className="sider-primary ant-layout-sider-primary"
-      >
-        <Sidenav color={sidenavColor} onClose={closeSidebar} />
-      </Sider>
+      <aside className="ant-layout-sider sider-primary">
+        <div className="ant-layout-sider-children">
+          <Sidenav onClose={closeSidebar} />
+        </div>
+      </aside>
 
-      <Layout>
-        <AntHeader>
+      <div className="ant-layout">
+        <header className="ant-layout-header">
           <Header onPress={toggleSidebar} collapsed={collapsed} name={page} />
-        </AntHeader>
-        <Content className="content-ant">{children}</Content>
+        </header>
+        <main className="content-ant">{children}</main>
         <Footer />
-      </Layout>
-    </Layout>
+      </div>
+    </div>
   );
 }

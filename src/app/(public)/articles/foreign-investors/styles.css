@@ -1,6 +1,6 @@
 /* Article Page */
 .article-page {
-  background: #faf7f2;
+  background: #f5f7fb;
   min-height: 100vh;
 }
 
@@ -9,7 +9,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 2rem 4rem;
-  background: #faf7f2;
+  background: #f5f7fb;
 }
 
 /* Large screens (1920px and above) */
@@ -52,7 +52,7 @@
   line-height: 1.6;
 }
 .article-byline a {
-  color: #1c3664;
+  color: #354AC4;
   text-decoration: none;
 }
 .article-byline a:hover {
@@ -78,7 +78,7 @@
   padding: 0;
   direction: rtl;
   text-align: right;
-  background: #faf7f2;
+  background: #f5f7fb;
 }
 
 /* Featured hero image at the top of each article body */
@@ -90,7 +90,7 @@
   border-radius: 16px;
   display: block;
   margin: 0.5rem 0 2.5rem;
-  box-shadow: 0 12px 32px rgba(28, 54, 100, 0.14);
+  box-shadow: 0 12px 32px rgba(5, 17, 80, 0.14);
 }
 
 @media (max-width: 640px) {
@@ -111,7 +111,7 @@
   object-fit: cover;
   border-radius: 14px;
   display: block;
-  box-shadow: 0 10px 26px rgba(28, 54, 100, 0.12);
+  box-shadow: 0 10px 26px rgba(5, 17, 80, 0.12);
 }
 @media (max-width: 640px) {
   .article-inline-figure { margin: 2rem 0; }
@@ -144,7 +144,7 @@
 .article-section h2 {
   font-size: 2.25rem;
   font-weight: 700;
-  color: #1c3664;
+  color: #051150;
   margin: 2.5rem 0 1.5rem 0;
   line-height: 1.3;
 }
@@ -152,7 +152,7 @@
 .article-section h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1c3664;
+  color: #051150;
   margin: 2rem 0 1rem 0;
 }
 
@@ -190,7 +190,7 @@
 }
 
 .faq-item h3 {
-  color: #1c3664;
+  color: #051150;
   margin: 0 0 1rem 0;
   font-size: 1.4rem;
   font-weight: 600;
@@ -205,13 +205,13 @@
 
 /* CTA Section */
 .cta-section {
-  background: #1c3664;
+  background: #051150;
   color: white;
   padding: 3rem;
   border-radius: 12px;
   margin: 3rem 0;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(28, 54, 100, 0.2);
+  box-shadow: 0 4px 16px rgba(5, 17, 80, 0.2);
 }
 
 .cta-section h2 {
@@ -245,7 +245,7 @@
 }
 
 .keywords-section h3 {
-  color: #1c3664;
+  color: #051150;
   margin: 0 0 1.25rem 0;
   font-size: 1.25rem;
 }
@@ -264,29 +264,29 @@
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.95rem;
-  color: #1c3664;
+  color: #051150;
   border: 1px solid #d1d5db;
   transition: all 0.2s ease;
 }
 
 .keywords-list li:hover {
   background: #ffffff;
-  border-color: #1c3664;
+  border-color: #354AC4;
 }
 
 /* Text Emphasis */
 .emphasis {
   font-weight: 500;
-  color: #1c3664;
+  color: #051150;
 }
 
 strong {
-  color: #1c3664;
+  color: #051150;
   font-weight: 600;
 }
 
 em {
-  color: #1c3664;
+  color: #051150;
   font-style: normal;
   font-weight: 500;
 }
@@ -374,8 +374,8 @@ em {
    the generic coloured-side-bar callout card. */
 .definition-block {
   position: relative;
-  background: #fbf8f2;
-  border: 1px solid #e7dcc6;
+  background: #f5f7fb;
+  border: 1px solid #E4E8F2;
   border-radius: 3px;
   padding: 1.9rem 2rem 1.6rem;
   margin: 2.25rem 0 2.5rem;
@@ -385,8 +385,8 @@ em {
   position: absolute;
   top: -0.72rem;
   right: 1.75rem;
-  background: #1c3664;
-  color: #c5a357;
+  background: #051150;
+  color: #5594F1;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -400,7 +400,7 @@ em {
   color: #1f2937;
 }
 .definition-block .definition-term {
-  color: #1c3664;
+  color: #051150;
   font-weight: 700;
 }
 
@@ -419,7 +419,7 @@ em {
   caption-side: top;
   text-align: right;
   font-weight: 700;
-  color: #1c3664;
+  color: #051150;
   font-size: 1.2rem;
   margin-bottom: 0.9rem;
 }
@@ -431,18 +431,18 @@ em {
 }
 .geo-table thead th {
   background: transparent;
-  color: #1c3664;
+  color: #051150;
   font-weight: 700;
   padding-top: 0.4rem;
   padding-bottom: 0.65rem;
-  border-bottom: 2px solid #c5a357;
+  border-bottom: 2px solid #5594F1;
 }
 .geo-table tbody td {
   color: #374151;
-  border-bottom: 1px solid #e7dcc6;
+  border-bottom: 1px solid #E4E8F2;
 }
 .geo-table tbody td:first-child {
-  color: #1c3664;
+  color: #051150;
   font-weight: 600;
 }
 .geo-table tbody tr:last-child td {
@@ -468,7 +468,7 @@ em {
   position: absolute;
   right: 0;
   top: 0;
-  color: #c5a357;
+  color: #5594F1;
   font-weight: 700;
 }
 .geo-list.ordered {
@@ -482,7 +482,7 @@ em {
   height: 1.4rem;
   line-height: 1.4rem;
   text-align: center;
-  background: #1c3664;
+  background: #051150;
   color: #fff;
   border-radius: 50%;
   top: 0.25rem;
@@ -497,7 +497,7 @@ em {
   font-weight: 500;
 }
 .source-note a {
-  color: #1c3664;
+  color: #354AC4;
   text-decoration: underline;
 }
 
@@ -511,5 +511,187 @@ em {
   }
   .definition-block p {
     font-size: 1.05rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Readable measure
+   The article column is up to 1200px wide, which lets 1.125rem body text run
+   110–160 characters per line. Cap the running prose to a comfortable ~760px
+   measure (≈65–75 chars) centred in the column, while media and data
+   components deliberately break out wider than the text so they stay scannable.
+   ───────────────────────────────────────────────────────────────────────── */
+.article-body .lead-paragraph,
+.article-section > p,
+.article-section > h2,
+.article-section > h3,
+.article-section > ul,
+.article-section > ol {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.article-inline-figure,
+.article-section > .definition-block,
+.article-section > .geo-table-wrap {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "בעמוד הזה" — compact table of contents (ArticleToc.tsx)
+   Collapsed <details> below lg; open <nav> list on lg+.
+   ───────────────────────────────────────────────────────────────────────── */
+.article-toc {
+  max-width: 760px;
+  margin: 0 auto 2.5rem;
+}
+.article-toc-mobile,
+.article-toc-desktop {
+  background: #ffffff;
+  border: 1px solid #E4E8F2;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+.article-toc-desktop {
+  display: none;
+}
+.article-toc-mobile summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #051150;
+}
+.article-toc-mobile summary:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.article-toc-heading {
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+  color: #051150;
+  font-size: 1rem;
+}
+.article-toc-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.article-toc-desktop .article-toc-list {
+  margin-top: 0;
+}
+.article-toc-list a {
+  color: #354AC4;
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.article-toc-list a:hover {
+  color: #28389B;
+  text-decoration: underline;
+}
+.article-toc-list a:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (min-width: 1024px) {
+  .article-toc-mobile {
+    display: none;
+  }
+  .article-toc-desktop {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   "מאמרים נוספים" — related-article cards (RelatedArticles.tsx)
+   Scoped mirror of the hub card idiom: white card, hairline border,
+   navy-tinted shadow, calm lift on hover. (The hub's articles.css is not
+   imported here because its .article-content rules clash with the article
+   shell's class of the same name.)
+   ───────────────────────────────────────────────────────────────────────── */
+.related-articles {
+  max-width: 1000px;
+  margin: 3.5rem auto 0;
+}
+.related-articles-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #051150;
+  margin: 0 0 1.5rem;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.related-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #E4E8F2;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(5, 17, 80, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+.related-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(53, 74, 196, 0.3);
+  box-shadow: 0 12px 28px rgba(5, 17, 80, 0.12);
+}
+.related-card:focus-visible {
+  outline: 2px solid #354AC4;
+  outline-offset: 2px;
+}
+.related-card-image {
+  position: relative;
+  aspect-ratio: 1200 / 630;
+  background: #f5f7fb;
+}
+.related-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.related-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  flex-grow: 1;
+}
+.related-card-category {
+  color: #354AC4;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.related-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #1f2937;
+  transition: color 0.2s ease;
+}
+.related-card:hover .related-card-title {
+  color: #354AC4;
+}
+.related-card-meta {
+  margin-top: auto;
+  padding-top: 0.35rem;
+  color: #64748B;
+  font-size: 0.8125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .related-card,
+  .related-card:hover {
+    transform: none;
+    transition: none;
   }
 }

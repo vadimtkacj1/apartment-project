@@ -1,7 +1,7 @@
 /* Marketing Section Styles */
 .marketing-section {
   padding: 80px 20px;
-  background: #faf7f2;
+  background: #f5f7fb;
 }
 
 .marketing-container {
@@ -64,10 +64,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #354ac4;
   border-radius: 14px;
   color: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(5,17,80,0.14);
 }
 
 .feature-text h3 {
@@ -90,9 +90,9 @@
   color: #4a5568;
   margin-top: 30px;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  background: #eef1f8;
   border-radius: 12px;
-  border: 2px solid #667eea40;
+  border: 1px solid #dbe3f7;
   font-weight: 500;
 }
 

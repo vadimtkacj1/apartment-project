@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function HolonNeighborhoodsContent() {
@@ -60,6 +63,8 @@ export default function HolonNeighborhoodsContent() {
                 אחרי 24 שנים שאנחנו מוכרים ומשכירים דירות בכל רחבי העיר, הנה המדריך שלנו לשכונות המרכזיות — <strong>בגובה העיניים, מנקודת מבט של מי שחי את השטח.</strong>
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -151,7 +156,7 @@ export default function HolonNeighborhoodsContent() {
                     </tr>
                   </tbody>
                 </table>
-                <span className="source-note">מקור: סיווג איכותני על בסיס ניסיון השטח של רם נכסים חיים ענבי. שלבי ההתחדשות משתנים — בדקו את הסטטוס של מתחם ספציפי לפני רכישה. מחירי עסקאות אמת למ״ר זמינים במאגר עסקאות הנדל״ן של רשות המסים.</span>
+                <span className="source-note">מקור: סיווג איכותני על בסיס ניסיון השטח של Aiterra. שלבי ההתחדשות משתנים — בדקו את הסטטוס של מתחם ספציפי לפני רכישה. מחירי עסקאות אמת למ״ר זמינים במאגר עסקאות הנדל״ן של רשות המסים.</span>
               </div>
             </section>
 
@@ -171,6 +176,10 @@ export default function HolonNeighborhoodsContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="holon-neighborhoods" />
+            <RelatedArticles currentId="holon-neighborhoods" />
           </div>
         </article>
       </div>

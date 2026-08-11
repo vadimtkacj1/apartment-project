@@ -53,8 +53,8 @@ const ProcessSection: React.FC = () => {
       className="relative w-full py-24 md:py-32 overflow-hidden bg-warm"
     >
       {/* Background Decorative Elements */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-[#1c3664] rounded-full blur-3xl opacity-10"></div>
-      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute top-20 left-10 w-64 h-64 bg-[#051150] rounded-full blur-3xl opacity-10"></div>
+      <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#051150] rounded-full blur-3xl opacity-10"></div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
 
@@ -73,12 +73,12 @@ const ProcessSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="text-[#051150] font-bold text-lg uppercase tracking-wider">
               מדריך
             </span>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {title}
           </h2>
         </m.div>
@@ -104,7 +104,7 @@ const ProcessSection: React.FC = () => {
                 <div className="relative h-full bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
 
                   {/* Background Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 group-hover:from-[#1c3664]/90 group-hover:via-gray-800/85 group-hover:to-gray-900/90 transition-all duration-500"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-900/90 via-gray-800/85 to-gray-900/90 group-hover:from-[#051150]/90 group-hover:via-gray-800/85 group-hover:to-gray-900/90 transition-all duration-500"></div>
 
                   {/* Background Pattern */}
                   <div className="absolute inset-0 opacity-10">
@@ -115,7 +115,7 @@ const ProcessSection: React.FC = () => {
                   <div className="relative z-10 p-8 lg:p-10 h-full flex flex-col">
 
                     {/* Number Badge */}
-                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-[#1c3664] to-[#152a4f] rounded-full flex items-center justify-center shadow-2xl border-4 border-white group-hover:scale-110 transition-transform duration-500">
+                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-[#354AC4] rounded-full flex items-center justify-center shadow-lg border-4 border-white">
                       <span className="text-3xl font-black text-white">
                         {step.number}
                       </span>
@@ -123,8 +123,8 @@ const ProcessSection: React.FC = () => {
 
                     {/* Icon */}
                     <div className="mb-6 mt-8">
-                      <div className="w-16 h-16 bg-[#1c3664]/20 rounded-xl flex items-center justify-center group-hover:bg-[#1c3664]/30 transition-colors duration-300">
-                        <Icon className="w-8 h-8 text-[#1c3664] group-hover:text-white transition-colors duration-300" />
+                      <div className="w-16 h-16 bg-[#5594f1]/20 rounded-xl flex items-center justify-center group-hover:bg-[#5594f1]/30 transition-colors duration-300">
+                        <Icon className="w-8 h-8 text-[#5594f1] group-hover:text-white transition-colors duration-300" />
                       </div>
                     </div>
 
@@ -133,17 +133,11 @@ const ProcessSection: React.FC = () => {
                       {step.title}
                     </h3>
 
-                    {/* Divider */}
-                    <div className="w-16 h-1 bg-[#1c3664] mb-6"></div>
-
                     {/* Description */}
                     <p className="text-gray-200 text-base md:text-lg leading-relaxed">
                       {step.description}
                     </p>
                   </div>
-
-                  {/* Bottom Accent */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#1c3664] to-transparent"></div>
                 </div>
               </m.div>
             );

@@ -1,28 +1,96 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 :root {
   color-scheme: light;
-  --background: #f9f6f0;
+  /* Aiterra: cool blue-tinted neutrals (former warm beige ramp — var names kept) */
+  --background: #f4f6fb;
   --foreground: #171717;
-  --warm-beige: #faf7f2;
-  --warm-sand: #f9f6f0;
-  --warm-cream: #fdfbf7;
-  --warm-light: #fcf9f5;
-  --warm-lighter: #fefcfa;
+  --warm-beige: #f5f7fb;
+  --warm-sand: #f4f6fb;
+  --warm-cream: #fbfcfe;
+  --warm-light: #f9fbfe;
+  --warm-lighter: #fcfdff;
+
+  /* ===== shadcn/ui design tokens — Aiterra admin (indigo #354AC4) =====
+     Additive: the public site never uses bg-primary/bg-card/border-border, so
+     these only feed the admin's shadcn primitives (src/components/shadcn/*). */
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+  --popover: #ffffff;
+  --popover-foreground: #1e293b;
+  --primary: #354ac4;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2fb;
+  --secondary-foreground: #354ac4;
+  --muted: #f4f6fb;
+  --muted-foreground: #64748b;
+  --accent: #e8f0fd;
+  --accent-foreground: #354ac4;
+  --destructive: #c0392b;
+  --destructive-foreground: #ffffff;
+  --border: #e4e8f2;
+  --input: #d8deec;
+  --ring: #354ac4;
+  --radius: 0.625rem;
+
+  /* ===== Unified elevation =====
+     One navy-tinted soft-shadow system shared by every light-surface card/panel,
+     replacing the ~4 ad-hoc shadow recipes scattered across the homepage sections.
+     Calibrated from PropertyCard's "one soft directional shadow, no blue glow":
+     a tight 1px contact shadow + a long, soft, downward ambient shadow. */
+  --elev-1: 0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.16);
+  --elev-2: 0 2px 4px rgba(5, 17, 80, 0.06), 0 22px 44px -18px rgba(5, 17, 80, 0.22);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 /* Завжди використовуємо світлу тему */
 html {
   overflow-y: auto;
   overflow-x: hidden;
-  background: #faf7f2 !important;
+  background: #f5f7fb !important;
+  /* Offset in-page anchor scrolls (#contact, #hero-next) so targets clear the
+     68px sticky header instead of hiding beneath it. */
+  scroll-padding-top: 84px;
+}
+
+/* Smooth in-page anchor scrolling, disabled for reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
   margin: 0;
   padding: 0;
   font-family: var(--font-assistant), Arial, Helvetica, sans-serif;
-  background: #faf7f2 !important;
+  background: #f5f7fb !important;
   color: #171717 !important;
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
@@ -33,11 +101,45 @@ body {
   font-family: var(--font-caramel), cursive, sans-serif !important;
 }
 
+/* HEADING-FONT EXPERIMENT (see layout.tsx): display h1/h2/h3 render the light
+   300 cut of Noto Sans Hebrew — they carry font-black/900 classes, which would
+   otherwise synthesize a fake bold and hide the light face entirely. Small
+   display labels (CTA spans, stat numbers) keep their bold → real 700 cut.
+   Delete this rule when reverting to Carmela. */
+:is(h1, h2, h3)[style*="font-caramel"] {
+  font-weight: 300 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Shared elevation utilities — registered as Tailwind v4 @utility so variants
+   (hover:, md:, …) apply. See --elev-* tokens above. */
+@utility shadow-elev-1 {
+  box-shadow: var(--elev-1);
+}
+@utility shadow-elev-2 {
+  box-shadow: var(--elev-2);
+}
+
 @layer utilities {
   .bg-warm {
-    background-color: #faf7f2 !important;
+    background-color: #f5f7fb !important;
   }
-  
+
+  /* Section rhythm helpers — the two alternating band backgrounds the
+     homepage sections lay out against: a plain white and the cool page tint. */
+  .section-white {
+    background-color: #ffffff !important;
+  }
+  .section-tint {
+    background-color: #f5f7fb !important;
+  }
+
+  /* Brand möbius band — a very low-opacity ink→sky wash for ONE feature band,
+     so a single section can carry the brand gradient without shouting. */
+  .brand-band {
+    background: #f5f7fb;
+  }
+
 
   .text-balance {
     text-wrap: balance;
@@ -197,14 +299,4 @@ header {
    column keeps the same proportions as at 1080p while using the extra width,
    instead of being stretched independently. */
 
-/* Admin panel - sold properties styling */
-.sold-property-row {
-  background-color: #fff1f0 !important;
-  opacity: 0.7;
-}
-
-.sold-property-row:hover {
-  background-color: #ffe7e6 !important;
-  opacity: 0.8;
-}
 

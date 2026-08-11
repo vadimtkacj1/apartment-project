@@ -4,12 +4,12 @@ import { m } from 'framer-motion';
 
 export default function AboutTeamNew() {
   return (
-    <section className="py-20 w-full bg-[#faf7f2]" dir="rtl">
+    <section className="py-20 w-full bg-[#f5f7fb]" dir="rtl">
       <div className="max-w-[1200px] mx-auto px-6">
 
         {/* H2 Title */}
         <m.h2
-          className="text-3xl md:text-4xl font-bold text-[#1c3664] mb-8 text-center"
+          className="text-3xl md:text-4xl font-bold text-[#051150] mb-8 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -37,7 +37,7 @@ export default function AboutTeamNew() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold text-[#1c3664]">
+            <h3 className="text-2xl md:text-3xl font-bold text-[#051150]">
               ליאור
             </h3>
             <p className="text-lg text-slate-700 leading-relaxed">
@@ -52,7 +52,7 @@ export default function AboutTeamNew() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold text-[#1c3664]">
+            <h3 className="text-2xl md:text-3xl font-bold text-[#051150]">
               תומר
             </h3>
             <p className="text-lg text-slate-700 leading-relaxed">

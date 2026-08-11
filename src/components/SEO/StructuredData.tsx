@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { owners } from '@/app/(public)/about/aboutData';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 // Parse an "HH:MM - HH:MM" range out of a free-text Hebrew hours string so the
 // schema OpeningHoursSpecification stays in sync with the admin-edited value.
@@ -97,14 +97,13 @@ export default async function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'RealEstateAgent',
     '@id': `${siteUrl}/#organization`,
-    name: 'רם נכסים חיים ענבי',
-    // Genuine alternate names of the agency — the short forms people actually type
-    // (the domain is ram-haim). These teach Google to resolve "רם חיים"/"רם נכסים"
-    // brand queries to this entity, not the generic adjective רם.
-    alternateName: ['רם חיים', 'רם נכסים', 'רם שיווק נכסים', 'רם נדל״ן', 'רם חיים נדל״ן', 'Ram Nekasim Chaim Anavi'],
+    name: 'Aiterra',
+    // Alternate spellings of the brand so Google resolves both the Latin and
+    // Hebrew forms to this entity.
+    alternateName: ['אייטרה', 'Aiterra נדל״ן', 'Aiterra Real Estate'],
     description: 'משרד תיווך ושיווק נדל״ן המתמחה בשיווק, מכירה והשכרה של דירות ונכסים בחולון והסביבה',
     url: siteUrl,
-    logo: `${siteUrl}/images/logos.png`,
+    logo: `${siteUrl}/aiterra-icon-512.png`,
     image: {
       '@type': 'ImageObject',
       url: `${siteUrl}/images/hero/main-hero.jpg`,
@@ -120,7 +119,7 @@ export default async function StructuredData() {
     },
     // Hardcoded to match contactPoint[0] (the main office line) so schema NAP never
     // drifts from the visible footer. Update here if the primary number changes.
-    telephone: '+972-50-549-6626',
+    telephone: '+972-52-384-7291',
     ...(lat != null && lng != null
       ? { geo: { '@type': 'GeoCoordinates', latitude: lat, longitude: lng } }
       : {}),
@@ -130,23 +129,23 @@ export default async function StructuredData() {
     ...(openingHoursSpecification.length > 0 ? { openingHoursSpecification } : {}),
     // Close the entity graph: link the agency to its named founders' Person nodes
     // (emitted by PersonSchema on /about with matching @id). Reinforces E-E-A-T and
-    // ties the personal brand "רם מזרחי" to the organization. Derived from the same
+    // ties the personal brand "דניאל שרון" to the organization. Derived from the same
     // owners source so the @id scheme can never drift.
     founder: owners.map((o) => ({ '@id': `${siteUrl}/about#owner-${o.id}` })),
     contactPoint: [
       {
         '@type': 'ContactPoint',
-        telephone: '+972-50-549-6626',
-        email: 'rammiz800@gmail.com',
-        name: 'רם מזרחי',
+        telephone: '+972-52-384-7291',
+        email: 'daniel.sharon.re@gmail.com',
+        name: 'דניאל שרון',
         contactType: 'Customer Service',
         availableLanguage: ['Hebrew', 'English'],
       },
       {
         '@type': 'ContactPoint',
-        telephone: '+972-50-675-9999',
-        email: 'hd.nadlan@gmail.com',
-        name: 'חיים ענבי',
+        telephone: '+972-54-729-3158',
+        email: 'yoav.almog.re@gmail.com',
+        name: 'יואב אלמוג',
         contactType: 'Customer Service',
         availableLanguage: ['Hebrew', 'English'],
       },
@@ -180,8 +179,8 @@ export default async function StructuredData() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${siteUrl}/#website`,
-    name: 'רם נכסים חיים ענבי',
-    alternateName: ['רם חיים', 'רם נכסים', 'רם שיווק נכסים', 'רם נדל״ן', 'רם חיים נדל״ן'],
+    name: 'Aiterra',
+    alternateName: ['אייטרה', 'Aiterra נדל״ן', 'Aiterra Real Estate'],
     url: siteUrl,
     inLanguage: 'he',
     publisher: { '@id': `${siteUrl}/#organization` },

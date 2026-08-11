@@ -3,7 +3,14 @@
 import { m } from 'framer-motion';
 import Image from 'next/image';
 import { Phone, Mail, Check } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useState } from 'react';
+
+/** Normalize an IL phone for wa.me: strip non-digits, leading 0 → 972. */
+function toWhatsappNumber(phone: string): string {
+  const digits = phone.replace(/[^0-9]/g, '');
+  return digits.startsWith('0') ? `972${digits.slice(1)}` : digits;
+}
 
 type TeamMember = {
   id: number;
@@ -78,7 +85,7 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
             />
           ) : (
             /* Fallback: branded initials avatar */
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1c3664] to-[#2d5a9e]">
+            <div className="w-full h-full flex items-center justify-center bg-[#354AC4]">
               <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
                 {initials}
               </span>
@@ -93,20 +100,21 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
         
         {/* Inner wrapper with padding based on direction to ensure text doesn't touch the image too closely, but isn't too far either */}
         <div className={`w-full ${!isEven ? 'md:pr-6' : 'md:pl-6'}`}>
-            <h3 className="text-3xl md:text-4xl font-extrabold text-[#1c3664] mb-3">
+            <h3 className="font-caramel text-3xl md:text-4xl font-extrabold text-[#051150] mb-3">
               {member.name}
             </h3>
 
-            {/* License Number */}
-            {member.licenceNumber && (
-              <p className="text-xl text-blue-600 font-semibold mb-6">
-                {member.licenceNumber}
-              </p>
-            )}
-
-            <p className="text-xl text-blue-600 font-semibold mb-6">
+            {/* Role — the single accent line */}
+            <p className={`text-xl text-[#354ac4] font-semibold ${member.licenceNumber ? 'mb-1' : 'mb-6'}`}>
               {member.role}
             </p>
+
+            {/* License Number — quiet, under the role */}
+            {member.licenceNumber && (
+              <p className="text-sm text-slate-500 mb-6">
+                רישיון מס׳ {member.licenceNumber}
+              </p>
+            )}
 
             {/* Description */}
             <p className="text-slate-600 leading-relaxed text-lg mb-8 max-w-lg mx-auto md:mx-0">
@@ -115,26 +123,42 @@ export default function AgentCard({ member, index, isEven }: AgentCardProps) {
 
             {/* Contact Buttons Grid */}
             <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                {/* Main Phone */}
-                <a
-                  href={`tel:${member.phone}`}
-                  className="flex items-center gap-3 px-6 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg group"
-                >
-                  <Phone size={18} className="group-hover:rotate-12 transition-transform" />
-                  <span
-                    dir="ltr"
-                    className="font-medium"
-                    style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                {/* Main Phone (only when one exists — no tel:null) */}
+                {member.phone && (
+                  <a
+                    href={`tel:${member.phone}`}
+                    className="flex items-center gap-3 px-6 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-all hover:shadow-lg group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
                   >
-                    {member.phone}
-                  </span>
-                </a>
+                    <Phone size={18} className="group-hover:rotate-12 transition-transform" />
+                    <span
+                      dir="ltr"
+                      className="font-medium"
+                      style={{ direction: 'ltr', unicodeBidi: 'embed' }}
+                    >
+                      {member.phone}
+                    </span>
+                  </a>
+                )}
+
+                {/* WhatsApp (same number as the phone line) */}
+                {member.phone && (
+                  <a
+                    href={`https://wa.me/${toWhatsappNumber(member.phone)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`וואטסאפ אל ${member.name}`}
+                    className="flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
+                  >
+                    <FaWhatsapp size={20} aria-hidden="true" />
+                    <span className="font-medium">WhatsApp</span>
+                  </a>
+                )}
 
                 {/* Email (if exists) */}
                 {member.email && (
                   <button
                     onClick={handleCopyEmail}
-                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all relative group"
+                    className="flex items-center gap-3 px-6 py-3 bg-white border border-[#354AC4] text-[#354ac4] rounded-full hover:bg-blue-50 transition-all relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
                     title="לחצו להעתקת האימייל"
                   >
                     {copied ? (

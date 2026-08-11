@@ -56,42 +56,43 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
       className="block h-full"
     >
       <m.div
-        whileHover={isSold ? {} : { y: -4, scale: 1.02 }}
+        whileHover={isSold ? {} : { y: -4 }}
         className={`group relative rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
           isSold
-            ? 'bg-gray-50 border-2 border-gray-200 opacity-70'
-            : 'bg-white border border-gray-100 shadow-lg hover:shadow-xl'
+            ? 'bg-gray-50 border border-gray-200 opacity-70'
+            : 'bg-white border border-[#E9EDF5] hover:border-[#354AC4]/40'
         }`}
         style={{
+          // Unified with PropertyCard: one soft grounded shadow, no blue glow.
           boxShadow: isSold
-            ? '0 2px 8px rgba(0, 0, 0, 0.08)'
-            : '0 4px 16px rgba(28, 54, 100, 0.12), 0 0 32px rgba(28, 54, 100, 0.06)'
+            ? '0 1px 2px rgba(5, 17, 80, 0.05), 0 6px 14px -10px rgba(5, 17, 80, 0.12)'
+            : '0 1px 2px rgba(5, 17, 80, 0.05), 0 14px 30px -14px rgba(5, 17, 80, 0.20)'
         }}
         dir="rtl"
       >
         {/* Property Image */}
-        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative h-64 overflow-hidden bg-slate-100">
           <Image
             src={displayImage}
             alt={title}
             fill
-            className={`object-contain transition-all duration-500 ${
+            className={`object-cover transition-all duration-500 ${
               isSold ? 'grayscale opacity-50' : 'group-hover:scale-105'
             }`}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={index !== undefined && index < 3}
           />
 
-          {/* Enhanced gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          {/* Ink scrim — enough for the price/logo legibility, light enough to keep the photo vivid */}
+          <div className="absolute inset-0 bg-linear-to-t from-[#051150]/55 via-[#051150]/5 to-[#051150]/15"></div>
 
           {/* Logo overlay - positioned left */}
           <div className="absolute top-4 left-4 z-30 pointer-events-none">
             <Image
-              src="/images/logos.png"
-              alt="לוגו רם נכסים חיים ענבי"
-              width={70}
-              height={35}
+              src="/aiterra-white-logo.png"
+              alt="לוגו Aiterra"
+              width={96}
+              height={34}
               className="object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
             />
           </div>
@@ -99,7 +100,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
           {/* Status Badge - positioned right for RTL */}
           {status && !isSold && (
             <div className="absolute top-4 right-4 z-30">
-              <div className="bg-[#1c3664] text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm">
+              <div className="bg-[#051150] text-white px-4 py-2 text-sm font-bold rounded-lg shadow-lg backdrop-blur-sm">
                 {getStatusLabel(status)}
               </div>
             </div>
@@ -110,7 +111,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
             <div className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl backdrop-blur-md shadow-xl ${
               isSold
                 ? 'bg-gray-500/80 text-gray-200'
-                : 'bg-[#1c3664]/90 text-white'
+                : 'bg-[#051150]/90 text-white'
             }`}>
               <p className={`text-2xl sm:text-3xl font-black ${isSold ? 'line-through' : ''}`}>
                 <span dir="ltr">{price} ₪</span>
@@ -157,7 +158,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               isSold ? 'text-gray-400' : 'text-gray-600'
             }`}>
               <div className={`p-1.5 rounded-lg ${isSold ? 'bg-gray-200' : 'bg-blue-50'}`}>
-                <MapPin size={16} className={`${isSold ? 'text-gray-400' : 'text-[#1c3664]'}`} />
+                <MapPin size={16} className={`${isSold ? 'text-gray-400' : 'text-[#354AC4]'}`} />
               </div>
               <span className="text-sm sm:text-base font-semibold truncate">{location}</span>
             </div>
@@ -172,7 +173,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
               </div>
             ) : (
               <button className="w-full group/btn">
-                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-[#1c3664] to-[#2a4a7a] text-white font-bold rounded-2xl text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+                <div className="flex items-center justify-center gap-2 px-6 py-4 bg-[#354AC4] hover:bg-[#28389B] text-white font-bold rounded-xl text-base transition-colors duration-200">
                   <span>לפרטים נוספים</span>
                   <ArrowLeft size={18} className="transition-transform duration-300 group-hover/btn:-translate-x-1" />
                 </div>

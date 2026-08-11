@@ -13,6 +13,8 @@ interface PropertySpecsProps {
 }
 
 export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
+  if (!specs || specs.length === 0) return null;
+
   return (
     <m.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,7 +24,7 @@ export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
         isSold ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-100'
       }`}
     >
-      <h2 className={`text-3xl font-black mb-8 ${
+      <h2 className={`text-2xl font-black mb-8 ${
         isSold ? 'text-gray-500 line-through' : 'text-gray-900'
       }`}>פרטים נוספים</h2>
 
@@ -30,16 +32,16 @@ export function PropertySpecs({ specs, isSold }: PropertySpecsProps) {
         {specs.map((spec, index) => {
           const Icon = spec.icon;
           return (
-            <div key={index} className={`flex items-center justify-between p-5 rounded-xl border transition-colors ${
+            <div key={index} className={`flex items-center justify-between p-5 rounded-xl border ${
               isSold
                 ? 'bg-gray-200 border-gray-300'
-                : 'bg-gray-50 border-gray-100 hover:border-[#1c3664]/30'
+                : 'bg-gray-50 border-gray-100'
             }`}>
               <div className="flex items-center gap-3">
                 <div className={`p-2.5 rounded-full shadow-sm ${
-                  isSold ? 'bg-gray-300 text-gray-500' : 'bg-white text-[#1c3664]'
+                  isSold ? 'bg-gray-300 text-gray-500' : 'bg-white text-[#354AC4]'
                 }`}>
-                  <Icon size={20} />
+                  <Icon size={20} aria-hidden="true" />
                 </div>
                 <span className={`font-semibold text-base ${isSold ? 'text-gray-400' : 'text-gray-500'}`}>{spec.label}:</span>
               </div>

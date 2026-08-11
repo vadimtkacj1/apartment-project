@@ -1,57 +1,93 @@
-import { Card, Row, Col, Form, Input } from 'antd';
+'use client';
+
+import { Info } from 'lucide-react';
+import { Card } from '@/components/shadcn/card';
+import { Input } from '@/components/shadcn/input';
+import { Textarea } from '@/components/shadcn/textarea';
+import { Label } from '@/components/shadcn/label';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/shadcn/tooltip';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { propertyFormMessages } from '@/lib/adminI18n/messages/propertyForm';
 import { PropertyFormSectionProps } from '../types';
 
-const { TextArea } = Input;
+export function SeoSection({ formData, handleChange }: PropertyFormSectionProps) {
+  const t = useAdminMessages(propertyFormMessages);
 
-export function SeoSection({ handleChange }: PropertyFormSectionProps) {
+  const metaTitle = formData.metaTitle ?? '';
+  const metaDescription = formData.metaDescription ?? '';
+
   return (
-    <Card title="SEO — קידום במנועי חיפוש (אופציונלי)" className="mb-4">
-      <p style={{ color: '#8c8c8c', marginTop: 0, marginBottom: 16 }}>
-        השאר ריק כדי להשתמש בכותרת, בתיאור ובתמונה הראשית של הנכס כברירת מחדל.
-      </p>
-      <Row gutter={16}>
-        <Col span={24}>
-          <Form.Item
-            label="כותרת SEO (Meta Title)"
-            name="metaTitle"
-            tooltip="עד ~60 תווים — מוצג בלשונית הדפדפן ובתוצאות גוגל"
-          >
-            <Input
-              maxLength={70}
-              showCount
-              placeholder="לדוגמה: דירת 4 חדרים למכירה בחולון — רם נכסים"
-              onChange={(e) => handleChange('metaTitle', e.target.value)}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={24}>
-          <Form.Item
-            label="תיאור SEO (Meta Description)"
-            name="metaDescription"
-            tooltip="עד ~160 תווים — הסניפט שמופיע מתחת לכותרת בגוגל"
-          >
-            <TextArea
-              rows={3}
-              maxLength={170}
-              showCount
-              placeholder="תיאור קצר ומושך שיופיע בתוצאות החיפוש..."
-              onChange={(e) => handleChange('metaDescription', e.target.value)}
-            />
-          </Form.Item>
-        </Col>
-        <Col span={24}>
-          <Form.Item
-            label="תמונת שיתוף (OG Image)"
-            name="ogImage"
-            tooltip="כתובת תמונה לשיתוף ברשתות חברתיות; ריק = התמונה הראשית של הנכס"
-          >
-            <Input
-              placeholder="/uploads/... או https://..."
-              onChange={(e) => handleChange('ogImage', e.target.value)}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
+    <Card className="mb-4 p-5">
+      <h3 className="mb-4 text-base font-semibold text-foreground">{t.seo.cardTitle}</h3>
+      <p className="mb-4 mt-0 text-muted-foreground">{t.seo.helpText}</p>
+
+      <div className="flex flex-col gap-4">
+        <div>
+          <div className="mb-1.5 flex items-center gap-1">
+            <Label>{t.seo.metaTitleLabel}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground" aria-label={t.seo.metaTitleLabel}>
+                  <Info className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t.seo.metaTitleTooltip}</TooltipContent>
+            </Tooltip>
+          </div>
+          <Input
+            maxLength={70}
+            placeholder={t.seo.metaTitlePlaceholder}
+            value={metaTitle}
+            onChange={(e) => handleChange('metaTitle', e.target.value)}
+          />
+          <div className="mt-1 text-end text-xs text-muted-foreground">{metaTitle.length} / 70</div>
+        </div>
+
+        <div>
+          <div className="mb-1.5 flex items-center gap-1">
+            <Label>{t.seo.metaDescriptionLabel}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground" aria-label={t.seo.metaDescriptionLabel}>
+                  <Info className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t.seo.metaDescriptionTooltip}</TooltipContent>
+            </Tooltip>
+          </div>
+          <Textarea
+            rows={3}
+            maxLength={170}
+            placeholder={t.seo.metaDescriptionPlaceholder}
+            value={metaDescription}
+            onChange={(e) => handleChange('metaDescription', e.target.value)}
+          />
+          <div className="mt-1 text-end text-xs text-muted-foreground">{metaDescription.length} / 170</div>
+        </div>
+
+        <div>
+          <div className="mb-1.5 flex items-center gap-1">
+            <Label>{t.seo.ogImageLabel}</Label>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="text-muted-foreground" aria-label={t.seo.ogImageLabel}>
+                  <Info className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t.seo.ogImageTooltip}</TooltipContent>
+            </Tooltip>
+          </div>
+          <Input
+            placeholder={t.seo.ogImagePlaceholder}
+            value={formData.ogImage ?? ''}
+            onChange={(e) => handleChange('ogImage', e.target.value)}
+          />
+        </div>
+      </div>
     </Card>
   );
 }

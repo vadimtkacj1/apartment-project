@@ -24,39 +24,39 @@ model User {
 
 // Contact information (singleton)
 model ContactInfo {
-  id           Int      @id @default(autoincrement())
-  phone        String
-  phoneLink    String // tel: format
-  phoneName    String? // Name for phone 1
-  phone2       String? // Second phone number
-  phoneLink2   String? // Second tel: format
-  phoneName2   String? // Name for phone 2
-  email        String
-  emailLink    String // mailto: format
-  email2       String? // Second email
-  emailLink2   String? // Second mailto: format
-  address      String
-  city         String
-  latitude     Float? // GPS latitude coordinate
-  longitude    Float? // GPS longitude coordinate
-  mapUrl       String?
-  weekdayHours String // "ראשון - חמישי: 9:00 - 18:00"
-  fridayHours  String // "שישי: 9:00 - 13:00"
-  facebook     String?
-  facebookName String? // Name for Facebook 1
-  facebook2    String? // Second Facebook
-  facebookName2 String? // Name for Facebook 2
-  instagram    String?
-  instagramName String? // Name for Instagram 1
-  instagram2   String? // Second Instagram
+  id             Int      @id @default(autoincrement())
+  phone          String
+  phoneLink      String // tel: format
+  phoneName      String? // Name for phone 1
+  phone2         String? // Second phone number
+  phoneLink2     String? // Second tel: format
+  phoneName2     String? // Name for phone 2
+  email          String
+  emailLink      String // mailto: format
+  email2         String? // Second email
+  emailLink2     String? // Second mailto: format
+  address        String
+  city           String
+  latitude       Float? // GPS latitude coordinate
+  longitude      Float? // GPS longitude coordinate
+  mapUrl         String?
+  weekdayHours   String // "ראשון - חמישי: 9:00 - 18:00"
+  fridayHours    String // "שישי: 9:00 - 13:00"
+  facebook       String?
+  facebookName   String? // Name for Facebook 1
+  facebook2      String? // Second Facebook
+  facebookName2  String? // Name for Facebook 2
+  instagram      String?
+  instagramName  String? // Name for Instagram 1
+  instagram2     String? // Second Instagram
   instagramName2 String? // Name for Instagram 2
-  linkedin     String?
-  whatsapp     String? // WhatsApp number
-  whatsappName String? // Name for WhatsApp 1
-  whatsapp2    String? // Second WhatsApp number
-  whatsappName2 String? // Name for WhatsApp 2
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  linkedin       String?
+  whatsapp       String? // WhatsApp number
+  whatsappName   String? // Name for WhatsApp 1
+  whatsapp2      String? // Second WhatsApp number
+  whatsappName2  String? // Name for WhatsApp 2
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 // Property model for real estate listings
@@ -147,6 +147,10 @@ model Property {
   // Agent(s) for this property - JSON array with type prefix, e.g. '["owner-1", "team-2"]'
   // Supports both Owner and TeamMember IDs
   agentIds String @default("[]")
+
+  /// Set the moment isSold flips on (cleared when it flips back). `updatedAt`
+  /// cannot answer "sold today" — any later edit moves it.
+  soldAt DateTime?
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -239,14 +243,17 @@ model HomepageSettings {
   id Int @id @default(autoincrement())
 
   // Section titles
-  hotPropositionsTitle String @default("הצעות חמות")
-  featuredPropertiesTitle String @default("נכסים באיזור המרכז")
+  hotPropositionsTitle       String @default("הצעות חמות")
+  featuredPropertiesTitle    String @default("נכסים באיזור המרכז")
   featuredPropertiesSubtitle String @default("מגוון דירות למכירה ולהשכרה אטרקטיביות באיזור המרכז")
-  valuesSectionTitle String @default("למה לבחור בנו?")
-  aboutSectionTitle String @default("אודות")
-  processSectionTitle String @default("מה חשוב לדעת כשקונים נכס?")
-  testimonialsTitle String @default("מה הלקוחות שלנו אומרים")
-  noCommissionTitle String @default("דירה ללא עמלת תיווך")
+  valuesSectionTitle         String @default("למה לבחור בנו?")
+  aboutSectionTitle          String @default("אודות")
+  processSectionTitle        String @default("מה חשוב לדעת כשקונים נכס?")
+  testimonialsTitle          String @default("מה הלקוחות שלנו אומרים")
+  noCommissionTitle          String @default("דירה ללא עמלת תיווך")
+
+  // Active public-site theme: 'classic' (calibrated default) | 'moonlit' (dark bronze)
+  siteTheme String @default("classic")
 
   // Order properties are listed in on /apartments (see src/lib/listing-order.ts).
   // One of: newest | price-asc | price-desc | random
@@ -260,12 +267,12 @@ model HomepageSettings {
 model Owner {
   id            Int      @id @default(autoincrement())
   name          String
-  title         String   // "מייסד ומתווך נדל״ן"
-  image         String?  // Path to profile image
+  title         String // "מייסד ומתווך נדל״ן"
+  image         String? // Path to profile image
   phone         String?
   email         String?
-  whatsapp      String?  // WhatsApp number
-  licenceNumber String?  // License number
+  whatsapp      String? // WhatsApp number
+  licenceNumber String? // License number
   description   String?
   order         Int      @default(0) // Display order
   isActive      Boolean  @default(true)
@@ -301,14 +308,14 @@ model Inquiry {
 model TeamMember {
   id            Int      @id @default(autoincrement())
   name          String
-  role          String   // "סוכן נדל״ן", "סוכנת נדל״ן"
-  image         String?  // Path to profile image
+  role          String // "סוכן נדל״ן", "סוכנת נדל״ן"
+  image         String? // Path to profile image
   phone         String?
   mobile        String?
-  whatsapp      String?  // WhatsApp number
+  whatsapp      String? // WhatsApp number
   fax           String?
   email         String?
-  licenceNumber String?  // License number
+  licenceNumber String? // License number
   description   String?
   order         Int      @default(0) // Display order
   isActive      Boolean  @default(true)
@@ -317,4 +324,70 @@ model TeamMember {
 
   @@index([order])
   @@index([isActive])
+}
+
+/// Admin activity feed. Today it records one thing — an agent closing a sale —
+/// which the dashboard surfaces on the team card and in the notifications block.
+/// Agent name and property title are snapshots so an old entry still reads
+/// correctly after a rename or a deletion.
+model Notification {
+  id   Int    @id @default(autoincrement())
+  type String // 'property_sold'
+
+  agentId   String? // 'team-X' / 'owner-X' — same format as Property.agentIds
+  agentName String?
+
+  propertyId    Int?
+  propertyTitle String?
+
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([createdAt])
+  @@index([type])
+}
+
+// Site-wide public settings (singleton row) — currently only the active theme.
+// Read by the public shell via src/themes/server.ts; written from /admin/design.
+model SiteSettings {
+  id Int @id @default(autoincrement())
+
+  /// Theme id from src/themes/registry.ts ('classic' | 'moonlit-*')
+  activeTheme String @default("classic")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Editable content of the Moonlit theme (singleton). Everything the theme
+/// renders that is not a property, a contact or a section title lives here, so
+/// /admin/design can edit it. Arrays are stored as JSON — the shapes are
+/// declared in src/themes/moonlit/data.ts.
+model MoonlitContent {
+  id Int @id @default(autoincrement())
+
+  bannerSlides Json? // [{ image, eyebrow, title, text, ctaHref, ctaLabel }]
+  facilities   Json? // [{ icon, title, text }]
+  testimonials Json? // [{ text, author, context, avatar }]
+
+  aboutText       String?
+  aboutImageMain  String?
+  aboutImageInset String?
+  aboutBadgeValue String?
+  aboutBadgeLabel String?
+  aboutCtaLabel   String?
+  bandImage       String?
+
+  navItems Json? // [{ label, href, submenu: [{ label, href }] }]
+
+  searchCities  Json? // ["holon", ...]
+  searchRooms   Json? // ["2", "3", ...]
+  searchBudgets Json? // [{ value, label }]
+
+  newsletterTitle String?
+  footerAbout     String?
+  footerColumns   Json? // [{ title, links: [{ label, href }] }]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { m } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
+import SectionEyebrow from '@/components/ui/SectionEyebrow';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { DealType, PropertyType } from '@/types/property.types';
@@ -152,12 +153,6 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
   dir="rtl"
   className="relative w-full py-16 md:py-20 bg-warm overflow-hidden"
 >
-      {/* Decorative background */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-[#1c3664] rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl"></div>
-      </div>
-
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Section Header */}
         <m.div
@@ -174,12 +169,10 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
             transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-block mb-4"
           >
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
-              נכסים נבחרים
-            </span>
+            <SectionEyebrow>נכסים נבחרים</SectionEyebrow>
           </m.div>
 
-          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
+          <h2 className="text-5xl md:text-6xl font-black text-[#051150] mb-6" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
             {titles.featuredPropertiesTitle}
           </h2>
 
@@ -210,7 +203,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         >
           <Link
             href="/apartments"
-            className="inline-flex items-center gap-3 px-12 py-5 bg-[#1c3664] text-white font-black text-xl uppercase tracking-tight rounded-2xl shadow-2xl hover:bg-[#152a4f] transition-all duration-300 hover:scale-105 active:scale-95 group border border-white/20"
+            className="inline-flex items-center gap-3 px-10 py-4 bg-[#354ac4] text-white font-bold text-lg rounded-xl hover:bg-[#28389b] transition-colors duration-200 group"
             style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}
           >
             <span>כל הנכסים</span>

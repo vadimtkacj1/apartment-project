@@ -6,12 +6,14 @@ import { getFullProperty } from '@/lib/property-detail';
 import { getCityLabel } from '@/data/cities';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
 import ApartmentDetailClient from './ApartmentDetailClient';
+import { getActiveTheme } from '@/themes/server';
+import MoonlitProperty from '@/themes/moonlit/MoonlitProperty';
 
 // Revalidate pre-rendered apartment pages every 5 minutes — matches the
 // freshness of the old client-side fetch (API s-maxage=300).
 export const revalidate = 300;
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -106,7 +108,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical: `${siteUrl}/apartments/${id}`,
     },
     openGraph: {
-      title: `${title} | רם נכסים`,
+      title: `${title} | Aiterra`,
       description,
       type: 'article',
       url: `${siteUrl}/apartments/${id}`,
@@ -123,7 +125,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ApartmentDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const property = await getProperty(id);
+  const [property, theme] = await Promise.all([getProperty(id), getActiveTheme()]);
 
   if (!property) notFound();
 
@@ -204,12 +206,16 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
         { name: 'דירות', path: '/apartments' },
         { name: initialTitle, path: `/apartments/${id}` },
       ]} />
-      <ApartmentDetailClient
-        propertyId={id}
-        initialProperty={property}
-        initialTitle={initialTitle}
-        initialDescription={initialDescription}
-      />
+      {theme.family === 'moonlit' ? (
+        <MoonlitProperty property={property} title={initialTitle} description={initialDescription} />
+      ) : (
+        <ApartmentDetailClient
+          propertyId={id}
+          initialProperty={property}
+          initialTitle={initialTitle}
+          initialDescription={initialDescription}
+        />
+      )}
     </>
   );
 }

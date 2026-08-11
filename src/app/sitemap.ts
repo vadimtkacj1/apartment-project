@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/prisma';
 import { articles, ARTICLES_LAST_REVISED } from '@/data/articles';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://go-apartsale.online';
 
 // Property.images is a JSON string column ("[]" by default). Parse it into a list
 // of absolute URLs for the image sitemap so listing photos can surface in Google

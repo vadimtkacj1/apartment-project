@@ -25,7 +25,12 @@ const routeNames: Record<string, string> = {
   'accessibility': 'נגישות',
 };
 
-export default function Breadcrumbs() {
+interface BreadcrumbsProps {
+  /** Optional mapping of a path segment to a display label (e.g. { '42': 'דירת גן ברמת גן' }). */
+  labels?: Record<string, string>;
+}
+
+export default function Breadcrumbs({ labels }: BreadcrumbsProps) {
   const pathname = usePathname();
 
   // Hide component on the root page
@@ -38,15 +43,15 @@ export default function Breadcrumbs() {
     const isLast = index === segments.length - 1;
     const isDynamicId = /^\d+$/.test(segment) || /^[a-f0-9-]{36}$/.test(segment);
 
-    let name = routeNames[segment] || segment;
-    if (isDynamicId) name = `#${segment}`;
+    let name = labels?.[segment] || routeNames[segment] || segment;
+    if (isDynamicId && !labels?.[segment]) name = `#${segment}`;
 
     return { name, path, isLast };
   });
 
   return (
     <nav
-      className="py-5 px-4 md:px-8 bg-[#faf7f2]"
+      className="py-5 px-4 md:px-8 bg-[#f5f7fb]"
       aria-label="מסלול ניווט"
       dir="rtl" // Standard for Hebrew
     >
@@ -68,7 +73,7 @@ export default function Breadcrumbs() {
         {breadcrumbs.map((crumb, index) => (
           <li key={crumb.path} className="flex items-center">
             {crumb.isLast ? (
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold text-gray-900" aria-current="page">
                 {crumb.name}
               </span>
             ) : (

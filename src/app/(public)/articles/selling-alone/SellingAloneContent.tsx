@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function SellingAloneContent() {
@@ -75,6 +78,8 @@ export default function SellingAloneContent() {
               </p>
             </section>
 
+            <ArticleToc />
+
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>למה הדירה &quot;נשרפת&quot; בשוק?</h2>
               <p>
@@ -126,7 +131,7 @@ export default function SellingAloneContent() {
 
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>איך השיטה שלנו מביאה את המחיר המקסימלי?</h2>
-              <p>כאן נכנס לתמונה הניסיון של הצוות שלנו, בהובלת רם וחיים. התהליך אצלנו עובד כמו מבצע צבאי מדויק:</p>
+              <p>כאן נכנס לתמונה הניסיון של הצוות שלנו, בהובלת דניאל ויואב. התהליך אצלנו עובד כמו מבצע צבאי מדויק:</p>
               <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>תמחור כירורגי</h3>
               <p>
                 אנחנו לא מנחשים. אנחנו מבצעים <strong>הערכת שווי נכס</strong> המבוססת על עסקאות אמת שנסגרו ברחוב שלכם (בין אם זה בנאות רחל או במתחם האלף) בחודש האחרון.
@@ -155,9 +160,10 @@ export default function SellingAloneContent() {
             </section>
 
             {/* Conversion CTA — funnels the DIY-intent reader to a free valuation
-                rather than enabling a self-sale. */}
-            <section className="article-section">
-              <div dir="rtl" className="my-6 rounded-2xl bg-[#1c3664] p-8 text-center">
+                rather than enabling a self-sale. Excluded from the TOC (not a
+                content section). */}
+            <section className="article-section" data-toc-exclude>
+              <div dir="rtl" className="my-6 rounded-2xl bg-[#051150] p-8 text-center">
                 <h2 className="text-3xl font-bold mb-3 text-white" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>
                   רוצים לדעת כמה הדירה שלכם באמת שווה?
                 </h2>
@@ -165,10 +171,10 @@ export default function SellingAloneContent() {
                   במקום לנחש לבד — קבלו מאיתנו הערכת שווי חינם וללא התחייבות. נראה לכם בדיוק כמה אתם עלולים להפסיד במכירה עצמאית, ואיך אנחנו משיגים את המחיר המקסימלי.
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center">
-                  <Link href="/selling-apartment" className="px-8 py-3 rounded-sm bg-[#c5a357] text-[#1c3664] font-black hover:bg-[#d4b46b] transition-colors">
+                  <Link href="/selling-apartment" className="px-8 py-3 rounded-sm bg-[#5594F1] text-[#051150] font-black hover:bg-[#78A9F5] transition-colors">
                     איך אנחנו מוכרים את הדירה שלכם
                   </Link>
-                  <a href="tel:+972505496626" className="px-8 py-3 rounded-sm border-2 border-[#c5a357] text-[#c5a357] font-black hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors">
+                  <a href="tel:+972523847291" className="px-8 py-3 rounded-sm border-2 border-[#5594F1] text-[#5594F1] font-black hover:bg-[#5594F1] hover:text-[#051150] transition-colors">
                     דברו איתנו עכשיו
                   </a>
                 </div>
@@ -176,6 +182,10 @@ export default function SellingAloneContent() {
             </section>
 
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="selling-alone" />
+            <RelatedArticles currentId="selling-alone" />
           </div>
         </article>
       </div>

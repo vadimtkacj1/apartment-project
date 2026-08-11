@@ -1,27 +1,20 @@
 'use client';
 
-import { Layout } from 'antd';
+import { useAdminMessages } from '@/lib/adminI18n';
+import { navMessages } from '@/lib/adminI18n/messages/nav';
 
 export default function Footer() {
-  const { Footer: AntFooter } = Layout;
+  const t = useAdminMessages(navMessages);
   const year = new Date().getFullYear();
 
   return (
-    <AntFooter style={{ background: 'transparent', padding: '12px 24px' }}>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-          color: '#9aa0aa',
-          fontSize: 12.5,
-        }}
-      >
-        <span>© {year} רם נכסים · כל הזכויות שמורות</span>
-        <span style={{ color: '#b08642', fontWeight: 600 }}>מערכת ניהול נכסים</span>
+    // .ant-layout-footer is the load-bearing shell class (see antd-admin.css:
+    // transparent bg, 12px/24px padding, flush margins on phones).
+    <footer className="ant-layout-footer">
+      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+        <span>{t.footerRights(year)}</span>
+        <span className="font-semibold">{t.footerSystem}</span>
       </div>
-    </AntFooter>
+    </footer>
   );
 }

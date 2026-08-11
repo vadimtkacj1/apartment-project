@@ -7,6 +7,9 @@ import SecondaryHero from '@/components/layout/SecondaryHero';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import ArticleByline from '@/components/SEO/ArticleByline';
 import FAQ, { FAQItem } from '@/components/ui/FAQ';
+import ArticleToc from '../ArticleToc';
+import ArticleCta from '../ArticleCta';
+import RelatedArticles from '../RelatedArticles';
 import '../foreign-investors/styles.css';
 
 export default function PurchaseTaxContent() {
@@ -60,6 +63,8 @@ export default function PurchaseTaxContent() {
                 אחרי 24 שנים של ליווי עסקאות בחולון, בת ים וראשון לציון, ראינו לא מעט עסקאות שכמעט התפוצצו בגלל תכנון מס שגוי. <strong>החדשות הטובות: עם תכנון נכון מראש, אפשר לחסוך הרבה מאוד כסף — באופן חוקי לחלוטין.</strong>
               </p>
             </section>
+
+            <ArticleToc />
 
             {/* Section 1 */}
             <section className="article-section">
@@ -184,6 +189,10 @@ export default function PurchaseTaxContent() {
 
             {/* FAQ */}
             <FAQ items={faqItems} />
+
+            {/* End CTA + related guides (shared components) */}
+            <ArticleCta articleId="purchase-tax-guide" />
+            <RelatedArticles currentId="purchase-tax-guide" />
           </div>
         </article>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
@@ -40,9 +39,6 @@ const PLANS: FloorPlan[] = [
 function FloorPlansSection() {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [active, setActive] = useState<FloorPlan | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   // Close the lightbox on Escape and lock body scroll while it is open.
   useEffect(() => {
@@ -63,16 +59,16 @@ function FloorPlansSection() {
 
   return (
     <section id="onethepark" className="relative w-full py-16 md:py-20 overflow-hidden bg-warm scroll-mt-24" dir="rtl">
-      <div className="relative z-10 max-w-[81.25rem] mx-auto px-4 sm:px-6">
+      <div className="relative z-10 max-w-[1300px] mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <div className="inline-block mb-4">
-            <span className="text-[#1c3664] font-bold text-lg uppercase tracking-wider">
+            <span className="text-[#051150] font-bold text-lg uppercase tracking-wider">
               תוכניות הפרויקט
             </span>
           </div>
           <h2
-            className="text-5xl md:text-6xl font-black text-gray-900 mb-5 uppercase tracking-tight"
+            className="text-5xl md:text-6xl font-black text-[#051150] mb-5 uppercase tracking-tight"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
             תוכניות הדירות והמסחר
@@ -104,7 +100,7 @@ function FloorPlansSection() {
           >
             {PLANS.map((plan, i) => (
               <SwiperSlide key={`${plan.image}-${i}`} className="!h-auto">
-                <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#1c3664]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
+                <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#051150]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
                   {/* Plan preview */}
                   <button
                     type="button"
@@ -121,8 +117,8 @@ function FloorPlansSection() {
                       loading="lazy"
                       quality={85}
                     />
-                    <span className="absolute inset-0 flex items-center justify-center bg-[#1c3664]/0 group-hover:bg-[#1c3664]/15 transition-colors duration-300">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                    <span className="absolute inset-0 flex items-center justify-center bg-[#354ac4]/0 group-hover:bg-[#354ac4]/15 transition-colors duration-300">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#354ac4] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
                         <Eye className="w-4 h-4" />
                         להגדלה
                       </span>
@@ -131,7 +127,7 @@ function FloorPlansSection() {
 
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-5 text-center">
-                    <h3 className="text-2xl font-black text-[#1c3664] leading-tight">
+                    <h3 className="text-2xl font-black text-[#051150] leading-tight">
                       {plan.title}
                     </h3>
                     <p className="text-gray-500 font-medium mt-1 mb-5">{plan.subtitle}</p>
@@ -141,7 +137,7 @@ function FloorPlansSection() {
                       <button
                         type="button"
                         onClick={() => setActive(plan)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#1c3664] text-white font-bold text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#354ac4] text-white font-bold text-sm hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
                       >
                         <Eye className="w-4 h-4" />
                         צפייה בתוכנית
@@ -150,7 +146,7 @@ function FloorPlansSection() {
                         href={plan.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#1c3664]/30 text-[#1c3664] font-bold text-sm hover:border-[#c5a357] hover:text-[#c5a357] transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#354ac4]/30 text-[#354ac4] font-bold text-sm hover:border-[#5594f1] hover:text-[#2a69c4] transition-colors"
                       >
                         <Download className="w-4 h-4" />
                         הורדה / פתיחה
@@ -167,14 +163,14 @@ function FloorPlansSection() {
             <button
               onClick={() => swiper?.slideNext()}
               aria-label="התוכנית הבאה"
-              className="pointer-events-auto w-12 h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+              className="pointer-events-auto w-12 h-12 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
             >
               <ChevronRight size={26} aria-hidden="true" />
             </button>
             <button
               onClick={() => swiper?.slidePrev()}
               aria-label="התוכנית הקודמת"
-              className="pointer-events-auto w-12 h-12 rounded-full bg-[#1c3664] text-white flex items-center justify-center shadow-xl hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+              className="pointer-events-auto w-12 h-12 rounded-full bg-[#354ac4] text-white flex items-center justify-center shadow-xl hover:bg-[#5594f1] hover:text-[#051150] transition-colors"
             >
               <ChevronLeft size={26} aria-hidden="true" />
             </button>
@@ -189,7 +185,7 @@ function FloorPlansSection() {
             href={ONE_THE_PARK_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#1c3664] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
+            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#354ac4] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#5594f1] hover:text-[#051150] hover:-translate-y-0.5"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
             <span dir="ltr">ONE THE PARK</span>
@@ -198,42 +194,34 @@ function FloorPlansSection() {
         </div>
       </div>
 
-      {/* Lightbox — portalled to <body>: nested inside this section (which is
-          `overflow-hidden`) iOS Safari paints the fixed overlay but routes taps
-          past it, so the close button was dead on phones. The overlay also drops
-          backdrop-filter below md for the same reason.
-          z-index must clear the Sienna a11y widget (1000001), or its launcher
-          floats above the overlay and covers the PDF button. */}
-      {mounted && active && createPortal(
+      {/* Lightbox */}
+      {active && (
         <div
-          className="fixed inset-0 z-1000002 flex flex-col items-center justify-center bg-black/90 md:bg-black/80 md:backdrop-blur-sm p-4 md:p-8"
+          className="fixed inset-0 z-[3000] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-8"
           dir="rtl"
           role="dialog"
           aria-modal="true"
           aria-label={`תוכנית ${active.title}`}
           onClick={closeLightbox}
-          style={{ WebkitTapHighlightColor: "transparent" }}
         >
           <button
             type="button"
             onClick={closeLightbox}
-            onPointerUp={closeLightbox}
             aria-label="סגירה"
-            className="absolute top-4 left-4 z-10 w-12 h-12 rounded-full bg-white/95 text-[#1c3664] flex items-center justify-center shadow-lg hover:bg-[#c5a357] transition-colors"
-            style={{ touchAction: "manipulation" }}
+            className="absolute top-4 left-4 w-11 h-11 rounded-full bg-white/90 text-[#051150] flex items-center justify-center shadow-lg hover:bg-[#5594f1] transition-colors"
           >
-            <X size={24} aria-hidden="true" />
+            <X size={24} />
           </button>
 
-          {/* The wrapper fills the viewport, so it must stay click-through:
-              only the image itself swallows the tap, everything around it closes. */}
-          <div className="relative w-full max-w-5xl max-h-[78vh] flex-1 flex items-center justify-center">
+          <div
+            className="relative w-full max-w-5xl max-h-[78vh] flex-1 flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={active.image}
               alt={`תוכנית ${active.title}, ${active.subtitle} — ONE THE PARK חולון`}
               className="max-w-full max-h-[78vh] object-contain rounded-lg bg-white shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
             />
           </div>
 
@@ -248,15 +236,13 @@ function FloorPlansSection() {
               href={active.pdf}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#c5a357] text-[#1c3664] font-bold text-sm hover:bg-white transition-colors"
-              style={{ touchAction: "manipulation" }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#5594f1] text-[#051150] font-bold text-sm hover:bg-white transition-colors"
             >
               <Download className="w-4 h-4" />
               הורדה / פתיחה (PDF באיכות מלאה)
             </a>
           </div>
-        </div>,
-        document.body
+        </div>
       )}
 
       <style jsx global>{`
@@ -270,7 +256,7 @@ function FloorPlansSection() {
         }
         .plan-bullet-active {
           width: 30px;
-          background: #1c3664;
+          background: #354ac4;
           border-radius: 10px;
         }
       `}</style>

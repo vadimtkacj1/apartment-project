@@ -47,9 +47,11 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
     .slice(0, 2)
     .join('');
 
-  // Photos hidden for now (awaiting real/generated images) — shows the initials
-  // avatar instead. Set HIDE_PHOTOS = false to restore real photos.
-  const HIDE_PHOTOS = true;
+  // Consistent with AgentCard: show the real founder photo when one is available,
+  // otherwise fall back to the branded initials avatar. Founders currently have no
+  // photo on file, so this renders initials — but a photo appears automatically the
+  // moment one is added (a broken/missing src also degrades to initials via onError).
+  const HIDE_PHOTOS = false;
   const showImage = !HIDE_PHOTOS && owner.image && !imgError;
 
   return (
@@ -74,7 +76,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
             />
           ) : (
             /* Fallback: initials avatar when no image or broken image */
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1c3664] to-[#2d5a9e]">
+            <div className="w-full h-full flex items-center justify-center bg-[#354AC4]">
               <span className="text-white font-extrabold" style={{ fontSize: '5rem', lineHeight: 1 }}>
                 {initials}
               </span>
@@ -86,21 +88,21 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
       {/* --- Text Info Section --- */}
       <div className="w-full px-4">
         {/* Name */}
-        <h3 className="text-4xl font-extrabold text-[#1c3664] mb-2">
+        <h3 className="font-caramel text-4xl font-extrabold text-[#051150] mb-2">
           {owner.name}
         </h3>
 
-        {/* License Number */}
-        {owner.licenceNumber && (
-          <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
-            {owner.licenceNumber}
-          </p>
-        )}
-
-        {/* Title / Position */}
-        <p className="text-xl text-blue-600 font-bold mb-4 tracking-wide">
+        {/* Title / Position — the single accent line */}
+        <p className={`text-xl text-[#354ac4] font-bold ${owner.licenceNumber ? 'mb-1' : 'mb-4'}`}>
           {owner.title}
         </p>
+
+        {/* License Number — quiet, under the role */}
+        {owner.licenceNumber && (
+          <p className="text-sm text-slate-500 mb-4">
+            רישיון מס׳ {owner.licenceNumber}
+          </p>
+        )}
 
         {/* Description */}
         {owner.description && (
@@ -114,7 +116,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.phone && (
             <a
               href={`tel:${owner.phone}`}
-              className="flex items-center gap-2 px-8 py-3 bg-[#1c3664] text-white rounded-full hover:bg-blue-800 transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-2 px-8 py-3 bg-[#354AC4] text-white rounded-full hover:bg-[#28389B] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
             >
               <Phone size={18} />
               <span dir="ltr" className="font-medium">{owner.phone}</span>
@@ -124,7 +126,7 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
           {owner.email && (
             <button
               onClick={handleCopyEmail}
-              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#1c3664] text-[#1c3664] rounded-full hover:bg-blue-50 transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-3 px-6 py-3 bg-white border-2 border-[#354AC4] text-[#354ac4] rounded-full hover:bg-blue-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
               title="לחצו להעתקת האימייל"
             >
               {copied ? (
@@ -146,7 +148,8 @@ export default function OwnerCard({ owner, index, inView }: OwnerCardProps) {
               href={`https://wa.me/${owner.whatsapp.replace(/[^0-9]/g, '')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-all hover:shadow-lg hover:-translate-y-1"
+              className="flex items-center gap-2 px-8 py-3 bg-[#25D366] text-white rounded-full hover:bg-[#1fb855] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5594f1] focus-visible:ring-offset-2"
+              aria-label={`וואטסאפ אל ${owner.name}`}
             >
               <FaWhatsapp size={20} />
               <span className="font-medium">WhatsApp</span>
