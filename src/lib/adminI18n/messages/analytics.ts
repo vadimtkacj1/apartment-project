@@ -39,6 +39,7 @@ export const analyticsMessages = defineMessages({
     visitor: (num: number | string) => `מבקר #${num}`,
 
     // KPI cards
+    trafficKpis: 'מדדי תנועה',
     totalViews: 'סה״כ צפיות',
     totalClicks: 'סה״כ לחיצות (פעולות)',
     engagement: 'מעורבות',
@@ -63,6 +64,43 @@ export const analyticsMessages = defineMessages({
     clicksLegend: 'לחיצות',
     filteredTag: 'מסונן',
     propertyFallback: (id: number) => `נכס #${id}`,
+
+    // Optional blocks (added from the block picker)
+    visitorsTrend: 'מבקרים ייחודיים לאורך זמן',
+    topPropertiesViews: 'נכסים מובילים (לפי צפיות)',
+    deviceSplit: 'פילוח מכשירים',
+    browserSplit: 'פילוח דפדפנים',
+    hourlyActivity: 'פעילות לפי שעה',
+    weekdayActivity: 'פעילות לפי יום בשבוע',
+    funnel: 'משפך המרה',
+    deviceMobile: 'נייד',
+    deviceDesktop: 'שולחני',
+    eventsLegend: 'אירועים',
+    weekdayShort: (index: number) => ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'][index] || '',
+    ofPrevious: (rate: string) => `${rate}% מהשלב הקודם`,
+
+    // More optional blocks
+    averagesKpis: 'ממוצעים יומיים',
+    avgViewsPerDay: 'צפיות ליום',
+    avgClicksPerDay: 'לחיצות ליום',
+    peakHour: 'שעת השיא',
+    peakDay: 'יום השיא',
+    propertyPerformance: 'ביצועי נכסים',
+    colViews: 'צפיות',
+    colClicks: 'לחיצות',
+    colCtr: 'יחס פעולות',
+    eventTypesTable: 'פירוט פעולות',
+    colShare: 'חלק',
+    returningVisitors: 'מבקרים חוזרים',
+    visitorNew: 'חד-פעמי',
+    visitorReturning: 'חוזר',
+    visitFrequency: 'תדירות ביקורים',
+    visitBucket: (label: string) => `${label} ביקורים`,
+    visitBucketOne: 'ביקור אחד',
+    engagementTrend: 'מעורבות לאורך זמן',
+    engagementLegend: 'לחיצות ל-100 צפיות',
+    busiestDays: 'הימים העמוסים ביותר',
+    noHourData: '—',
 
     // Recent activity tables
     recentActions: 'פעולות אחרונות',
@@ -157,6 +195,7 @@ export const analyticsMessages = defineMessages({
     visitor: (num: number | string) => `Visitor #${num}`,
 
     // KPI cards
+    trafficKpis: 'Traffic KPIs',
     totalViews: 'Total Views',
     totalClicks: 'Total Clicks (Actions)',
     engagement: 'Engagement',
@@ -181,6 +220,43 @@ export const analyticsMessages = defineMessages({
     clicksLegend: 'Clicks',
     filteredTag: 'Filtered',
     propertyFallback: (id: number) => `Property #${id}`,
+
+    // Optional blocks (added from the block picker)
+    visitorsTrend: 'Unique Visitors Over Time',
+    topPropertiesViews: 'Top Properties (by Views)',
+    deviceSplit: 'Device Breakdown',
+    browserSplit: 'Browser Breakdown',
+    hourlyActivity: 'Activity by Hour',
+    weekdayActivity: 'Activity by Weekday',
+    funnel: 'Conversion Funnel',
+    deviceMobile: 'Mobile',
+    deviceDesktop: 'Desktop',
+    eventsLegend: 'Events',
+    weekdayShort: (index: number) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index] || '',
+    ofPrevious: (rate: string) => `${rate}% of previous step`,
+
+    // More optional blocks
+    averagesKpis: 'Daily Averages',
+    avgViewsPerDay: 'Views per day',
+    avgClicksPerDay: 'Clicks per day',
+    peakHour: 'Peak hour',
+    peakDay: 'Peak weekday',
+    propertyPerformance: 'Property Performance',
+    colViews: 'Views',
+    colClicks: 'Clicks',
+    colCtr: 'Action rate',
+    eventTypesTable: 'Actions Breakdown (table)',
+    colShare: 'Share',
+    returningVisitors: 'Returning Visitors',
+    visitorNew: 'One-off',
+    visitorReturning: 'Returning',
+    visitFrequency: 'Visit Frequency',
+    visitBucket: (label: string) => `${label} visits`,
+    visitBucketOne: 'Single visit',
+    engagementTrend: 'Engagement Over Time',
+    engagementLegend: 'Clicks per 100 views',
+    busiestDays: 'Busiest Days',
+    noHourData: '—',
 
     // Recent activity tables
     recentActions: 'Recent Actions',

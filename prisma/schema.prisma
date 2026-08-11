@@ -148,6 +148,10 @@ model Property {
   // Supports both Owner and TeamMember IDs
   agentIds String @default("[]")
 
+  /// Set the moment isSold flips on (cleared when it flips back). `updatedAt`
+  /// cannot answer "sold today" — any later edit moves it.
+  soldAt DateTime?
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -316,6 +320,27 @@ model TeamMember {
 
   @@index([order])
   @@index([isActive])
+}
+
+/// Admin activity feed. Today it records one thing — an agent closing a sale —
+/// which the dashboard surfaces on the team card and in the notifications block.
+/// Agent name and property title are snapshots so an old entry still reads
+/// correctly after a rename or a deletion.
+model Notification {
+  id   Int    @id @default(autoincrement())
+  type String // 'property_sold'
+
+  agentId   String? // 'team-X' / 'owner-X' — same format as Property.agentIds
+  agentName String?
+
+  propertyId    Int?
+  propertyTitle String?
+
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([createdAt])
+  @@index([type])
 }
 
 // Site-wide public settings (singleton row) — currently only the active theme.

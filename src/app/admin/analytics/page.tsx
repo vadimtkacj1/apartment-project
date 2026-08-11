@@ -1,15 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import {
-  User,
-  Trash2,
-  RotateCw,
-  Smartphone,
-  Monitor,
-} from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { User, Trash2, RotateCw, Plus } from 'lucide-react';
 import dayjs from 'dayjs';
-import { cn } from '@/lib/utils';
 import { toast } from '@/components/shadcn/sonner';
 import { Card } from '@/components/shadcn/card';
 import { Button } from '@/components/shadcn/button';
@@ -18,9 +11,6 @@ import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from '@/components/shadcn/select';
 import {
-  Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
-} from '@/components/shadcn/table';
-import {
   AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle,
   AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction,
 } from '@/components/shadcn/alert-dialog';
@@ -28,134 +18,27 @@ import { useIsMobile } from '@/hooks/useIsMobile';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useAdminMessages, useAdminI18n } from '@/lib/adminI18n';
 import { analyticsMessages } from '@/lib/adminI18n/messages/analytics';
+import { boardMessages } from '@/lib/adminI18n/messages/board';
 import AdminPageHeader from '@/components/admin/AdminPageHeader';
-import AdminEmptyState from '@/components/admin/AdminEmptyState';
-import MetricCardGrid from '@/components/admin/MetricCardGrid';
-import { IcEye, IcCursor, IcTrendUp, IcUser, IcChat, IcPhone, IcMail } from '@/components/admin/AdminIcons';
-import SectionHeading from '@/components/admin/SectionHeading';
-import {
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from 'recharts';
+import WidgetBoard from '@/components/admin/board/WidgetBoard';
+import AddWidgetDialog from '@/components/admin/board/AddWidgetDialog';
+import { BoardControls, BoardHint, BoardStyles } from '@/components/admin/board/BoardChrome';
+import { useWidgetLayout } from '@/components/admin/board/useWidgetLayout';
 
-interface AnalyticsSummary {
-  totalViews: number;
-  totalClicks: number;
-  uniqueVisitors: number;
-  topProperties: Array<{ propertyId: number; views: number }>;
-  topPropertiesByClicks: Array<{
-    propertyId: number;
-    clicks: number;
-    property?: { id: number; title: string; location: string } | null;
-  }>;
-  clickTypes: Array<{ eventType: string; count: number }>;
-  topUsersByClicks?: Array<{ ipAddress: string; clicks: number; userAgent: string | null }>;
-  // Real leads (Inquiry table) + acquisition — all computed server-side in the summary endpoint.
-  totalInquiries?: number;
-  newInquiries?: number;
-  inquiriesToday?: number;
-  inquiriesLast7Days?: number;
-  inquiriesBySource?: Array<{ source: string; count: number }>;
-  inquiriesByStatus?: Array<{ status: string; count: number }>;
-  trafficSources?: Array<{ source: string; count: number }>;
-}
+import { ANALYTICS_WIDGETS, WIDGETS_BY_ID } from './widgets';
+import type {
+  AnalyticsSummary,
+  AnalyticsWidgetContext,
+  ChartDataPoint,
+  ClickEvent,
+  PropertyView,
+} from './types';
 
-interface PropertyView {
-  id: number;
-  propertyId: number;
-  ipAddress: string;
-  userAgent: string | null;
-  referer: string | null;
-  createdAt: string;
-  property: {
-    id: number;
-    title: string;
-    location: string;
-  } | null;
-}
-
-interface ClickEvent {
-  id: number;
-  propertyId: number | null;
-  eventType: string;
-  elementId: string | null;
-  elementType: string | null;
-  ipAddress: string;
-  userAgent: string | null;
-  createdAt: string;
-  property: {
-    id: number;
-    title: string;
-    location: string;
-  } | null;
-}
-
-interface ChartDataPoint {
-  date: string;
-  views: number;
-  clicks: number;
-  uniqueUsers: number;
-}
-
-/* Brand palette — Aiterra: indigo · sky · deep navy, no rainbow */
-const NAVY = '#354AC4';
-const SKY = '#5594F1'; // sky-blue accent
-const SKY_TEXT = '#2A69C4'; // AA-safe accent blue for text on light surfaces
-// Categorical sequence kept within the indigo/sky family + neutrals
-const COLORS = ['#354AC4', '#5594F1', '#051150', '#2A69C4', '#7BAAF5', '#8F9BD8', '#9AA0AA', '#C9CDD6'];
-
-// Referer buckets / Inquiry.source labels moved into analyticsMessages
-// (t.trafficLabels / t.leadSourceLabels) — resolved per locale in the component.
-// Matches STATUS_META in /admin/inquiries, tinted to the estate palette.
-// Labels live in analyticsMessages (t.statusLabels).
-const LEAD_STATUS_STYLES: Record<string, { color: string; bg: string }> = {
-  new: { color: SKY_TEXT, bg: 'rgba(85,148,241,.16)' },
-  in_progress: { color: NAVY, bg: 'rgba(53,74,196,.08)' },
-  closed: { color: '#051150', bg: 'rgba(5,17,80,.07)' },
-};
-
-// Compact ranked bar list — used for both traffic sources and lead sources.
-// One hairline-separated row per bucket: label · count · share, with a proportional
-// bar (top bucket in sky). Deliberately not another pie chart.
-function SourceBars({ items, labels }: { items?: Array<{ source: string; count: number }>; labels: Record<string, string> }) {
-  const t = useAdminMessages(analyticsMessages);
-  const data = (items || []).slice(0, 8);
-  const total = data.reduce((s, d) => s + d.count, 0);
-  if (!total) return <AdminEmptyState message={t.noDataInRange} />;
-  return (
-    <div>
-      {data.map((d, i) => {
-        const pct = Math.round((d.count / total) * 100);
-        return (
-          <div key={d.source} style={{ padding: '9px 0', borderBottom: i === data.length - 1 ? 'none' : '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
-              <span style={{ fontWeight: 600, color: '#334155' }}>{labels[d.source] || d.source}</span>
-              <span style={{ color: '#475569' }}>{d.count} · {pct}%</span>
-            </div>
-            <div style={{ position: 'relative', height: 6, borderRadius: 4, background: '#F0F1F3' }}>
-              <div style={{ position: 'absolute', insetInlineStart: 0, top: 0, height: 6, borderRadius: 4, width: `${pct}%`, background: i === 0 ? SKY : NAVY }} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
+const LAYOUT_STORAGE_KEY = 'admin-analytics-layout-v1';
 
 export default function AnalyticsPage() {
   const t = useAdminMessages(analyticsMessages);
+  const board = useAdminMessages(boardMessages);
   const { dir } = useAdminI18n();
   const isMobile = useIsMobile();
   const reduced = usePrefersReducedMotion();
@@ -169,6 +52,14 @@ export default function AnalyticsPage() {
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [ipToVisitorMap, setIpToVisitorMap] = useState<Map<string, number>>(new Map());
   const [resetOpen, setResetOpen] = useState(false);
+
+  // Dashboard customisation: block order / width / visibility (persisted locally).
+  const {
+    visibleItems, hiddenWidgets, isCustomized,
+    moveWidget, setSpan, hideWidget, addWidget, resetLayout,
+  } = useWidgetLayout(LAYOUT_STORAGE_KEY, ANALYTICS_WIDGETS);
+  const [editing, setEditing] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     fetchAnalytics();
@@ -314,58 +205,34 @@ export default function AnalyticsPage() {
     }
   };
 
-  const getVisitorNumber = (ipAddress: string): string => {
+  const getVisitorNumber = useCallback((ipAddress: string): string => {
     const visitorNum = ipToVisitorMap.get(ipAddress);
     return visitorNum ? t.visitor(visitorNum) : t.visitor('?');
-  };
+  }, [ipToVisitorMap, t]);
 
-  const getEventTypeLabel = (eventType: string) => {
-    const labels = t.eventTypes as Record<string, string>;
-    return labels[eventType] || eventType;
-  };
+  // Everything the blocks render from — they are pure functions of this.
+  const widgetCtx: AnalyticsWidgetContext = useMemo(() => ({
+    t, dir, isMobile, reduced,
+    summary, views, clicks, chartData,
+    selectedIP, setSelectedIP, getVisitorNumber,
+  }), [t, dir, isMobile, reduced, summary, views, clicks, chartData, selectedIP, getVisitorNumber]);
 
-  // Restrained, brand-aligned chip: leads in sky, views in indigo, the rest neutral —
-  // replaces the previous rainbow of antd tag presets. Text colors are AA on their tints.
-  const LEAD_EVENTS = ['click_phone', 'click_whatsapp', 'click_email', 'contact_form'];
-  const getEventChipStyle = (eventType: string): React.CSSProperties => {
-    const lead = LEAD_EVENTS.includes(eventType);
-    const isView = eventType === 'property_view';
-    return {
-      background: lead ? 'rgba(85,148,241,.14)' : isView ? 'rgba(53,74,196,.08)' : '#EEF1F7',
-      color: lead ? SKY_TEXT : isView ? NAVY : '#475569',
-      borderRadius: 9999,
-      padding: '2px 9px',
-      fontSize: 12,
-      fontWeight: 600,
-      display: 'inline-block',
-      whiteSpace: 'nowrap',
-    };
-  };
+  const handleHide = useCallback((id: string) => {
+    hideWidget(id);
+    const def = WIDGETS_BY_ID[id];
+    if (def) toast.success(board.blockHidden(def.title(widgetCtx)));
+  }, [hideWidget, board, widgetCtx]);
 
-  // Browser + device chip shared by both recent-activity tables and the active-visitors list.
-  const renderBrowser = (userAgent: string | null) => {
-    if (!userAgent) return '-';
-    const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
-    const browser = browsers.find(b => userAgent.includes(b)) || 'Unknown';
-    const mobile = userAgent.includes('Mobile');
-    return (
-      <span title={userAgent} style={{ fontSize: '0.9em', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-        {mobile ? <Smartphone className="size-4" /> : <Monitor className="size-4" />}
-        {browser}
-      </span>
-    );
-  };
+  const handleAdd = useCallback((id: string) => {
+    addWidget(id);
+    const def = WIDGETS_BY_ID[id];
+    if (def) toast.success(board.blockAdded(def.title(widgetCtx)));
+  }, [addWidget, board, widgetCtx]);
 
-  // Engagement = interactions (clicks) per view. This is NOT a conversion rate —
-  // real conversion is leads/visitors (shown in the פניות section below). Labeling
-  // clicks/views "יחס המרה" (conversion) next to 0 leads read as fake/"каша", so it
-  // is honestly surfaced as "מעורבות" (matches the /admin dashboard terminology).
-  const engagementRate = summary?.totalViews
-    ? ((summary.totalClicks / summary.totalViews) * 100).toFixed(1)
-    : '0.0';
-
-  const recentClicks = Array.isArray(clicks) ? clicks.slice(0, 10) : [];
-  const recentViews = Array.isArray(views) ? views.slice(0, 10) : [];
+  const handleResetLayout = useCallback(() => {
+    resetLayout();
+    toast.success(board.layoutReset);
+  }, [resetLayout, board]);
 
   if (loading && !summary) {
     // Same skeleton vocabulary as /admin: one hero-sized block + a stack of lines.
@@ -381,27 +248,6 @@ export default function AnalyticsPage() {
     );
   }
 
-  // Prepare pie chart data
-  const pieChartData = (summary?.clickTypes || []).map(ct => ({
-    name: getEventTypeLabel(ct.eventType),
-    value: ct.count,
-  }));
-
-  // Fewer points on phone (last 7) vs desktop (last 30) — chartData itself is
-  // untouched; this is purely a display slice for the area chart.
-  const chartMaxChars = isMobile ? 10 : 15;
-  const displayChartData = isMobile ? chartData.slice(-7) : chartData.slice(-30);
-
-  // Prepare bar chart data
-  const barChartData = (summary?.topPropertiesByClicks || [])
-    .slice(0, 8)
-    .map(p => ({
-      name: p.property ? (p.property.title.length > chartMaxChars ? p.property.title.substring(0, chartMaxChars) + '...' : p.property.title) : t.propertyFallback(p.propertyId),
-      clicks: p.clicks,
-      fullTitle: p.property?.title || '',
-      propertyId: p.propertyId,
-    }));
-
   return (
     <div className="analytics-console">
       {/* Header */}
@@ -409,15 +255,28 @@ export default function AnalyticsPage() {
         title={t.title}
         subtitle={t.subtitle}
         extra={
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <Button type="button" variant="outline" onClick={fetchAnalytics} disabled={loading}>
-              <RotateCw className="size-4" />
-              {t.refresh}
-            </Button>
-            <Button type="button" variant="destructive" onClick={() => setResetOpen(true)}>
-              <Trash2 className="size-4" />
-              {t.resetData}
-            </Button>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+            <BoardControls
+              editing={editing}
+              onEdit={() => setEditing(true)}
+              onDone={() => setEditing(false)}
+              onAdd={() => setPickerOpen(true)}
+              onReset={handleResetLayout}
+              canReset={isCustomized}
+              labels={board}
+            />
+            {!editing && (
+              <>
+                <Button type="button" variant="outline" onClick={fetchAnalytics} disabled={loading}>
+                  <RotateCw className="size-4" />
+                  {t.refresh}
+                </Button>
+                <Button type="button" variant="destructive" onClick={() => setResetOpen(true)}>
+                  <Trash2 className="size-4" />
+                  {t.resetData}
+                </Button>
+              </>
+            )}
           </div>
         }
       />
@@ -510,326 +369,42 @@ export default function AnalyticsPage() {
         </Card>
       )}
 
-      {/* Key Metrics Cards */}
-      <MetricCardGrid
-        items={[
-          { icon: <IcEye className="size-5" />, label: t.totalViews, value: summary?.totalViews || 0, accent: NAVY },
-          { icon: <IcCursor className="size-5" />, label: t.totalClicks, value: summary?.totalClicks || 0, accent: NAVY },
-          { icon: <IcTrendUp className="size-5" />, label: t.engagement, value: Number(engagementRate || 0).toFixed(1), suffix: '%', accent: SKY },
-          { icon: <IcUser className="size-5" />, label: t.uniqueUsers, value: summary?.uniqueVisitors || 0, accent: NAVY },
-        ]}
+      {/* Customisation hint — only while editing, so read mode stays clean */}
+      {editing && <BoardHint labels={board} />}
+
+      {/* The board — order, width and visibility come from the layout store */}
+      <WidgetBoard
+        items={visibleItems}
+        widgets={ANALYTICS_WIDGETS}
+        ctx={widgetCtx}
+        labels={board}
+        editing={editing}
+        rtl={dir === 'rtl'}
+        onMove={moveWidget}
+        onSpanChange={setSpan}
+        onHide={handleHide}
       />
 
-      {/* Leads (Inquiry table) — the money metric — plus where traffic and leads come
-          from. All values are computed server-side in /api/analytics/track (summary). */}
-      <SectionHeading>{t.inquiriesSection}</SectionHeading>
-      <MetricCardGrid
-        items={[
-          { icon: <IcChat className="size-5" />, label: t.totalInquiries, value: summary?.totalInquiries || 0, accent: NAVY },
-          { icon: <IcTrendUp className="size-5" />, label: t.newInquiries, value: summary?.newInquiries || 0, accent: SKY },
-          { icon: <IcPhone className="size-5" />, label: t.inquiriesToday, value: summary?.inquiriesToday || 0, accent: NAVY },
-          { icon: <IcMail className="size-5" />, label: t.inquiriesLast7Days, value: summary?.inquiriesLast7Days || 0, accent: NAVY },
-        ]}
+      {visibleItems.length === 0 && (
+        <Card className="ec-card p-6" style={{ textAlign: 'center' }}>
+          <p className="m-0 text-sm text-muted-foreground">{board.emptyBoard}</p>
+          <Button type="button" className="mt-4" onClick={() => { setEditing(true); setPickerOpen(true); }}>
+            <Plus className="size-4" />
+            {board.addBlock}
+          </Button>
+        </Card>
+      )}
+
+      {/* Block picker */}
+      <AddWidgetDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        hidden={hiddenWidgets}
+        onAdd={handleAdd}
+        ctx={widgetCtx}
+        labels={board}
       />
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3" style={{ marginBottom: '28px' }}>
-        <Card className="ec-card h-full p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.trafficSources}</div>
-          <SourceBars items={summary?.trafficSources} labels={t.trafficLabels} />
-        </Card>
-        <Card className="ec-card h-full p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.inquiriesBySource}</div>
-          <SourceBars items={summary?.inquiriesBySource} labels={t.leadSourceLabels} />
-        </Card>
-        <Card className="ec-card h-full p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.inquiriesByStatus}</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {(['new', 'in_progress', 'closed'] as const).map((st) => {
-              const meta = LEAD_STATUS_STYLES[st];
-              const count = summary?.inquiriesByStatus?.find((s) => s.status === st)?.count || 0;
-              return (
-                <div key={st} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 8, background: meta.bg }}>
-                  <span style={{ fontWeight: 600, color: meta.color }}>{t.statusLabels[st]}</span>
-                  <span style={{ fontWeight: 700, fontSize: 18, color: meta.color }}>{count}</span>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      </div>
-
-      {/* Main Charts Row */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3" style={{ marginBottom: '28px' }}>
-        {/* Line Chart */}
-        <Card className="ec-card h-full p-6 lg:col-span-2">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.trendsOverTime}</div>
-          {displayChartData.length === 0 ? (
-            <AdminEmptyState message={t.noDataInRange} />
-          ) : (
-            <ResponsiveContainer width="100%" height={350}>
-              <AreaChart data={displayChartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#354AC4" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#354AC4" stopOpacity={0.1}/>
-                  </linearGradient>
-                  <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={SKY} stopOpacity={0.7}/>
-                    <stop offset="95%" stopColor={SKY} stopOpacity={0.05}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  reversed={dir === 'rtl'}
-                  tick={{fontSize: 12}}
-                  interval="preserveStartEnd"
-                  minTickGap={24}
-                  {...(isMobile ? { angle: -45, textAnchor: 'end', height: 50 } : {})}
-                />
-                <YAxis tick={{fontSize: 12}} />
-                <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', direction: dir, textAlign: 'start' }}
-                  labelStyle={{ fontWeight: 'bold', marginBottom: '5px' }}
-                />
-                <Legend verticalAlign="top" height={36} />
-                <Area type="monotone" dataKey="views" stroke="#354AC4" fillOpacity={1} fill="url(#colorViews)" name={t.viewsLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
-                <Area type="monotone" dataKey="clicks" stroke={SKY} fillOpacity={1} fill="url(#colorClicks)" name={t.clicksLegend} activeDot={{ r: 6 }} isAnimationActive={!reduced} />
-              </AreaChart>
-            </ResponsiveContainer>
-          )}
-        </Card>
-
-        {/* Pie Chart */}
-        <Card className="ec-card h-full p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.actionsDistribution}</div>
-          {pieChartData.length === 0 ? (
-            <AdminEmptyState message={t.noDataInRange} />
-          ) : (
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={({ percent }) => `${(percent ? percent * 100 : 0).toFixed(0)}%`}
-                  isAnimationActive={!reduced}
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ borderRadius: '8px' }} />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
-        </Card>
-      </div>
-
-      {/* Charts Row - Properties & Users */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2" style={{ marginBottom: '28px' }}>
-        {/* Bar Chart - Popular Properties */}
-        {barChartData.length > 0 && (
-          <Card className="ec-card h-full p-6">
-            <div className="mb-4" style={{ fontWeight: 600 }}>{t.topProperties}</div>
-            <ResponsiveContainer width="100%" height={300}>
-              {/* RTL mirror — same approach as the AreaChart above: reverse the value
-                  axis so bars grow from the inline-start edge, move category labels to
-                  the inline-start side, and swap the asymmetric margins. */}
-              <BarChart
-                data={barChartData}
-                layout="vertical"
-                margin={dir === 'rtl' ? { top: 5, right: 20, left: 30, bottom: 5 } : { top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                <XAxis type="number" reversed={dir === 'rtl'} />
-                <YAxis
-                  dataKey="name"
-                  type="category"
-                  orientation={dir === 'rtl' ? 'right' : 'left'}
-                  width={isMobile ? 90 : 150}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip
-                  cursor={{ fill: 'transparent' }}
-                  content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                          const data = payload[0].payload;
-                          return (
-                              <div style={{ backgroundColor: '#fff', padding: '10px 12px', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 6px 18px rgba(5,17,80,0.08)' }}>
-                                  <p style={{ fontWeight: 'bold', margin: 0 }}>{data.fullTitle}</p>
-                                  <p style={{ margin: 0, color: SKY_TEXT }}>{t.clicksCount(data.clicks)}</p>
-                              </div>
-                          );
-                      }
-                      return null;
-                  }}
-                />
-                <Bar dataKey="clicks" name={t.clicksLegend} radius={(dir === 'rtl' ? [4, 0, 0, 4] : [0, 4, 4, 0]) as [number, number, number, number]} barSize={24} isAnimationActive={!reduced}>
-                  {barChartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? SKY : NAVY} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        )}
-
-        {/* Top Users by Clicks */}
-        {summary?.topUsersByClicks && summary.topUsersByClicks.length > 0 && (
-          <Card className={cn('ec-card h-full p-6', barChartData.length === 0 && 'lg:col-span-2')}>
-            <div className="mb-4" style={{ fontWeight: 600 }}>{t.activeVisitors}</div>
-            <div style={{ maxHeight: 300, overflowY: 'auto' }}>
-              {summary.topUsersByClicks.map((user, index) => {
-                const browsers = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'];
-                const browser = user.userAgent ? browsers.find(b => user.userAgent!.includes(b)) || 'Unknown' : 'Unknown';
-                const isMobile = !!user.userAgent?.includes('Mobile');
-                const isSelected = selectedIP === user.ipAddress;
-
-                return (
-                  <button
-                    type="button"
-                    key={user.ipAddress}
-                    onClick={() => setSelectedIP(user.ipAddress)}
-                    className={`analytics-visitor-row${isSelected ? ' is-selected' : ''}`}
-                    style={{
-                      width: '100%',
-                      textAlign: 'start',
-                      border: 0,
-                      color: 'inherit',
-                      font: 'inherit',
-                      padding: '12px 16px',
-                      borderBottom: '1px solid var(--border)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s ease',
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span className="admin-pill admin-pill--neutral">#{index + 1}</span>
-                        <span style={{ fontSize: '0.95em', fontWeight: 700, color: 'var(--brand)' }}>
-                          {getVisitorNumber(user.ipAddress)}
-                        </span>
-                        {isSelected && (
-                          <span className="admin-pill admin-pill--neutral">{t.filteredTag}</span>
-                        )}
-                      </div>
-                      <div style={{ fontSize: '0.85em', color: '#64748B', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {isMobile ? <Smartphone className="size-4" /> : <Monitor className="size-4" />}
-                        {browser}
-                      </div>
-                    </div>
-                    <div style={{
-                      fontSize: '1.5em',
-                      fontWeight: 'bold',
-                      color: 'var(--brand)',
-                      minWidth: '60px',
-                      textAlign: 'center',
-                    }}>
-                      {user.clicks}
-                      <div className="text-xs font-normal text-muted-foreground">{t.clicksLegend}</div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </Card>
-        )}
-      </div>
-
-      {/* Recent Activity Tables — full-width, stacked one under the other so the
-          5-column clicks table has room (side-by-side clipped the date column). */}
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <Card className="ec-card p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.recentActions}</div>
-          {recentClicks.length === 0 ? (
-            <AdminEmptyState message={t.noDataInRange} />
-          ) : (
-            <Table className="min-w-[640px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead style={{ width: '25%' }}>{t.colProperty}</TableHead>
-                  <TableHead style={{ width: '15%' }}>{t.colAction}</TableHead>
-                  <TableHead style={{ width: '18%' }}>{t.colVisitorId}</TableHead>
-                  <TableHead style={{ width: '17%' }}>{t.colBrowser}</TableHead>
-                  <TableHead style={{ width: '25%' }}>{t.colDate}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentClicks.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>
-                      {record.property ? (
-                        <div>
-                          <div style={{ fontWeight: 600 }}>{record.property.title}</div>
-                          <div style={{ fontSize: '0.85em', color: '#64748B' }}>#{record.propertyId}</div>
-                        </div>
-                      ) : record.propertyId ? (
-                        <span className="admin-pill admin-pill--neutral">#{record.propertyId}</span>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <span style={getEventChipStyle(record.eventType)}>{getEventTypeLabel(record.eventType)}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#354AC4' }}>{getVisitorNumber(record.ipAddress)}</span>
-                    </TableCell>
-                    <TableCell>{renderBrowser(record.userAgent)}</TableCell>
-                    <TableCell>{dayjs(record.createdAt).format('DD/MM/YYYY HH:mm')}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Card>
-
-        <Card className="ec-card p-6">
-          <div className="mb-4" style={{ fontWeight: 600 }}>{t.recentViews}</div>
-          {recentViews.length === 0 ? (
-            <AdminEmptyState message={t.noDataInRange} />
-          ) : (
-            <Table className="min-w-[640px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead style={{ width: '35%' }}>{t.colProperty}</TableHead>
-                  <TableHead style={{ width: '20%' }}>{t.colVisitorId}</TableHead>
-                  <TableHead style={{ width: '20%' }}>{t.colBrowser}</TableHead>
-                  <TableHead style={{ width: '25%' }}>{t.colDate}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentViews.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>
-                      {record.property ? (
-                        <div style={{ fontWeight: 500 }}>
-                          <div>{record.property.title}</div>
-                          <div style={{ color: '#64748B', fontSize: '0.85em', marginTop: '2px' }}>{record.property.location}</div>
-                        </div>
-                      ) : (
-                        <span style={{ color: '#94A3B8' }}>{t.notAvailable}</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span style={{ fontWeight: 600, fontSize: '0.9em', color: '#354AC4' }}>{getVisitorNumber(record.ipAddress)}</span>
-                    </TableCell>
-                    <TableCell>{renderBrowser(record.userAgent)}</TableCell>
-                    <TableCell>{dayjs(record.createdAt).format('DD/MM/YYYY HH:mm')}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Card>
-      </div>
+      <BoardStyles />
 
       {/* Reset-all confirmation */}
       <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>

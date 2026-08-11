@@ -14,7 +14,12 @@ export default function NotFound() {
       style={{ background: "#f5f7fb", color: "#171717" }}
     >
       <Header />
-      <main className="flex-grow flex items-center justify-center px-4">
+      {/* The site header is position:fixed, so the page owns the offset that
+          keeps its content out from under it (same as every public page's hero). */}
+      <main
+        className="flex flex-grow items-center justify-center px-4"
+        style={{ paddingBlockStart: 'clamp(112px, 14vh, 160px)', paddingBlockEnd: 'clamp(56px, 8vh, 96px)' }}
+      >
         <div className="text-center" dir="rtl">
           <p
             className="text-8xl font-bold mb-4"

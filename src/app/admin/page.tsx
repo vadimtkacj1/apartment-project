@@ -1,137 +1,43 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, ArrowRight, Image as ImageIcon, Plus, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Plus, ExternalLink } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { Skeleton } from '@/components/shadcn/skeleton';
-import {
-  AreaChart,
-  Area,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import Link from 'next/link';
 import dayjs from 'dayjs';
-import { getCityLabel } from '@/data/cities';
-import { useAdminI18n, useAdminMessages, type MessagesShape } from '@/lib/adminI18n';
+
+import { Button } from '@/components/shadcn/button';
+import { toast } from '@/components/shadcn/sonner';
+import { useAdminI18n, useAdminMessages } from '@/lib/adminI18n';
 import { dashboardMessages } from '@/lib/adminI18n/messages/dashboard';
+import { boardMessages } from '@/lib/adminI18n/messages/board';
+import WidgetBoard from '@/components/admin/board/WidgetBoard';
+import AddWidgetDialog from '@/components/admin/board/AddWidgetDialog';
+import { BoardControls, BoardHint, BoardStyles } from '@/components/admin/board/BoardChrome';
+import { useWidgetLayout } from '@/components/admin/board/useWidgetLayout';
 
-/* ===== palette — tokens from src/styles/admin-design.css (single source of truth).
-   Indigo (BRAND / BRAND_SKY) is rationed to DATA MARKS ONLY (chart lines, composition
-   bar fills) and to CTAs/active states. Every resting figure is ink. ===== */
-const BRAND = '#354AC4';      // --brand — primary data line + composition fill + CTAs
-const BRAND_SKY = '#5594F1';  // --brand-sky — secondary data line + composition fill
-const BRAND_WASH = '#EEF1FB'; // --brand-wash — chart area fill
-const INK = '#051150';        // --text-ink — every KPI / static figure
-const MUTED = '#6C76A0';      // --text-muted — labels / axis
-const DIVIDER = '#EEF1F7';    // --divider — gridlines / hairlines
-const BORDER = '#E3E8F2';     // --border — tooltip hairline
+import {
+  DASHBOARD_WIDGETS,
+  DASHBOARD_WIDGETS_BY_ID,
+  NOTIFICATIONS_WIDGET_ID,
+  TEAM_WIDGET_ID,
+  computeMetrics,
+  computePortfolio,
+  formatLongDate,
+  type DashboardContext,
+  type NotificationRow,
+  type PropertyRow,
+  type SeriesPoint,
+  type Summary,
+  type TeamMemberRow,
+} from './dashboard-widgets';
 
-const WINDOW_DAYS = 14; // trend window; the full, filterable analytics lives on /admin/analytics
-
-/** Resolved dashboard message record for the active locale. */
-type DashboardT = MessagesShape<(typeof dashboardMessages)['he']>;
-
-/* ===== types ===== */
-interface PropertyRow {
-  id: number;
-  dealType: 'sale' | 'rent';
-  city: string;
-  propertyType: string;
-  rooms: number;
-  area: number;
-  price: string;
-  originalPrice: string | null;
-  images: string[];
-  isActive: boolean;
-  isSold: boolean;
-  isPinned: boolean;
-  isHotProposition?: boolean;
-  isNoCommission?: boolean;
-  title: string;
-  location: string;
-  createdAt: string;
-}
-
-interface Summary {
-  totalViews: number;
-  totalClicks: number;
-  uniqueVisitors: number;
-  clickTypes: Array<{ eventType: string; count: number }>;
-  // Real lead/inquiry stats (from the Inquiry table)
-  totalInquiries?: number;
-  newInquiries?: number;
-  inquiriesToday?: number;
-  inquiriesLast7Days?: number;
-  // 14-day sparkline + today's views, now aggregated server-side (was two
-  // ≤1000-row analytics fetches bucketed on the client).
-  dailySeries?: Array<{ date: string; views: number; clicks: number }>;
-  viewsToday?: number;
-}
-
-/* ===== helpers ===== */
-const parseMoney = (s: string | null | undefined): number =>
-  parseInt(String(s ?? '0').replace(/[^0-9]/g, ''), 10) || 0;
-
-const ils = (n: number): string => '₪' + n.toLocaleString('en-US');
-
-/** Self-contained long date (no dayjs locale dependency): "1 ביולי 2026" / "1 July 2026". */
-const formatLongDate = (d: ReturnType<typeof dayjs>, t: DashboardT): string => t.longDate(d.date(), d.month(), d.year());
-
-/** Human relative age for a listing — keeps recent rows feeling live, not template-y. */
-const relDaysLabel = (iso: string, t: DashboardT): string => {
-  const days = dayjs().startOf('day').diff(dayjs(iso).startOf('day'), 'day');
-  if (days <= 0) return t.addedToday;
-  if (days === 1) return t.addedYesterday;
-  if (days < 7) return t.daysAgo(days);
-  if (days < 14) return t.weekAgo;
-  return t.weeksAgo(Math.floor(days / 7));
-};
-
-/** Bidi-isolated, tabular-numeral wrapper so ₪/%/commas/digits never reorder in RTL. */
-const Num: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
-  <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block', ...style }}>
-    {children}
-  </span>
-);
-
-/** Quiet section micro-label — hierarchy via size + whitespace, no eyebrow trope. */
-const Label: React.FC<{ children: React.ReactNode; style?: React.CSSProperties }> = ({ children, style }) => (
-  <div style={{ fontSize: 12, fontWeight: 600, color: MUTED, ...style }}>{children}</div>
-);
-
-/** Section title — 15/600 ink, no letter-spacing (RTL hierarchy = weight + color). */
-const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span style={{ fontSize: 15, fontWeight: 600, color: INK }}>{children}</span>
-);
-
-/** Local card shell — quiet by default (`--shadow-card` + hairline); pass `className="ec-card--hero"` for the one data hero. */
-function ECard({ title, extra, style, className, children }: { title?: React.ReactNode; extra?: React.ReactNode; style?: React.CSSProperties; className?: string; children: React.ReactNode }) {
-  return (
-    <div className={`ec-card${className ? ' ' + className : ''}`} style={style}>
-      {(title || extra) && <div className="ec-card-head">{title}{extra}</div>}
-      <div className="ec-card-body">{children}</div>
-    </div>
-  );
-}
-
-/** Skeleton paragraph — a stack of full-width lines (replaces antd `Skeleton active paragraph`). */
-function SkelLines({ rows }: { rows: number }) {
-  return (
-    <div className="flex flex-col gap-3">
-      {Array.from({ length: rows }).map((_, i) => (
-        <Skeleton key={i} className="h-4 w-full" />
-      ))}
-    </div>
-  );
-}
+const LAYOUT_STORAGE_KEY = 'admin-dashboard-layout-v1';
 
 /* ===== page ===== */
 export default function AdminDashboard() {
   const t = useAdminMessages(dashboardMessages);
+  const board = useAdminMessages(boardMessages);
   const { data: session } = useSession();
   const userName = (session?.user as { name?: string; username?: string } | undefined)?.name
     ?? (session?.user as { username?: string } | undefined)?.username;
@@ -143,12 +49,23 @@ export default function AdminDashboard() {
     const h = new Date().getHours();
     setGreeting(h < 12 ? t.greetingMorning : h < 18 ? t.greetingAfternoon : t.greetingEvening);
   }, [t]);
-  const { dir } = useAdminI18n();
-  const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
+  const { dir, locale } = useAdminI18n();
   const [props, setProps] = useState<PropertyRow[] | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [propsLoading, setPropsLoading] = useState(true);
   const [trafficLoading, setTrafficLoading] = useState(true);
+  const [team, setTeam] = useState<TeamMemberRow[] | null>(null);
+  const [teamLoading, setTeamLoading] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationRow[] | null>(null);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
+  // Board customisation: block order / width / visibility (persisted locally).
+  const {
+    visibleItems, hiddenWidgets, isCustomized,
+    moveWidget, setSpan, hideWidget, addWidget, resetLayout,
+  } = useWidgetLayout(LAYOUT_STORAGE_KEY, DASHBOARD_WIDGETS);
+  const [editing, setEditing] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -165,8 +82,8 @@ export default function AdminDashboard() {
     })();
     (async () => {
       try {
-        // Single call — the summary now carries the sparkline series and today's
-        // views, so the dashboard no longer pulls the full views/clicks tables.
+        // Single call — the summary carries the sparkline series and today's
+        // views, so the dashboard never pulls the full views/clicks tables.
         const s = await fetch('/api/analytics/track?type=summary');
         if (alive && s.ok) setSummary(await s.json());
       } catch {
@@ -180,98 +97,96 @@ export default function AdminDashboard() {
     };
   }, []);
 
-  const p = useMemo(() => props ?? [], [props]);
-  const portfolio = useMemo(() => {
-    const total = p.length;
-    const portfolioValue = p.reduce((a, x) => a + parseMoney(x.price), 0);
-    const activeCount = p.filter((x) => x.isActive).length;
-    const saleCount = p.filter((x) => x.dealType === 'sale').length;
-    const rentCount = p.filter((x) => x.dealType === 'rent').length;
-    const salePct = total ? Math.round((saleCount / total) * 100) : 0;
-    const avgPrice = total ? Math.round(portfolioValue / total) : 0;
-    const maxPrice = p.reduce((m, x) => Math.max(m, parseMoney(x.price)), 0);
-    const newThisWeek = p.filter((x) => dayjs().diff(dayjs(x.createdAt), 'day') < 7).length;
-    const priceDrops = p.filter((x) => x.originalPrice && parseMoney(x.originalPrice) > parseMoney(x.price)).length;
-    const noPhotos = p.filter((x) => !x.images || x.images.length === 0).length;
-    const hidden = p.filter((x) => !x.isActive).length;
-    const soldCount = p.filter((x) => x.isSold).length;
-    const pinnedCount = p.filter((x) => x.isPinned).length;
-    const hotCount = p.filter((x) => x.isHotProposition).length;
-
-    const typeLabels: Record<string, string> = t.propertyTypes;
-    const typeMap = new Map<string, number>();
-    p.forEach((x) => typeMap.set(x.propertyType, (typeMap.get(x.propertyType) || 0) + 1));
-    const typeCounts = Array.from(typeMap.entries())
-      .map(([type, count]) => ({ type, count, label: typeLabels[type] || type }))
-      .sort((a, b) => b.count - a.count);
-
-    const cityMap = new Map<string, number>();
-    p.forEach((x) => cityMap.set(x.city, (cityMap.get(x.city) || 0) + 1));
-    const cityCounts = Array.from(cityMap.entries())
-      .map(([city, count]) => ({ label: getCityLabel(city) || city, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 4);
-
-    const recentListings = [...p]
-      .sort((a, b) => dayjs(b.createdAt).unix() - dayjs(a.createdAt).unix())
-      .slice(0, 5);
-
-    return {
-      total, portfolioValue, activeCount, saleCount, rentCount, salePct, avgPrice, maxPrice,
-      newThisWeek, priceDrops, noPhotos, hidden, soldCount, pinnedCount, hotCount,
-      typeCounts, cityCounts, recentListings,
+  // The team block is optional, so its fetch only happens once it is on the board.
+  const teamOnBoard = useMemo(() => visibleItems.some((i) => i.id === TEAM_WIDGET_ID), [visibleItems]);
+  useEffect(() => {
+    if (!teamOnBoard || team !== null) return;
+    let alive = true;
+    setTeamLoading(true);
+    (async () => {
+      try {
+        const r = await fetch('/api/admin/team');
+        const data = r.ok ? await r.json() : [];
+        if (alive) setTeam(Array.isArray(data) ? data : []);
+      } catch {
+        if (alive) setTeam([]);
+      } finally {
+        if (alive) setTeamLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
     };
-  }, [p, t]);
+  }, [teamOnBoard, team]);
 
-  const totalViews = summary?.totalViews ?? 0;
-  const totalClicks = summary?.totalClicks ?? 0;
-  const uniqueVisitors = summary?.uniqueVisitors ?? 0;
-  // Real leads from the Inquiry table (actual submitted contact forms) —
-  // accurate, replaces the old clickEvent-derived "פניות" approximation.
-  const leadSignals = summary?.totalInquiries ?? 0;
-  // מעורבות (engagement) = interactions per view. This is what the panel used to
-  // mislabel as "conversion" — an 83% "conversion" with 0 leads reads as fake.
-  const engagement = totalViews ? ((totalClicks / totalViews) * 100).toFixed(1) : '0.0';
-  // יחס המרה (real conversion) = actual submitted inquiries per unique visitor.
-  const conversion = uniqueVisitors ? ((leadSignals / uniqueVisitors) * 100).toFixed(1) : '0.0';
+  // Same deal for the activity feed — the team card's bubble reads from it too.
+  const notificationsOnBoard = useMemo(
+    () => visibleItems.some((i) => i.id === NOTIFICATIONS_WIDGET_ID || i.id === TEAM_WIDGET_ID),
+    [visibleItems]
+  );
+  useEffect(() => {
+    if (!notificationsOnBoard || notifications !== null) return;
+    let alive = true;
+    setNotificationsLoading(true);
+    (async () => {
+      try {
+        const r = await fetch('/api/admin/notifications?limit=20');
+        const data = r.ok ? await r.json() : [];
+        if (alive) setNotifications(Array.isArray(data) ? data : []);
+      } catch {
+        if (alive) setNotifications([]);
+      } finally {
+        if (alive) setNotificationsLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [notificationsOnBoard, notifications]);
 
-  const series = useMemo(
+  const p = useMemo(() => props ?? [], [props]);
+  const portfolio = useMemo(() => computePortfolio(p, t), [p, t]);
+
+  const series = useMemo<SeriesPoint[]>(
     () => (summary?.dailySeries ?? []).map((d) => ({ date: dayjs(d.date).format('DD/MM'), views: d.views, clicks: d.clicks })),
     [summary],
   );
+  const metrics = useMemo(() => computeMetrics(summary, series), [summary, series]);
 
-  const viewsToday = summary?.viewsToday ?? 0;
-  const leadsToday = summary?.inquiriesToday ?? 0;
+  // Everything the blocks render from — they are pure functions of this.
+  const widgetCtx: DashboardContext = useMemo(() => ({
+    t, locale, dir, summary, propsLoading, trafficLoading, portfolio, series, metrics,
+    team: team ?? [],
+    teamLoading: teamLoading || (teamOnBoard && team === null),
+    notifications: notifications ?? [],
+    notificationsLoading: notificationsLoading || (notificationsOnBoard && notifications === null),
+  }), [
+    t, locale, dir, summary, propsLoading, trafficLoading, portfolio, series, metrics,
+    team, teamLoading, teamOnBoard, notifications, notificationsLoading, notificationsOnBoard,
+  ]);
 
-  const trendEmpty = series.every((d) => d.views === 0 && d.clicks === 0);
+  const handleHide = useCallback((id: string) => {
+    hideWidget(id);
+    const def = DASHBOARD_WIDGETS_BY_ID[id];
+    if (def) toast.success(board.blockHidden(def.title(widgetCtx)));
+  }, [hideWidget, board, widgetCtx]);
 
-  // Week-over-week deltas for the two series-backed KPIs (views, interactions).
-  // Unique-visitors and inquiries carry no prior series, so they get no delta.
-  const { viewsDelta, interactionsDelta } = useMemo(() => {
-    const last7 = series.slice(-7);
-    const prior7 = series.slice(-14, -7);
-    const sum = (a: typeof series, k: 'views' | 'clicks') => a.reduce((s, d) => s + d[k], 0);
-    const pct = (n: number, p: number): number | null => (p > 0 ? Math.round(((n - p) / p) * 100) : null);
-    return {
-      viewsDelta: pct(sum(last7, 'views'), sum(prior7, 'views')),
-      interactionsDelta: pct(sum(last7, 'clicks'), sum(prior7, 'clicks')),
-    };
-  }, [series]);
+  const handleAdd = useCallback((id: string) => {
+    addWidget(id);
+    const def = DASHBOARD_WIDGETS_BY_ID[id];
+    if (def) toast.success(board.blockAdded(def.title(widgetCtx)));
+  }, [addWidget, board, widgetCtx]);
 
-  // Bidi-isolated delta line under a KPI value; ▲/▼ carry direction (not color alone),
-  // token classes carry the pos/neg color. null when there's no prior week.
-  const deltaEl = (d: number | null): React.ReactNode =>
-    d === null ? null : (
-      <div className={`delta ${d > 0 ? 'up' : d < 0 ? 'down' : 'ec-delta-flat'}`} aria-label={t.vsPrev7}>
-        <bdi dir="ltr">{(d > 0 ? '▲ ' : d < 0 ? '▼ ' : '±') + Math.abs(d) + '%'}</bdi>
-      </div>
-    );
+  const handleResetLayout = useCallback(() => {
+    resetLayout();
+    toast.success(board.layoutReset);
+  }, [resetLayout, board]);
 
   /* ===== render ===== */
   return (
     <div className="estate-console">
-      {/* ── 0. Page header — plain, on page bg (no gradient band). Title + faint date;
-              the actionable new-leads count folds in at inline-end as a brand CTA. ── */}
+      {/* ── Page header — plain, on page bg. Title + faint date; quick actions and
+              the board's customise control sit at the inline-end. ── */}
       <header className="ec-pagehead">
         <div>
           <h1 className="ec-h1">
@@ -280,269 +195,69 @@ export default function AdminDashboard() {
           <p className="ec-subtitle">{formatLongDate(dayjs(), t)} · {t.pageTitle}</p>
         </div>
         <div className="ec-quick">
-          <a href="/" target="_blank" rel="noopener" className="ec-quick-ghost">
-            <ExternalLink className="size-4" aria-hidden="true" />
-            {t.quickViewSite}
-          </a>
-          <Link href="/admin/properties/new" className="ec-quick-primary">
-            <Plus className="size-4" aria-hidden="true" />
-            {t.quickAddProperty}
-          </Link>
+          <BoardControls
+            editing={editing}
+            onEdit={() => setEditing(true)}
+            onDone={() => setEditing(false)}
+            onAdd={() => setPickerOpen(true)}
+            onReset={handleResetLayout}
+            canReset={isCustomized}
+            labels={board}
+          />
+          {!editing && (
+            <>
+              <a href="/" target="_blank" rel="noopener" className="ec-quick-ghost">
+                <ExternalLink className="size-4" aria-hidden="true" />
+                {t.quickViewSite}
+              </a>
+              <Link href="/admin/properties/new" className="ec-quick-primary">
+                <Plus className="size-4" aria-hidden="true" />
+                {t.quickAddProperty}
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
-      {/* ── 1. Focal hero — dark navy card holding the portfolio headline + facts + CTA ── */}
-      {propsLoading ? (
-        <Skeleton className="w-full" style={{ height: 108, marginBlock: '6px 24px', borderRadius: 16 }} />
-      ) : (
-        <div className="ec-focal">
-          <div className="ec-focal-main">
-            <span className="ec-focal-label">{t.portfolioValue}</span>
-            <span className="ec-focal-value"><bdi dir="ltr">{ils(portfolio.portfolioValue)}</bdi></span>
-            <span className="ec-focal-sub">
-              <bdi dir="ltr">{portfolio.activeCount}</bdi> {t.activeProperties}
-              {' · '}<bdi dir="ltr">{portfolio.saleCount}</bdi> {t.forSaleLower}
-              {' · '}<bdi dir="ltr">{portfolio.rentCount}</bdi> {t.forRentLower}
-            </span>
-          </div>
-          <div className="ec-focal-side">
-            <div className="ec-focal-stats">
-              <div>
-                <span className="fk">{t.mostExpensive}</span>
-                <span className="fv"><bdi dir="ltr">{ils(portfolio.maxPrice)}</bdi></span>
-              </div>
-              <div>
-                <span className="fk">{t.averageLabel}</span>
-                <span className="fv"><bdi dir="ltr">{ils(portfolio.avgPrice)}</bdi></span>
-              </div>
-            </div>
-            {!trafficLoading && (summary?.newInquiries ?? 0) > 0 && (
-              <Link href="/admin/inquiries" className="ec-focal-cta">
-                <bdi dir="ltr">{summary?.newInquiries}</bdi> {t.newInquiries}
-                <Fwd className="size-3.5" />
-              </Link>
-            )}
-          </div>
-        </div>
-      )}
+      <div style={{ marginBlockStart: 24 }}>
+        {editing && <BoardHint labels={board} />}
 
-      {/* ── 2. KPI strip — one card, 4 hairline-divided tiles. Numbers = ink, no icons ── */}
-      <div className="ec-kpi-strip" style={{ marginBottom: 24 }}>
-        <KpiTile label={t.kpiUniqueVisitors} value={uniqueVisitors} loading={trafficLoading} />
-        <KpiTile label={t.kpiViews} value={totalViews} delta={deltaEl(viewsDelta)} loading={trafficLoading} />
-        <KpiTile label={t.kpiInteractions} value={totalClicks} delta={deltaEl(interactionsDelta)} loading={trafficLoading} />
-        <KpiTile label={t.kpiInquiries} value={leadSignals} loading={trafficLoading} />
-      </div>
+        {/* The board — order, width and visibility come from the layout store */}
+        <WidgetBoard
+          items={visibleItems}
+          widgets={DASHBOARD_WIDGETS}
+          ctx={widgetCtx}
+          labels={board}
+          editing={editing}
+          rtl={dir === 'rtl'}
+          onMove={moveWidget}
+          onSpanChange={setSpan}
+          onHide={handleHide}
+        />
 
-      {/* ── 3. Traffic chart — the ONE data hero (--shadow-hero, radius 16) ── */}
-      <ECard
-        className={trendEmpty ? '' : 'ec-card--hero'}
-        style={{ marginBottom: 24 }}
-        title={
-          <div>
-            <SectionTitle>{t.siteTraffic}</SectionTitle>
-            <div className="ec-card-subtitle">{t.lastDays(WINDOW_DAYS)}</div>
-          </div>
-        }
-        extra={
-          <div className="ec-chart-tools">
-            <span className="ec-spark-legend">
-              <span className="ec-legend-item"><span className="ec-dot" style={{ background: BRAND }} />{t.chartViews}</span>
-              <span className="ec-legend-item"><span className="ec-dot" style={{ background: BRAND_SKY }} />{t.chartInteractions}</span>
-            </span>
-            <Link href="/admin/analytics" className="ec-viewall">
-              {t.fullAnalytics} <Fwd className="size-3" />
-            </Link>
-          </div>
-        }
-      >
-        {trafficLoading ? (
-          <SkelLines rows={5} />
-        ) : (
-          <>
-            {trendEmpty ? (
-              <EmptyBlock height={72} text={t.noTrafficData} />
-            ) : (
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={series} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
-                  <CartesianGrid vertical={false} stroke={DIVIDER} />
-                  <XAxis dataKey="date" reversed={dir === 'rtl'} tick={{ fontSize: 11, fill: MUTED }} axisLine={{ stroke: DIVIDER }} tickLine={false} minTickGap={24} />
-                  <YAxis hide />
-                  <Tooltip
-                    contentStyle={{ borderRadius: 10, border: `1px solid ${BORDER}`, direction: dir, textAlign: 'start', boxShadow: '0 6px 20px -8px rgba(5,17,80,.10)', fontSize: 12 }}
-                    labelStyle={{ fontWeight: 600, marginBottom: 4, color: INK }}
-                  />
-                  <Area type="monotone" dataKey="views" name={t.chartViews} stroke={BRAND} strokeWidth={2} fill={BRAND_WASH} fillOpacity={1} activeDot={{ r: 4 }} isAnimationActive={false} />
-                  <Area type="monotone" dataKey="clicks" name={t.chartInteractions} stroke={BRAND_SKY} strokeWidth={2} fill="transparent" activeDot={{ r: 4 }} isAnimationActive={false} />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
-            <div className="ec-chart-foot">
-              <span>
-                {t.conversionRate} <Num style={{ color: INK, fontWeight: 600 }}>{conversion}%</Num> · {t.engagement} <Num style={{ color: INK, fontWeight: 600 }}>{engagement}%</Num>
-              </span>
-              <span>
-                {t.todayLabel} <Num style={{ color: INK, fontWeight: 600 }}>{viewsToday}</Num> {t.viewsLower} · <Num style={{ color: INK, fontWeight: 600 }}>{leadsToday}</Num> {t.inquiriesLower}
-              </span>
-            </div>
-          </>
-        )}
-      </ECard>
-
-      {/* ── 4. Composition + Attention queue ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[13fr_11fr] gap-6" style={{ marginBottom: 24 }}>
-        <ECard style={{ height: '100%' }} title={<SectionTitle>{t.portfolioComposition}</SectionTitle>}>
-            {propsLoading ? (
-              <SkelLines rows={5} />
-            ) : portfolio.total === 0 ? (
-              <EmptyBlock height={160} text={t.noPropertiesInSystem} />
-            ) : (
-              <>
-                <div className="ec-splitbar" role="img" aria-label={t.splitBarAria}>
-                  {portfolio.salePct > 0 && <div className="ec-bar-fill" style={{ inlineSize: `${portfolio.salePct}%`, background: BRAND }} />}
-                  {portfolio.salePct < 100 && <div className="ec-bar-fill" style={{ inlineSize: `${100 - portfolio.salePct}%`, background: BRAND_SKY }} />}
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
-                  <span className="ec-comp-legend">
-                    <span className="ec-dot" style={{ background: BRAND }} />
-                    <Num>{portfolio.salePct}%</Num> · <Num>{portfolio.saleCount}</Num> {t.forSaleLower}
-                  </span>
-                  <span className="ec-comp-legend">
-                    <span className="ec-dot" style={{ background: BRAND_SKY }} />
-                    <Num>{100 - portfolio.salePct}%</Num> · <Num>{portfolio.rentCount}</Num> {t.forRentLower}
-                  </span>
-                </div>
-
-                <Label style={{ marginTop: 22, marginBottom: 8 }}>{t.byPropertyType}</Label>
-                <div>
-                  {portfolio.typeCounts.map((tc) => (
-                    <div key={tc.type} className="ec-typerow">
-                      <span className="ec-typelabel">{tc.label}</span>
-                      <span className="ec-countbadge"><Num>{tc.count}</Num></span>
-                    </div>
-                  ))}
-                </div>
-
-                {portfolio.cityCounts.length > 0 && (
-                  <>
-                    <Label style={{ marginTop: 18, marginBottom: 10 }}>{t.topCities}</Label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {portfolio.cityCounts.map((c) => (
-                        <span key={c.label} className="ec-citychip">
-                          {c.label} <Num style={{ color: INK, fontWeight: 600, marginInlineStart: 4 }}>{c.count}</Num>
-                        </span>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-        </ECard>
-
-        <ECard style={{ height: '100%' }} title={<SectionTitle>{t.needsAttention}</SectionTitle>}>
-            {propsLoading ? (
-              <SkelLines rows={4} />
-            ) : (
-              <div>
-                {/* Actionable rows lead with a warn/neg dot; informational rows a muted dot.
-                    Whole row is the click target; chevron surfaces on hover. */}
-                <AttentionRow label={t.priceDrops} count={portfolio.priceDrops} tone="warn" href="/admin/properties?attention=price-drop" />
-                <AttentionRow label={t.propertiesWithoutPhotos} count={portfolio.noPhotos} tone="neg" href="/admin/properties?attention=no-photos" />
-                <AttentionRow label={t.hiddenProperties} count={portfolio.hidden} tone="warn" href="/admin/properties?attention=hidden" />
-                <AttentionRow label={t.soldProperties} count={portfolio.soldCount} tone="muted" />
-                {portfolio.hotCount > 0 && <AttentionRow label={t.hotOffers} count={portfolio.hotCount} tone="muted" />}
-                {portfolio.pinnedCount > 0 && <AttentionRow label={t.pinnedProperties} count={portfolio.pinnedCount} tone="muted" />}
-              </div>
-            )}
-        </ECard>
-      </div>
-
-      {/* ── 5. Recent listings ── */}
-      <ECard title={<SectionTitle>{t.recentlyAdded}</SectionTitle>} extra={<Link href="/admin/properties" className="ec-viewall">{t.viewAll} <Fwd className="size-3" /></Link>}>
-        {propsLoading ? (
-          <SkelLines rows={4} />
-        ) : portfolio.recentListings.length === 0 ? (
-          <EmptyBlock height={120} text={t.noProperties} />
-        ) : (
-          <div>
-            {portfolio.recentListings.map((x) => (
-              <Link key={x.id} href="/admin/properties" className="ec-row ec-listrow">
-                {x.images && x.images.length > 0 ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={x.images[0]} alt={x.title} className="ec-thumb" loading="lazy" />
-                ) : (
-                  <span className="ec-thumb ec-thumb-empty">
-                    <ImageIcon style={{ color: 'var(--text-faint)' }} className="size-4" />
-                  </span>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="ec-listtitle">{x.title}</div>
-                  <div className="ec-listmeta">
-                    {getCityLabel(x.city) || x.location} · <Num>{x.rooms}</Num> {t.roomsAbbr} · <Num>{x.area}</Num> {t.sqmAbbr} · {relDaysLabel(x.createdAt, t)}
-                  </div>
-                </div>
-                <span className="ec-listprice"><Num>{ils(parseMoney(x.price))}</Num></span>
-                <span className={`ec-dealpill ${x.dealType === 'sale' ? 'sale' : 'rent'}`}>
-                  {x.dealType === 'sale' ? t.dealSale : t.dealRent}
-                </span>
-              </Link>
-            ))}
+        {visibleItems.length === 0 && (
+          <div className="ec-card" style={{ padding: 24, textAlign: 'center' }}>
+            <p className="m-0 text-sm text-muted-foreground">{board.emptyBoard}</p>
+            <Button type="button" className="mt-4" onClick={() => { setEditing(true); setPickerOpen(true); }}>
+              <Plus className="size-4" />
+              {board.addBlock}
+            </Button>
           </div>
         )}
-      </ECard>
+      </div>
 
+      {/* Block picker */}
+      <AddWidgetDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        hidden={hiddenWidgets}
+        onAdd={handleAdd}
+        ctx={widgetCtx}
+        labels={board}
+      />
+
+      <BoardStyles />
       <DashboardStyles />
-    </div>
-  );
-}
-
-/* ===== sub-components ===== */
-/** One KPI tile inside `.ec-kpi-strip`: muted label → ink tabular value → optional delta. */
-function KpiTile({ label, value, delta, loading }: { label: string; value: number; delta?: React.ReactNode; loading?: boolean }) {
-  return (
-    <div className="ec-kpi-tile">
-      <div className="lbl">{label}</div>
-      <div className="val">
-        {loading ? <Skeleton className="h-8.25 w-16" /> : <bdi dir="ltr">{value.toLocaleString('en-US')}</bdi>}
-      </div>
-      {!loading && delta}
-    </div>
-  );
-}
-
-/** Attention row — whole-row click target, tone-coded dot, neutral count badge, hover chevron. */
-function AttentionRow({ label, count, tone, href = '/admin/properties' }: { label: string; count: number; tone: 'warn' | 'neg' | 'muted'; href?: string }) {
-  const t = useAdminMessages(dashboardMessages);
-  const { dir } = useAdminI18n();
-  const Fwd = dir === 'rtl' ? ArrowLeft : ArrowRight;
-  const ok = count === 0;
-  const dotColor = ok
-    ? 'var(--text-faint)'
-    : tone === 'neg'
-      ? 'var(--neg)'
-      : tone === 'warn'
-        ? 'var(--warn)'
-        : 'var(--text-faint)';
-  return (
-    <Link href={href} className="ec-row ec-attrow">
-      <span className="ec-attdot" style={{ background: dotColor }} />
-      <span className="ec-attlabel" style={{ color: ok ? 'var(--text-muted)' : 'var(--text-body)' }}>{label}</span>
-      {ok ? (
-        <span className="ec-att-clear">{t.allClear}</span>
-      ) : (
-        <>
-          <span className="ec-att-count"><bdi dir="ltr">{count}</bdi></span>
-          <Fwd className="ec-att-chev size-4" />
-        </>
-      )}
-    </Link>
-  );
-}
-
-function EmptyBlock({ height, text }: { height: number; text: string }) {
-  return (
-    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13.5, textAlign: 'center', padding: 16 }}>
-      {text}
     </div>
   );
 }
@@ -568,7 +283,7 @@ function DashboardStyles() {
 .estate-console .ec-kpi-tile .delta.ec-delta-flat{color:var(--text-muted);}
 
 /* Focal hero — the one dark premium card on the light page (Runey cashflow-card move) */
-.estate-console .ec-focal{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:#051150;border-radius:var(--r-hero);box-shadow:var(--shadow-hero);padding:22px 26px;margin-block:6px 24px;}
+.estate-console .ec-focal{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;background:#051150;border-radius:var(--r-hero);box-shadow:var(--shadow-hero);padding:22px 26px;}
 .estate-console .ec-focal::after{content:"";position:absolute;inset-block-start:-60%;inset-inline-end:-8%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(85,148,241,.28) 0%,rgba(85,148,241,0) 70%);pointer-events:none;}
 .estate-console .ec-focal-main{position:relative;z-index:1;min-width:0;}
 .estate-console .ec-focal-label{display:block;font-size:12.5px;font-weight:600;color:rgba(255,255,255,.55);}
@@ -631,6 +346,29 @@ function DashboardStyles() {
 .estate-console .ec-dealpill{font-size:11.5px;font-weight:600;padding:3px 11px;border-radius:var(--r-pill);white-space:nowrap;}
 .estate-console .ec-dealpill.sale{background:var(--brand-tint);color:var(--brand);}
 .estate-console .ec-dealpill.rent{background:#e8f1fe;color:#2f6fd0;}
+
+/* Team preview — profile chips in a row, wrapping on narrow widths. The one
+   highlighted member carries a notification bubble above the avatar. */
+.estate-console .ec-team-row{display:flex;flex-wrap:wrap;gap:14px;}
+.estate-console .ec-team-card{position:relative;flex:1 1 150px;min-inline-size:140px;max-inline-size:210px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:16px 12px 14px;border:1px solid var(--divider);border-radius:var(--r-card);background:var(--surface-sunken);transition:border-color .15s ease,box-shadow .15s ease;}
+.estate-console .ec-team-card:hover{border-color:rgba(53,74,196,.35);box-shadow:var(--shadow-card);}
+.estate-console .ec-team-card.is-highlight{margin-block-start:26px;border-color:rgba(53,74,196,.45);background:var(--brand-tint,#eef1fb);}
+.estate-console .ec-team-avatar{inline-size:56px;block-size:56px;border-radius:50%;object-fit:cover;background:var(--surface);border:2px solid var(--surface);box-shadow:0 4px 12px -6px rgba(5,17,80,.35);}
+.estate-console .ec-team-avatar--empty{display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--brand);background:var(--brand-tint,#eef1fb);}
+.estate-console .ec-team-name{font-size:13.5px;font-weight:600;color:var(--text-ink);max-inline-size:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.estate-console .ec-team-role{font-size:12px;color:var(--text-muted);max-inline-size:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.estate-console .ec-team-stats{font-size:11.5px;color:var(--text-faint,#8b93b5);font-variant-numeric:tabular-nums;}
+.estate-console .ec-team-bubble{position:absolute;inset-block-start:-24px;inset-inline-start:50%;transform:translateX(-50%);max-inline-size:190px;padding:7px 11px;border-radius:12px;background:var(--surface);border:1px solid rgba(53,74,196,.25);box-shadow:0 10px 22px -12px rgba(5,17,80,.45);font-size:11.5px;font-weight:700;line-height:1.35;color:var(--brand);white-space:normal;}
+.estate-console .ec-team-bubble::after{content:"";position:absolute;inset-block-end:-5px;inset-inline-start:50%;margin-inline-start:-5px;inline-size:9px;block-size:9px;background:var(--surface);border-inline-end:1px solid rgba(53,74,196,.25);border-block-end:1px solid rgba(53,74,196,.25);transform:rotate(45deg);}
+[dir="rtl"] .estate-console .ec-team-bubble{transform:translateX(50%);}
+
+/* Activity feed rows — unread carries a filled brand dot */
+.estate-console .ec-noti-row{display:flex;align-items:center;gap:10px;padding-block:10px;border-block-end:1px solid var(--divider);}
+.estate-console .ec-noti-row:last-child{border-block-end:none;}
+.estate-console .ec-noti-dot{inline-size:8px;block-size:8px;border-radius:50%;flex-shrink:0;background:var(--text-faint,#8b93b5);}
+.estate-console .ec-noti-dot.is-unread{background:var(--brand);box-shadow:0 0 0 3px rgba(53,74,196,.14);}
+.estate-console .ec-noti-text{flex:1;min-width:0;font-size:13.5px;color:var(--text-body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.estate-console .ec-noti-when{font-size:11.5px;color:var(--text-muted);white-space:nowrap;font-variant-numeric:tabular-nums;}
 
 /* Links / CTAs — brand is allowed here */
 .estate-console .ec-viewall{color:var(--brand);font-weight:600;font-size:13px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
