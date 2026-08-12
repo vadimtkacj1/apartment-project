@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
-import { ChevronLeft, ChevronRight, Eye, Download, X, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, Download, X, ExternalLink, Share2, Check } from "lucide-react";
 import type { Swiper as SwiperType } from "swiper";
+import { copyToClipboard } from "@/lib/copy-to-clipboard";
+import { analytics } from "@/lib/analytics";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -37,12 +39,82 @@ const PLANS: FloorPlan[] = [
   { title: "מסחר", subtitle: "קומת קרקע", image: "/plans/onethepark/commerce-ground-floor.jpg", pdf: "/plans/onethepark/commerce-ground-floor.pdf" },
 ];
 
+/** Stable id of a plan, taken from its asset filename — used in shared links. */
+const planSlug = (plan: FloorPlan) =>
+  plan.image.split("/").pop()!.replace(/\.[^.]+$/, "");
+
+/**
+ * Link that reopens this exact plan: the query param drives the lightbox, the
+ * hash lands the reader on the section even before the (lazy) chunk mounts.
+ */
+const planShareUrl = (plan: FloorPlan) =>
+  `${window.location.origin}${window.location.pathname}?plan=${planSlug(plan)}#onethepark`;
+
 function FloorPlansSection() {
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const [active, setActive] = useState<FloorPlan | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+  }, []);
+
+  // Open the shared plan when arriving via a ?plan=… link. This section is
+  // lazy-loaded, so the browser has long finished its own hash scroll by the
+  // time we mount — scroll again once the slides exist.
+  const deepLinkOpened = useRef(false);
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get("plan");
+    if (!slug) return;
+    const shared = PLANS.find((p) => planSlug(p) === slug);
+    if (!shared) return;
+
+    // `swiper` is intentionally a dependency: it is null on the first pass and
+    // the effect re-runs once the carousel registers itself, which is when the
+    // slide can actually be selected.
+    swiper?.slideTo(PLANS.indexOf(shared), 0);
+
+    // Open the lightbox only on the first pass — otherwise closing it and
+    // letting Swiper re-register would pop it straight back open.
+    if (deepLinkOpened.current) return;
+    deepLinkOpened.current = true;
+    document.getElementById("onethepark")?.scrollIntoView({ behavior: "smooth" });
+    setActive(shared);
+  }, [swiper]);
+
+  const handleShare = async (plan: FloorPlan, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const slug = planSlug(plan);
+    const url = planShareUrl(plan);
+
+    // On phones this opens the OS sheet (WhatsApp, Telegram, mail…), which is
+    // what "share with people" means there. Desktop has no sheet — fall back to
+    // copying the link.
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: `תוכנית ${plan.title} — ONE THE PARK`, url });
+        // The slug rides in the button id: `propertyId` is an Int column and a
+        // plan has no property row behind it.
+        analytics.trackButtonClick(`share-floorplan:${slug}`);
+        return;
+      } catch (err) {
+        // AbortError = the user dismissed the sheet; anything else falls back.
+        if ((err as Error)?.name === "AbortError") return;
+      }
+    }
+
+    if (!(await copyToClipboard(url))) return;
+    analytics.trackButtonClick(`copy-link-floorplan:${slug}`);
+    setCopiedSlug(slug);
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopiedSlug(null), 2000);
+  };
 
   // Close the lightbox on Escape and lock body scroll while it is open.
   useEffect(() => {
@@ -105,29 +177,54 @@ function FloorPlansSection() {
             {PLANS.map((plan, i) => (
               <SwiperSlide key={`${plan.image}-${i}`} className="!h-auto">
                 <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#1c3664]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
-                  {/* Plan preview */}
-                  <button
-                    type="button"
-                    onClick={() => setActive(plan)}
-                    aria-label={`צפייה בתוכנית — ${plan.title}, ${plan.subtitle}`}
-                    className="relative block w-full h-64 md:h-72 bg-[#f5f1ea] cursor-zoom-in"
-                  >
-                    <Image
-                      src={plan.image}
-                      alt={`תוכנית ${plan.title}, ${plan.subtitle} — ONE THE PARK חולון`}
-                      fill
-                      sizes="(max-width: 640px) 90vw, (max-width: 1024px) 55vw, 620px"
-                      className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                      quality={85}
-                    />
-                    <span className="absolute inset-0 flex items-center justify-center bg-[#1c3664]/0 group-hover:bg-[#1c3664]/15 transition-colors duration-300">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
-                        <Eye className="w-4 h-4" />
-                        להגדלה
+                  {/* Plan preview. The share button is a sibling, not a child:
+                      a <button> may not nest inside another <button>. */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setActive(plan)}
+                      aria-label={`צפייה בתוכנית — ${plan.title}, ${plan.subtitle}`}
+                      className="relative block w-full h-64 md:h-72 bg-[#f5f1ea] cursor-zoom-in"
+                    >
+                      <Image
+                        src={plan.image}
+                        alt={`תוכנית ${plan.title}, ${plan.subtitle} — ONE THE PARK חולון`}
+                        fill
+                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 55vw, 620px"
+                        className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
+                        loading="lazy"
+                        quality={85}
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center bg-[#1c3664]/0 group-hover:bg-[#1c3664]/15 transition-colors duration-300">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                          <Eye className="w-4 h-4" />
+                          להגדלה
+                        </span>
                       </span>
-                    </span>
-                  </button>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleShare(plan, e)}
+                      aria-label={
+                        copiedSlug === planSlug(plan)
+                          ? "הקישור הועתק ללוח"
+                          : `שיתוף התוכנית — ${plan.title}, ${plan.subtitle}`
+                      }
+                      title={copiedSlug === planSlug(plan) ? "הקישור הועתק ללוח!" : "שיתוף התוכנית"}
+                      className={`absolute top-3 left-3 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors duration-200 ${
+                        copiedSlug === planSlug(plan)
+                          ? "bg-[#1c3664] text-white"
+                          : "bg-white/95 text-[#1c3664] hover:bg-[#1c3664] hover:text-white"
+                      }`}
+                    >
+                      {copiedSlug === planSlug(plan) ? (
+                        <Check className="w-4 h-4" aria-hidden="true" />
+                      ) : (
+                        <Share2 className="w-4 h-4" aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
 
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-5 text-center">
@@ -244,16 +341,36 @@ function FloorPlansSection() {
             <p className="text-white font-bold text-lg">
               {active.title} <span className="text-white/60 font-normal">· {active.subtitle}</span>
             </p>
-            <a
-              href={active.pdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#c5a357] text-[#1c3664] font-bold text-sm hover:bg-white transition-colors"
-              style={{ touchAction: "manipulation" }}
-            >
-              <Download className="w-4 h-4" />
-              הורדה / פתיחה (PDF באיכות מלאה)
-            </a>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={active.pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#c5a357] text-[#1c3664] font-bold text-sm hover:bg-white transition-colors"
+                style={{ touchAction: "manipulation" }}
+              >
+                <Download className="w-4 h-4" />
+                הורדה / פתיחה (PDF באיכות מלאה)
+              </a>
+              <button
+                type="button"
+                onClick={(e) => handleShare(active, e)}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/95 text-[#1c3664] font-bold text-sm hover:bg-[#c5a357] transition-colors"
+                style={{ touchAction: "manipulation" }}
+              >
+                {copiedSlug === planSlug(active) ? (
+                  <>
+                    <Check className="w-4 h-4" aria-hidden="true" />
+                    הקישור הועתק!
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4" aria-hidden="true" />
+                    שיתוף התוכנית
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>,
         document.body
