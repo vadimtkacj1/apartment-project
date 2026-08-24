@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { firstImage } from '@/lib/media';
 import { m } from 'framer-motion';
 import PropertyCard from '@/components/properties/PropertyCard';
 import Link from 'next/link';
@@ -108,7 +109,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
           totalFloors: prop.totalFloors,
           neighborhood: prop.neighborhood,
           features: prop.features,
-          image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
+          image: firstImage(prop.images) || "/images/hero/sales.jpg",
           images: prop.images,
           isSold: false,
         }));

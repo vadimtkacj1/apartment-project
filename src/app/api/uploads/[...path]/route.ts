@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFile } from 'fs/promises';
+import { readFile, stat } from 'fs/promises';
+import { createReadStream, existsSync } from 'fs';
 import { join, resolve, sep } from 'path';
-import { existsSync } from 'fs';
+import { Readable } from 'stream';
 
 export async function GET(
   request: NextRequest,
@@ -37,22 +38,62 @@ export async function GET(
       );
     }
 
-    // Read file
-    const fileBuffer = await readFile(fullPath);
-    
     // Determine content type based on file extension
     const extension = relativePath.split('.').pop()?.toLowerCase();
     const contentType = getContentType(extension || '');
 
+    // Для загруженных файлов отключаем агрессивный кеш – всегда можно получить свежую версию.
+    // ETag/Last-Modified дают дешёвую ревалидацию (304) вместо повторной загрузки —
+    // критично для видео, которое иначе качалось бы целиком при каждом просмотре.
+    const stats = await stat(fullPath);
+    const etag = `"${stats.size.toString(16)}-${Math.floor(stats.mtimeMs).toString(16)}"`;
+    const baseHeaders: Record<string, string> = {
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=0, must-revalidate',
+      'Access-Control-Allow-Origin': '*',
+      'ETag': etag,
+      'Last-Modified': stats.mtime.toUTCString(),
+    };
+
+    if (request.headers.get('if-none-match') === etag && !request.headers.get('range')) {
+      return new NextResponse(null, { status: 304, headers: baseHeaders });
+    }
+
+    // Video is streamed instead of buffered, and answers Range requests: without
+    // 206 support the browser cannot seek and Safari refuses to play at all.
+    if (contentType.startsWith('video/')) {
+      const fileSize = stats.size;
+      const range = parseRange(request.headers.get('range'), fileSize);
+
+      if (range === 'invalid') {
+        return new NextResponse(null, {
+          status: 416,
+          headers: { ...baseHeaders, 'Content-Range': `bytes */${fileSize}` },
+        });
+      }
+
+      const start = range ? range.start : 0;
+      const end = range ? range.end : fileSize - 1;
+      const stream = Readable.toWeb(
+        createReadStream(fullPath, { start, end })
+      ) as unknown as ReadableStream;
+
+      return new NextResponse(stream, {
+        status: range ? 206 : 200,
+        headers: {
+          ...baseHeaders,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': String(end - start + 1),
+          ...(range ? { 'Content-Range': `bytes ${start}-${end}/${fileSize}` } : {}),
+        },
+      });
+    }
+
+    // Read file
+    const fileBuffer = await readFile(fullPath);
+
     // Return file with appropriate headers
-    // Для загруженных файлов отключаем агрессивный кеш – всегда можно получить свежую версию
-    return new NextResponse(fileBuffer, {
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=0, must-revalidate',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    return new NextResponse(fileBuffer, { headers: baseHeaders });
   } catch (error: any) {
     console.error('Error serving file:', error);
     return NextResponse.json(
@@ -60,6 +101,37 @@ export async function GET(
       { status: 500 }
     );
   }
+}
+
+function parseRange(
+  header: string | null,
+  fileSize: number
+): { start: number; end: number } | 'invalid' | null {
+  if (!header) return null;
+
+  const match = /^bytes=(\d*)-(\d*)$/.exec(header.trim());
+  if (!match) return 'invalid';
+
+  const [, rawStart, rawEnd] = match;
+  if (!rawStart && !rawEnd) return 'invalid';
+
+  let start: number;
+  let end: number;
+
+  if (!rawStart) {
+    const suffixLength = Number(rawEnd);
+    if (suffixLength <= 0) return 'invalid';
+    start = Math.max(0, fileSize - suffixLength);
+    end = fileSize - 1;
+  } else {
+    start = Number(rawStart);
+    end = rawEnd ? Number(rawEnd) : fileSize - 1;
+  }
+
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return 'invalid';
+  if (start >= fileSize || start > end) return 'invalid';
+
+  return { start, end: Math.min(end, fileSize - 1) };
 }
 
 function getContentType(extension: string): string {
@@ -71,8 +143,12 @@ function getContentType(extension: string): string {
     'webp': 'image/webp',
     'svg': 'image/svg+xml',
     'ico': 'image/x-icon',
+    'mp4': 'video/mp4',
+    'm4v': 'video/mp4',
+    'webm': 'video/webm',
+    'mov': 'video/quicktime',
+    'ogv': 'video/ogg',
   };
-  
+
   return contentTypes[extension] || 'application/octet-stream';
 }
-

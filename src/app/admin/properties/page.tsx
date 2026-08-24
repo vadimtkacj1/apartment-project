@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { firstImage } from '@/lib/media';
 import { BRAND } from '@/lib/adminTheme';
 import {
   Row,
@@ -95,6 +96,56 @@ function formatPropertyPrice(price: string): string {
   return Number.isFinite(n) && n > 0 ? `₪${n.toLocaleString('en-US')}` : `₪${price}`;
 }
 
+type SortField =
+  | 'title'
+  | 'location'
+  | 'city'
+  | 'dealType'
+  | 'price'
+  | 'rooms'
+  | 'area'
+  | 'floor'
+  | 'status';
+
+type SortOrder = 'ascend' | 'descend' | null;
+
+function priceValue(price: string): number {
+  const n = parseInt(String(price ?? '').replace(/[^0-9]/g, ''), 10);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function statusRank(property: Property): number {
+  if (property.isSold) return 2;
+  return property.isActive ? 0 : 1;
+}
+
+const SORT_COMPARATORS: Record<SortField, (a: Property, b: Property) => number> = {
+  title: (a, b) => a.title.localeCompare(b.title, 'he'),
+  location: (a, b) => a.location.localeCompare(b.location, 'he'),
+  city: (a, b) =>
+    (getCityLabel(a.city) || a.city).localeCompare(getCityLabel(b.city) || b.city, 'he'),
+  dealType: (a, b) => a.dealType.localeCompare(b.dealType),
+  price: (a, b) => priceValue(a.price) - priceValue(b.price),
+  rooms: (a, b) => Number(a.rooms || 0) - Number(b.rooms || 0),
+  area: (a, b) => Number(a.area || 0) - Number(b.area || 0),
+  floor: (a, b) => (a.floor ?? -9999) - (b.floor ?? -9999),
+  status: (a, b) => statusRank(a) - statusRank(b),
+};
+
+const MOBILE_SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'default', label: 'מיון: ברירת מחדל' },
+  { value: 'price-descend', label: 'מחיר: מהגבוה לנמוך' },
+  { value: 'price-ascend', label: 'מחיר: מהנמוך לגבוה' },
+  { value: 'area-descend', label: 'שטח: מהגדול לקטן' },
+  { value: 'area-ascend', label: 'שטח: מהקטן לגדול' },
+  { value: 'rooms-descend', label: 'חדרים: מהרב למעט' },
+  { value: 'rooms-ascend', label: 'חדרים: מהמעט לרב' },
+  { value: 'floor-descend', label: 'קומה: מהגבוהה לנמוכה' },
+  { value: 'floor-ascend', label: 'קומה: מהנמוכה לגבוהה' },
+  { value: 'title-ascend', label: 'כותרת: א׳ עד ת׳' },
+  { value: 'city-ascend', label: 'עיר: א׳ עד ת׳' },
+];
+
 // Explanatory copy under each choice in the site-order control
 const LISTING_ORDER_HINTS: Record<ListingOrder, string> = {
   newest: 'הנכסים שנוספו לאחרונה יופיעו ראשונים',
@@ -114,6 +165,8 @@ export default function PropertiesPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
   // Order visitors see the properties in on the public /apartments page
   const [listingOrder, setListingOrder] = useState<ListingOrder>(DEFAULT_LISTING_ORDER);
@@ -134,6 +187,10 @@ export default function PropertiesPage() {
         if (typeof s.filterStatus === 'string') setFilterStatus(s.filterStatus);
         if (typeof s.currentPage === 'number') setCurrentPage(s.currentPage);
         if (typeof s.pageSize === 'number') setPageSize(s.pageSize);
+        if (typeof s.sortField === 'string' && s.sortField in SORT_COMPARATORS) {
+          setSortField(s.sortField as SortField);
+        }
+        if (s.sortOrder === 'ascend' || s.sortOrder === 'descend') setSortOrder(s.sortOrder);
       }
     } catch {
       // ignore malformed/blocked storage
@@ -151,12 +208,12 @@ export default function PropertiesPage() {
     try {
       sessionStorage.setItem(
         TABLE_STATE_KEY,
-        JSON.stringify({ searchTerm, filterDealType, filterStatus, currentPage, pageSize })
+        JSON.stringify({ searchTerm, filterDealType, filterStatus, currentPage, pageSize, sortField, sortOrder })
       );
     } catch {
       // ignore quota/blocked storage
     }
-  }, [searchTerm, filterDealType, filterStatus, currentPage, pageSize]);
+  }, [searchTerm, filterDealType, filterStatus, currentPage, pageSize, sortField, sortOrder]);
 
   const fetchProperties = async () => {
     try {
@@ -236,10 +293,17 @@ export default function PropertiesPage() {
       return matchesSearch && matchesDealType && matchesStatus;
     });
 
-    // Push sold / rented-out properties (isSold) to the bottom of the list.
-    // Array.sort is stable, so within each group the createdAt-desc order is kept.
+    // An explicit column sort wins outright; without one, sold / rented-out
+    // properties sink to the bottom. Array.sort is stable, so within each group
+    // the createdAt-desc order from the API is kept.
+    if (sortField && sortOrder) {
+      const compare = SORT_COMPARATORS[sortField];
+      const direction = sortOrder === 'descend' ? -1 : 1;
+      return filtered.sort((a, b) => compare(a, b) * direction);
+    }
+
     return filtered.sort((a, b) => Number(a.isSold) - Number(b.isSold));
-  }, [properties, searchTerm, filterDealType, filterStatus]);
+  }, [properties, searchTerm, filterDealType, filterStatus, sortField, sortOrder]);
 
   // Keep the current page within range when filtering shrinks the result set
   useEffect(() => {
@@ -431,6 +495,15 @@ export default function PropertiesPage() {
             },
           }}
           scroll={{ x: 'max-content' }}
+          showSorterTooltip={false}
+          onChange={(_pagination, _filters, sorter) => {
+            const active = Array.isArray(sorter) ? sorter[0] : sorter;
+            const key = (active?.columnKey ?? active?.field) as SortField | undefined;
+            const order = (active?.order ?? null) as SortOrder;
+            setSortField(order && key && key in SORT_COMPARATORS ? key : null);
+            setSortOrder(order && key && key in SORT_COMPARATORS ? order : null);
+            setCurrentPage(1);
+          }}
           locale={{ emptyText: <AdminEmptyState message="לא נמצאו נכסים" addHref="/admin/properties/new" addLabel="הוספת נכס" /> }}
           rowClassName={(record) => record.isSold ? 'sold-property-row' : ''}
           columns={[
@@ -441,7 +514,7 @@ export default function PropertiesPage() {
               width: 72,
               render: (images: string[]) => (
                 <Image
-                  src={images[0] || '/images/hero/sales.jpg'}
+                  src={firstImage(images) || '/images/hero/sales.jpg'}
                   alt="Property"
                   width={56}
                   height={56}
@@ -461,6 +534,8 @@ export default function PropertiesPage() {
               title: 'כותרת',
               dataIndex: 'title',
               key: 'title',
+              sorter: true,
+              sortOrder: sortField === 'title' ? sortOrder : null,
               width: 250,
               ellipsis: {
                 showTitle: true,
@@ -470,6 +545,8 @@ export default function PropertiesPage() {
               title: 'מיקום',
               dataIndex: 'location',
               key: 'location',
+              sorter: true,
+              sortOrder: sortField === 'location' ? sortOrder : null,
               width: 150,
               ellipsis: true,
             },
@@ -477,6 +554,8 @@ export default function PropertiesPage() {
               title: 'עיר',
               dataIndex: 'city',
               key: 'city',
+              sorter: true,
+              sortOrder: sortField === 'city' ? sortOrder : null,
               width: 100,
               render: (city: string) => getCityLabel(city) || city,
             },
@@ -484,6 +563,8 @@ export default function PropertiesPage() {
               title: 'סוג עסקה',
               dataIndex: 'dealType',
               key: 'dealType',
+              sorter: true,
+              sortOrder: sortField === 'dealType' ? sortOrder : null,
               width: 100,
               render: (dealType: string) => (
                 <Tag color={dealType === 'sale' ? 'green' : '#1C3664'}>
@@ -495,6 +576,8 @@ export default function PropertiesPage() {
               title: 'מחיר',
               dataIndex: 'price',
               key: 'price',
+              sorter: true,
+              sortOrder: sortField === 'price' ? sortOrder : null,
               width: 120,
               render: (price: string) => (
                 <span dir="ltr" style={{ fontVariantNumeric: 'tabular-nums', unicodeBidi: 'isolate', display: 'inline-block' }}>
@@ -506,6 +589,8 @@ export default function PropertiesPage() {
               title: 'חדרים',
               dataIndex: 'rooms',
               key: 'rooms',
+              sorter: true,
+              sortOrder: sortField === 'rooms' ? sortOrder : null,
               width: 80,
               align: 'center',
             },
@@ -513,6 +598,8 @@ export default function PropertiesPage() {
               title: 'שטח',
               dataIndex: 'area',
               key: 'area',
+              sorter: true,
+              sortOrder: sortField === 'area' ? sortOrder : null,
               width: 80,
               align: 'center',
               render: (area: number) => `${area} מ"ר`,
@@ -520,6 +607,8 @@ export default function PropertiesPage() {
             {
               title: 'קומה',
               key: 'floor',
+              sorter: true,
+              sortOrder: sortField === 'floor' ? sortOrder : null,
               width: 80,
               align: 'center',
               render: (_, record: Property) =>
@@ -530,6 +619,8 @@ export default function PropertiesPage() {
             {
               title: 'סטטוס',
               key: 'status',
+              sorter: true,
+              sortOrder: sortField === 'status' ? sortOrder : null,
               width: 120,
               render: (_, record: Property) => (
                 <Space vertical size={4}>
@@ -583,6 +674,23 @@ export default function PropertiesPage() {
 
       {/* Property list — mobile (<768px) card view */}
       <div className="admin-only-mobile">
+        <Select
+          value={sortField && sortOrder ? `${sortField}-${sortOrder}` : 'default'}
+          onChange={(value) => {
+            if (value === 'default') {
+              setSortField(null);
+              setSortOrder(null);
+            } else {
+              const separator = value.lastIndexOf('-');
+              setSortField(value.slice(0, separator) as SortField);
+              setSortOrder(value.slice(separator + 1) as SortOrder);
+            }
+            setCurrentPage(1);
+          }}
+          options={MOBILE_SORT_OPTIONS}
+          size="large"
+          style={{ width: '100%', marginBottom: 12 }}
+        />
         {loading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredProperties.length === 0 ? (
@@ -609,7 +717,7 @@ export default function PropertiesPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       className="admin-card__thumb"
-                      src={property.images[0] || '/images/hero/sales.jpg'}
+                      src={firstImage(property.images) || '/images/hero/sales.jpg'}
                       alt={property.title}
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg';

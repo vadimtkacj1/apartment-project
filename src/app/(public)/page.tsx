@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { firstImage } from '@/lib/media';
 import dynamic from 'next/dynamic';
 import { preload } from 'react-dom';
 import Hero from '@/components/layout/Hero';
@@ -111,7 +112,7 @@ export default async function Home() {
       id: p.id, title: p.title, price: p.price,
       rooms: p.rooms, bedrooms: p.rooms,
       bathrooms: p.bathrooms, area: p.area, location: p.location,
-      images, image: images[0] || '/images/hero/sales.jpg',
+      images, image: firstImage(images) || '/images/hero/sales.jpg',
       status: p.status ?? undefined, isSold: Boolean(p.isSold),
       floor: p.floor ?? undefined,
       dealType: resolveDealType(p.dealType, p.category) as DealType,
@@ -132,7 +133,7 @@ export default async function Home() {
       rooms: noCommPropRaw.rooms, bedrooms: noCommPropRaw.rooms,
       bathrooms: noCommPropRaw.bathrooms, area: noCommPropRaw.area,
       location: noCommPropRaw.location,
-      images, image: images[0] || '/images/hero/sales.jpg',
+      images, image: firstImage(images) || '/images/hero/sales.jpg',
       status: noCommPropRaw.status ?? undefined, isSold: Boolean(noCommPropRaw.isSold),
       floor: noCommPropRaw.floor ?? undefined,
       description: noCommPropRaw.description ?? undefined,
@@ -161,7 +162,7 @@ export default async function Home() {
       propertyType: p.propertyType ?? undefined,
       floor: p.floor, totalFloors: p.totalFloors,
       neighborhood: p.neighborhood ?? undefined,
-      images, image: images[0] || '/images/hero/sales.jpg',
+      images, image: firstImage(images) || '/images/hero/sales.jpg',
       isSold: false as const,
     };
   });

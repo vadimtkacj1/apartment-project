@@ -1,10 +1,5 @@
 /* RTL Fixes for Admin Dashboard */
 
-/* Sidebar backdrop - hidden by default (desktop). Shown on mobile below. */
-.layout-dashboard .sidebar-backdrop {
-  display: none;
-}
-
 /* Sidebar position for RTL - fixed to the right edge.
    NOTE: collapse is driven solely by the `.sidebar-open` / `.sidebar-collapsed`
    classes on the root .layout-dashboard (see antd-admin.css). MainLayout uses
@@ -16,19 +11,16 @@
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Responsive: Mobile behavior — the sider overlays content; show the backdrop */
-@media (max-width: 991px) {
-  .layout-dashboard .ant-layout-sider.sider-primary {
-    position: fixed;
-    z-index: 1000;
-    height: 100vh;
-  }
+/* The sider overlays content at every breakpoint */
+.layout-dashboard .ant-layout-sider.sider-primary {
+  position: fixed;
+  z-index: 1000;
+  height: 100vh;
+}
 
-  /* Show backdrop on mobile when the sidebar is open */
-  .layout-dashboard .sidebar-backdrop {
-    display: block;
-    animation: fadeIn 0.3s ease;
-  }
+.layout-dashboard .sidebar-backdrop {
+  display: block;
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {

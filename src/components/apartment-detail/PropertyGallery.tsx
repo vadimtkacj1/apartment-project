@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Autoplay } from 'swiper/modules';
+import type { Swiper as SwiperClass } from 'swiper';
 import { DealType } from '@/types/property.types';
+import { isVideoUrl, videoMimeType } from '@/lib/media';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -19,15 +21,28 @@ interface PropertyGalleryProps {
 export function PropertyGallery({ images, isSold, dealType, propertyTitle }: PropertyGalleryProps) {
   const imageAlt = propertyTitle || `דירה ${dealType === 'rent' ? 'להשכרה' : 'למכירה'}`;
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  const mainSwiperRef = useRef<SwiperClass | null>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
+
+  const pauseAllVideos = () => {
+    galleryRef.current?.querySelectorAll('video').forEach((video) => video.pause());
+  };
+
+  // A playing clip must not be swiped away by the autoplay timer.
+  const stopAutoplay = () => {
+    mainSwiperRef.current?.autoplay?.stop();
+  };
 
   return (
     // No entrance animation on the gallery wrapper: it holds the LCP image, and an
     // initial opacity:0 (rendered into the SSR HTML by framer-motion) prevents the
     // image from counting as "contentful" until the client hydrates + the fade runs,
     // pushing LCP out by seconds on slow mobile. The hero now paints as soon as it loads.
-    <div className="mb-8">
+    <div className="mb-8" ref={galleryRef}>
       <Swiper
         modules={[Navigation, Pagination, Thumbs, Autoplay]}
+        onSwiper={(swiper) => { mainSwiperRef.current = swiper; }}
+        onSlideChange={pauseAllVideos}
         navigation
         pagination={{ clickable: true }}
         autoplay={isSold ? false : { delay: 3000, disableOnInteraction: false }}
@@ -45,16 +60,29 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
           <SwiperSlide key={index}>
             <div className="relative w-full h-full flex items-center justify-center bg-black/5">
               <div className="relative w-full h-full">
-                <Image
-                  src={image}
-                  alt={images.length > 1 ? `${imageAlt} - תמונה ${index + 1}` : imageAlt}
-                  fill
-                  priority={index === 0}
-                  fetchPriority={index === 0 ? 'high' : 'auto'}
-                  loading={index === 0 ? 'eager' : 'lazy'}
-                  sizes="100vw"
-                  className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`}
-                />
+                {isVideoUrl(image) ? (
+                  <video
+                    controls
+                    playsInline
+                    preload="metadata"
+                    onPlay={stopAutoplay}
+                    aria-label={`${imageAlt} - סרטון`}
+                    className={`swiper-no-swiping w-full h-full object-contain bg-black ${isSold ? 'grayscale opacity-60' : ''}`}
+                  >
+                    <source src={image} type={videoMimeType(image)} />
+                  </video>
+                ) : (
+                  <Image
+                    src={image}
+                    alt={images.length > 1 ? `${imageAlt} - תמונה ${index + 1}` : imageAlt}
+                    fill
+                    priority={index === 0}
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    sizes="100vw"
+                    className={`object-cover ${isSold ? 'grayscale opacity-60' : ''}`}
+                  />
+                )}
                 
                 <div 
                   className="absolute z-10 pointer-events-none" 
@@ -134,7 +162,18 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
             <div className={`relative aspect-video rounded-lg overflow-hidden transition-colors ${
               isSold ? 'opacity-60' : ''
             }`}>
-              <Image src={image} alt={`${imageAlt} - תמונה ממוזערת ${index + 1}`} fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
+              {isVideoUrl(image) ? (
+                <>
+                  <video src={image} muted playsInline preload="metadata" className={`w-full h-full object-cover bg-black ${isSold ? 'grayscale opacity-60' : ''}`} />
+                  <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" className="w-8 h-8 fill-white/90 drop-shadow-lg">
+                      <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.5 6.2 5 3.3a.6.6 0 0 1 0 1l-5 3.3a.6.6 0 0 1-.9-.5V8.7a.6.6 0 0 1 .9-.5z" />
+                    </svg>
+                  </span>
+                </>
+              ) : (
+                <Image src={image} alt={`${imageAlt} - תמונה ממוזערת ${index + 1}`} fill className={`object-contain ${isSold ? 'grayscale opacity-60' : ''}`} loading="lazy" sizes="(max-width: 768px) 25vw, 20vw" />
+              )}
             </div>
           </SwiperSlide>
         ))}

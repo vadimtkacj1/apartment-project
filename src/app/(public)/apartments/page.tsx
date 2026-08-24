@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { firstImage } from '@/lib/media';
 import ApartmentsPageClient from '@/components/pages/ApartmentsPageClient';
 import { DealType, City } from '@/types/property.types';
 import BreadcrumbSchema from '@/components/SEO/BreadcrumbSchema';
@@ -123,7 +124,7 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
       category: p.category || (resolvedDealType === 'sale' ? 'sales' : 'rentals'),
       dealType: resolvedDealType,
       city: (p.city ?? undefined) as City | undefined,
-      image: parseImages(p.images)[0] || '/images/hero/sales.jpg',
+      image: firstImage(parseImages(p.images)) || '/images/hero/sales.jpg',
       isSold: Boolean(p.isSold),
     };
   });

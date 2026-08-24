@@ -1,5 +1,6 @@
 "use client";
 import React, { memo, useEffect, useRef, useState } from 'react';
+import { firstImage } from '@/lib/media';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -89,7 +90,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
   const router = useRouter();
 
   // Состояние
-  const displayImage = image || images?.find(img => img?.trim()) || DEFAULT_IMAGE;
+  const displayImage = image || firstImage(images) || DEFAULT_IMAGE;
   const [imageSrc, setImageSrc] = useState(displayImage);
   const [imageError, setImageError] = useState(false);
   const [copied, setCopied] = useState(false);

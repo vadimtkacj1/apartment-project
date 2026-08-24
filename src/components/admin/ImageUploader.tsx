@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Upload, Button, App, Alert, Typography } from 'antd';
-import { InboxOutlined, DeleteOutlined, LeftOutlined, RightOutlined, CloseOutlined } from '@ant-design/icons';
+import { InboxOutlined, DeleteOutlined, LeftOutlined, RightOutlined, CloseOutlined, PlayCircleFilled } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { isVideoUrl, videoMimeType } from '@/lib/media';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -15,6 +16,9 @@ interface ImageUploaderProps {
   maxImages?: number;
 }
 
+const MAX_IMAGE_MB = 20;
+const MAX_VIDEO_MB = 100;
+
 export default function ImageUploader({
   images,
   onImagesChange,
@@ -24,6 +28,7 @@ export default function ImageUploader({
   const isMobile = useIsMobile();
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const previewIsVideo = isVideoUrl(previewImage);
 
   // Lock body scroll while the fullscreen preview overlay is open.
   useEffect(() => {
@@ -89,15 +94,16 @@ export default function ImageUploader({
     setUploading(true);
 
     try {
-      const url = await uploadImage(file as File);
+      const uploaded = file as File;
+      const url = await uploadImage(uploaded);
       console.log('💾 [FRONTEND] Adding URL to images list:', url);
       onImagesChange([...images, url]);
       console.log('✅ [FRONTEND] Images list updated. Total images:', images.length + 1);
-      message.success('התמונה הועלתה בהצלחה');
+      message.success(uploaded.type.startsWith('video/') ? 'הסרטון הועלה בהצלחה' : 'התמונה הועלתה בהצלחה');
       onSuccess?.(url);
     } catch (err: any) {
       console.error('❌ [FRONTEND] Upload error:', err);
-      message.error(err.message || 'שגיאה בהעלאת התמונה');
+      message.error(err.message || 'שגיאה בהעלאת הקובץ');
       onError?.(err);
     } finally {
       setUploading(false);
@@ -107,19 +113,25 @@ export default function ImageUploader({
 
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
-    if (!isImage) {
-      message.error('רק קבצי תמונה מותרים');
+    const isVideo = file.type.startsWith('video/');
+    if (!isImage && !isVideo) {
+      message.error('רק קבצי תמונה או וידאו מותרים');
       return false;
     }
 
-    const isLt50M = file.size / 1024 / 1024 < 50;
-    if (!isLt50M) {
-      message.error('התמונה חייבת להיות קטנה מ-50MB');
+    const sizeMb = file.size / 1024 / 1024;
+    const maxMb = isVideo ? MAX_VIDEO_MB : MAX_IMAGE_MB;
+    if (sizeMb >= maxMb) {
+      message.error(
+        isVideo
+          ? `הסרטון חייב להיות קטן מ-${MAX_VIDEO_MB}MB`
+          : `התמונה חייבת להיות קטנה מ-${MAX_IMAGE_MB}MB`
+      );
       return false;
     }
 
     if (images.length >= maxImages) {
-      message.error(`ניתן להעלות עד ${maxImages} תמונות`);
+      message.error(`ניתן להעלות עד ${maxImages} קבצים`);
       return false;
     }
 
@@ -129,7 +141,7 @@ export default function ImageUploader({
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);
-    message.success('התמונה נמחקה');
+    message.success('הקובץ נמחק');
   };
 
   const moveImage = (fromIndex: number, toIndex: number) => {
@@ -145,7 +157,7 @@ export default function ImageUploader({
       <Dragger
         name="file"
         multiple
-        accept="image/*"
+        accept="image/*,video/*"
         customRequest={handleUpload}
         beforeUpload={beforeUpload}
         showUploadList={false}
@@ -162,10 +174,10 @@ export default function ImageUploader({
           <InboxOutlined style={{ fontSize: '48px', color: '#1C3664' }} />
         </p>
         <p style={{ fontSize: '18px', fontWeight: 600, color: '#141414', margin: '12px 0 8px' }}>
-          גרור תמונות לכאן או לחץ להעלאה
+          גרור תמונות או סרטונים לכאן או לחץ להעלאה
         </p>
         <p style={{ color: '#8c8c8c', fontSize: '14px', margin: 0 }}>
-          עד {maxImages} תמונות (JPG, PNG, GIF) - מקסימום 50MB לכל תמונה
+          עד {maxImages} קבצים - תמונות (JPG, PNG, WebP, GIF) עד {MAX_IMAGE_MB}MB, סרטונים (MP4, WebM, MOV) עד {MAX_VIDEO_MB}MB
         </p>
         {uploading && (
           <Text type="secondary" style={{ display: 'block', marginTop: '8px' }}>
@@ -178,8 +190,8 @@ export default function ImageUploader({
       {images.length > 0 && (
         <div>
           <Alert
-            title={`תמונות שהועלו (${images.length})`}
-            description="התמונה הראשונה תוצג כתמונה ראשית"
+            title={`קבצים שהועלו (${images.length})`}
+            description="הקובץ הראשון מוצג ראשון בגלריה. התמונה הראשונה ברשימה משמשת כתמונה ראשית בכרטיסים ובשיתוף"
             type="info"
             showIcon
             style={{ marginBottom: '16px' }}
@@ -192,7 +204,9 @@ export default function ImageUploader({
               gap: '16px',
             }}
           >
-            {images.map((url, index) => (
+            {images.map((url, index) => {
+              const isVideo = isVideoUrl(url);
+              return (
               <div
                 key={`${url}-${index}`}
                 style={{
@@ -223,41 +237,98 @@ export default function ImageUploader({
                   </div>
                 )}
 
-                {/* Logo overlay - top left */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '8px',
-                    left: '8px',
-                    zIndex: 3,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <img
-                    src="/images/logos.png"
-                    alt="Logo"
+                {!isVideo && (
+                  /* Logo overlay - top left */
+                  <div
                     style={{
-                      maxWidth: '140px',
-                      maxHeight: '70px',
-                      objectFit: 'contain',
-                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                      position: 'absolute',
+                      top: '8px',
+                      left: '8px',
+                      zIndex: 3,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <img
+                      src="/images/logos.png"
+                      alt="Logo"
+                      style={{
+                        maxWidth: '140px',
+                        maxHeight: '70px',
+                        objectFit: 'contain',
+                        filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {isVideo ? (
+                  <>
+                    <video
+                      src={url}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      onClick={() => setPreviewImage(url)}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                        cursor: 'pointer',
+                        background: '#000',
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        pointerEvents: 'none',
+                        zIndex: 3,
+                      }}
+                    >
+                      <PlayCircleFilled
+                        style={{
+                          fontSize: '44px',
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5))',
+                        }}
+                      />
+                    </div>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        left: '8px',
+                        background: 'rgba(0, 0, 0, 0.65)',
+                        color: 'white',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        zIndex: 4,
+                      }}
+                    >
+                      וידאו
+                    </div>
+                  </>
+                ) : (
+                  /* Use regular img tag to avoid Tailwind conflicts */
+                  <img
+                    src={url}
+                    alt={`Property ${index + 1}`}
+                    onClick={() => setPreviewImage(url)}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                      cursor: 'pointer',
                     }}
                   />
-                </div>
-
-                {/* Use regular img tag to avoid Tailwind conflicts */}
-                <img
-                  src={url}
-                  alt={`Property ${index + 1}`}
-                  onClick={() => setPreviewImage(url)}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                    cursor: 'pointer',
-                  }}
-                />
+                )}
 
                 <div
                   style={{
@@ -296,7 +367,8 @@ export default function ImageUploader({
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -319,38 +391,69 @@ export default function ImageUploader({
             cursor: 'pointer',
           }}
         >
-          <div style={{ position: 'relative', display: 'inline-block' }}>
-            <img
-              src={previewImage}
-              alt="Preview"
-              style={{
-                maxWidth: '90vw',
-                maxHeight: '90vh',
-                objectFit: 'contain',
-                borderRadius: '8px',
-              }}
-            />
-            {/* Logo overlay on preview */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '16px',
-                left: '16px',
-                zIndex: 10,
-                pointerEvents: 'none',
-              }}
-            >
-              <img
-                src="/images/logos.png"
-                alt="Logo"
+          <div
+            onClick={(event) => previewIsVideo && event.stopPropagation()}
+            style={{ position: 'relative', display: 'inline-block', cursor: previewIsVideo ? 'default' : 'pointer' }}
+          >
+            {previewIsVideo ? (
+              <video
+                src={previewImage}
+                controls
+                autoPlay
+                playsInline
                 style={{
-                  maxWidth: '200px',
-                  maxHeight: '100px',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
+                  borderRadius: '8px',
+                  background: '#000',
+                  display: 'block',
                 }}
+              >
+                <source src={previewImage} type={videoMimeType(previewImage)} />
+              </video>
+            ) : (
+              <>
+                <img
+                  src={previewImage}
+                  alt="Preview"
+                  style={{
+                    maxWidth: '90vw',
+                    maxHeight: '90vh',
+                    objectFit: 'contain',
+                    borderRadius: '8px',
+                  }}
+                />
+                {/* Logo overlay on preview */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    left: '16px',
+                    zIndex: 10,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <img
+                    src="/images/logos.png"
+                    alt="Logo"
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '100px',
+                      objectFit: 'contain',
+                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
+                    }}
+                  />
+                </div>
+              </>
+            )}
+            {previewIsVideo && (
+              <Button
+                shape="circle"
+                icon={<CloseOutlined />}
+                onClick={() => setPreviewImage(null)}
+                style={{ position: 'absolute', top: '12px', right: '12px', zIndex: 11 }}
               />
-            </div>
+            )}
           </div>
         </div>
       )}

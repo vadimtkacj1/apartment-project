@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { firstImage } from '@/lib/media';
 import { m } from 'framer-motion';
 import PropertyCard from './PropertyCard';
 import { DealType, PropertyType } from '@/types/property.types';
@@ -57,7 +58,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
             ...prop,
             bedrooms: prop.rooms,
             category: prop.category || (prop.dealType === 'sale' ? 'sales' : 'rentals'),
-            image: prop.images && prop.images.length > 0 ? prop.images[0] : "/images/hero/sales.jpg",
+            image: firstImage(prop.images) || "/images/hero/sales.jpg",
             isSold: prop.isSold || false,
           }))
           // FIXED: Explicitly typed parameters 'a' and 'b' to resolve TS7006 error

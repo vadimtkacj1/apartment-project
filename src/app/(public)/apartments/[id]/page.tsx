@@ -1,4 +1,5 @@
 import { cache } from 'react';
+import { firstImage as pickFirstImage } from '@/lib/media';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
@@ -75,7 +76,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const images = (property.images || []) as string[];
-  const firstImage = images[0];
+  const firstImage = pickFirstImage(images);
   const { dealTypeLabel, cityName, metaTitle } = buildListingTitles(property);
   // Admin SEO overrides (set per-property in the editor) take precedence over the
   // auto-generated title/description/share-image; empty fields fall back to defaults.
@@ -131,7 +132,7 @@ export default async function ApartmentDetailPage({ params }: PageProps) {
   const initialDescription = property.description?.trim() || undefined;
 
   const images = (property.images || []) as string[];
-  const firstImage = images[0];
+  const firstImage = pickFirstImage(images);
   const ogImage = firstImage
     ? (firstImage.startsWith('http') ? firstImage : `${siteUrl}${firstImage}`)
     : `${siteUrl}/images/hero/main-hero.jpg`;

@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, Suspense, useMemo, useState, useRef, useCallback } from 'react';
+import { firstImage } from '@/lib/media';
 import { m, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SlidersHorizontal } from 'lucide-react';
@@ -280,7 +281,7 @@ function ApartmentsPageContent({
           ...prop,
           bedrooms: prop.rooms,
           category: prop.category || (prop.dealType === 'sale' ? 'sales' : 'rentals'),
-          image: prop.images?.[0] || "/images/hero/sales.jpg",
+          image: firstImage(prop.images) || "/images/hero/sales.jpg",
         }));
 
         setProperties(mappedProperties);

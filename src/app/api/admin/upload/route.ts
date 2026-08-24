@@ -14,6 +14,17 @@ const ALLOWED_IMAGE_EXTENSIONS: Record<string, string> = {
   gif: 'gif',
 };
 
+// Same magic-byte policy for video: only containers browsers can play from a
+// plain <video> tag, sniffed from the bytes rather than the supplied filename.
+const ALLOWED_VIDEO_EXTENSIONS: Record<string, string> = {
+  mp4: 'mp4',
+  webm: 'webm',
+  mov: 'mov',
+};
+
+const MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024;
+
 // Inspect the real file bytes instead of trusting the client-supplied MIME type
 // or filename extension. Returns the canonical extension or null if unrecognised.
 function sniffImageExtension(buffer: Buffer): string | null {
@@ -40,6 +51,26 @@ function sniffImageExtension(buffer: Buffer): string | null {
   ) {
     return 'gif';
   }
+  return null;
+}
+
+function sniffVideoExtension(buffer: Buffer): string | null {
+  if (
+    buffer.length >= 4 &&
+    buffer[0] === 0x1a && buffer[1] === 0x45 && buffer[2] === 0xdf && buffer[3] === 0xa3
+  ) {
+    const header = buffer.toString('binary', 0, Math.min(buffer.length, 4096));
+    return header.includes('webm') ? 'webm' : null;
+  }
+
+  if (buffer.length >= 12 && buffer.toString('ascii', 4, 8) === 'ftyp') {
+    const brand = buffer.toString('ascii', 8, 12).trim().toLowerCase();
+    if (brand === 'qt') return 'mov';
+    const mp4Brands = ['isom', 'iso2', 'iso4', 'iso5', 'iso6', 'mp41', 'mp42', 'avc1', 'm4v', 'mmp4', 'dash'];
+    if (mp4Brands.includes(brand) || brand.startsWith('mp4')) return 'mp4';
+    return null;
+  }
+
   return null;
 }
 
@@ -78,12 +109,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (max 20MB) before reading it into memory
-    const maxSize = 20 * 1024 * 1024; // 20MB
+    // Validate file size before reading it into memory. Video gets a larger
+    // budget than photos, but is still capped so one clip can't exhaust RAM.
+    const looksLikeVideo = file.type.startsWith('video/');
+    const maxSize = looksLikeVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
     if (file.size > maxSize) {
       console.log(`❌ [UPLOAD] Error: File too large (${file.size} bytes)`);
       return NextResponse.json(
-        { error: 'File size must be less than 20MB' },
+        { error: `File size must be less than ${Math.round(maxSize / 1024 / 1024)}MB` },
         { status: 400 }
       );
     }
@@ -97,20 +130,51 @@ export async function POST(request: NextRequest) {
 
     // Validate the actual file content (magic bytes), not the client-supplied
     // MIME type or extension. Rejects SVG, HTML, scripts and polyglot files.
-    const sniffedExtension = sniffImageExtension(buffer);
-    if (!sniffedExtension || !ALLOWED_IMAGE_EXTENSIONS[sniffedExtension]) {
-      console.log(`❌ [UPLOAD] Error: File content is not an allowed image type`);
+    const sniffedImage = sniffImageExtension(buffer);
+    const sniffedVideo = sniffedImage ? null : sniffVideoExtension(buffer);
+    const extension = sniffedImage
+      ? ALLOWED_IMAGE_EXTENSIONS[sniffedImage]
+      : sniffedVideo
+        ? ALLOWED_VIDEO_EXTENSIONS[sniffedVideo]
+        : null;
+
+    if (!extension) {
+      console.log(`❌ [UPLOAD] Error: File content is not an allowed image or video type`);
       return NextResponse.json(
-        { error: 'File must be a JPG, PNG, WebP or GIF image' },
+        { error: 'File must be a JPG, PNG, WebP or GIF image, or an MP4, WebM or MOV video' },
         { status: 400 }
       );
     }
-    console.log(`✅ [UPLOAD] File content validated as: ${sniffedExtension}`);
+
+    if (sniffedVideo && folder !== 'properties') {
+      console.log(`❌ [UPLOAD] Error: Video upload not allowed in folder "${folder}"`);
+      return NextResponse.json(
+        { error: 'Video uploads are only allowed for properties' },
+        { status: 400 }
+      );
+    }
+
+    if (sniffedVideo && file.size > MAX_VIDEO_SIZE) {
+      console.log(`❌ [UPLOAD] Error: Video too large (${file.size} bytes)`);
+      return NextResponse.json(
+        { error: `File size must be less than ${Math.round(MAX_VIDEO_SIZE / 1024 / 1024)}MB` },
+        { status: 400 }
+      );
+    }
+
+    if (sniffedImage && file.size > MAX_IMAGE_SIZE) {
+      console.log(`❌ [UPLOAD] Error: Image too large (${file.size} bytes)`);
+      return NextResponse.json(
+        { error: `File size must be less than ${Math.round(MAX_IMAGE_SIZE / 1024 / 1024)}MB` },
+        { status: 400 }
+      );
+    }
+
+    console.log(`✅ [UPLOAD] File content validated as: ${sniffedImage || sniffedVideo}`);
 
     // Generate unique filename using the sniffed extension (never user input)
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = ALLOWED_IMAGE_EXTENSIONS[sniffedExtension];
     const filename = `${timestamp}-${randomString}.${extension}`;
     console.log(`🏷️  [UPLOAD] Generated filename: ${filename}`);
 

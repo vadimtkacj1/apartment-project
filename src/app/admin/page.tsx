@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { firstImage } from '@/lib/media';
 import { Row, Col, Card, Skeleton } from 'antd';
 import { ArrowLeftOutlined, PictureOutlined } from '@ant-design/icons';
 import {
@@ -403,9 +404,9 @@ export default function AdminDashboard() {
           <div>
             {portfolio.recentListings.map((x) => (
               <Link key={x.id} href="/admin/properties" className="ec-row ec-listrow">
-                {x.images && x.images.length > 0 ? (
+                {firstImage(x.images) ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={x.images[0]} alt={x.title} className="ec-thumb" loading="lazy" />
+                  <img src={firstImage(x.images)} alt={x.title} className="ec-thumb" loading="lazy" />
                 ) : (
                   <span className="ec-thumb ec-thumb-empty">
                     <PictureOutlined style={{ color: 'rgba(255,255,255,.7)', fontSize: 16 }} />

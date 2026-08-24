@@ -14,53 +14,33 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  // Mobile-first defaults: SSR / first paint render the CLOSED, mobile state so
-  // a phone never flashes the open sidebar (and its 250px content margin) before
-  // JS runs. The matchMedia effect promotes to the open desktop state on mount.
+  // The sidebar is an overlay at every breakpoint and starts closed, so content
+  // (wide tables above all) always gets the full window width.
   const [collapsed, setCollapsed] = useState(true);
-  const [isMobile, setIsMobile] = useState(true);
   const sidenavColor = '#1C3664';
 
   const pathname = usePathname();
   const page = pathname.replace('/admin/', '').replace('/admin', '');
 
-  // Single source of truth for "are we in overlay (mobile) mode": one matchMedia
-  // query, which also fires reliably on orientationchange. Crossing the 992px
-  // breakpoint re-syncs the default (desktop = open, mobile = closed); it does
-  // not fire on every resize tick, so a manual toggle within a range is kept.
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 991px)');
-    const apply = (matches: boolean) => {
-      setIsMobile(matches);
-      setCollapsed(matches);
-    };
-    apply(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => apply(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  // On phones, auto-close the overlay after a navigation so tapping a nav item
-  // doesn't leave the menu + backdrop covering the new page. The permanent
-  // desktop sider is untouched.
-  //
-  // Query matchMedia directly instead of reading `isMobile`: on mount this effect
-  // runs with the FIRST render's closure, where isMobile is still its `true`
-  // default — so it re-collapsed the sider on desktop right after the matchMedia
-  // effect had opened it, and the sidebar never showed until you hit the burger.
-  useEffect(() => {
-    if (window.matchMedia('(max-width: 991px)').matches) setCollapsed(true);
+    setCollapsed(true);
   }, [pathname]);
 
-  // Lock body scroll while the overlay sidebar is open on mobile, so the page
-  // behind the dim backdrop can't scroll under the finger.
   useEffect(() => {
-    const lock = !collapsed && isMobile;
-    document.body.style.overflow = lock ? 'hidden' : '';
+    document.body.style.overflow = collapsed ? '' : 'hidden';
     return () => {
       document.body.style.overflow = '';
     };
-  }, [collapsed, isMobile]);
+  }, [collapsed]);
+
+  useEffect(() => {
+    if (collapsed) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setCollapsed(true);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [collapsed]);
 
   const toggleSidebar = () => setCollapsed((c) => !c);
   const closeSidebar = () => setCollapsed(true);
@@ -70,8 +50,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       className={`layout-dashboard ${collapsed ? 'sidebar-collapsed' : 'sidebar-open'}`}
       dir="rtl"
     >
-      {/* Dim backdrop — only on mobile, where the sidebar overlays content */}
-      {!collapsed && isMobile && (
+      {!collapsed && (
         <div className="sidebar-backdrop" onClick={closeSidebar} aria-hidden="true" />
       )}
 

@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { firstImage } from '@/lib/media';
 import { m } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -42,7 +43,7 @@ const HotPropositionCard: React.FC<HotPropositionCardProps> = ({
   };
 
   // Determine the main image to display
-  const displayImage = image || (images && images.length > 0 ? images[0] : '/images/placeholder.webp');
+  const displayImage = image || firstImage(images) || '/images/placeholder.webp';
 
   return (
     <Link

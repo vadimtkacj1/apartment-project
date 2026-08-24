@@ -40,7 +40,7 @@
   position: fixed;
   right: 0;
   left: auto;
-  z-index: 99;
+  z-index: 1000;
   height: 100vh;
   overflow: hidden;
   margin: 0;
@@ -66,11 +66,10 @@
   min-height: 100vh;
   width: 100%;
   flex-shrink: 0;
-  margin-right: 250px;
+  margin-right: 0;
   margin-left: 0;
   overflow-x: hidden;
   overflow-y: visible;
-  transition: margin-right 0.3s ease;
 }
 
 /* ===== HEADER ===== */
@@ -327,7 +326,13 @@
   box-shadow: none;
 }
 
-/* Dim backdrop shown behind the open sidebar on mobile */
+/* Open, it overlays the content at every breakpoint — the page keeps its full
+   width so wide tables never need a horizontal scroll. */
+.layout-dashboard.sidebar-open .ant-layout-sider.sider-primary {
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.16);
+}
+
+/* Dim backdrop shown behind the open sidebar */
 .layout-dashboard .sidebar-backdrop {
   position: fixed;
   inset: 0;
@@ -356,19 +361,7 @@
   }
 
   /* The header toggle stays visible on every breakpoint — it's the always-
-     available control to collapse AND reopen the sidebar (otherwise closing
-     it on desktop is a dead-end). */
-
-  /* Open: reserve room for the sidebar. Collapsed: content reclaims the space. */
-  .layout-dashboard.sidebar-open .ant-layout {
-    margin-right: 250px;
-    margin-left: 0;
-  }
-
-  .layout-dashboard.sidebar-collapsed .ant-layout {
-    margin-right: 0;
-    margin-left: 0;
-  }
+     available control to open AND close the overlay sidebar. */
 }
 
 @media (min-width: 768px) {
@@ -378,13 +371,6 @@
 
   .layout-dashboard .header-control {
     margin-top: 0;
-  }
-}
-
-@media (max-width: 991px) {
-  /* Sidebar overlays the content on mobile; never reserve space for it. */
-  .layout-dashboard .ant-layout {
-    margin-right: 0;
   }
 }
 
@@ -839,8 +825,8 @@
 }
 
 @media (min-width: 1600px) {
-  /* Sidebar: scales with the rest, and its 250px width / -250px collapsed offset
-     scale together, so the reserved margin on the column still matches it. */
+  /* Sidebar: scales with the rest, and its 250px width / -250px collapsed
+     offset scale together. */
   .layout-dashboard .ant-layout-sider.sider-primary {
     zoom: var(--admin-zoom);
     height: calc(100vh / var(--admin-zoom));

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { firstImage } from '@/lib/media';
 import { Row, Col, Card, Button, App, Spin, Modal, Checkbox, Space, Typography, Radio, InputNumber, Form, Input, Tabs, Table, Image, Tag, Statistic, RadioChangeEvent } from 'antd';
 import { PlusOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import type { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from '@/types/property.types';
@@ -325,7 +326,7 @@ export default function HomepagePage() {
           height: '80px'
         }}>
           <Image
-            src={images[0] || '/images/hero/sales.jpg'}
+            src={firstImage(images) || '/images/hero/sales.jpg'}
             alt="נכס"
             width={80}
             height={80}
@@ -427,7 +428,7 @@ export default function HomepagePage() {
           <div className="admin-card__head">
             <img
               className="admin-card__thumb"
-              src={property.images[0] || '/images/hero/sales.jpg'}
+              src={firstImage(property.images) || '/images/hero/sales.jpg'}
               alt={property.title}
               onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero/sales.jpg'; }}
             />
@@ -778,7 +779,7 @@ export default function HomepagePage() {
                         <Radio value={property.id} className="w-full">
                           <div className="flex items-center gap-3 ml-2">
                             <img
-                              src={property.images[0] || '/images/placeholder.jpg'}
+                              src={firstImage(property.images) || '/images/placeholder.jpg'}
                               alt={property.title}
                               className="w-12 h-12 object-cover rounded"
                             />
@@ -805,7 +806,7 @@ export default function HomepagePage() {
                         <Checkbox value={property.id} className="w-full">
                           <div className="flex items-center gap-3 ml-2">
                             <img
-                              src={property.images[0] || '/images/placeholder.jpg'}
+                              src={firstImage(property.images) || '/images/placeholder.jpg'}
                               alt={property.title}
                               className="w-12 h-12 object-cover rounded"
                             />

@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { isVideoUrl } from '@/lib/media';
 import { prisma } from '@/lib/prisma';
 import { articles, ARTICLES_LAST_REVISED } from '@/data/articles';
 
@@ -14,7 +15,7 @@ function parseImageUrls(raw: string | null | undefined): string[] {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return [];
     return arr
-      .filter((u): u is string => typeof u === 'string' && u.length > 0)
+      .filter((u): u is string => typeof u === 'string' && u.length > 0 && !isVideoUrl(u))
       .slice(0, 25)
       .map((u) => (u.startsWith('http') ? u : `${siteUrl}${u.startsWith('/') ? '' : '/'}${u}`));
   } catch {
