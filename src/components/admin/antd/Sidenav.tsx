@@ -237,14 +237,6 @@ export default function Sidenav({ onClose }: SidenavProps) {
           color: #1c3664 !important;
         }
 
-        /* The ✕ only makes sense for the mobile overlay. On desktop the
-           sidebar is permanent and the header hamburger collapses/expands it,
-           so a second close control here is redundant — hide it. */
-        @media (min-width: 992px) {
-          .estate-close-btn.ant-btn {
-            display: none !important;
-          }
-        }
       `}</style>
     </nav>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { Row, Col, Breadcrumb, Button, Tooltip } from 'antd';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { CloseOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 // Breadcrumbs derive from the single source of truth (src/config/adminSections.tsx).
 import { buildAdminCrumbs } from '@/config/adminSections';
@@ -25,16 +25,17 @@ export default function Header({ onPress, name, collapsed = false }: HeaderProps
       className="admin-header-row"
       style={{ width: '100%', margin: 0, gap: 12 }}
     >
-      {/* Single, clear control: collapse / expand the sidebar.
+      {/* Single, clear control: open the sidebar / close it again.
           (User identity + logout live in the sidebar footer.) */}
       <Col flex="none">
-        <Tooltip title={collapsed ? 'פתח תפריט' : 'כווץ תפריט'} placement="bottom">
+        <Tooltip title={collapsed ? 'פתח תפריט' : 'סגור תפריט'} placement="bottom">
           <Button
             type="text"
             className="sidebar-toggler"
             onClick={onPress}
-            aria-label={collapsed ? 'פתח תפריט' : 'כווץ תפריט'}
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            aria-label={collapsed ? 'פתח תפריט' : 'סגור תפריט'}
+            aria-expanded={!collapsed}
+            icon={collapsed ? <MenuUnfoldOutlined /> : <CloseOutlined />}
             style={{ color: '#595959', fontSize: '18px', minWidth: 44, minHeight: 44 }}
           />
         </Tooltip>
