@@ -23,14 +23,25 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const mainSwiperRef = useRef<SwiperClass | null>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
 
   const pauseAllVideos = () => {
     galleryRef.current?.querySelectorAll('video').forEach((video) => video.pause());
   };
 
-  // A playing clip must not be swiped away by the autoplay timer.
   const stopAutoplay = () => {
     mainSwiperRef.current?.autoplay?.stop();
+  };
+
+  const holdOnVideoSlide = (swiper: SwiperClass) => {
+    const activeSlide = swiper.slides?.[swiper.activeIndex];
+    if (activeSlide?.querySelector('video')) swiper.autoplay?.stop();
+  };
+
+  const handleSlideChange = (swiper: SwiperClass) => {
+    pauseAllVideos();
+    setPlayingIndex(null);
+    holdOnVideoSlide(swiper);
   };
 
   return (
@@ -41,8 +52,8 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
     <div className="mb-8" ref={galleryRef}>
       <Swiper
         modules={[Navigation, Pagination, Thumbs, Autoplay]}
-        onSwiper={(swiper) => { mainSwiperRef.current = swiper; }}
-        onSlideChange={pauseAllVideos}
+        onSwiper={(swiper) => { mainSwiperRef.current = swiper; holdOnVideoSlide(swiper); }}
+        onSlideChange={handleSlideChange}
         navigation
         pagination={{ clickable: true }}
         autoplay={isSold ? false : { delay: 3000, disableOnInteraction: false }}
@@ -61,16 +72,43 @@ export function PropertyGallery({ images, isSold, dealType, propertyTitle }: Pro
             <div className="relative w-full h-full flex items-center justify-center bg-black/5">
               <div className="relative w-full h-full">
                 {isVideoUrl(image) ? (
-                  <video
-                    controls
-                    playsInline
-                    preload="metadata"
-                    onPlay={stopAutoplay}
-                    aria-label={`${imageAlt} - סרטון`}
-                    className={`swiper-no-swiping w-full h-full object-contain bg-black ${isSold ? 'grayscale opacity-60' : ''}`}
-                  >
-                    <source src={image} type={videoMimeType(image)} />
-                  </video>
+                  <>
+                    <video
+                      controls
+                      playsInline
+                      preload="metadata"
+                      onPlay={() => { stopAutoplay(); setPlayingIndex(index); }}
+                      onPause={() => setPlayingIndex((current) => (current === index ? null : current))}
+                      aria-label={`${imageAlt} - סרטון`}
+                      className={`swiper-no-swiping w-full h-full object-contain bg-black ${isSold ? 'grayscale opacity-60' : ''}`}
+                    >
+                      <source src={`${image}#t=0.1`} type={videoMimeType(image)} />
+                    </video>
+                    {playingIndex !== index && (
+                      <button
+                        type="button"
+                        aria-label="נגן סרטון"
+                        onClick={(event) => {
+                          stopAutoplay();
+                          const video = event.currentTarget.parentElement?.querySelector('video');
+                          video?.play().catch(() => undefined);
+                        }}
+                        className="swiper-no-swiping absolute inset-0 z-20 flex items-center justify-center bg-black/25 transition-colors hover:bg-black/35"
+                        style={{ bottom: '60px' }}
+                      >
+                        <span className="flex flex-col items-center gap-2">
+                          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-xl sm:h-20 sm:w-20">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-8 w-8 fill-[#1c3664] sm:h-10 sm:w-10">
+                              <path d="M8.5 5.6a.8.8 0 0 1 1.2-.7l8.2 5.4a.8.8 0 0 1 0 1.4l-8.2 5.4a.8.8 0 0 1-1.2-.7V5.6z" />
+                            </svg>
+                          </span>
+                          <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
+                            סרטון הנכס
+                          </span>
+                        </span>
+                      </button>
+                    )}
+                  </>
                 ) : (
                   <Image
                     src={image}

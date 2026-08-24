@@ -42,9 +42,7 @@ export async function GET(
     const extension = relativePath.split('.').pop()?.toLowerCase();
     const contentType = getContentType(extension || '');
 
-    // Для загруженных файлов отключаем агрессивный кеш – всегда можно получить свежую версию.
-    // ETag/Last-Modified дают дешёвую ревалидацию (304) вместо повторной загрузки —
-    // критично для видео, которое иначе качалось бы целиком при каждом просмотре.
+    // Для загруженных файлов отключаем агрессивный кеш – всегда можно получить свежую версию
     const stats = await stat(fullPath);
     const etag = `"${stats.size.toString(16)}-${Math.floor(stats.mtimeMs).toString(16)}"`;
     const baseHeaders: Record<string, string> = {
@@ -59,8 +57,6 @@ export async function GET(
       return new NextResponse(null, { status: 304, headers: baseHeaders });
     }
 
-    // Video is streamed instead of buffered, and answers Range requests: without
-    // 206 support the browser cannot seek and Safari refuses to play at all.
     if (contentType.startsWith('video/')) {
       const fileSize = stats.size;
       const range = parseRange(request.headers.get('range'), fileSize);

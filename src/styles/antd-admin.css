@@ -326,8 +326,6 @@
   box-shadow: none;
 }
 
-/* Open, it overlays the content at every breakpoint — the page keeps its full
-   width so wide tables never need a horizontal scroll. */
 .layout-dashboard.sidebar-open .ant-layout-sider.sider-primary {
   box-shadow: -8px 0 24px rgba(0, 0, 0, 0.16);
 }

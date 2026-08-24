@@ -1,6 +1,6 @@
 "use client";
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { firstImage } from '@/lib/media';
+import { firstImage, isVideoUrl } from '@/lib/media';
 import Image from 'next/image';
 import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -91,6 +91,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
   // Состояние
   const displayImage = image || firstImage(images) || DEFAULT_IMAGE;
+  const hasVideo = Array.isArray(images) && images.some(isVideoUrl);
   const [imageSrc, setImageSrc] = useState(displayImage);
   const [imageError, setImageError] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -199,6 +200,15 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
               <Tag size={13} />
               <span>{dealTypeLabel}</span>
             </div>
+
+            {hasVideo && !isSold && (
+              <div className="absolute bottom-4 left-4 z-30 flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg shadow-lg backdrop-blur-sm bg-black/65 text-white border border-white/20">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5 fill-current">
+                  <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.5 6.2 5 3.3a.6.6 0 0 1 0 1l-5 3.3a.6.6 0 0 1-.9-.5V8.7a.6.6 0 0 1 .9-.5z" />
+                </svg>
+                <span>וידאו</span>
+              </div>
+            )}
 
             {/* Бейдж статуса */}
             {status && !isSold && (

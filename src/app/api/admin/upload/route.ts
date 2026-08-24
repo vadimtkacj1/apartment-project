@@ -14,8 +14,6 @@ const ALLOWED_IMAGE_EXTENSIONS: Record<string, string> = {
   gif: 'gif',
 };
 
-// Same magic-byte policy for video: only containers browsers can play from a
-// plain <video> tag, sniffed from the bytes rather than the supplied filename.
 const ALLOWED_VIDEO_EXTENSIONS: Record<string, string> = {
   mp4: 'mp4',
   webm: 'webm',
@@ -109,8 +107,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size before reading it into memory. Video gets a larger
-    // budget than photos, but is still capped so one clip can't exhaust RAM.
+    // Validate file size before reading it into memory
     const looksLikeVideo = file.type.startsWith('video/');
     const maxSize = looksLikeVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE;
     if (file.size > maxSize) {

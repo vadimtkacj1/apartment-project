@@ -293,15 +293,14 @@ export default function PropertiesPage() {
       return matchesSearch && matchesDealType && matchesStatus;
     });
 
-    // An explicit column sort wins outright; without one, sold / rented-out
-    // properties sink to the bottom. Array.sort is stable, so within each group
-    // the createdAt-desc order from the API is kept.
     if (sortField && sortOrder) {
       const compare = SORT_COMPARATORS[sortField];
       const direction = sortOrder === 'descend' ? -1 : 1;
       return filtered.sort((a, b) => compare(a, b) * direction);
     }
 
+    // Push sold / rented-out properties (isSold) to the bottom of the list.
+    // Array.sort is stable, so within each group the createdAt-desc order is kept.
     return filtered.sort((a, b) => Number(a.isSold) - Number(b.isSold));
   }, [properties, searchTerm, filterDealType, filterStatus, sortField, sortOrder]);
 

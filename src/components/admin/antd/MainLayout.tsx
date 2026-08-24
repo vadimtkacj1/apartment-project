@@ -14,8 +14,6 @@ interface MainLayoutProps {
 }
 
 export default function MainLayout({ children }: MainLayoutProps) {
-  // The sidebar is an overlay at every breakpoint and starts closed, so content
-  // (wide tables above all) always gets the full window width.
   const [collapsed, setCollapsed] = useState(true);
   const sidenavColor = '#1C3664';
 
