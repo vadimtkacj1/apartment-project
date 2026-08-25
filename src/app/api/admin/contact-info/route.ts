@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateSite } from '@/lib/revalidate-public';
 
 // GET contact info
 export async function GET(request: NextRequest) {
@@ -115,6 +116,8 @@ export async function POST(request: NextRequest) {
         },
       });
     }
+
+    revalidateSite();
 
     return NextResponse.json(contactInfo);
   } catch (error) {

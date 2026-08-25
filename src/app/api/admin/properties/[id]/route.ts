@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateProperty } from '@/lib/revalidate-public';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -230,6 +231,8 @@ export async function PUT(
     console.log('✅ [DB UPDATE] Property обновлён успешно! ID:', property.id);
     console.log('   - Изображений в БД:', property.images);
 
+    revalidateProperty(property.id);
+
     const formatted = formatProperty(property);
     console.log('🎉 [DB UPDATE] Property форматирован для ответа');
     console.log('   - Images count:', formatted.images?.length || 0);
@@ -294,6 +297,8 @@ export async function PATCH(
       data: updateData,
     });
 
+    revalidateProperty(property.id);
+
     const formatted = formatProperty(property);
     console.log('✅ [DB PATCH] Property partially updated. Fields:', Object.keys(updateData));
 
@@ -322,6 +327,8 @@ export async function DELETE(
         id: parseInt(id),
       },
     });
+
+    revalidateProperty(id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

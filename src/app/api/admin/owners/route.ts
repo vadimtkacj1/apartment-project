@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateSite } from '@/lib/revalidate-public';
 
 // GET all owners (including inactive for admin panel)
 export async function GET(request: NextRequest) {
@@ -50,6 +51,8 @@ export async function POST(request: NextRequest) {
         isActive: body.isActive !== undefined ? body.isActive : true,
       },
     });
+
+    revalidateSite();
 
     return NextResponse.json(owner, { status: 201 });
   } catch (error) {

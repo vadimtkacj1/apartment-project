@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateSite } from '@/lib/revalidate-public';
 
 // GET homepage section titles (admin)
 export async function GET(request: NextRequest) {
@@ -92,6 +93,8 @@ export async function PUT(request: NextRequest) {
         }
       });
     }
+
+    revalidateSite();
 
     const response = NextResponse.json({ success: true, settings });
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');

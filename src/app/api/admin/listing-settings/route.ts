@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateProperty } from '@/lib/revalidate-public';
 import { DEFAULT_LISTING_ORDER, isListingOrder, LISTING_ORDERS } from '@/lib/listing-order';
 
 /**
@@ -66,6 +67,8 @@ export async function PUT(request: NextRequest) {
           data: { propertyListingOrder },
           select: { propertyListingOrder: true },
         });
+
+    revalidateProperty();
 
     return noStore(
       NextResponse.json({ success: true, propertyListingOrder: settings.propertyListingOrder })

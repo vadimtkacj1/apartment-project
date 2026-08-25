@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateProperty } from '@/lib/revalidate-public';
 
 // Helper to parse JSON arrays stored as strings in SQLite
 function parseJsonArray(value: string | null): string[] {
@@ -202,6 +203,8 @@ export async function POST(request: NextRequest) {
     console.log('✅ [DB] Property created successfully! ID:', property.id);
     console.log('   - Saved images count:', parseJsonArray(property.images).length);
     console.log('   - Images in DB:', property.images);
+
+    revalidateProperty(property.id);
 
     const formatted = formatProperty(property);
     console.log('🎉 [DB] Property formatted and ready to send');

@@ -240,7 +240,11 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, s-maxage=60, stale-while-revalidate=300',
+            // stale-while-revalidate let a browser serve a five-minute-old
+            // listing after an admin edit. The route is force-dynamic, and
+            // Cloudflare does not cache it, so nothing is gained by a stale
+            // window — revalidate every time instead.
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },

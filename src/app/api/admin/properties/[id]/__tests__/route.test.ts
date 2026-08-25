@@ -8,6 +8,8 @@ const { requireAdmin, property } = vi.hoisted(() => ({
 vi.mock('@/lib/require-admin', () => ({ requireAdmin }));
 vi.mock('@/lib/prisma', () => ({ prisma: { property } }));
 
+import { revalidatePath } from 'next/cache';
+
 import { GET, PUT, PATCH, DELETE } from '@/app/api/admin/properties/[id]/route';
 
 const ctx = (id: string) => ({ params: Promise.resolve({ id }) });
@@ -39,6 +41,7 @@ const validPut = {
 };
 
 beforeEach(() => {
+  vi.mocked(revalidatePath).mockClear();
   requireAdmin.mockReset().mockResolvedValue(null);
   property.findUnique.mockReset();
   property.update.mockReset();
@@ -139,5 +142,38 @@ describe('DELETE /api/admin/properties/[id]', () => {
   it('returns 500 on delete error', async () => {
     property.delete.mockRejectedValue(new Error('fk constraint'));
     expect((await DELETE(plainReq(), ctx('5'))).status).toBe(500);
+  });
+});
+
+describe('cache invalidation', () => {
+  const revalidated = () => vi.mocked(revalidatePath).mock.calls.map(([path]) => path);
+
+  it('drops the cached public pages after an update', async () => {
+    property.update.mockResolvedValue(row());
+    await PUT(bodyReq(validPut), ctx('5'));
+    expect(revalidated()).toEqual(
+      expect.arrayContaining(['/', '/apartments', '/apartments/5', '/sitemap.xml'])
+    );
+  });
+
+  it('drops them after a status toggle', async () => {
+    property.update.mockResolvedValue(row());
+    await PATCH(bodyReq({ isSold: true }, 'PATCH'), ctx('5'));
+    expect(revalidated()).toContain('/apartments/5');
+  });
+
+  it('drops them after a delete', async () => {
+    property.delete.mockResolvedValue(row());
+    await DELETE(plainReq(), ctx('5'));
+    expect(revalidated()).toContain('/apartments/5');
+  });
+
+  it('still saves when revalidation blows up', async () => {
+    vi.mocked(revalidatePath).mockImplementationOnce(() => {
+      throw new Error('no request scope');
+    });
+    property.update.mockResolvedValue(row());
+    const res = await PUT(bodyReq(validPut), ctx('5'));
+    expect(res.status).toBe(200);
   });
 });

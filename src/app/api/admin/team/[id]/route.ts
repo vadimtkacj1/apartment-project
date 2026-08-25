@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateSite } from '@/lib/revalidate-public';
 
 // GET single team member
 export async function GET(
@@ -67,6 +68,8 @@ export async function PUT(
       },
     });
 
+    revalidateSite();
+
     return NextResponse.json(teamMember);
   } catch (error) {
     console.error('Error updating team member:', error);
@@ -92,6 +95,8 @@ export async function DELETE(
         id: parseInt(id),
       },
     });
+
+    revalidateSite();
 
     return NextResponse.json({ success: true });
   } catch (error) {

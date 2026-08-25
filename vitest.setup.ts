@@ -7,6 +7,13 @@
 // `restoreMocks: true` resets spies after every test.
 import { beforeEach, vi } from 'vitest';
 
+// `revalidatePath` only works inside a Next request scope; the route tests call
+// the handlers directly, so stub it here instead of in every suite.
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+  revalidateTag: vi.fn(),
+}));
+
 beforeEach(() => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});

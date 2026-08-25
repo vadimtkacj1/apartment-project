@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { requireAdmin } from '@/lib/require-admin';
+import { revalidateProperty } from '@/lib/revalidate-public';
 
 const SETTINGS_FILE = path.join(process.cwd(), 'data', 'homepage-settings.json');
 
@@ -65,6 +66,8 @@ export async function PUT(request: NextRequest) {
     };
 
     await writeSettings(settings);
+
+    revalidateProperty();
 
     return NextResponse.json({ success: true, settings });
   } catch (error) {
