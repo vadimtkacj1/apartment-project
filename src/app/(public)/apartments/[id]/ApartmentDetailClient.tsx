@@ -7,6 +7,8 @@ import { useState, useEffect, useRef } from 'react';
 import SimilarProperties from '@/components/properties/SimilarProperties';
 import { PropertyGallery } from '@/components/apartment-detail/PropertyGallery';
 import { usePropertyData } from '@/hooks/usePropertyData';
+import { shareOrCopy, propertyShareUrl } from '@/lib/copy-to-clipboard';
+import { analytics } from '@/lib/analytics';
 import {
   LoadingState,
   ErrorState,
@@ -53,11 +55,26 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapNearViewport, setMapNearViewport] = useState(false);
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+  }, []);
+
+  const handleShare = async () => {
+    const url = propertyShareUrl(propertyId);
+    const result = await shareOrCopy(displayTitle || 'נכס', url);
+
+    if (result === 'shared') {
+      analytics.trackButtonClick('share-property', propertyId);
+      return;
+    }
+    if (result !== 'copied') return;
+
+    analytics.trackButtonClick('copy-link-property', propertyId);
+    setCopied(true);
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+    copyTimer.current = setTimeout(() => setCopied(false), 2000);
   };
 
   useEffect(() => {

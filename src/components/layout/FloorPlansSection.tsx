@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import { ChevronLeft, ChevronRight, Eye, Download, X, ExternalLink, Share2, Check } from "lucide-react";
 import type { Swiper as SwiperType } from "swiper";
-import { copyToClipboard } from "@/lib/copy-to-clipboard";
+import { shareOrCopy } from "@/lib/copy-to-clipboard";
 import { analytics } from "@/lib/analytics";
 
 import "swiper/css";
@@ -93,23 +93,16 @@ function FloorPlansSection() {
     const slug = planSlug(plan);
     const url = planShareUrl(plan);
 
-    // On phones this opens the OS sheet (WhatsApp, Telegram, mail…), which is
-    // what "share with people" means there. Desktop has no sheet — fall back to
-    // copying the link.
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title: `תוכנית ${plan.title} — ONE THE PARK`, url });
-        // The slug rides in the button id: `propertyId` is an Int column and a
-        // plan has no property row behind it.
-        analytics.trackButtonClick(`share-floorplan:${slug}`);
-        return;
-      } catch (err) {
-        // AbortError = the user dismissed the sheet; anything else falls back.
-        if ((err as Error)?.name === "AbortError") return;
-      }
-    }
+    const result = await shareOrCopy(`תוכנית ${plan.title} — ONE THE PARK`, url);
 
-    if (!(await copyToClipboard(url))) return;
+    if (result === "shared") {
+      // The slug rides in the button id: `propertyId` is an Int column and a
+      // plan has no property row behind it.
+      analytics.trackButtonClick(`share-floorplan:${slug}`);
+      return;
+    }
+    if (result !== "copied") return;
+
     analytics.trackButtonClick(`copy-link-floorplan:${slug}`);
     setCopiedSlug(slug);
     if (copyTimer.current) clearTimeout(copyTimer.current);

@@ -36,6 +36,25 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
+export type ShareResult = 'shared' | 'dismissed' | 'copied' | 'failed';
+
+/**
+ * Hands a link to the OS share sheet where one exists (phones), and copies it
+ * to the clipboard everywhere else, so one tap always does something useful.
+ */
+export async function shareOrCopy(title: string, url: string): Promise<ShareResult> {
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      await navigator.share({ title, url });
+      return 'shared';
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return 'dismissed';
+    }
+  }
+
+  return (await copyToClipboard(url)) ? 'copied' : 'failed';
+}
+
 /** Absolute public URL of a property page, for sharing. */
 export function propertyShareUrl(id: number | string): string {
   const origin = typeof window !== 'undefined' ? window.location.origin : '';

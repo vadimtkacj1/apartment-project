@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { copyToClipboard, propertyShareUrl } from '../copy-to-clipboard';
+import { copyToClipboard, propertyShareUrl, shareOrCopy } from '../copy-to-clipboard';
 
 const setClipboard = (value: unknown) => {
   Object.defineProperty(navigator, 'clipboard', {
@@ -57,6 +57,66 @@ describe('copyToClipboard', () => {
     (document as any).execCommand = vi.fn(() => false);
 
     await expect(copyToClipboard('x')).resolves.toBe(false);
+  });
+});
+
+describe('shareOrCopy', () => {
+  const setShare = (value: unknown) => {
+    Object.defineProperty(navigator, 'share', {
+      value,
+      configurable: true,
+      writable: true,
+    });
+  };
+
+  afterEach(() => {
+    setShare(undefined);
+    setClipboard(undefined);
+    delete (document as any).execCommand;
+  });
+
+  it('opens the OS share sheet when one exists', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    setShare(share);
+
+    await expect(shareOrCopy('דירה', 'https://example.com/apartments/3')).resolves.toBe('shared');
+    expect(share).toHaveBeenCalledWith({ title: 'דירה', url: 'https://example.com/apartments/3' });
+  });
+
+  it('reports a dismissed sheet without copying', async () => {
+    const abort = Object.assign(new Error('dismissed'), { name: 'AbortError' });
+    setShare(vi.fn().mockRejectedValue(abort));
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setClipboard({ writeText });
+
+    await expect(shareOrCopy('דירה', 'https://example.com/apartments/3')).resolves.toBe('dismissed');
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it('copies when the sheet fails for any other reason', async () => {
+    setShare(vi.fn().mockRejectedValue(new Error('not allowed')));
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setClipboard({ writeText });
+
+    await expect(shareOrCopy('דירה', 'https://example.com/apartments/4')).resolves.toBe('copied');
+    expect(writeText).toHaveBeenCalledWith('https://example.com/apartments/4');
+  });
+
+  it('copies on desktop, where there is no share sheet', async () => {
+    setShare(undefined);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setClipboard({ writeText });
+
+    await expect(shareOrCopy('דירה', 'https://example.com/apartments/5')).resolves.toBe('copied');
+    expect(writeText).toHaveBeenCalledWith('https://example.com/apartments/5');
+  });
+
+  it('reports failure when copying is impossible too', async () => {
+    setShare(undefined);
+    setClipboard(undefined);
+    (document as any).execCommand = vi.fn(() => false);
+
+    await expect(shareOrCopy('דירה', 'https://example.com/apartments/6')).resolves.toBe('failed');
   });
 });
 
