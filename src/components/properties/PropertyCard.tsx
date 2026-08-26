@@ -147,7 +147,7 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
 
   const cardShadow = isSold
     ? '0 2px 10px rgba(0, 0, 0, 0.1)'
-    : '0 4px 20px rgba(28, 54, 100, 0.15), 0 0 40px rgba(28, 54, 100, 0.08)';
+    : '0 1px 2px rgba(28, 54, 100, 0.05), 0 10px 24px -12px rgba(28, 54, 100, 0.28)';
 
   return (
     <div
