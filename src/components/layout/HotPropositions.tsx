@@ -50,7 +50,7 @@ const MARQUEE_PX_PER_SECOND = 16;
 const MARQUEE_FALLBACK_MS = 6000;
 const MIN_MARQUEE_SLIDES = 12;
 const ARROW_MS = 600;
-const WATCHDOG_MS = 1000;
+const WATCHDOG_MS = 400;
 const STALL_EPSILON_PX = 1;
 const STUCK_DRAG_MS = 3000;
 
@@ -134,7 +134,7 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
       lastTranslate.current = translate;
 
       if (previous !== null && Math.abs(translate - previous) < STALL_EPSILON_PX) {
-        swiper.slideNext(Number(swiper.params.speed) || MARQUEE_FALLBACK_MS, false);
+        swiper.slideNext(Number(swiper.params.speed) || MARQUEE_FALLBACK_MS, true);
       }
     };
 
@@ -169,10 +169,12 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
         simulateTouch
         allowTouchMove
         touchEventsTarget="container"
-        threshold={4}
+        threshold={3}
+        followFinger
+        resistance={false}
         loop={marquee}
         loopAdditionalSlides={2}
-        freeMode={marquee ? { enabled: true, momentum: false } : false}
+        freeMode={marquee ? { enabled: true, momentum: true, momentumRatio: 0.7, momentumVelocityRatio: 0.7, momentumBounce: false } : false}
         autoplay={marquee ? { delay: 0, disableOnInteraction: false, stopOnLastSlide: false } : false}
         speed={marquee ? MARQUEE_FALLBACK_MS : ARROW_MS}
         watchOverflow
