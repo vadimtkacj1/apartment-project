@@ -92,7 +92,7 @@ const ArrowButton = ({
   </button>
 );
 
-const PropertyCarousel = ({ items }: { items: Property[] }) => {
+const PropertyCarousel = ({ items, reverse = false }: { items: Property[]; reverse?: boolean }) => {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
   const [scrollable, setScrollable] = useState(false);
   const draggingSince = useRef<number | null>(null);
@@ -134,7 +134,9 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
       lastTranslate.current = translate;
 
       if (previous !== null && Math.abs(translate - previous) < STALL_EPSILON_PX) {
-        swiper.slideNext(Number(swiper.params.speed) || MARQUEE_FALLBACK_MS, true);
+        const step = Number(swiper.params.speed) || MARQUEE_FALLBACK_MS;
+        if (reverse) swiper.slidePrev(step, true);
+        else swiper.slideNext(step, true);
       }
     };
 
@@ -157,7 +159,7 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
       window.removeEventListener("pointerup", endDrag);
       window.removeEventListener("pointercancel", endDrag);
     };
-  }, [swiper, marquee]);
+  }, [swiper, marquee, reverse]);
 
   return (
     <div className="relative">
@@ -175,7 +177,7 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
         loop={marquee}
         loopAdditionalSlides={2}
         freeMode={marquee ? { enabled: true, momentum: true, momentumRatio: 0.7, momentumVelocityRatio: 0.7, momentumBounce: false } : false}
-        autoplay={marquee ? { delay: 0, disableOnInteraction: false, stopOnLastSlide: false } : false}
+        autoplay={marquee ? { delay: 0, disableOnInteraction: false, stopOnLastSlide: false, reverseDirection: reverse } : false}
         speed={marquee ? MARQUEE_FALLBACK_MS : ARROW_MS}
         watchOverflow
         centerInsufficientSlides={!marquee}
@@ -402,7 +404,7 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
           {forRent.length > 0 && (
             <div className="w-full">
               <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
-              <PropertyCarousel items={forRent.slice(0, MAX_PER_GROUP)} />
+              <PropertyCarousel items={forRent.slice(0, MAX_PER_GROUP)} reverse />
             </div>
           )}
         </div>
