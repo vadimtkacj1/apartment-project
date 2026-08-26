@@ -5,7 +5,6 @@ import { m } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperInstance } from "swiper";
 import { A11y, Autoplay, FreeMode } from "swiper/modules";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
@@ -48,8 +47,7 @@ const MAX_PER_GROUP = 8;
 
 const MARQUEE_PX_PER_SECOND = 16;
 const MARQUEE_FALLBACK_MS = 6000;
-const MIN_MARQUEE_SLIDES = 12;
-const ARROW_MS = 600;
+const MIN_MARQUEE_SLIDES = 16;
 const WATCHDOG_MS = 400;
 const STALL_EPSILON_PX = 1;
 const STUCK_DRAG_MS = 3000;
@@ -68,33 +66,8 @@ const repeatToFill = (items: Property[], min: number) => {
   return filled;
 };
 
-const ArrowButton = ({
-  side,
-  disabled,
-  onClick,
-  label,
-}: {
-  side: "start" | "end";
-  disabled: boolean;
-  onClick: () => void;
-  label: string;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    disabled={disabled}
-    aria-label={label}
-    className={`absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e4e0d8] bg-white text-[#1c3664] shadow-[0_4px_14px_rgba(28,54,100,0.14)] transition hover:bg-[#1c3664] hover:text-white disabled:pointer-events-none disabled:opacity-0 md:flex ${
-      side === "start" ? "-start-4 lg:-start-8" : "-end-4 lg:-end-8"
-    }`}
-  >
-    {side === "start" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
-  </button>
-);
-
 const PropertyCarousel = ({ items, reverse = false }: { items: Property[]; reverse?: boolean }) => {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
-  const [scrollable, setScrollable] = useState(false);
   const draggingSince = useRef<number | null>(null);
   const lastTranslate = useRef<number | null>(null);
 
@@ -178,22 +151,23 @@ const PropertyCarousel = ({ items, reverse = false }: { items: Property[]; rever
         loopAdditionalSlides={2}
         freeMode={marquee ? { enabled: true, momentum: true, momentumRatio: 0.7, momentumVelocityRatio: 0.7, momentumBounce: false } : false}
         autoplay={marquee ? { delay: 0, disableOnInteraction: false, stopOnLastSlide: false, reverseDirection: reverse } : false}
-        speed={marquee ? MARQUEE_FALLBACK_MS : ARROW_MS}
+        speed={MARQUEE_FALLBACK_MS}
         watchOverflow
         centerInsufficientSlides={!marquee}
         breakpoints={{
           480: { slidesPerView: 2, spaceBetween: 16 },
+          640: { slidesPerView: 3, spaceBetween: 16 },
           768: { slidesPerView: 3, spaceBetween: 20 },
           1024: { slidesPerView: 4, spaceBetween: 24 },
-          1536: { slidesPerView: 5, spaceBetween: 24 },
+          1280: { slidesPerView: 5, spaceBetween: 24 },
+          1536: { slidesPerView: 6, spaceBetween: 24 },
+          1920: { slidesPerView: 7, spaceBetween: 24 },
         }}
         onSwiper={(instance) => {
           setSwiper(instance);
-          setScrollable(!instance.isLocked);
           if (marquee) applyMarqueeSpeed(instance);
         }}
         onResize={(instance) => {
-          setScrollable(!instance.isLocked);
           if (marquee) applyMarqueeSpeed(instance);
         }}
         onBreakpoint={(instance) => {
@@ -207,7 +181,7 @@ const PropertyCarousel = ({ items, reverse = false }: { items: Property[]; rever
           lastTranslate.current = null;
           if (marquee) instance.autoplay?.start();
         }}
-        className={`property-carousel !px-1 !py-1 ${marquee ? "property-carousel--marquee" : ""}`}
+        className={`property-carousel !px-0 !py-4 ${marquee ? "property-carousel--marquee" : ""}`}
       >
         {slides.map((item: Property, i: number) => {
           const cardProps = {
@@ -235,12 +209,6 @@ const PropertyCarousel = ({ items, reverse = false }: { items: Property[]; rever
         })}
       </Swiper>
 
-      {scrollable && (
-        <>
-          <ArrowButton side="start" disabled={false} onClick={() => swiper?.slidePrev(ARROW_MS)} label="הנכסים הקודמים" />
-          <ArrowButton side="end" disabled={false} onClick={() => swiper?.slideNext(ARROW_MS)} label="הנכסים הבאים" />
-        </>
-      )}
     </div>
   );
 };
@@ -393,17 +361,21 @@ function HotPropositions({ initialProperties, initialTitle }: HotPropositionsPro
             skipped entirely (title included) rather than left as an empty strip.
             Centered in a rem container so it uses the extra width on large
             screens without stretching edge-to-edge. */}
-        <div className="flex flex-col gap-14 md:gap-20 w-full max-w-7xl mx-auto px-4 md:px-6">
+        <div className="flex flex-col gap-14 md:gap-20 w-full">
           {forSale.length > 0 && (
             <div className="w-full">
-              <RowTitle href="/apartments?dealType=sale">נכסים למכירה</RowTitle>
+              <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <RowTitle href="/apartments?dealType=sale">נכסים למכירה</RowTitle>
+              </div>
               <PropertyCarousel items={forSale.slice(0, MAX_PER_GROUP)} />
             </div>
           )}
 
           {forRent.length > 0 && (
             <div className="w-full">
-              <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
+              <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <RowTitle href="/apartments?dealType=rent">נכסים להשכרה</RowTitle>
+              </div>
               <PropertyCarousel items={forRent.slice(0, MAX_PER_GROUP)} reverse />
             </div>
           )}
