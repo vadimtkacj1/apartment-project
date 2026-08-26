@@ -76,17 +76,28 @@ export default function Header() {
         position: "fixed",
         top: 0, left: 0, right: 0,
         zIndex: 1000,
-        transition: "all 0.35s ease",
-        background: shouldBeTransparent
-          ? "transparent"
-          : "rgba(255, 255, 255, 0.95)",
-        backdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
-        WebkitBackdropFilter: shouldBeTransparent ? "none" : "blur(12px)",
+        transform: "translateZ(0)",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        transition: "background-color 0.35s ease, box-shadow 0.35s ease",
+        backgroundColor: shouldBeTransparent ? "transparent" : "#ffffff",
         boxShadow: shouldBeTransparent
           ? "none"
           : "0 2px 4px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.15)",
       }}
     >
+      <span
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: "100%",
+          height: 80,
+          backgroundColor: "inherit",
+          pointerEvents: "none",
+        }}
+      />
       {/* Same container as the page content sections — `max-w-7xl mx-auto px-4
           md:px-6` — so the logo lines up with the section content edge on EVERY
           width. The old fixed `maxWidth: 2400px` + `3rem` padding diverged from
