@@ -208,3 +208,27 @@ header {
   opacity: 0.8;
 }
 
+
+.property-carousel .swiper-slide {
+  height: auto;
+}
+
+.property-carousel img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.property-carousel--marquee {
+  --swiper-wrapper-transition-timing-function: linear;
+}
+
+.property-carousel--marquee .swiper-wrapper {
+  transition-timing-function: linear;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .property-carousel--marquee .swiper-wrapper {
+    transition-timing-function: ease-out;
+  }
+}

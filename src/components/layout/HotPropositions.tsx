@@ -1,14 +1,15 @@
 "use client";
 
 import { memo, useEffect, useState } from "react";
-import { m } from "framer-motion";
+import { m, useReducedMotion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Autoplay } from "swiper/modules";
+import { A11y, Autoplay, FreeMode } from "swiper/modules";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
 import "swiper/css";
+import "swiper/css/free-mode";
 
 // Type for apartment data
 interface Property {
@@ -43,53 +44,57 @@ interface Property {
     listing, so this stays a curated preview rather than an endless list. */
 const MAX_PER_GROUP = 8;
 
-/**
- * Infinite, self-advancing property carousel. It scrolls on its own — Swiper
- * `loop` + autoplay steps ONE card forward every few seconds — and pauses while
- * the pointer is over it so a visitor can read a card; cards stay draggable.
- *
- * Stepped (not a continuous marquee) on purpose: it settles on WHOLE cards
- * between steps instead of leaving cards cropped mid-flow at the edges, and moves
- * at a relaxed pace (`delay` 4.5s, smooth 0.9s transition). Integer
- * `slidesPerView` at every breakpoint keeps cards whole — no fractional peek.
- *
- * Auto-scroll only engages when a group has more cards than fit (desktop shows
- * 3); a smaller group is a static, centered row.
- */
+const MARQUEE_MS_PER_CARD = 4200;
+const MIN_MARQUEE_SLIDES = 8;
+
+const repeatToFill = (items: Property[], min: number) => {
+  if (items.length === 0) return items;
+  const filled = [...items];
+  while (filled.length < min) filled.push(...items);
+  return filled;
+};
+
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
-  const autoScroll = items.length > 3;
+  const reduceMotion = useReducedMotion();
+  const marquee = items.length >= 3 && !reduceMotion;
+  const slides = marquee ? repeatToFill(items, MIN_MARQUEE_SLIDES) : items;
 
   return (
     <div className="relative">
       <Swiper
-        modules={[A11y, Autoplay]}
+        modules={[A11y, Autoplay, FreeMode]}
         spaceBetween={24}
         slidesPerView={1}
         grabCursor
-        loop={autoScroll}
-        autoplay={autoScroll ? { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
-        speed={900}
+        simulateTouch
+        allowTouchMove
+        touchEventsTarget="container"
+        threshold={4}
+        loop={marquee}
+        loopAdditionalSlides={2}
+        freeMode={marquee ? { enabled: true, momentum: false } : false}
+        autoplay={marquee ? { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+        speed={marquee ? MARQUEE_MS_PER_CARD : 600}
         watchOverflow
-        centerInsufficientSlides={!autoScroll}
+        centerInsufficientSlides={!marquee}
         breakpoints={{
           640: { slidesPerView: 2 },
           1024: { slidesPerView: 3 },
         }}
-        className="!px-1 !py-1"
+        className={`property-carousel !px-1 !py-1 ${marquee ? "property-carousel--marquee" : ""}`}
       >
-        {items.map((item: Property, i: number) => {
+        {slides.map((item: Property, i: number) => {
           const cardProps = {
             ...item,
             propertyType: item.propertyType as PropertyType | undefined,
             index: i,
-            // The <a> wrapper handles navigation, so the card's own click is
-            // disabled to avoid a double push.
             disableClick: true,
           };
           return (
             <SwiperSlide key={`hot-proposition-card-${item.id}-${i}`} className="!h-auto">
               <a
                 href={`/apartments/${item.id}`}
+                draggable={false}
                 onClick={() => {
                   if (!item.isSold) {
                     analytics.trackPropertyClick(item.id, 'hot-proposition');
