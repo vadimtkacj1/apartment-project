@@ -1,15 +1,16 @@
 "use client";
 
 import { memo, useEffect, useState } from "react";
-import { m, useReducedMotion } from "framer-motion";
+import { m } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { A11y, Autoplay, FreeMode } from "swiper/modules";
+import type { Swiper as SwiperInstance } from "swiper";
+import { A11y } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
 import "swiper/css";
-import "swiper/css/free-mode";
 
 // Type for apartment data
 interface Property {
@@ -44,46 +45,68 @@ interface Property {
     listing, so this stays a curated preview rather than an endless list. */
 const MAX_PER_GROUP = 8;
 
-const MARQUEE_MS_PER_CARD = 4200;
-const MIN_MARQUEE_SLIDES = 8;
-
-const repeatToFill = (items: Property[], min: number) => {
-  if (items.length === 0) return items;
-  const filled = [...items];
-  while (filled.length < min) filled.push(...items);
-  return filled;
-};
+const ArrowButton = ({
+  side,
+  disabled,
+  onClick,
+  label,
+}: {
+  side: "start" | "end";
+  disabled: boolean;
+  onClick: () => void;
+  label: string;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={label}
+    className={`absolute top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-[#e4e0d8] bg-white text-[#1c3664] shadow-[0_4px_14px_rgba(28,54,100,0.14)] transition hover:bg-[#1c3664] hover:text-white disabled:pointer-events-none disabled:opacity-0 md:flex ${
+      side === "start" ? "-start-4 lg:-start-8" : "-end-4 lg:-end-8"
+    }`}
+  >
+    {side === "start" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+  </button>
+);
 
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
-  const reduceMotion = useReducedMotion();
-  const marquee = items.length >= 3 && !reduceMotion;
-  const slides = marquee ? repeatToFill(items, MIN_MARQUEE_SLIDES) : items;
+  const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
+  const [scrollable, setScrollable] = useState(false);
+
+  const syncEdges = (instance: SwiperInstance) => {
+    setAtStart(instance.isBeginning);
+    setAtEnd(instance.isEnd);
+    setScrollable(!instance.isLocked);
+  };
 
   return (
     <div className="relative">
       <Swiper
-        modules={[A11y, Autoplay, FreeMode]}
+        modules={[A11y]}
         spaceBetween={24}
         slidesPerView={1}
         grabCursor
         simulateTouch
         allowTouchMove
-        touchEventsTarget="container"
         threshold={4}
-        loop={marquee}
-        loopAdditionalSlides={2}
-        freeMode={marquee ? { enabled: true, momentum: false } : false}
-        autoplay={marquee ? { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
-        speed={marquee ? MARQUEE_MS_PER_CARD : 600}
+        speed={500}
         watchOverflow
-        centerInsufficientSlides={!marquee}
+        centerInsufficientSlides
         breakpoints={{
           640: { slidesPerView: 2 },
           1024: { slidesPerView: 3 },
         }}
-        className={`property-carousel !px-1 !py-1 ${marquee ? "property-carousel--marquee" : ""}`}
+        onSwiper={(instance) => {
+          setSwiper(instance);
+          syncEdges(instance);
+        }}
+        onSlideChange={syncEdges}
+        onResize={syncEdges}
+        className="property-carousel !px-1 !py-1"
       >
-        {slides.map((item: Property, i: number) => {
+        {items.map((item: Property, i: number) => {
           const cardProps = {
             ...item,
             propertyType: item.propertyType as PropertyType | undefined,
@@ -108,6 +131,13 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
           );
         })}
       </Swiper>
+
+      {scrollable && (
+        <>
+          <ArrowButton side="start" disabled={atStart} onClick={() => swiper?.slidePrev()} label="הנכסים הקודמים" />
+          <ArrowButton side="end" disabled={atEnd} onClick={() => swiper?.slideNext()} label="הנכסים הבאים" />
+        </>
+      )}
     </div>
   );
 };
