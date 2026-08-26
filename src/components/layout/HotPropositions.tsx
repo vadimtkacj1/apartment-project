@@ -46,7 +46,7 @@ interface Property {
     listing, so this stays a curated preview rather than an endless list. */
 const MAX_PER_GROUP = 8;
 
-const MARQUEE_PX_PER_SECOND = 28;
+const MARQUEE_PX_PER_SECOND = 16;
 const MARQUEE_FALLBACK_MS = 6000;
 const MIN_MARQUEE_SLIDES = 12;
 const ARROW_MS = 600;
