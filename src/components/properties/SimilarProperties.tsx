@@ -101,7 +101,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
 
   return (
     <section className="w-full py-24 " dir="rtl">
-      <div className="max-w-[1300px] mx-auto px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
         
         {/* Section Header */}
         <m.div
@@ -120,7 +120,7 @@ const SimilarProperties: React.FC<SimilarPropertiesProps> = ({
         </m.div>
 
         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 gap-3 min-[480px]:gap-4 md:gap-5 lg:gap-6 lg:grid-cols-3">
           {properties.map((property, index) => (
             <m.div
               key={property.id}

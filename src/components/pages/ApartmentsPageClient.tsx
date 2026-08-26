@@ -455,7 +455,7 @@ function ApartmentsPageContent({
             <div className="text-center py-20 font-bold text-gray-400">טוען נכסים...</div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:pl-20">
+              <div className="grid grid-cols-2 gap-3 min-[480px]:gap-4 md:gap-5 lg:gap-6 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 md:pl-20">
                 {currentProperties.map((prop, i) => (
                   <PropertyCard key={prop.id} {...prop} index={i} />
                 ))}

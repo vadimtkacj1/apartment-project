@@ -134,7 +134,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         dir="rtl"
         className="relative w-full pt-24 md:pt-32 pb-0 overflow-hidden bg-warm"
       >
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center py-20">
             <p className="text-gray-600 text-xl">טוען נכסים...</p>
           </div>
@@ -159,7 +159,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         <div className="absolute bottom-20 left-20 w-80 h-80 bg-[#1c3664] rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6">
         {/* Section Header */}
         <m.div
           initial={{ opacity: 0, y: 30 }}
@@ -190,7 +190,7 @@ const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ initialProperti
         </m.div>
 
         {/* Properties Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-2 gap-3 min-[480px]:gap-4 md:gap-5 lg:gap-6 lg:grid-cols-3 mb-12">
           {properties.map((property, index) => (
             <PropertyCard
               key={property.id}

@@ -151,13 +151,15 @@ function FloorPlansSection() {
         <div className="relative">
           <Swiper
             modules={[Navigation, Pagination, A11y]}
-            spaceBetween={24}
-            slidesPerView={1.1}
+            spaceBetween={12}
+            slidesPerView={2}
             grabCursor
             onSwiper={setSwiper}
             breakpoints={{
-              640: { slidesPerView: 1.6 },
-              1024: { slidesPerView: 2 },
+              480: { slidesPerView: 2, spaceBetween: 16 },
+              768: { slidesPerView: 3, spaceBetween: 20 },
+              1024: { slidesPerView: 3, spaceBetween: 24 },
+              1536: { slidesPerView: 4, spaceBetween: 24 },
             }}
             pagination={{
               clickable: true,
@@ -169,7 +171,7 @@ function FloorPlansSection() {
           >
             {PLANS.map((plan, i) => (
               <SwiperSlide key={`${plan.image}-${i}`} className="!h-auto">
-                <article className="group h-full flex flex-col bg-white rounded-2xl border border-[#1c3664]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
+                <article className="@container group h-full flex flex-col bg-white rounded-2xl border border-[#1c3664]/10 overflow-hidden shadow-sm hover:-translate-y-1 transition-all duration-300">
                   {/* Plan preview. The share button is a sibling, not a child:
                       a <button> may not nest inside another <button>. */}
                   <div className="relative">
@@ -177,19 +179,19 @@ function FloorPlansSection() {
                       type="button"
                       onClick={() => setActive(plan)}
                       aria-label={`צפייה בתוכנית — ${plan.title}, ${plan.subtitle}`}
-                      className="relative block w-full h-64 md:h-72 bg-[#f5f1ea] cursor-zoom-in"
+                      className="relative block w-full h-40 @[16rem]:h-56 @[22rem]:h-64 @[30rem]:h-72 bg-[#f5f1ea] cursor-zoom-in"
                     >
                       <Image
                         src={plan.image}
                         alt={`תוכנית ${plan.title}, ${plan.subtitle} — ONE THE PARK חולון`}
                         fill
-                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 55vw, 620px"
+                        sizes="(max-width: 480px) 46vw, (max-width: 768px) 31vw, (max-width: 1536px) 32vw, 24vw"
                         className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.03]"
                         loading="lazy"
                         quality={85}
                       />
                       <span className="absolute inset-0 flex items-center justify-center bg-[#1c3664]/0 group-hover:bg-[#1c3664]/15 transition-colors duration-300">
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-sm font-bold px-4 py-2 rounded-full shadow-lg">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 inline-flex items-center gap-2 bg-white/95 text-[#1c3664] text-[11px] @[22rem]:text-sm font-bold px-2.5 py-1 @[22rem]:px-4 @[22rem]:py-2 rounded-full shadow-lg">
                           <Eye className="w-4 h-4" />
                           להגדלה
                         </span>
@@ -205,7 +207,7 @@ function FloorPlansSection() {
                           : `שיתוף התוכנית — ${plan.title}, ${plan.subtitle}`
                       }
                       title={copiedSlug === planSlug(plan) ? "הקישור הועתק ללוח!" : "שיתוף התוכנית"}
-                      className={`absolute top-3 left-3 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors duration-200 ${
+                      className={`absolute top-2 left-2 @[22rem]:top-3 @[22rem]:left-3 z-10 w-7 h-7 @[22rem]:w-10 @[22rem]:h-10 rounded-full flex items-center justify-center shadow-md transition-colors duration-200 ${
                         copiedSlug === planSlug(plan)
                           ? "bg-[#1c3664] text-white"
                           : "bg-white/95 text-[#1c3664] hover:bg-[#1c3664] hover:text-white"
@@ -220,29 +222,29 @@ function FloorPlansSection() {
                   </div>
 
                   {/* Body */}
-                  <div className="flex flex-col flex-1 p-5 text-center">
-                    <h3 className="text-2xl font-black text-[#1c3664] leading-tight">
+                  <div className="flex flex-col flex-1 p-2.5 @[22rem]:p-5 text-center">
+                    <h3 className="text-sm @[16rem]:text-lg @[22rem]:text-2xl font-black text-[#1c3664] leading-tight">
                       {plan.title}
                     </h3>
-                    <p className="text-gray-500 font-medium mt-1 mb-5">{plan.subtitle}</p>
+                    <p className="text-[11px] @[22rem]:text-base text-gray-500 font-medium mt-1 mb-2.5 @[22rem]:mb-5">{plan.subtitle}</p>
 
                     {/* Buttons */}
-                    <div className="mt-auto grid grid-cols-2 gap-3">
+                    <div className="mt-auto grid grid-cols-1 @[16rem]:grid-cols-2 gap-2 @[22rem]:gap-3">
                       <button
                         type="button"
                         onClick={() => setActive(plan)}
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#1c3664] text-white font-bold text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+                        className="inline-flex items-center justify-center gap-1 @[22rem]:gap-2 px-2 py-2 @[22rem]:px-4 @[22rem]:py-3 rounded-xl bg-[#1c3664] text-white font-bold text-[11px] @[22rem]:text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-3 h-3 @[22rem]:w-4 @[22rem]:h-4 shrink-0" />
                         צפייה בתוכנית
                       </button>
                       <a
                         href={plan.pdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white border border-[#1c3664]/30 text-[#1c3664] font-bold text-sm hover:border-[#c5a357] hover:text-[#c5a357] transition-colors"
+                        className="inline-flex items-center justify-center gap-1 @[22rem]:gap-2 px-2 py-2 @[22rem]:px-4 @[22rem]:py-3 rounded-xl bg-white border border-[#1c3664]/30 text-[#1c3664] font-bold text-[11px] @[22rem]:text-sm hover:border-[#c5a357] hover:text-[#c5a357] transition-colors"
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3 h-3 @[22rem]:w-4 @[22rem]:h-4 shrink-0" />
                         הורדה / פתיחה
                       </a>
                     </div>
@@ -274,16 +276,16 @@ function FloorPlansSection() {
         </div>
 
         {/* CTA — through to the full ONE THE PARK project page */}
-        <div className="mt-10 md:mt-12 flex justify-center">
+        <div className="mt-8 md:mt-12 flex justify-center">
           <a
             href={ONE_THE_PARK_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-2.5 rounded-2xl bg-[#1c3664] px-8 py-4 text-base md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
+            className="group inline-flex items-center justify-center gap-2 md:gap-2.5 rounded-xl md:rounded-2xl bg-[#1c3664] px-5 py-2.5 md:px-8 md:py-4 text-sm md:text-lg font-black text-white shadow-md transition-all duration-300 hover:bg-[#c5a357] hover:text-[#1c3664] hover:-translate-y-0.5"
             style={{ fontFamily: "var(--font-caramel), cursive, sans-serif" }}
           >
             <span dir="ltr">ONE THE PARK</span>
-            <ExternalLink className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
+            <ExternalLink className="w-4 h-4 md:w-5 md:h-5 shrink-0 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
           </a>
         </div>
       </div>

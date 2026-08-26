@@ -218,3 +218,12 @@ header {
   user-select: none;
 }
 
+.property-carousel--marquee {
+  --swiper-wrapper-transition-timing-function: linear;
+}
+
+.property-carousel--marquee .swiper-wrapper {
+  transition-timing-function: linear !important;
+  will-change: transform;
+}
+

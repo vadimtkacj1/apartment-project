@@ -1,16 +1,17 @@
 "use client";
 
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { m } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperInstance } from "swiper";
-import { A11y } from "swiper/modules";
+import { A11y, Autoplay, FreeMode } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { analytics } from "@/lib/analytics";
 import { DealType, PropertyType, ParkingType, Position, FurnitureLevel, Direction } from "@/types/property.types";
 
 import "swiper/css";
+import "swiper/css/free-mode";
 
 // Type for apartment data
 interface Property {
@@ -45,6 +46,25 @@ interface Property {
     listing, so this stays a curated preview rather than an endless list. */
 const MAX_PER_GROUP = 8;
 
+const MARQUEE_PX_PER_SECOND = 28;
+const MARQUEE_FALLBACK_MS = 6000;
+const MIN_MARQUEE_SLIDES = 12;
+const ARROW_MS = 600;
+
+const applyMarqueeSpeed = (instance: SwiperInstance) => {
+  const slideWidth = instance.slidesSizesGrid?.[0];
+  if (!slideWidth) return;
+  const gap = Number(instance.params.spaceBetween ?? 0);
+  instance.params.speed = ((slideWidth + gap) / MARQUEE_PX_PER_SECOND) * 1000;
+};
+
+const repeatToFill = (items: Property[], min: number) => {
+  if (items.length === 0) return items;
+  const filled = [...items];
+  while (filled.length < min) filled.push(...items);
+  return filled;
+};
+
 const ArrowButton = ({
   side,
   disabled,
@@ -71,42 +91,82 @@ const ArrowButton = ({
 
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
   const [scrollable, setScrollable] = useState(false);
+  const dragging = useRef(false);
 
-  const syncEdges = (instance: SwiperInstance) => {
-    setAtStart(instance.isBeginning);
-    setAtEnd(instance.isEnd);
-    setScrollable(!instance.isLocked);
-  };
+  const marquee = items.length >= 2;
+  const slides = marquee ? repeatToFill(items, MIN_MARQUEE_SLIDES) : items;
+
+  useEffect(() => {
+    if (!swiper || !marquee) return;
+
+    const keepMoving = () => {
+      if (swiper.destroyed || !swiper.autoplay) return;
+      if (dragging.current || document.visibilityState !== "visible") return;
+      applyMarqueeSpeed(swiper);
+      if (!swiper.autoplay.running) swiper.autoplay.start();
+      else if (swiper.autoplay.paused) swiper.autoplay.resume();
+    };
+
+    const ticker = window.setInterval(keepMoving, 1000);
+    document.addEventListener("visibilitychange", keepMoving);
+    window.addEventListener("focus", keepMoving);
+    window.addEventListener("pageshow", keepMoving);
+
+    return () => {
+      window.clearInterval(ticker);
+      document.removeEventListener("visibilitychange", keepMoving);
+      window.removeEventListener("focus", keepMoving);
+      window.removeEventListener("pageshow", keepMoving);
+    };
+  }, [swiper, marquee]);
 
   return (
     <div className="relative">
       <Swiper
-        modules={[A11y]}
-        spaceBetween={24}
-        slidesPerView={1}
+        modules={[A11y, Autoplay, FreeMode]}
+        spaceBetween={12}
+        slidesPerView={2}
         grabCursor
         simulateTouch
         allowTouchMove
+        touchEventsTarget="container"
         threshold={4}
-        speed={500}
+        loop={marquee}
+        loopAdditionalSlides={2}
+        freeMode={marquee ? { enabled: true, momentum: false } : false}
+        autoplay={marquee ? { delay: 0, disableOnInteraction: false, stopOnLastSlide: false } : false}
+        speed={marquee ? MARQUEE_FALLBACK_MS : ARROW_MS}
         watchOverflow
-        centerInsufficientSlides
+        centerInsufficientSlides={!marquee}
         breakpoints={{
-          640: { slidesPerView: 2 },
-          1024: { slidesPerView: 3 },
+          480: { slidesPerView: 2, spaceBetween: 16 },
+          768: { slidesPerView: 3, spaceBetween: 20 },
+          1024: { slidesPerView: 4, spaceBetween: 24 },
+          1536: { slidesPerView: 5, spaceBetween: 24 },
         }}
         onSwiper={(instance) => {
           setSwiper(instance);
-          syncEdges(instance);
+          setScrollable(!instance.isLocked);
+          if (marquee) applyMarqueeSpeed(instance);
         }}
-        onSlideChange={syncEdges}
-        onResize={syncEdges}
-        className="property-carousel !px-1 !py-1"
+        onResize={(instance) => {
+          setScrollable(!instance.isLocked);
+          if (marquee) applyMarqueeSpeed(instance);
+        }}
+        onBreakpoint={(instance) => {
+          if (marquee) applyMarqueeSpeed(instance);
+        }}
+        onTouchStart={() => {
+          dragging.current = true;
+        }}
+        onTouchEnd={(instance) => {
+          dragging.current = false;
+          if (marquee) instance.autoplay?.start();
+        }}
+        className={`property-carousel !px-1 !py-1 ${marquee ? "property-carousel--marquee" : ""}`}
       >
-        {items.map((item: Property, i: number) => {
+        {slides.map((item: Property, i: number) => {
           const cardProps = {
             ...item,
             propertyType: item.propertyType as PropertyType | undefined,
@@ -134,8 +194,8 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
 
       {scrollable && (
         <>
-          <ArrowButton side="start" disabled={atStart} onClick={() => swiper?.slidePrev()} label="הנכסים הקודמים" />
-          <ArrowButton side="end" disabled={atEnd} onClick={() => swiper?.slideNext()} label="הנכסים הבאים" />
+          <ArrowButton side="start" disabled={false} onClick={() => swiper?.slidePrev(ARROW_MS)} label="הנכסים הקודמים" />
+          <ArrowButton side="end" disabled={false} onClick={() => swiper?.slideNext(ARROW_MS)} label="הנכסים הבאים" />
         </>
       )}
     </div>
