@@ -50,6 +50,9 @@ const MARQUEE_PX_PER_SECOND = 28;
 const MARQUEE_FALLBACK_MS = 6000;
 const MIN_MARQUEE_SLIDES = 12;
 const ARROW_MS = 600;
+const WATCHDOG_MS = 1000;
+const STALL_EPSILON_PX = 1;
+const STUCK_DRAG_MS = 3000;
 
 const applyMarqueeSpeed = (instance: SwiperInstance) => {
   const slideWidth = instance.slidesSizesGrid?.[0];
@@ -92,7 +95,8 @@ const ArrowButton = ({
 const PropertyCarousel = ({ items }: { items: Property[] }) => {
   const [swiper, setSwiper] = useState<SwiperInstance | null>(null);
   const [scrollable, setScrollable] = useState(false);
-  const dragging = useRef(false);
+  const draggingSince = useRef<number | null>(null);
+  const lastTranslate = useRef<number | null>(null);
 
   const marquee = items.length >= 2;
   const slides = marquee ? repeatToFill(items, MIN_MARQUEE_SLIDES) : items;
@@ -100,24 +104,58 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
   useEffect(() => {
     if (!swiper || !marquee) return;
 
+    const isDragging = () => {
+      const since = draggingSince.current;
+      if (since === null) return false;
+      if (Date.now() - since > STUCK_DRAG_MS) {
+        draggingSince.current = null;
+        return false;
+      }
+      return true;
+    };
+
+    const endDrag = () => {
+      draggingSince.current = null;
+    };
+
     const keepMoving = () => {
       if (swiper.destroyed || !swiper.autoplay) return;
-      if (dragging.current || document.visibilityState !== "visible") return;
+      if (isDragging() || document.visibilityState !== "visible") {
+        lastTranslate.current = null;
+        return;
+      }
+
       applyMarqueeSpeed(swiper);
       if (!swiper.autoplay.running) swiper.autoplay.start();
       else if (swiper.autoplay.paused) swiper.autoplay.resume();
+
+      const translate = swiper.translate;
+      const previous = lastTranslate.current;
+      lastTranslate.current = translate;
+
+      if (previous !== null && Math.abs(translate - previous) < STALL_EPSILON_PX) {
+        swiper.slideNext(Number(swiper.params.speed) || MARQUEE_FALLBACK_MS, false);
+      }
     };
 
-    const ticker = window.setInterval(keepMoving, 1000);
+    const ticker = window.setInterval(keepMoving, WATCHDOG_MS);
     document.addEventListener("visibilitychange", keepMoving);
     window.addEventListener("focus", keepMoving);
     window.addEventListener("pageshow", keepMoving);
+    window.addEventListener("touchend", endDrag);
+    window.addEventListener("touchcancel", endDrag);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
 
     return () => {
       window.clearInterval(ticker);
       document.removeEventListener("visibilitychange", keepMoving);
       window.removeEventListener("focus", keepMoving);
       window.removeEventListener("pageshow", keepMoving);
+      window.removeEventListener("touchend", endDrag);
+      window.removeEventListener("touchcancel", endDrag);
+      window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener("pointercancel", endDrag);
     };
   }, [swiper, marquee]);
 
@@ -158,10 +196,11 @@ const PropertyCarousel = ({ items }: { items: Property[] }) => {
           if (marquee) applyMarqueeSpeed(instance);
         }}
         onTouchStart={() => {
-          dragging.current = true;
+          draggingSince.current = Date.now();
         }}
         onTouchEnd={(instance) => {
-          dragging.current = false;
+          draggingSince.current = null;
+          lastTranslate.current = null;
           if (marquee) instance.autoplay?.start();
         }}
         className={`property-carousel !px-1 !py-1 ${marquee ? "property-carousel--marquee" : ""}`}
