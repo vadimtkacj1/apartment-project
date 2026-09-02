@@ -8,6 +8,10 @@ interface ContactFormFieldsProps {
   onSubmitSuccess?: () => void;
   resetOnSubmit?: boolean;
   idPrefix?: string;
+  propertyId?: number | string;
+  source?: string;
+  compact?: boolean;
+  messagePlaceholder?: string;
 }
 
 export interface FormData {
@@ -20,7 +24,11 @@ export interface FormData {
 const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
   onSubmitSuccess,
   resetOnSubmit = false,
-  idPrefix = ''
+  idPrefix = '',
+  propertyId,
+  source,
+  compact = false,
+  messagePlaceholder
 }) => {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -33,6 +41,32 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+
+  const styles = compact
+    ? {
+        form: 'space-y-4',
+        label: 'block text-sm font-bold text-gray-900 mb-2',
+        field: 'w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300',
+        phoneField: 'w-full pr-11 pl-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300',
+        consentBox: 'bg-gray-50 border-2 border-gray-200 rounded-xl p-4',
+        consentText: 'text-xs text-gray-700 leading-relaxed',
+        button: 'w-full px-6 py-4 text-white font-black text-lg uppercase tracking-tight rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group mt-2',
+        rows: 4,
+        iconSize: 18,
+        sendSize: 20
+      }
+    : {
+        form: 'space-y-6',
+        label: 'block text-lg font-bold text-gray-900 mb-3',
+        field: 'w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300',
+        phoneField: 'w-full pr-12 pl-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300',
+        consentBox: 'bg-gray-50 border-2 border-gray-200 rounded-xl p-5',
+        consentText: 'text-sm text-gray-700 leading-relaxed',
+        button: 'w-full px-8 py-5 text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group mt-4',
+        rows: 5,
+        iconSize: 20,
+        sendSize: 22
+      };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +82,9 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
     setIsSubmitting(true);
     setSubmitStatus({ type: null, message: '' });
 
+    const numericPropertyId = Number(propertyId);
+    const hasPropertyId = Number.isInteger(numericPropertyId) && numericPropertyId > 0;
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
@@ -58,6 +95,8 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           name: formData.name,
           phone: formData.phone,
           message: formData.message,
+          ...(hasPropertyId ? { propertyId: numericPropertyId } : {}),
+          ...(source ? { source } : {}),
         }),
       });
 
@@ -69,8 +108,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           message: 'הפנייה נשלחה בהצלחה! נחזור אליך בקרוב'
         });
 
-        // Track contact form submission
-        analytics.trackContactForm();
+        analytics.trackContactForm(hasPropertyId ? numericPropertyId : undefined);
 
         // Reset form state if enabled
         if (resetOnSubmit) {
@@ -136,10 +174,10 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className={styles.form}>
       {/* Full Name Field */}
       <div>
-        <label htmlFor={`${idPrefix}name`} className="block text-lg font-bold text-gray-900 mb-3">
+        <label htmlFor={`${idPrefix}name`} className={styles.label}>
           שם מלא <span className="text-[#1c3664]">*</span>
         </label>
         <input
@@ -149,19 +187,19 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
+          className={styles.field}
           placeholder="הזן את שמך המלא"
         />
       </div>
 
       {/* Phone Number Field */}
       <div>
-        <label htmlFor={`${idPrefix}phone`} className="block text-lg font-bold text-gray-900 mb-3">
+        <label htmlFor={`${idPrefix}phone`} className={styles.label}>
           טלפון <span className="text-[#1c3664]">*</span>
         </label>
         <div className="relative">
           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-            <Phone size={20} className="text-gray-400" />
+            <Phone size={styles.iconSize} className="text-gray-400" />
           </div>
           <input
             type="tel"
@@ -173,7 +211,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
             maxLength={12}
             inputMode="numeric"
             pattern="[0-9-]*"
-            className="w-full pr-12 pl-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300"
+            className={styles.phoneField}
             placeholder="050-123-4567"
             dir="ltr"
           />
@@ -182,7 +220,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
 
       {/* Message/Interest Field */}
       <div>
-        <label htmlFor={`${idPrefix}message`} className="block text-lg font-bold text-gray-900 mb-3">
+        <label htmlFor={`${idPrefix}message`} className={styles.label}>
           במה אתה מעוניין?
         </label>
         <textarea
@@ -190,14 +228,14 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
           name="message"
           value={formData.message}
           onChange={handleChange}
-          rows={5}
-          className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 text-lg focus:border-[#1c3664] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c3664]/20 transition-all duration-300 resize-none"
-          placeholder="ספר לנו במה אתה מעוניין - מכירה, קניה, השכרה... (אופציונלי)"
+          rows={styles.rows}
+          className={`${styles.field} resize-none`}
+          placeholder={messagePlaceholder || 'ספר לנו במה אתה מעוניין - מכירה, קניה, השכרה... (אופציונלי)'}
         />
       </div>
 
       {/* Legal Consent Checkbox */}
-      <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-5">
+      <div className={styles.consentBox}>
         <label className="flex items-start gap-3 cursor-pointer">
           <input
             type="checkbox"
@@ -205,9 +243,9 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
             checked={formData.consent}
             onChange={handleChange}
             required
-            className="mt-1 w-5 h-5 text-[#1c3664] border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#1c3664]/20 cursor-pointer"
+            className="mt-1 w-5 h-5 shrink-0 text-[#1c3664] border-2 border-gray-300 rounded focus:ring-2 focus:ring-[#1c3664]/20 cursor-pointer"
           />
-          <span className="text-sm text-gray-700 leading-relaxed">
+          <span className={styles.consentText}>
             אני מאשר/ת לחזור אליי גם בפנייה טלפונית בהתאם להוראות סעיף 16ג לחוק הגנת הצרכן, תשמ"א–1981, ו/או מאשר/ת קבלת דיוור ומידע פרסומי בדוא"ל ו/או באמצעות מסרונים מחברת רם וחיים נכסים ו/או חברות הקשורות אליה, ומסכים/ה לתקנון האתר.
           </span>
         </label>
@@ -234,7 +272,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
         disabled={isSubmitting}
         whileHover={!isSubmitting ? { scale: 1.01 } : {}}
         whileTap={!isSubmitting ? { scale: 0.99 } : {}}
-        className={`w-full px-8 py-5 text-white font-black text-xl uppercase tracking-tight rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-3 group mt-4 ${
+        className={`${styles.button} ${
           isSubmitting
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-[#1c3664] hover:bg-[#152a4f]'
@@ -243,7 +281,7 @@ const ContactFormFields: React.FC<ContactFormFieldsProps> = ({
         <span>{isSubmitting ? 'שולח...' : 'שלח הודעה'}</span>
         {!isSubmitting && (
           <Send
-            size={22}
+            size={styles.sendSize}
             className="transform rotate-180 transition-transform duration-300 group-hover:translate-x-2"
           />
         )}

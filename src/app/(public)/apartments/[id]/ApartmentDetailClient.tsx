@@ -224,7 +224,7 @@ export default function ApartmentDetailClient({ propertyId, initialProperty, ini
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="sticky top-24"
+                  className="sticky top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:px-1 lg:-mx-1"
                 >
                   <PriceCard
                     price={property.price}
