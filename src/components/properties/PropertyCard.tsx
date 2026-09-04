@@ -2,6 +2,7 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { firstImage, isVideoUrl } from '@/lib/media';
 import Image from 'next/image';
+import Link from 'next/link';
 import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
@@ -246,7 +247,9 @@ const PropertyCard: React.FC<PropertyCardProps> = memo(({
                   isSold ? 'text-gray-500 line-through' : 'text-gray-900'
                 }`}
               >
-                {title}
+                <Link href={`/apartments/${id}`} className="hover:underline">
+                  {title}
+                </Link>
               </h3>
               <button
                 type="button"
