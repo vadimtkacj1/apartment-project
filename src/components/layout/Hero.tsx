@@ -199,7 +199,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center md:items-start w-full">
 
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-3 md:gap-x-5 mb-4 w-full">
-            <h1
+            <div
               className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
                 fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
@@ -211,7 +211,7 @@ const Hero: React.FC = () => {
               }}
             >
               <span className="type-line1 inline-block">{line1}</span>
-            </h1>
+            </div>
 
             <span
               className="amp-pop relative shrink-0 inline-block"
@@ -227,7 +227,7 @@ const Hero: React.FC = () => {
               />
             </span>
 
-            <h1
+            <div
               className="font-black text-white leading-none whitespace-nowrap shrink-0"
               style={{
                 fontSize: 'clamp(1.8rem, 5.5vw, 8.5rem)',
@@ -240,15 +240,15 @@ const Hero: React.FC = () => {
             >
               <span className="type-line2 inline-block">{line2}</span>
               <span className="cursor" />
-            </h1>
+            </div>
           </div>
 
-          <p
+          <h1
             className="hero-fade-1 text-white font-medium max-w-2xl xl:max-w-4xl 2xl:max-w-[80rem] leading-relaxed text-center md:text-start"
             style={{ fontSize: 'clamp(0.82rem, 1.5vw, 2.6rem)', textShadow: '0 1px 2px rgba(0,0,0,0.7), 0 1px 10px rgba(0,0,0,0.55)', WebkitTextStroke: '0.5px rgba(0,0,0,0.3)', paintOrder: 'stroke' }}
           >
-            מקצועיות ללא פשרות, שקיפות מלאה ותוצאות שמדברות בעד עצמן
-          </p>
+            משרד תיווך בחולון, בת ים וראשון לציון — מקצועיות ללא פשרות ושקיפות מלאה
+          </h1>
         </div>
 
         {/* BOTTOM: CTA buttons — centered on narrow screens, right-aligned from

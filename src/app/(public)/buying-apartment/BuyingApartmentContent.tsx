@@ -127,7 +127,7 @@ export default function BuyingApartmentContent() {
     <div dir="rtl" className="min-h-screen bg-warm">
       <SecondaryHero
         img="/7.jpg"
-        title="קונים דירה"
+        title="קונים דירה בחולון"
         centered={true}
       />
       <Breadcrumbs />

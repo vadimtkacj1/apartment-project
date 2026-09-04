@@ -5,9 +5,11 @@ interface SecondaryHeroProps {
   img: string;
   title: string;
   centered?: boolean;
+  as?: 'h1' | 'h2' | 'p';
 }
 
-const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = false }) => {
+const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = false, as = 'h1' }) => {
+  const Heading = as;
   return (
     <section
       dir="rtl"
@@ -41,7 +43,7 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
               : 'ms-0 me-auto items-start text-right max-w-full md:max-w-[75%] lg:max-w-[65%]'
           }`}>
 
-            <h1
+            <Heading
               className="font-black text-white inline-block px-6 py-3 md:px-8 md:py-4 rounded-lg"
               style={{
                 fontSize: 'clamp(1.8rem, 6vw, 4.5rem)',
@@ -52,7 +54,7 @@ const SecondaryHero: React.FC<SecondaryHeroProps> = ({ img, title, centered = fa
               }}
             >
               {title}
-            </h1>
+            </Heading>
           </div>
         </div>
       </div>

@@ -45,9 +45,9 @@ const FAQ: React.FC = () => {
             </span>
           </m.div>
 
-          <h1 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
+          <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6 uppercase tracking-tight">
             שאלות ותשובות
-          </h1>
+          </h2>
 
           <div className="w-32 h-1 bg-[#1c3664] mx-auto mb-6"></div>
 

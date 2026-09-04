@@ -369,7 +369,7 @@ function ApartmentsPageContent({
       <ContactFormPopup isOpen={isContactPopupOpen} onClose={() => setIsContactPopupOpen(false)} />
 
       {/* Hero Section */}
-      <SecondaryHero img="/7.jpg" title="נכסים למכירה והשכרה" centered={true} />
+      <SecondaryHero img="/7.jpg" title="נכסים למכירה והשכרה" centered={true} as="p" />
 
       {/* Breadcrumbs */}
       <Breadcrumbs />

@@ -66,7 +66,7 @@ export default function FAQPage() {
       <BreadcrumbSchema items={[{ name: 'שאלות נפוצות', path: '/faq' }]} />
       <SecondaryHero
         img="/7.jpg"
-        title="שאלות ותשובות"
+        title="שאלות ותשובות בנדל״ן"
         centered={true}
       />
       <Breadcrumbs />
