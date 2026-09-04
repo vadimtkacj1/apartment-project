@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { isVideoUrl } from '@/lib/media';
 import { prisma } from '@/lib/prisma';
 import { articles, ARTICLES_LAST_REVISED } from '@/data/articles';
+import { cityLandings } from '@/data/city-landings';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 
@@ -98,6 +99,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // the revision date (per-article `updated`, else the catalog default), NOT the
   // publish date — so <lastmod> matches each page's JSON-LD dateModified instead of
   // claiming the guide is months staler than its own structured data says.
+  const cityRoutes: MetadataRoute.Sitemap = cityLandings.map((c) => ({
+    url: `${baseUrl}/${c.slug}`,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
   const articleRoutes: MetadataRoute.Sitemap = articles.map((a) => {
     const revised = a.updated ?? (a.date > ARTICLES_LAST_REVISED ? a.date : ARTICLES_LAST_REVISED);
     return {
@@ -144,11 +151,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Combine static routes with dynamic property routes
     // Total sitemap size = static routes (10) + number of active properties
-    return [...staticRoutes, ...articleRoutes, ...propertyRoutes];
+    return [...staticRoutes, ...cityRoutes, ...articleRoutes, ...propertyRoutes];
   } catch (error) {
     console.error('Error generating sitemap:', error);
     // Return static + article routes if the property query fails
-    return [...staticRoutes, ...articleRoutes];
+    return [...staticRoutes, ...cityRoutes, ...articleRoutes];
   }
 }
 

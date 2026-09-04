@@ -23,6 +23,9 @@ const routeNames: Record<string, string> = {
   'privacy-policy': 'מדיניות פרטיות',
   'terms-of-use': 'תקנון ותנאי שימוש',
   'accessibility': 'נגישות',
+  'holon': 'תיווך בחולון',
+  'bat-yam': 'תיווך בבת ים',
+  'rishon-lezion': 'תיווך בראשון לציון',
 };
 
 export default function Breadcrumbs() {

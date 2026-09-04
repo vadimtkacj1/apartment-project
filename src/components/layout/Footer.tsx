@@ -92,6 +92,9 @@ export default async function Footer() {
             <ul className="space-y-2 text-gray-300 font-medium" style={{ fontSize: '1.0625rem' }}>
               <li><Link href="/selling-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">מכירת נכס</Link></li>
               <li><Link href="/buying-apartment" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">רכישת נכס</Link></li>
+              <li><Link href="/holon" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">תיווך בחולון</Link></li>
+              <li><Link href="/bat-yam" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">תיווך בבת ים</Link></li>
+              <li><Link href="/rishon-lezion" className="hover:text-white transition-colors underline decoration-gray-500 hover:decoration-white underline-offset-2">תיווך בראשון לציון</Link></li>
             </ul>
           </div>
 
