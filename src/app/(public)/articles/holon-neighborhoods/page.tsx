@@ -6,8 +6,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ram-haim.co.il';
 const ogImage = `${siteUrl}/images/articles/holon-neighborhoods.jpg`;
 
 export const metadata: Metadata = {
-  title: 'שכונות חולון: המדריך המלא — איפה לגור ואיפה להשקיע',
-  description: 'מדריך השכונות של חולון: קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ועוד. יתרונות, מחירים, פוטנציאל השבחה — איזו שכונה מתאימה לכם לגור או להשקיע?',
+  title: 'שכונות חולון 2026: איפה כדאי לגור',
+  description: 'איזו שכונה בחולון מתאימה לכם? קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ומזרח העיר — טבלת השוואה לפי אופי השכונה ושלב ההתחדשות העירונית.',
   keywords: [
     'שכונות חולון',
     'איפה לגור בחולון',
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     canonical: `${siteUrl}/articles/holon-neighborhoods`,
   },
   openGraph: {
-    title: 'שכונות חולון: המדריך המלא — איפה לגור ואיפה להשקיע',
-    description: 'קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ועוד — מדריך השכונות מבית רם נכסים חיים ענבי.',
+    title: 'שכונות חולון 2026: איפה כדאי לגור ואיפה להשקיע',
+    description: 'קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ומזרח העיר — טבלת השוואה של שכונות חולון מבית רם נכסים חיים ענבי.',
     url: `${siteUrl}/articles/holon-neighborhoods`,
     type: 'article',
     images: [
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'שכונות חולון: המדריך המלא — איפה לגור ואיפה להשקיע',
-    description: 'קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ועוד — מדריך השכונות מבית רם נכסים חיים ענבי.',
+    title: 'שכונות חולון 2026: איפה כדאי לגור ואיפה להשקיע',
+    description: 'קרית שרת, נאות שושנים, ג\'סי כהן, תל גיבורים ומזרח העיר — טבלת השוואה של שכונות חולון מבית רם נכסים חיים ענבי.',
     images: [ogImage],
   },
 };
