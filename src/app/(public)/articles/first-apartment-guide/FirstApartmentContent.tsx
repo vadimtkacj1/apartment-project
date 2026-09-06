@@ -63,7 +63,8 @@ export default function FirstApartmentContent() {
 
             {/* Section 1 */}
             <section className="article-section">
-              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלב 1: תקציב אמיתי — לא חלום</h2>
+              <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלב 1: כמה הון עצמי צריך לדירה ראשונה?</h2>
+              <div className="definition-block"><p><span className="definition-term">הון עצמי לדירה ראשונה</span> עומד על לפחות 25% משווי הדירה, מכיוון שלפי הנחיות בנק ישראל הבנק רשאי לממן עד 75% מהשווי לרוכשי דירה יחידה. לסכום הזה מוסיפים כ-5% נוספים לעלויות נלוות: עורך דין, תיווך, מעבר ושיפוצים קלים.</p></div>
               <p>
                 לפני שפותחים אפליקציות נדל״ן, פותחים אקסל. התקציב האמיתי שלכם מורכב משלושה חלקים:
               </p>

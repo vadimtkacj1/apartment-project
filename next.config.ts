@@ -66,6 +66,9 @@ const nextConfig: NextConfig = {
     // `critters`) package to inline critical CSS, which isn't installed, so the
     // flag was a no-op at best and a build hazard at worst. Re-add it together
     // with `npm i -D beasties` if critical-CSS inlining is wanted later.
+    // Retested 2026-09-06 with beasties 0.5.4 on Next 16.1.6: the flag inlined
+    // only 269 bytes and left both stylesheet links render-blocking, so it does
+    // not work on this App Router build. Do not re-enable without re-measuring.
   },
   
   // Webpack optimizations

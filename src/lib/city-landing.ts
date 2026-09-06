@@ -110,7 +110,7 @@ export function cityServiceSchema(city: CityLanding) {
     serviceType: 'תיווך נדל״ן',
     url,
     inLanguage: 'he',
-    provider: { '@id': `${siteUrl}#organization` },
+    provider: { '@id': `${siteUrl}/#organization` },
     areaServed: { '@type': 'City', name: city.name },
   };
 }

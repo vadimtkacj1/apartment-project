@@ -64,6 +64,7 @@ export default function LandlordGuideContent() {
             {/* Section 1 */}
             <section className="article-section">
               <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: 'var(--font-caramel), cursive, sans-serif' }}>שלב 1: כמה שווה הדירה שלכם בשוק השכירות?</h2>
+              <div className="definition-block"><p><span className="definition-term">שכר דירה ריאלי</span> נקבע לפי שכונה, גודל, קומה, מצב הדירה ותוספות כמו ממ״ד, מרפסת, חניה ומיזוג תקין — ולא לפי מה שהשכן ביקש. דירה מתוחזקת ומוצגת היטב משיגה עד 15% יותר מדירה זהה ומוזנחת באותו בניין, ומושכת שוכרים איכותיים יותר.</p></div>
               <p>
                 גם כאן, כמו במכירה, תמחור שגוי עולה כסף. מחיר גבוה מדי — והדירה עומדת ריקה (כל חודש ריק מוחק כ-8% מההכנסה השנתית). מחיר נמוך מדי — והפסדתם הכנסה לכל אורך החוזה.
               </p>

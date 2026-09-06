@@ -1,11 +1,17 @@
 import Link from 'next/link';
-import { Home, Key, HelpCircle, FileText, ArrowLeft } from 'lucide-react';
+import { Home, Key, HelpCircle, FileText, ArrowLeft, MapPin } from 'lucide-react';
 
 // Compact internal-link band (server component — plain crawlable <Link>s in the
 // SSR HTML). Keeps the homepage-body crawl links to the guide/knowledge pages —
 // most sit at "Discovered – not indexed" in GSC and the indexed homepage is the
 // strongest repo-side crawl nudge — but without the large card section that used
 // to dominate the page. The same slugs also live in the footer site-wide.
+
+const cityLinks = [
+  { href: '/holon', title: 'תיווך בחולון' },
+  { href: '/bat-yam', title: 'תיווך בבת ים' },
+  { href: '/rishon-lezion', title: 'תיווך בראשון לציון' },
+];
 
 // Primary navigation hubs — emphasized (navy-filled) pills.
 const hubLinks = [
@@ -31,11 +37,22 @@ export default function GuidesSection() {
         <div className="flex flex-col items-center text-center gap-6">
           {/* Heading */}
           <h2 className="text-2xl md:text-3xl font-black text-[#1c3664]">
-            מדריכים ומידע שימושי
+            אזורי פעילות ומדריכים
           </h2>
 
           {/* Hub + guide links in one wrapped pill row */}
           <ul className="flex flex-wrap justify-center gap-2.5">
+            {cityLinks.map(({ href, title }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1c3664] text-white font-semibold text-sm hover:bg-[#c5a357] hover:text-[#1c3664] transition-colors"
+                >
+                  <MapPin className="w-4 h-4" />
+                  {title}
+                </Link>
+              </li>
+            ))}
             {hubLinks.map(({ href, icon: Icon, title }) => (
               <li key={href}>
                 <Link

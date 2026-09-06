@@ -15,6 +15,15 @@ const NAV_LINKS: NavLink[] = [
   { label: "דף הבית", href: "/" },
   { label: "הנכסים השלנו", href: "/apartments" },
   {
+    label: "אזורי פעילות",
+    href: "#",
+    submenu: [
+      { label: "תיווך בחולון", href: "/holon" },
+      { label: "תיווך בבת ים", href: "/bat-yam" },
+      { label: "תיווך בראשון לציון", href: "/rishon-lezion" },
+    ],
+  },
+  {
     label: 'מידע מקצועי בנדל"ן',
     href: "#",
     submenu: [

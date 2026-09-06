@@ -182,6 +182,11 @@ export default async function ApartmentsPage({ searchParams }: PageProps) {
           רם נכסים וחיים ענבי — משרד תיווך עם ניסיון של מעל 24 שנה,
           מלווה קונים, מוכרים ומשכירים לאורך כל הדרך.
         </p>
+        <nav aria-label="אזורי פעילות">
+          <a href="/holon">משרד תיווך בחולון</a>
+          <a href="/bat-yam">משרד תיווך בבת ים</a>
+          <a href="/rishon-lezion">משרד תיווך בראשון לציון</a>
+        </nav>
         <nav aria-label="רשימת נכסים">
           {activeProperties.map((p) => {
             const label = p.title?.trim() ||
