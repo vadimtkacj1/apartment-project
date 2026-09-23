@@ -495,7 +495,8 @@ export default function PropertiesPage() {
           }}
           scroll={{ x: 'max-content' }}
           showSorterTooltip={false}
-          onChange={(_pagination, _filters, sorter) => {
+          onChange={(_pagination, _filters, sorter, extra) => {
+            if (extra.action === 'paginate') return;
             const active = Array.isArray(sorter) ? sorter[0] : sorter;
             const key = (active?.columnKey ?? active?.field) as SortField | undefined;
             const order = (active?.order ?? null) as SortOrder;

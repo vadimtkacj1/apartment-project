@@ -1,4 +1,5 @@
 import { revalidatePath } from 'next/cache';
+import { cityLandings } from '@/data/city-landings';
 
 /**
  * Drops the cached public pages that an admin edit has just made stale.
@@ -13,6 +14,9 @@ export function revalidateProperty(propertyId?: number | string | null) {
     revalidatePath('/apartments');
     if (propertyId !== undefined && propertyId !== null) {
       revalidatePath(`/apartments/${propertyId}`);
+    }
+    for (const city of cityLandings) {
+      revalidatePath(`/${city.slug}`);
     }
     revalidatePath('/sitemap.xml');
   });
